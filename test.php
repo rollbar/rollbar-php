@@ -26,6 +26,8 @@ function main() {
     } catch (Exception $e) {
         $ratchet->report_exception($e);
     }
+
+    $ratchet->report_message("hey there", "info");
 }
 
 main();

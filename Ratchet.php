@@ -68,8 +68,19 @@ class Ratchet {
         if (!$this->check_config()) {
             return;
         }
-        
-        // TODO
+
+        $data = $this->build_base_data();
+        $data['level'] = strtolower($level);
+        $data['body'] = array(
+            'message' => array(
+                'body' => $message
+            )
+        );
+        $data['request'] = $this->build_request_data();
+        $data['server'] = $this->build_server_data();
+
+        $payload = $this->build_payload($data);
+        $this->send_payload($payload);
     }
 
     private function build_request_data() {
