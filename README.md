@@ -1,7 +1,7 @@
 ratchet-php
 ===========
 
-PHP notifier for Ratchet.io. Catches and reports exceptions.
+PHP notifier for Ratchet.io. Catches and reports exceptions to [Ratchet.io](https://ratchet.io/) for alerts, reporting, and analysis.
 
 ```php
 // installs global error and exception handlers
