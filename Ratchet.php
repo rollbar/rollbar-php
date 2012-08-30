@@ -338,6 +338,7 @@ class RatchetNotifier {
             'environment' => $this->environment,
             'level' => $level,
             'language' => 'php',
+            'framework' => 'php',
             'notifier' => array(
                 'name' => 'ratchet-php',
                 'version' => self::VERSION
