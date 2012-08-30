@@ -1,13 +1,53 @@
 <?php
+
+/**
+ * Singleton-style wrapper around RatchetNotifier
+ *
+ * Unless you need multiple Ratchet instances in the same app, use this.
+ */
 class Ratchet {
+    public static $instance = null;
+
+    public static function init($config, $set_exception_handler = true, $set_error_handler = true) {
+        self::$instance = new RatchetNotifier($config);
+
+        if ($set_exception_handler) {
+            set_exception_handler('Ratchet::report_exception');
+        }
+        if ($set_error_handler) {
+            set_error_handler('Ratchet::report_php_error');
+        }
+    }
+
+    public static function report_exception($exc) {
+        if (self::$instance == null) {
+            return;
+        }
+        self::$instance->report_exception($exc);
+    }
+
+    public static function report_message($message, $level = 'error') {
+        if (self::$instance == null) {
+            return;
+        }
+        self::$instance->report_message($message, $level);
+    }
+
+    public static function report_php_error($errno, $errstr, $errfile, $errline) {
+        if (self::$instance == null) {
+            return;
+        }
+        self::$instance->report_php_error($errno, $errstr, $errfile, $errline);
+    }
+}
+
+
+class RatchetNotifier {
     
     const DEFAULT_ENDPOINT = 'https://submit.ratchet.io/api/1/item/';
     const VERSION = "0.1";
 
-    // TODO singleton, static-style methods
-    // TODO global error/exception handler
-
-    // required. 
+    // required
     public $access_token = '';
     
     // optional / defaults
@@ -36,6 +76,42 @@ class Ratchet {
     }
 
     public function report_exception($exc) {
+        try {
+            $this->_report_exception($exc);
+        } catch (Exception $e) {
+            try {
+                $this->log_error("Exception while reporting exception");
+            } catch (Exception $e) {
+                // swallow
+            }
+        }
+    }
+    
+    public function report_message($message, $level = 'error') {
+        try {
+            $this->_report_message($message, $level);
+        } catch (Exception $e) {
+            try {
+                $this->log_error("Exception while reporting message");
+            } catch (Exception $e) {
+                // swallow
+            }
+        }
+    }
+
+    public function report_php_error($errno, $errstr, $errfile, $errline) {
+        try {
+            $this->_report_php_error($errno, $errstr, $errfile, $errline);
+        } catch (Exception $e) {
+            try {
+                $this->log_error("Exception while reporting php error");
+            } catch (Exception $e) {
+                // swallow
+            }
+        }
+    }
+
+    private function _report_exception($exc) {
         if (!$this->check_config()) {
             return;
         }
@@ -64,7 +140,77 @@ class Ratchet {
         $this->send_payload($payload);
     }
 
-    public function report_message($message, $level = 'error') {
+    private function _report_php_error($errno, $errstr, $errfile, $errline) {
+        if (!$this->check_config()) {
+            return;
+        }
+
+        $data = $this->build_base_data();
+        
+        // set error level and error constant name
+        $level = 'info';
+        $constant = '#' . $errno;
+        switch ($errno) {
+            case 2:
+                $level = 'warning';
+                $constant = 'E_WARNING';
+                break;
+            case 8:
+                $level = 'info';
+                $constant = 'E_NOTICE';
+                break;
+            case 256:
+                $level = 'error';
+                $constant = 'E_USER_ERROR';
+                break;
+            case 512:
+                $level = 'warning';
+                $constant = 'E_USER_WARNING';
+                break;
+            case 1024:
+                $level = 'info';
+                $constant = 'E_USER_NOTICE';
+                break;
+            case 2048:
+                $level = 'info';
+                $constant = 'E_STRICT';
+            case 4096:
+                $level = 'error';
+                $constant = 'E_RECOVERABLE_ERROR';
+                break;
+            case 8192:
+                $level = 'info';
+                $constant = 'E_DEPRECATED';
+                break;
+            case 16384:
+                $level = 'info';
+                $constant = 'E_USER_DEPRECATED';
+        }
+
+        // use the whole $errstr. may want to split this by colon for better de-duping.
+        $error_class = $constant . ' ' . $errstr;
+
+        // build something that looks like an exception
+        $data['body'] = array(
+            'trace' => array(
+                'frames' => array(array('filename' => $errfile, 'lineno' => $errline)),
+                'exception' => array(
+                    'class' => $error_class
+                )
+            )
+        );
+        
+        // request data
+        $data['request'] = $this->build_request_data();
+        
+        // server data
+        $data['server'] = $this->build_server_data();
+
+        $payload = $this->build_payload($data);
+        $this->send_payload($payload);
+    }
+
+    private function _report_message($message, $level) {
         if (!$this->check_config()) {
             return;
         }
@@ -97,7 +243,7 @@ class Ratchet {
         if ($_POST) {
             $request['POST'] = $_POST;
         }
-        if ($_SESSION) {
+        if (isset($_SESSION) && $_SESSION) {
             $request['session'] = $_SESSION;
         }
 
@@ -121,7 +267,7 @@ class Ratchet {
 
     private function current_url() {
         // should work with apache. not sure about other environments.
-        $proto = $_SERVER['HTTPS'] == 'on' ? 'https' : 'http';
+        $proto = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https' : 'http';
         $host = $_SERVER['SERVER_NAME'];
         $port = $_SERVER['SERVER_PORT'];
         $path = $_SERVER['REQUEST_URI'];
@@ -138,13 +284,13 @@ class Ratchet {
     }
 
     private function user_ip() {
-        $forwardfor = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        $forwardfor = isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'];
         if ($forwardfor) {
             // return everything until the first comma
             $parts = preg_split(',', $forwardfor);
             return $parts[0];
         }
-        $realip = $_SERVER['HTTP_X_REAL_IP'];
+        $realip = isset($_SERVER['HTTP_X_REAL_IP']) && $_SERVER['HTTP_X_REAL_IP'];
         if ($realip) {
             return $realip;
         }
@@ -161,6 +307,13 @@ class Ratchet {
                 // TODO include args? need to sanitize first.
             );
         }
+        
+        // add top-level file and line
+        $frames[] = array(
+            'filename' => $exc->getFile(),
+            'lineno' => $exc->getLine()
+        );
+
         return $frames;
     }
 

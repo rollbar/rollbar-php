@@ -19,15 +19,22 @@ function main() {
         'endpoint' => 'http://brian.ratchetdev.com/api/1/item/',
         'logger' => new EchoLogger()
     );
-    $ratchet = new Ratchet($config);
+    // $config, $set_exception_handler, $set_error_handler
+    Ratchet::init($config, true, true);
     
     try {
         throw_test_exception("yo");
     } catch (Exception $e) {
-        $ratchet->report_exception($e);
+        Ratchet::report_exception($e);
     }
 
-    $ratchet->report_message("hey there", "info");
+    Ratchet::report_message("hey there", "info");
+
+    // raises an E_NOTICE, reported by the error handler
+    $foo = $bar;
+
+    // reported by the exception handler
+    throw new Exception("uncaught exception");
 }
 
 main();
