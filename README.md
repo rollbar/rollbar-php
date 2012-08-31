@@ -78,6 +78,7 @@ All of the following options can be passed as keys in the $config array.
 - logger: an object that has a log($level, $message) method. If provided, will be used by RatchetNotifier to log messages.
 - base_api_url: the base api url to post to (default 'https://submit.ratchet.io/api/1/')
 - batched: true to batch all reports from a single request together. default true.
+- batch_size: flush batch early if it reaches this size. default: 50
 - timeout: request timeout for posting to ratchet, in seconds. default 3.
 
 

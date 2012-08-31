@@ -52,9 +52,7 @@ class Ratchet {
 
 class RatchetNotifier {
     
-    const DEFAULT_BASE_API_URL = 'https://submit.ratchet.io/api/1/';
     const VERSION = "0.2";
-    const MAX_QUEUE_SIZE = 50;  // to prevent absurd memory usage
 
     // required
     public $access_token = '';
@@ -64,11 +62,12 @@ class RatchetNotifier {
     public $environment = 'production';
     public $branch = 'master';
     public $logger = null;
-    public $base_api_url = self::DEFAULT_BASE_API_URL;
+    public $base_api_url = 'https://submit.ratchet.io/api/1/';
     public $batched = true;
+    public $batch_size = 50;
     public $timeout = 3;
     private $config_keys = array('access_token', 'root', 'environment', 'branch', 'logger', 
-        'base_api_url', 'batched', 'timeout');
+        'base_api_url', 'batched', 'batch_size', 'timeout');
 
     // cached values for request/server data
     private $_request_data = null;
@@ -125,10 +124,17 @@ class RatchetNotifier {
         }
     }
 
+    /**
+     * Flushes the queue.
+     * Called internally when the queue exceeds $batch_size, and by Ratchet::flush
+     * on shutdown.
+     */
     public function flush() {
-        if (count($this->_queue)) {
-            $this->log_info("Flushing queue...");
+        $queue_size = count($this->_queue);
+        if ($queue_size > 0) {
+            $this->log_info('Flushing queue of size ' . $queue_size);
             $this->send_batch($this->_queue);
+            $this->_queue = array();
         }
     }
 
@@ -385,11 +391,11 @@ class RatchetNotifier {
 
     private function send_payload($payload) {
         if ($this->batched) {
-            if (count($this->_queue) >= self::MAX_QUEUE_SIZE) {
-                $this->log_warning("Batch size met MAX_QUEUE_SIZE, discarding.");
-            } else {
-                $this->_queue[] = $payload;
+            if (count($this->_queue) >= $this->batch_size) {
+                // flush queue before adding payload to queue
+                $this->flush();
             }
+            $this->_queue[] = $payload;
         } else {
             $this->_send_payload($payload);
         }
