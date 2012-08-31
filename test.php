@@ -16,7 +16,7 @@ function main() {
     $config = array(
         'access_token' => '089b0e7847134faf9ed9d3febd3f6d46',
         'root' => '/Users/brian/www/ratchet-php',
-        'endpoint' => 'http://brian.ratchetdev.com/api/1/item/',
+        'base_api_url' => 'http://brian.ratchetdev.com/api/1/',
         'logger' => new EchoLogger()
     );
     // $config, $set_exception_handler, $set_error_handler

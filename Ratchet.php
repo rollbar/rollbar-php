@@ -17,6 +17,10 @@ class Ratchet {
         if ($set_error_handler) {
             set_error_handler('Ratchet::report_php_error');
         }
+
+        if (self::$instance->batched) {
+            register_shutdown_function('Ratchet::flush');
+        }
     }
 
     public static function report_exception($exc) {
@@ -39,13 +43,18 @@ class Ratchet {
         }
         self::$instance->report_php_error($errno, $errstr, $errfile, $errline);
     }
+
+    public static function flush() {
+        self::$instance->flush();
+    }
 }
 
 
 class RatchetNotifier {
     
-    const DEFAULT_ENDPOINT = 'https://submit.ratchet.io/api/1/item/';
-    const VERSION = "0.1";
+    const DEFAULT_BASE_API_URL = 'https://submit.ratchet.io/api/1/';
+    const VERSION = "0.2";
+    const MAX_QUEUE_SIZE = 50;  // to prevent absurd memory usage
 
     // required
     public $access_token = '';
@@ -55,9 +64,18 @@ class RatchetNotifier {
     public $environment = 'production';
     public $branch = 'master';
     public $logger = null;
-    public $endpoint = self::DEFAULT_ENDPOINT;
+    public $base_api_url = self::DEFAULT_BASE_API_URL;
+    public $batched = true;
+    public $timeout = 3;
     private $config_keys = array('access_token', 'root', 'environment', 'branch', 'logger', 
-        'endpoint');
+        'base_api_url', 'batched', 'timeout');
+
+    // cached values for request/server data
+    private $_request_data = null;
+    private $_server_data = null;
+
+    // payload queue, used when $batched is true
+    private $_queue = array();
     
     public function __construct($config) {
         foreach ($this->config_keys as $key) {
@@ -69,10 +87,6 @@ class RatchetNotifier {
         if (!$this->access_token) {
             $this->log_error('Missing access token');
         }
-    }
-
-    private function check_config() {
-        return $this->access_token && strlen($this->access_token) == 32;
     }
 
     public function report_exception($exc) {
@@ -108,6 +122,13 @@ class RatchetNotifier {
             } catch (Exception $e) {
                 // swallow
             }
+        }
+    }
+
+    public function flush() {
+        if (count($this->_queue)) {
+            $this->log_info("Flushing queue...");
+            $this->send_batch($this->_queue);
         }
     }
 
@@ -228,26 +249,33 @@ class RatchetNotifier {
         $payload = $this->build_payload($data);
         $this->send_payload($payload);
     }
+    
+    private function check_config() {
+        return $this->access_token && strlen($this->access_token) == 32;
+    }
 
     private function build_request_data() {
-        $request = array(
-            'url' => $this->current_url(),
-            'user_ip' => $this->user_ip(),
-            'headers' => $this->headers(),
-            'method' => $_SERVER['REQUEST_METHOD'],
-        );
-        
-        if ($_GET) {
-            $request['GET'] = $_GET;
-        }
-        if ($_POST) {
-            $request['POST'] = $_POST;
-        }
-        if (isset($_SESSION) && $_SESSION) {
-            $request['session'] = $_SESSION;
+        if ($this->_request_data === null) {
+            $request = array(
+                'url' => $this->current_url(),
+                'user_ip' => $this->user_ip(),
+                'headers' => $this->headers(),
+                'method' => $_SERVER['REQUEST_METHOD'],
+            );
+            
+            if ($_GET) {
+                $request['GET'] = $_GET;
+            }
+            if ($_POST) {
+                $request['POST'] = $_POST;
+            }
+            if (isset($_SESSION) && $_SESSION) {
+                $request['session'] = $_SESSION;
+            }
+            $this->_request_data = $request;
         }
 
-        return $request;
+        return $this->_request_data;
     }
 
     private function headers() {
@@ -318,18 +346,20 @@ class RatchetNotifier {
     }
 
     private function build_server_data() {
-        $server_data = array(
-            'host' => gethostname()
-        );
+        if ($this->_server_data === null) {
+            $server_data = array(
+                'host' => gethostname()
+            );
 
-        if ($this->branch) {
-            $server_data['branch'] = $this->branch;
+            if ($this->branch) {
+                $server_data['branch'] = $this->branch;
+            }
+            if ($this->root) {
+                $server_data['root'] = $this->root;
+            }
+            $this->_server_data = $server_data;
         }
-        if ($this->root) {
-            $server_data['root'] = $this->root;
-        }
-
-        return $server_data;
+        return $this->_server_data;
     }
 
     private function build_base_data($level = 'error') {
@@ -347,34 +377,72 @@ class RatchetNotifier {
     }
 
     private function build_payload($data) {
-        $payload = array(
+        return array(
             'access_token' => $this->access_token,
             'data' => $data
         );
-        return json_encode($payload);
     }
 
     private function send_payload($payload) {
+        if ($this->batched) {
+            if (count($this->_queue) >= self::MAX_QUEUE_SIZE) {
+                $this->log_warning("Batch size met MAX_QUEUE_SIZE, discarding.");
+            } else {
+                $this->_queue[] = $payload;
+            }
+        } else {
+            $this->_send_payload($payload);
+        }
+    }
+
+    /**
+     * Sends a single payload to the /item endpoint.
+     * $payload - php array
+     */
+    private function _send_payload($payload) {
         $this->log_info("Sending payload");
 
+        $post_data = json_encode($payload);
+        $this->make_api_call('item', $post_data);
+    }
+
+    /**
+     * Sends a batch of payloads to the /batch endpoint. 
+     * A batch is just an array of standalone payloads.
+     * $batch - php array of payloads
+     */
+    private function send_batch($batch) {
+        $this->log_info("Sending batch");
+        
+        $post_data = json_encode($batch);
+        $this->make_api_call('item_batch', $post_data);
+    }
+    
+    private function make_api_call($action, $post_data) {
+        $url = $this->base_api_url . $action . '/';
+
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $this->endpoint);
+        curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
         curl_setopt($ch, CURLOPT_VERBOSE, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
         $result = curl_exec($ch);
         $status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
         
         if ($status_code != 200) {
-            $this->log_warning("Got unexpected status code from Ratchet API: $status_code");
-            $this->log_warning("Output: $result");
+            $this->log_warning('Got unexpected status code from Ratchet API ' . $action . 
+                ': ' .$status_code);
+            $this->log_warning('Output: ' .$result);
         } else {
-            $this->log_info("Success");
+            $this->log_info('Success');
         }
     }
+
+    /* Logging */
 
     private function log_info($msg) {
         $this->log_message("INFO", $msg);

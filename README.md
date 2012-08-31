@@ -76,7 +76,9 @@ environment: environment name, e.g. 'production' or 'development'
 root: path to your project's root dir
 branch: name of the current branch (default 'master')
 logger: an object that has a log($level, $message) method. If provided, will be used by RatchetNotifier to log messages.
-endpoint: the url to post items to (default 'https://submit.ratchet.io/api/1/item/')
+base_api_url: the base api url to post to (default 'https://submit.ratchet.io/api/1/')
+batched: true to batch all reports from a single request together. default true.
+timeout: request timeout for posting to ratchet, in seconds. default 3.
 
 
 ## Support
