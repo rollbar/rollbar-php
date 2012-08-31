@@ -71,14 +71,14 @@ Ratchet::report_message('could not connect to mysql server', 'warning');
 
 All of the following options can be passed as keys in the $config array.
 
-access_token: your project access token
-environment: environment name, e.g. 'production' or 'development'
-root: path to your project's root dir
-branch: name of the current branch (default 'master')
-logger: an object that has a log($level, $message) method. If provided, will be used by RatchetNotifier to log messages.
-base_api_url: the base api url to post to (default 'https://submit.ratchet.io/api/1/')
-batched: true to batch all reports from a single request together. default true.
-timeout: request timeout for posting to ratchet, in seconds. default 3.
+- access_token: your project access token
+- environment: environment name, e.g. 'production' or 'development'
+- root: path to your project's root dir
+- branch: name of the current branch (default 'master')
+- logger: an object that has a log($level, $message) method. If provided, will be used by RatchetNotifier to log messages.
+- base_api_url: the base api url to post to (default 'https://submit.ratchet.io/api/1/')
+- batched: true to batch all reports from a single request together. default true.
+- timeout: request timeout for posting to ratchet, in seconds. default 3.
 
 
 ## Support
