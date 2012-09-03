@@ -1,19 +1,19 @@
-ratchet-php
+ratchetio-php
 ===========
 
 PHP notifier for Ratchet.io. Catches and reports exceptions to [Ratchet.io](https://ratchet.io/) for alerts, reporting, and analysis.
 
 ```php
 // installs global error and exception handlers
-Ratchet::init(array('access_token' => 'your_access_token'));
+Ratchetio::init(array('access_token' => 'your_access_token'));
 
 try {
     throw new Exception('test exception');
 } catch (Exception $e) {
-    Ratchet::report_exception($e);
+    Ratchetio::report_exception($e);
 }
 
-Ratchet::report_message('testing 123', 'info');
+Ratchetio::report_message('testing 123', 'info');
 
 // raises an E_NOTICE which will be reported by the error handler
 $foo = $bar;
@@ -24,12 +24,12 @@ throw new Exception('test 2');
 
 ## Installation and Configuration
 
-1. Download the code and put `Ratchet.php` somewhere you can access it
+1. Download the code and put `ratchetio.php` somewhere you can access it
 
 2. Add the following code at your application's entry point:
 
 ```php
-require_once 'Ratchet.php';
+require_once 'ratchetio.php';
 
 $config = array(
     // required
@@ -39,7 +39,7 @@ $config = array(
     // optional - dir your code is in. used for linking stack traces.
     'root' => '/Users/brian/www/myapp'
 );
-Ratchet::init($config);
+Ratchetio::init($config);
 ```
 
 This will install an exception handler (with `set_exception_handler`) and an error handler (with `set_error_handler`). If you'd rather not do that:
@@ -47,7 +47,7 @@ This will install an exception handler (with `set_exception_handler`) and an err
 ```php
 $set_exception_handler = false;
 $set_error_handler = false;
-Ratchet::init($config, $set_exception_handler, $set_error_handler);
+Ratchetio::init($config, $set_exception_handler, $set_error_handler);
 ```
 
 3. That's it! If you'd like to report exceptions that you catch yourself:
@@ -56,14 +56,14 @@ Ratchet::init($config, $set_exception_handler, $set_error_handler);
 try {
     do_something();
 } catch (Exception $e) {
-    Ratchet::report_exception($e);
+    Ratchetio::report_exception($e);
 }
 ```
 
 You can also send ratchet log-like messages:
 
 ```php
-Ratchet::report_message('could not connect to mysql server', 'warning');
+Ratchetio::report_message('could not connect to mysql server', 'warning');
 ```
 
 
@@ -75,7 +75,7 @@ All of the following options can be passed as keys in the $config array.
 - environment: environment name, e.g. 'production' or 'development'
 - root: path to your project's root dir
 - branch: name of the current branch (default 'master')
-- logger: an object that has a log($level, $message) method. If provided, will be used by RatchetNotifier to log messages.
+- logger: an object that has a log($level, $message) method. If provided, will be used by RatchetioNotifier to log messages.
 - base_api_url: the base api url to post to (default 'https://submit.ratchet.io/api/1/')
 - batched: true to batch all reports from a single request together. default true.
 - batch_size: flush batch early if it reaches this size. default: 50

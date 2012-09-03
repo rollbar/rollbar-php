@@ -1,25 +1,24 @@
 <?php
-
 /**
- * Singleton-style wrapper around RatchetNotifier
+ * Singleton-style wrapper around RatchetioNotifier
  *
- * Unless you need multiple Ratchet instances in the same app, use this.
+ * Unless you need multiple RatchetioNotifier instances in the same project, use this.
  */
-class Ratchet {
+class Ratchetio {
     public static $instance = null;
 
     public static function init($config, $set_exception_handler = true, $set_error_handler = true) {
-        self::$instance = new RatchetNotifier($config);
+        self::$instance = new RatchetioNotifier($config);
 
         if ($set_exception_handler) {
-            set_exception_handler('Ratchet::report_exception');
+            set_exception_handler('Ratchetio::report_exception');
         }
         if ($set_error_handler) {
-            set_error_handler('Ratchet::report_php_error');
+            set_error_handler('Ratchetio::report_php_error');
         }
 
         if (self::$instance->batched) {
-            register_shutdown_function('Ratchet::flush');
+            register_shutdown_function('Ratchetio::flush');
         }
     }
 
@@ -50,7 +49,7 @@ class Ratchet {
 }
 
 
-class RatchetNotifier {
+class RatchetioNotifier {
     
     const VERSION = "0.2";
 
@@ -126,7 +125,7 @@ class RatchetNotifier {
 
     /**
      * Flushes the queue.
-     * Called internally when the queue exceeds $batch_size, and by Ratchet::flush
+     * Called internally when the queue exceeds $batch_size, and by Ratchetio::flush
      * on shutdown.
      */
     public function flush() {
@@ -440,7 +439,7 @@ class RatchetNotifier {
         curl_close($ch);
         
         if ($status_code != 200) {
-            $this->log_warning('Got unexpected status code from Ratchet API ' . $action . 
+            $this->log_warning('Got unexpected status code from Ratchet.io API ' . $action . 
                 ': ' .$status_code);
             $this->log_warning('Output: ' .$result);
         } else {
@@ -468,5 +467,4 @@ class RatchetNotifier {
         }
     }
 }
-
 ?>
