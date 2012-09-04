@@ -51,7 +51,7 @@ class Ratchetio {
 
 class RatchetioNotifier {
     
-    const VERSION = "0.2";
+    const VERSION = "0.2.1";
 
     // required
     public $access_token = '';
@@ -221,6 +221,7 @@ class RatchetioNotifier {
                 $level = 'info';
                 $constant = 'E_USER_DEPRECATED';
         }
+        $data['level'] = $level;
 
         // use the whole $errstr. may want to split this by colon for better de-duping.
         $error_class = $constant . ' ' . $errstr;
