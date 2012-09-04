@@ -65,8 +65,10 @@ class RatchetioNotifier {
     public $batched = true;
     public $batch_size = 50;
     public $timeout = 3;
+    public $max_errno = -1;
+    
     private $config_keys = array('access_token', 'root', 'environment', 'branch', 'logger', 
-        'base_api_url', 'batched', 'batch_size', 'timeout');
+        'base_api_url', 'batched', 'batch_size', 'timeout', 'max_errno');
 
     // cached values for request/server data
     private $_request_data = null;
@@ -170,6 +172,12 @@ class RatchetioNotifier {
         if (!$this->check_config()) {
             return;
         }
+        
+        if ($this->max_errno != -1 && $errno > $this->max_errno) {
+            // ignore
+            return;
+        }
+
 
         $data = $this->build_base_data();
         
@@ -200,6 +208,7 @@ class RatchetioNotifier {
             case 2048:
                 $level = 'info';
                 $constant = 'E_STRICT';
+                break;
             case 4096:
                 $level = 'error';
                 $constant = 'E_RECOVERABLE_ERROR';
