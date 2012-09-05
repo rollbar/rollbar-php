@@ -80,7 +80,8 @@ All of the following options can be passed as keys in the $config array.
 - batched: true to batch all reports from a single request together. default true.
 - batch_size: flush batch early if it reaches this size. default: 50
 - timeout: request timeout for posting to ratchet, in seconds. default 3.
-- max_errno: max php error number to report. e.g. 1024 will ignore all errors above E_USER_NOTICE. default: -1 (report all errors).
+- max_errno: max PHP error number to report. e.g. 1024 will ignore all errors above E_USER_NOTICE. default: -1 (report all errors).
+- capture_error_stacktraces: record full stacktraces for PHP errors. default: true.
 
 
 ## Support

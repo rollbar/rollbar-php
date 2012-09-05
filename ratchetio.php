@@ -51,7 +51,7 @@ class Ratchetio {
 
 class RatchetioNotifier {
     
-    const VERSION = "0.2.1";
+    const VERSION = "0.2.2";
 
     // required
     public $access_token = '';
@@ -66,9 +66,11 @@ class RatchetioNotifier {
     public $batch_size = 50;
     public $timeout = 3;
     public $max_errno = -1;
+    public $capture_error_backtraces = true;
     
     private $config_keys = array('access_token', 'root', 'environment', 'branch', 'logger', 
-        'base_api_url', 'batched', 'batch_size', 'timeout', 'max_errno');
+        'base_api_url', 'batched', 'batch_size', 'timeout', 'max_errno', 
+        'capture_error_backtraces');
 
     // cached values for request/server data
     private $_request_data = null;
@@ -147,10 +149,10 @@ class RatchetioNotifier {
         $data = $this->build_base_data();
 
         // exception info
-        $frames = $this->build_frames($exc);
+        $frames = $this->build_exception_frames($exc);
         $data['body'] = array(
             'trace' => array(
-                'frames' => $this->build_frames($exc),
+                'frames' => $this->build_exception_frames($exc),
                 'exception' => array(
                     'class' => get_class($exc),
                     'message' => $exc->getMessage()
@@ -177,7 +179,6 @@ class RatchetioNotifier {
             // ignore
             return;
         }
-
 
         $data = $this->build_base_data();
         
@@ -220,16 +221,17 @@ class RatchetioNotifier {
             case 16384:
                 $level = 'info';
                 $constant = 'E_USER_DEPRECATED';
+                break;
         }
         $data['level'] = $level;
 
         // use the whole $errstr. may want to split this by colon for better de-duping.
-        $error_class = $constant . ' ' . $errstr;
+        $error_class = $constant . ': ' . $errstr;
 
         // build something that looks like an exception
         $data['body'] = array(
             'trace' => array(
-                'frames' => array(array('filename' => $errfile, 'lineno' => $errline)),
+                'frames' => $this->build_error_frames($errfile, $errline),
                 'exception' => array(
                     'class' => $error_class
                 )
@@ -297,10 +299,12 @@ class RatchetioNotifier {
         $headers = array();
         foreach ($_SERVER as $key => $val) {
             if (substr($key, 0, 5) == 'HTTP_') {
-                // convert HTTP_CONTENT_TYPE to Content-Type
+                // convert HTTP_CONTENT_TYPE to Content-Type, HTTP_HOST to Host, etc.
                 $name = strtolower(substr($key, 5));
-                if (strpos($name, "_") != -1) {
-                    $name = preg_replace("/ /", "-", ucwords(preg_replace('/_/', " ", $name)));
+                if (strpos($name, '_') != -1) {
+                    $name = preg_replace('/ /', '-', ucwords(preg_replace('/_/', ' ', $name)));
+                } else {
+                    $name = ucfirst($name);
                 }
                 $headers[$name] = $val;
             }
@@ -311,9 +315,9 @@ class RatchetioNotifier {
     private function current_url() {
         // should work with apache. not sure about other environments.
         $proto = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https' : 'http';
-        $host = $_SERVER['SERVER_NAME'];
-        $port = $_SERVER['SERVER_PORT'];
-        $path = $_SERVER['REQUEST_URI'];
+        $host = isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'unknown';
+        $port = isset($_SERVER['SERVER_PORT']) ? $_SERVER['SERVER_PORT'] : 80;
+        $path = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '/';
 
         $url = $proto . '://' . $host;
 
@@ -340,7 +344,7 @@ class RatchetioNotifier {
         return $_SERVER['REMOTE_ADDR'];
     }
 
-    private function build_frames($exc) {
+    private function build_exception_frames($exc) {
         $frames = array();
         foreach ($exc->getTrace() as $frame) {
             $frames[] = array(
@@ -355,6 +359,38 @@ class RatchetioNotifier {
         $frames[] = array(
             'filename' => $exc->getFile(),
             'lineno' => $exc->getLine()
+        );
+
+        return $frames;
+    }
+
+    private function build_error_frames($errfile, $errline) {
+        $frames = array();
+        
+        if ($this->capture_error_backtraces) {
+            $backtrace = debug_backtrace();
+            foreach ($backtrace as $frame) {
+                // skip frames in this file
+                if ($frame['file'] == __FILE__) {
+                    continue;
+                }
+                // skip the confusing set_error_handler frame
+                if ($frame['function'] == 'report_php_error' && count($frames) == 0) {
+                    continue;
+                }
+                
+                $frames[] = array(
+                    'filename' => $frame['file'],
+                    'lineno' => $frame['line'],
+                    'method' => $frame['function']
+                );
+            }
+        }
+
+        // add top-level file and line
+        $frames[] = array(
+            'filename' => $errfile, 
+            'lineno' => $errline
         );
 
         return $frames;
