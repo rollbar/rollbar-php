@@ -51,7 +51,7 @@ class Ratchetio {
 
 class RatchetioNotifier {
     
-    const VERSION = "0.2.3";
+    const VERSION = "0.2.4";
 
     // required
     public $access_token = '';
@@ -376,7 +376,7 @@ class RatchetioNotifier {
             $backtrace = debug_backtrace();
             foreach ($backtrace as $frame) {
                 // skip frames in this file
-                if ($frame['file'] == __FILE__) {
+                if (isset($frame['file']) && $frame['file'] == __FILE__) {
                     continue;
                 }
                 // skip the confusing set_error_handler frame
