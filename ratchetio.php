@@ -334,7 +334,7 @@ class RatchetioNotifier {
         $forwardfor = isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'];
         if ($forwardfor) {
             // return everything until the first comma
-            $parts = preg_split(',', $forwardfor);
+            $parts = explode(',', $forwardfor);
             return $parts[0];
         }
         $realip = isset($_SERVER['HTTP_X_REAL_IP']) && $_SERVER['HTTP_X_REAL_IP'];
