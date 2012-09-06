@@ -456,7 +456,7 @@ class RatchetioNotifier {
             'language' => 'php',
             'framework' => 'php',
             'notifier' => array(
-                'name' => 'ratchet-php',
+                'name' => 'ratchetio-php',
                 'version' => self::VERSION
             )
         );
