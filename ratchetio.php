@@ -51,7 +51,7 @@ class Ratchetio {
 
 class RatchetioNotifier {
     
-    const VERSION = "0.2.2";
+    const VERSION = "0.2.3";
 
     // required
     public $access_token = '';
@@ -309,7 +309,12 @@ class RatchetioNotifier {
                 $headers[$name] = $val;
             }
         }
-        return $headers;
+        if (count($headers) > 0) {
+            return $headers;
+        } else {
+            // serializes to emtpy json object  
+            return new stdClass;
+        }
     }
 
     private function current_url() {
