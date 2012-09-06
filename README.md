@@ -82,6 +82,19 @@ All of the following options can be passed as keys in the $config array.
 - timeout: request timeout for posting to ratchet, in seconds. default 3.
 - max_errno: max PHP error number to report. e.g. 1024 will ignore all errors above E_USER_NOTICE. default: -1 (report all errors).
 - capture_error_stacktraces: record full stacktraces for PHP errors. default: true.
+- error_sample_rates: associative array mapping error numbers to sample rates. Sample rates are ratio out of 1, e.g. 0 is "never report", 1 is "always report", and 0.1 is "report 10% of the time". Sampling is done on a per-error basis. Default: empty array, meaning all errors are reported.
+
+Example use of error_sample_rates:
+```php
+$config['error_sample_rates'] = array(
+    // E_WARNING omitted, so defaults to 1
+    E_NOTICE => 0.1,
+    E_USER_ERROR => 0.5,
+    // E_USER_WARNING will take the same value, 0.5
+    E_USER_NOTICE => 0.1,
+    // E_STRICT and beyond will all be 0.1
+);
+```
 
 
 ## Support

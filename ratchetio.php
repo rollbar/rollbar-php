@@ -51,7 +51,7 @@ class Ratchetio {
 
 class RatchetioNotifier {
     
-    const VERSION = "0.2.4";
+    const VERSION = "0.2.5";
 
     // required
     public $access_token = '';
@@ -67,10 +67,11 @@ class RatchetioNotifier {
     public $timeout = 3;
     public $max_errno = -1;
     public $capture_error_backtraces = true;
+    public $error_sample_rates = array();
     
     private $config_keys = array('access_token', 'root', 'environment', 'branch', 'logger', 
         'base_api_url', 'batched', 'batch_size', 'timeout', 'max_errno', 
-        'capture_error_backtraces');
+        'capture_error_backtraces', 'error_sample_rates');
 
     // cached values for request/server data
     private $_request_data = null;
@@ -78,6 +79,8 @@ class RatchetioNotifier {
 
     // payload queue, used when $batched is true
     private $_queue = array();
+
+    private $_mt_randmax;
     
     public function __construct($config) {
         foreach ($this->config_keys as $key) {
@@ -89,6 +92,22 @@ class RatchetioNotifier {
         if (!$this->access_token) {
             $this->log_error('Missing access token');
         }
+
+        // fill in missing values in error_sample_rates
+        $levels = array(E_WARNING, E_NOTICE, E_USER_ERROR, E_USER_WARNING, E_USER_NOTICE,
+            E_STRICT, E_RECOVERABLE_ERROR, E_DEPRECATED, E_USER_DEPRECATED);
+        $curr = 1;
+        for ($i = 0, $num = count($levels); $i < $num; $i++) {
+            $level = $levels[$i];
+            if (isset($this->error_sample_rates[$level])) {
+                $curr = $this->error_sample_rates[$level];
+            } else {
+                $this->error_sample_rates[$level] = $curr;
+            }
+        }
+        
+        // cache this value
+        $this->_mt_randmax = mt_getrandmax();
     }
 
     public function report_exception($exc) {
@@ -178,6 +197,16 @@ class RatchetioNotifier {
         if ($this->max_errno != -1 && $errno >= $this->max_errno) {
             // ignore
             return;
+        }
+
+        if (isset($this->error_sample_rates[$errno])) {
+            // get a float in the range [0, 1)
+            // mt_rand() is inclusive, so add 1 to mt_randmax
+            $float_rand = mt_rand() / ($this->_mt_randmax + 1);
+            if ($float_rand > $this->error_sample_rates[$errno]) {
+                // skip
+                return;
+            }
         }
 
         $data = $this->build_base_data();
@@ -309,6 +338,7 @@ class RatchetioNotifier {
                 $headers[$name] = $val;
             }
         }
+        
         if (count($headers) > 0) {
             return $headers;
         } else {
