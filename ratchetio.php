@@ -175,7 +175,7 @@ class RatchetioNotifier {
             return;
         }
         
-        if ($this->max_errno != -1 && $errno > $this->max_errno) {
+        if ($this->max_errno != -1 && $errno >= $this->max_errno) {
             // ignore
             return;
         }
