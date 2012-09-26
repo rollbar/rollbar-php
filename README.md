@@ -83,6 +83,8 @@ All of the following options can be passed as keys in the $config array.
 - max_errno: max PHP error number to report. e.g. 1024 will ignore all errors above E_USER_NOTICE. default: -1 (report all errors).
 - capture_error_stacktraces: record full stacktraces for PHP errors. default: true.
 - error_sample_rates: associative array mapping error numbers to sample rates. Sample rates are ratio out of 1, e.g. 0 is "never report", 1 is "always report", and 0.1 is "report 10% of the time". Sampling is done on a per-error basis. Default: empty array, meaning all errors are reported.
+- person: an associative array containing data about the currently-logged in user. Required: 'id', optional: 'username', 'email'. All values are strings.
+- person_fn: a function reference (string, etc. - anything that [call_user_func()](http://php.net/call_user_func) can handle) returning an array like the one for 'person'.
 
 Example use of error_sample_rates:
 ```php
@@ -94,6 +96,21 @@ $config['error_sample_rates'] = array(
     E_USER_NOTICE => 0.1,
     // E_STRICT and beyond will all be 0.1
 );
+```
+
+Example use of person_fn:
+```php
+function get_current_user() {
+    if ($_SESSION['user_id']) {
+        return array(
+            'id' => $_SESSION['user_id'], // required - value is a string
+            'username' => '$_SESSION['username'], // optional - value is a string
+            'email' => $_SESSION['user_email'] // optional - value is a string
+        );
+    }
+    return null;
+}
+$config['person_fn'] = 'get_current_user';
 ```
 
 

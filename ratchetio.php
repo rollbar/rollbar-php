@@ -51,7 +51,7 @@ class Ratchetio {
 
 class RatchetioNotifier {
     
-    const VERSION = "0.2.5";
+    const VERSION = "0.3";
 
     // required
     public $access_token = '';
@@ -68,14 +68,17 @@ class RatchetioNotifier {
     public $max_errno = -1;
     public $capture_error_backtraces = true;
     public $error_sample_rates = array();
+    public $person = null;
+    public $person_fn = null;
     
     private $config_keys = array('access_token', 'root', 'environment', 'branch', 'logger', 
         'base_api_url', 'batched', 'batch_size', 'timeout', 'max_errno', 
-        'capture_error_backtraces', 'error_sample_rates');
+        'capture_error_backtraces', 'error_sample_rates', 'person', 'person_fn');
 
-    // cached values for request/server data
+    // cached values for request/server/person data
     private $_request_data = null;
     private $_server_data = null;
+    private $_person_data = null;
 
     // payload queue, used when $batched is true
     private $_queue = array();
@@ -179,11 +182,10 @@ class RatchetioNotifier {
             )
         );
         
-        // request data
+        // request, server, person data
         $data['request'] = $this->build_request_data();
-        
-        // server data
         $data['server'] = $this->build_server_data();
+        $data['person'] = $this->build_person_data();
 
         $payload = $this->build_payload($data);
         $this->send_payload($payload);
@@ -267,11 +269,10 @@ class RatchetioNotifier {
             )
         );
         
-        // request data
+        // request, server, person data
         $data['request'] = $this->build_request_data();
-        
-        // server data
         $data['server'] = $this->build_server_data();
+        $data['person'] = $this->build_person_data();
 
         $payload = $this->build_payload($data);
         $this->send_payload($payload);
@@ -291,6 +292,7 @@ class RatchetioNotifier {
         );
         $data['request'] = $this->build_request_data();
         $data['server'] = $this->build_server_data();
+        $data['person'] = $this->build_person_data();
 
         $payload = $this->build_payload($data);
         $this->send_payload($payload);
@@ -446,6 +448,32 @@ class RatchetioNotifier {
             $this->_server_data = $server_data;
         }
         return $this->_server_data;
+    }
+
+    private function build_person_data() {
+        // return cached value if non-null
+        // it *is* possible for it to really be null (i.e. user is not logged in)
+        // but we'll keep trying anyway until we get a logged-in user value.
+        if ($this->_person_data == null) {
+            // first priority: try to use $this->person
+            if ($this->person && is_array($this->person)) {
+                if (isset($this->person['id'])) {
+                    $this->_person_data = $this->person;
+                    return $this->_person_data;
+                }
+            }
+
+            // second priority: try to use $this->person_fn
+            if ($this->person_fn && is_callable($this->person_fn)) {
+                $data = @call_user_func($this->person_fn);
+                if (isset($data['id'])) {
+                    $this->_person_data = $data;
+                    return $this->_person_data;
+                }
+            }
+        } else {
+            return $this->_person_data;
+        }
     }
 
     private function build_base_data($level = 'error') {
