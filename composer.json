@@ -2,7 +2,7 @@
   "name": "ratchetio/ratchetio",
   "description": "Monitors errors and exceptions and reports them to Ratchet.io",
   "type": "library",
-  "keywords": ["logging", "debugging", "monitoring"],
+  "keywords": ["logging", "debugging", "monitoring", "errors", "exceptions"],
   "version": "0.3",
   "license": "MIT",
   "homepage": "http://github.com/ratchetio/ratchetio-php",
