@@ -1,6 +1,21 @@
 {
-  "name":    "ratchetio/ratchetio",
+  "name": "ratchetio/ratchetio",
+  "description": "Monitors errors and exceptions and reports them to Ratchet.io",
+  "type": "library",
+  "keywords": ["logging", "debugging", "monitoring"],
   "version": "0.3",
+  "license": "MIT",
+  "homepage": "http://github.com/ratchetio/ratchetio-php",
+  "authors": [
+    {
+      "name": "Brian Rue",
+      "email": "brian@ratchet.io",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "email": "support@ratchet.io"
+  },
   "autoload": {
     "files": ["ratchetio.php"]
   }
