@@ -1,0 +1,7 @@
+{
+  "name":    "ratchetio/ratchetio",
+  "version": "0.3",
+  "autoload": {
+    "files": ["ratchetio.php"]
+  }
+}
