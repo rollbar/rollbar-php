@@ -382,6 +382,12 @@ class RatchetioNotifier {
     private function build_exception_frames($exc) {
         $frames = array();
         foreach ($exc->getTrace() as $frame) {
+			if (empty($frame['file']))
+			    $frame['file'] = $exc->getFile();
+
+            if (empty($frame['line']))
+				$frame['line'] = $exc->getLine();
+			
             $frames[] = array(
                 'filename' => $frame['file'],
                 'lineno' => $frame['line'],
@@ -414,6 +420,12 @@ class RatchetioNotifier {
                     continue;
                 }
                 
+				if (! isset($frame['file']))
+					$frame['file'] = $errfile;
+
+				if (! isset($frame['line']))
+					$frame['line'] = $errline;
+				
                 $frames[] = array(
                     'filename' => $frame['file'],
                     'lineno' => $frame['line'],
