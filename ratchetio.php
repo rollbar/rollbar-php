@@ -171,7 +171,6 @@ class RatchetioNotifier {
         $data = $this->build_base_data();
 
         // exception info
-        $frames = $this->build_exception_frames($exc);
         $data['body'] = array(
             'trace' => array(
                 'frames' => $this->build_exception_frames($exc),
