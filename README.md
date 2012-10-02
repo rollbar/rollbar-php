@@ -85,6 +85,7 @@ All of the following options can be passed as keys in the $config array.
 - error_sample_rates: associative array mapping error numbers to sample rates. Sample rates are ratio out of 1, e.g. 0 is "never report", 1 is "always report", and 0.1 is "report 10% of the time". Sampling is done on a per-error basis. Default: empty array, meaning all errors are reported.
 - person: an associative array containing data about the currently-logged in user. Required: 'id', optional: 'username', 'email'. All values are strings.
 - person_fn: a function reference (string, etc. - anything that [call_user_func()](http://php.net/call_user_func) can handle) returning an array like the one for 'person'.
+- shift_function: whether to shift function names in stack traces down one frame, so that the function name correctly reflects the context of each frame. default: true.
 
 Example use of error_sample_rates:
 ```php

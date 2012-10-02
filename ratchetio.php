@@ -51,7 +51,7 @@ class Ratchetio {
 
 class RatchetioNotifier {
     
-    const VERSION = "0.3";
+    const VERSION = "0.3.1";
 
     // required
     public $access_token = '';
@@ -67,13 +67,14 @@ class RatchetioNotifier {
     public $timeout = 3;
     public $max_errno = -1;
     public $capture_error_backtraces = true;
+    public $shift_function = true;
     public $error_sample_rates = array();
     public $person = null;
     public $person_fn = null;
     
     private $config_keys = array('access_token', 'root', 'environment', 'branch', 'logger', 
         'base_api_url', 'batched', 'batch_size', 'timeout', 'max_errno', 
-        'capture_error_backtraces', 'error_sample_rates', 'person', 'person_fn');
+        'capture_error_backtraces', 'shift_function', 'error_sample_rates', 'person', 'person_fn');
 
     // cached values for request/server/person data
     private $_request_data = null;
@@ -384,26 +385,41 @@ class RatchetioNotifier {
         $frames = array();
         foreach ($exc->getTrace() as $frame) {
             $frames[] = array(
-                'filename' => $frame['file'],
-                'lineno' => $frame['line'],
+                'filename' => isset($frame['file']) ? $frame['file'] : '<internal>',
+                'lineno' =>  isset($frame['line']) ? $frame['line'] : 0,
                 'method' => $frame['function']
                 // TODO include args? need to sanitize first.
             );
         }
+
+        // ratchet expects most recent call to be last, not first
+        $frames = array_reverse($frames);
         
-        // add top-level file and line
+        // add top-level file and line to end of the reversed array
         $frames[] = array(
             'filename' => $exc->getFile(),
             'lineno' => $exc->getLine()
         );
 
+        $this->shift_method($frames);
+
         return $frames;
     }
 
+    private function shift_method(&$frames) {
+        if ($this->shift_function) {
+            // shift 'method' values down one frame, so they reflect where the call
+            // occurs (like Ratchet expects), instead of what is being called.
+            for ($i = count($frames) - 1; $i > 0; $i--) {
+                $frames[$i]['method'] = $frames[$i - 1]['method'];
+            }
+            $frames[0]['method'] = '<main>';
+        }
+    }
+
     private function build_error_frames($errfile, $errline) {
-        $frames = array();
-        
         if ($this->capture_error_backtraces) {
+            $frames = array();
             $backtrace = debug_backtrace();
             foreach ($backtrace as $frame) {
                 // skip frames in this file
@@ -416,20 +432,34 @@ class RatchetioNotifier {
                 }
                 
                 $frames[] = array(
-                    'filename' => $frame['file'],
-                    'lineno' => $frame['line'],
+                    // Sometimes, file and line are not set. See:
+                    // http://stackoverflow.com/questions/4581969/why-is-debug-backtrace-not-including-line-number-sometimes
+                    'filename' => isset($frame['file']) ? $frame['file'] : "<internal>",
+                    'lineno' =>  isset($frame['line']) ? $frame['line'] : 0,
                     'method' => $frame['function']
                 );
             }
+
+            // ratchet expects most recent call last, not first
+            $frames = array_reverse($frames);
+
+            // add top-level file and line to end of the reversed array
+            $frames[] = array(
+                'filename' => $errfile, 
+                'lineno' => $errline
+            );
+            
+            $this->shift_method($frames);
+            
+            return $frames;
+        } else {
+            return array(
+                array(
+                    'filename' => $errfile, 
+                    'lineno' => $errline
+                )
+            );
         }
-
-        // add top-level file and line
-        $frames[] = array(
-            'filename' => $errfile, 
-            'lineno' => $errline
-        );
-
-        return $frames;
     }
 
     private function build_server_data() {
