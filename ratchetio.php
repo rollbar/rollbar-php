@@ -382,7 +382,16 @@ class RatchetioNotifier {
 
     private function build_exception_frames($exc) {
         $frames = array();
-        foreach ($exc->getTrace() as $frame) {
+        
+        $trace = $exc->getTrace();
+        $topframe = array_shift($trace);
+        $frames[] = array(
+            'filename' => $exc->getFile(),
+            'lineno' => $exc->getLine(),
+            'method' => $topframe['function']
+        );
+
+        foreach ($trace as $frame) {
             $frames[] = array(
                 'filename' => $frame['file'],
                 'lineno' => $frame['line'],
@@ -391,12 +400,6 @@ class RatchetioNotifier {
             );
         }
         
-        // add top-level file and line
-        $frames[] = array(
-            'filename' => $exc->getFile(),
-            'lineno' => $exc->getLine()
-        );
-
         return $frames;
     }
 
@@ -416,18 +419,14 @@ class RatchetioNotifier {
                 }
                 
                 $frames[] = array(
-                    'filename' => $frame['file'],
-                    'lineno' => $frame['line'],
+                    // Sometimes, file and line are not set and we must use a fake value. See:
+                    // http://stackoverflow.com/questions/4581969/why-is-debug-backtrace-not-including-line-number-sometimes
+                    'filename' => isset($frame['file']) ? $frame['file'] : "<internal>",
+                    'lineno' =>  isset($frame['line']) ? $frame['line'] : 0,
                     'method' => $frame['function']
                 );
             }
         }
-
-        // add top-level file and line
-        $frames[] = array(
-            'filename' => $errfile, 
-            'lineno' => $errline
-        );
 
         return $frames;
     }
