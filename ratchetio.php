@@ -98,8 +98,14 @@ class RatchetioNotifier {
         }
 
         // fill in missing values in error_sample_rates
-        $levels = array(E_WARNING, E_NOTICE, E_USER_ERROR, E_USER_WARNING, E_USER_NOTICE,
-            E_STRICT, E_RECOVERABLE_ERROR, E_DEPRECATED, E_USER_DEPRECATED);
+        $levels = array(E_WARNING, E_NOTICE, E_USER_ERROR, E_USER_WARNING,
+            E_USER_NOTICE, E_STRICT, E_RECOVERABLE_ERROR);
+
+        // PHP 5.3.0
+        if (defined('E_DEPRECATED')) {
+            $levels += array(E_DEPRECATED, E_USER_DEPRECATED);
+        }
+
         $curr = 1;
         for ($i = 0, $num = count($levels); $i < $num; $i++) {
             $level = $levels[$i];
@@ -464,9 +470,14 @@ class RatchetioNotifier {
 
     private function build_server_data() {
         if ($this->_server_data === null) {
-            $server_data = array(
-                'host' => gethostname()
-            );
+            $server_data = array();
+
+            // PHP 5.3.0
+            if (function_exists('gethostname')) {
+                $server_data['host'] = gethostname();
+            } else {
+                $server_data['host'] = php_uname('n');
+            }
 
             if ($this->branch) {
                 $server_data['branch'] = $this->branch;
