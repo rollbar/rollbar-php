@@ -605,4 +605,3 @@ class RatchetioNotifier {
         }
     }
 }
-?>
