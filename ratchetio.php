@@ -50,12 +50,12 @@ class Ratchetio {
 
 
 class RatchetioNotifier {
-    
+
     const VERSION = "0.3.1";
 
     // required
     public $access_token = '';
-    
+
     // optional / defaults
     public $root = '';
     public $environment = 'production';
@@ -71,9 +71,9 @@ class RatchetioNotifier {
     public $error_sample_rates = array();
     public $person = null;
     public $person_fn = null;
-    
-    private $config_keys = array('access_token', 'root', 'environment', 'branch', 'logger', 
-        'base_api_url', 'batched', 'batch_size', 'timeout', 'max_errno', 
+
+    private $config_keys = array('access_token', 'root', 'environment', 'branch', 'logger',
+        'base_api_url', 'batched', 'batch_size', 'timeout', 'max_errno',
         'capture_error_backtraces', 'shift_function', 'error_sample_rates', 'person', 'person_fn');
 
     // cached values for request/server/person data
@@ -85,7 +85,7 @@ class RatchetioNotifier {
     private $_queue = array();
 
     private $_mt_randmax;
-    
+
     public function __construct($config) {
         foreach ($this->config_keys as $key) {
             if (isset($config[$key])) {
@@ -98,8 +98,14 @@ class RatchetioNotifier {
         }
 
         // fill in missing values in error_sample_rates
-        $levels = array(E_WARNING, E_NOTICE, E_USER_ERROR, E_USER_WARNING, E_USER_NOTICE,
-            E_STRICT, E_RECOVERABLE_ERROR, E_DEPRECATED, E_USER_DEPRECATED);
+        $levels = array(E_WARNING, E_NOTICE, E_USER_ERROR, E_USER_WARNING,
+            E_USER_NOTICE, E_STRICT, E_RECOVERABLE_ERROR);
+
+        // PHP 5.3.0
+        if (defined('E_DEPRECATED')) {
+            $levels += array(E_DEPRECATED, E_USER_DEPRECATED);
+        }
+
         $curr = 1;
         for ($i = 0, $num = count($levels); $i < $num; $i++) {
             $level = $levels[$i];
@@ -109,7 +115,7 @@ class RatchetioNotifier {
                 $this->error_sample_rates[$level] = $curr;
             }
         }
-        
+
         // cache this value
         $this->_mt_randmax = mt_getrandmax();
     }
@@ -125,7 +131,7 @@ class RatchetioNotifier {
             }
         }
     }
-    
+
     public function report_message($message, $level = 'error') {
         try {
             $this->_report_message($message, $level);
@@ -181,7 +187,7 @@ class RatchetioNotifier {
                 )
             )
         );
-        
+
         // request, server, person data
         $data['request'] = $this->build_request_data();
         $data['server'] = $this->build_server_data();
@@ -195,7 +201,7 @@ class RatchetioNotifier {
         if (!$this->check_config()) {
             return;
         }
-        
+
         if ($this->max_errno != -1 && $errno >= $this->max_errno) {
             // ignore
             return;
@@ -212,7 +218,7 @@ class RatchetioNotifier {
         }
 
         $data = $this->build_base_data();
-        
+
         // set error level and error constant name
         $level = 'info';
         $constant = '#' . $errno;
@@ -268,7 +274,7 @@ class RatchetioNotifier {
                 )
             )
         );
-        
+
         // request, server, person data
         $data['request'] = $this->build_request_data();
         $data['server'] = $this->build_server_data();
@@ -297,7 +303,7 @@ class RatchetioNotifier {
         $payload = $this->build_payload($data);
         $this->send_payload($payload);
     }
-    
+
     private function check_config() {
         return $this->access_token && strlen($this->access_token) == 32;
     }
@@ -310,7 +316,7 @@ class RatchetioNotifier {
                 'headers' => $this->headers(),
                 'method' => $_SERVER['REQUEST_METHOD'],
             );
-            
+
             if ($_GET) {
                 $request['GET'] = $_GET;
             }
@@ -340,11 +346,11 @@ class RatchetioNotifier {
                 $headers[$name] = $val;
             }
         }
-        
+
         if (count($headers) > 0) {
             return $headers;
         } else {
-            // serializes to emtpy json object  
+            // serializes to emtpy json object
             return new stdClass;
         }
     }
@@ -394,7 +400,7 @@ class RatchetioNotifier {
 
         // ratchet expects most recent call to be last, not first
         $frames = array_reverse($frames);
-        
+
         // add top-level file and line to end of the reversed array
         $frames[] = array(
             'filename' => $exc->getFile(),
@@ -430,7 +436,7 @@ class RatchetioNotifier {
                 if ($frame['function'] == 'report_php_error' && count($frames) == 0) {
                     continue;
                 }
-                
+
                 $frames[] = array(
                     // Sometimes, file and line are not set. See:
                     // http://stackoverflow.com/questions/4581969/why-is-debug-backtrace-not-including-line-number-sometimes
@@ -445,17 +451,17 @@ class RatchetioNotifier {
 
             // add top-level file and line to end of the reversed array
             $frames[] = array(
-                'filename' => $errfile, 
+                'filename' => $errfile,
                 'lineno' => $errline
             );
-            
+
             $this->shift_method($frames);
-            
+
             return $frames;
         } else {
             return array(
                 array(
-                    'filename' => $errfile, 
+                    'filename' => $errfile,
                     'lineno' => $errline
                 )
             );
@@ -464,9 +470,14 @@ class RatchetioNotifier {
 
     private function build_server_data() {
         if ($this->_server_data === null) {
-            $server_data = array(
-                'host' => gethostname()
-            );
+            $server_data = array();
+
+            // PHP 5.3.0
+            if (function_exists('gethostname')) {
+                $server_data['host'] = gethostname();
+            } else {
+                $server_data['host'] = php_uname('n');
+            }
 
             if ($this->branch) {
                 $server_data['branch'] = $this->branch;
@@ -550,17 +561,17 @@ class RatchetioNotifier {
     }
 
     /**
-     * Sends a batch of payloads to the /batch endpoint. 
+     * Sends a batch of payloads to the /batch endpoint.
      * A batch is just an array of standalone payloads.
      * $batch - php array of payloads
      */
     private function send_batch($batch) {
         $this->log_info("Sending batch");
-        
+
         $post_data = json_encode($batch);
         $this->make_api_call('item_batch', $post_data);
     }
-    
+
     private function make_api_call($action, $post_data) {
         $url = $this->base_api_url . $action . '/';
 
@@ -575,9 +586,9 @@ class RatchetioNotifier {
         $result = curl_exec($ch);
         $status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
-        
+
         if ($status_code != 200) {
-            $this->log_warning('Got unexpected status code from Ratchet.io API ' . $action . 
+            $this->log_warning('Got unexpected status code from Ratchet.io API ' . $action .
                 ': ' .$status_code);
             $this->log_warning('Output: ' .$result);
         } else {
@@ -594,7 +605,7 @@ class RatchetioNotifier {
     private function log_warning($msg) {
         $this->log_message("WARNING", $msg);
     }
-    
+
     private function log_error($msg) {
         $this->log_message("ERROR", $msg);
     }
@@ -605,4 +616,3 @@ class RatchetioNotifier {
         }
     }
 }
-?>
