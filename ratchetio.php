@@ -103,7 +103,7 @@ class RatchetioNotifier {
 
         // PHP 5.3.0
         if (defined('E_DEPRECATED')) {
-            $levels += array(E_DEPRECATED, E_USER_DEPRECATED);
+            $levels = array_merge($levels, array(E_DEPRECATED, E_USER_DEPRECATED));
         }
 
         $curr = 1;
