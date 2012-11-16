@@ -37,7 +37,9 @@ $config = array(
     // optional - environment name. any string will do.
     'environment' => 'production',
     // optional - dir your code is in. used for linking stack traces.
-    'root' => '/Users/brian/www/myapp'
+    'root' => '/Users/brian/www/myapp',
+    // optional - max error number to report. defaults to -1 (report all errors)
+    'max_errno' => E_USER_NOTICE  // ignore E_STRICT and above
 );
 Ratchetio::init($config);
 ```
