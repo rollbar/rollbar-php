@@ -51,7 +51,7 @@ class Ratchetio {
 
 class RatchetioNotifier {
 
-    const VERSION = "0.3.2";
+    const VERSION = "0.3.3";
 
     // required
     public $access_token = '';
@@ -71,10 +71,12 @@ class RatchetioNotifier {
     public $error_sample_rates = array();
     public $person = null;
     public $person_fn = null;
+    public $scrub_fields = array('passwd', 'password', 'secret');
 
     private $config_keys = array('access_token', 'root', 'environment', 'branch', 'logger',
         'base_api_url', 'batched', 'batch_size', 'timeout', 'max_errno',
-        'capture_error_backtraces', 'shift_function', 'error_sample_rates', 'person', 'person_fn');
+        'capture_error_backtraces', 'shift_function', 'error_sample_rates', 'person', 'person_fn',
+        'scrub_fields');
 
     // cached values for request/server/person data
     private $_request_data = null;
@@ -321,7 +323,7 @@ class RatchetioNotifier {
                 $request['GET'] = $_GET;
             }
             if ($_POST) {
-                $request['POST'] = $_POST;
+                $request['POST'] = $this->scrub_request_params($_POST);
             }
             if (isset($_SESSION) && $_SESSION) {
                 $request['session'] = $_SESSION;
@@ -330,6 +332,16 @@ class RatchetioNotifier {
         }
 
         return $this->_request_data;
+    }
+    
+    private function scrub_request_params($params) {
+        foreach ($params as $k => $v) {
+            if (in_array($k, $this->scrub_fields)) {
+                $params[$k] = str_repeat('*', strlen($v));
+            }
+        }
+        
+        return $params;
     }
 
     private function headers() {

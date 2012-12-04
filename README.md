@@ -88,6 +88,7 @@ All of the following options can be passed as keys in the $config array.
 - person: an associative array containing data about the currently-logged in user. Required: 'id', optional: 'username', 'email'. All values are strings.
 - person_fn: a function reference (string, etc. - anything that [call_user_func()](http://php.net/call_user_func) can handle) returning an array like the one for 'person'.
 - shift_function: whether to shift function names in stack traces down one frame, so that the function name correctly reflects the context of each frame. default: true.
+- scrub_fields: array of field names to scrub out of POST. Values will be replaced with astrickses. If overridiing, make sure to list all fields you want to scrub, not just fields you want to add to the default. Param names are converted to lowercase before comparing against the scrub list. default: ('passwd', 'password', 'secret').
 
 Example use of error_sample_rates:
 ```php
