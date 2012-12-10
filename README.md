@@ -74,20 +74,20 @@ Ratchetio::report_message('could not connect to mysql server', 'warning');
 All of the following options can be passed as keys in the $config array.
 
 - access_token: your project access token
-- environment: environment name, e.g. 'production' or 'development'
-- root: path to your project's root dir
-- branch: name of the current branch (default 'master')
-- logger: an object that has a log($level, $message) method. If provided, will be used by RatchetioNotifier to log messages.
 - base_api_url: the base api url to post to (default 'https://submit.ratchet.io/api/1/')
 - batched: true to batch all reports from a single request together. default true.
 - batch_size: flush batch early if it reaches this size. default: 50
-- timeout: request timeout for posting to ratchet, in seconds. default 3.
-- max_errno: max PHP error number to report. e.g. 1024 will ignore all errors above E_USER_NOTICE. default: -1 (report all errors).
+- branch: name of the current branch (default 'master')
 - capture_error_stacktraces: record full stacktraces for PHP errors. default: true.
+- environment: environment name, e.g. 'production' or 'development'
 - error_sample_rates: associative array mapping error numbers to sample rates. Sample rates are ratio out of 1, e.g. 0 is "never report", 1 is "always report", and 0.1 is "report 10% of the time". Sampling is done on a per-error basis. Default: empty array, meaning all errors are reported.
+- logger: an object that has a log($level, $message) method. If provided, will be used by RatchetioNotifier to log messages.
+- max_errno: max PHP error number to report. e.g. 1024 will ignore all errors above E_USER_NOTICE. default: 1024 (ignore E_STRICT and above).
 - person: an associative array containing data about the currently-logged in user. Required: 'id', optional: 'username', 'email'. All values are strings.
 - person_fn: a function reference (string, etc. - anything that [call_user_func()](http://php.net/call_user_func) can handle) returning an array like the one for 'person'.
+- root: path to your project's root dir
 - shift_function: whether to shift function names in stack traces down one frame, so that the function name correctly reflects the context of each frame. default: true.
+- timeout: request timeout for posting to ratchet, in seconds. default 3.
 
 Example use of error_sample_rates:
 ```php
