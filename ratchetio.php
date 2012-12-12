@@ -51,7 +51,7 @@ class Ratchetio {
 
 class RatchetioNotifier {
 
-    const VERSION = "0.3.4";
+    const VERSION = "0.3.5";
 
     // required
     public $access_token = '';
@@ -316,7 +316,7 @@ class RatchetioNotifier {
                 'url' => $this->current_url(),
                 'user_ip' => $this->user_ip(),
                 'headers' => $this->headers(),
-                'method' => $_SERVER['REQUEST_METHOD'],
+                'method' => isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : null,
             );
 
             if ($_GET) {
@@ -386,17 +386,17 @@ class RatchetioNotifier {
     }
 
     private function user_ip() {
-        $forwardfor = isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'];
+        $forwardfor = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : null;
         if ($forwardfor) {
             // return everything until the first comma
             $parts = explode(',', $forwardfor);
             return $parts[0];
         }
-        $realip = isset($_SERVER['HTTP_X_REAL_IP']) && $_SERVER['HTTP_X_REAL_IP'];
+        $realip = isset($_SERVER['HTTP_X_REAL_IP']) ? $_SERVER['HTTP_X_REAL_IP'] : null;
         if ($realip) {
             return $realip;
         }
-        return $_SERVER['REMOTE_ADDR'];
+        return isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
     }
 
     private function build_exception_frames($exc) {
