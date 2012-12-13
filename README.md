@@ -75,12 +75,13 @@ All of the following options can be passed as keys in the $config array.
 
 - access_token: your project access token
 - base_api_url: the base api url to post to (default 'https://submit.ratchet.io/api/1/')
-- batched: true to batch all reports from a single request together. default true.
 - batch_size: flush batch early if it reaches this size. default: 50
+- batched: true to batch all reports from a single request together. default true.
 - branch: name of the current branch (default 'master')
 - capture_error_stacktraces: record full stacktraces for PHP errors. default: true.
 - environment: environment name, e.g. 'production' or 'development'
 - error_sample_rates: associative array mapping error numbers to sample rates. Sample rates are ratio out of 1, e.g. 0 is "never report", 1 is "always report", and 0.1 is "report 10% of the time". Sampling is done on a per-error basis. Default: empty array, meaning all errors are reported.
+- host: server hostname. Default: null, which will result in a call to `gethostname()` (or `php_uname('n')` if that function does not exist)
 - logger: an object that has a log($level, $message) method. If provided, will be used by RatchetioNotifier to log messages.
 - max_errno: max PHP error number to report. e.g. 1024 will ignore all errors above E_USER_NOTICE. default: 1024 (ignore E_STRICT and above).
 - person: an associative array containing data about the currently-logged in user. Required: 'id', optional: 'username', 'email'. All values are strings.

@@ -51,32 +51,32 @@ class Ratchetio {
 
 class RatchetioNotifier {
 
-    const VERSION = "0.3.5";
+    const VERSION = "0.3.6";
 
     // required
     public $access_token = '';
 
     // optional / defaults
-    public $root = '';
-    public $environment = 'production';
-    public $branch = 'master';
-    public $logger = null;
     public $base_api_url = 'https://submit.ratchet.io/api/1/';
-    public $batched = true;
     public $batch_size = 50;
-    public $timeout = 3;
-    public $max_errno = 1024;  // ignore E_STRICT and above
+    public $batched = true;
+    public $branch = 'master';
     public $capture_error_backtraces = true;
-    public $shift_function = true;
+    public $environment = 'production';
     public $error_sample_rates = array();
+    public $host = null;
+    public $logger = null;
+    public $max_errno = 1024;  // ignore E_STRICT and above
     public $person = null;
     public $person_fn = null;
+    public $root = '';
     public $scrub_fields = array('passwd', 'password', 'secret');
+    public $shift_function = true;
+    public $timeout = 3;
 
-    private $config_keys = array('access_token', 'root', 'environment', 'branch', 'logger',
-        'base_api_url', 'batched', 'batch_size', 'timeout', 'max_errno',
-        'capture_error_backtraces', 'shift_function', 'error_sample_rates', 'person', 'person_fn',
-        'scrub_fields');
+    private $config_keys = array('access_token', 'base_api_url', 'batch_size', 'batched', 'branch', 
+        'capture_error_backtraces', 'environment', 'error_sample_rates', 'host', 'logger', 
+        'max_errno', 'person', 'person_fn', 'root', 'scrub_fields', 'shift_function', 'timeout');
 
     // cached values for request/server/person data
     private $_request_data = null;
@@ -484,12 +484,15 @@ class RatchetioNotifier {
         if ($this->_server_data === null) {
             $server_data = array();
 
-            // PHP 5.3.0
-            if (function_exists('gethostname')) {
-                $server_data['host'] = gethostname();
-            } else {
-                $server_data['host'] = php_uname('n');
+            if ($this->host === null) {
+                // PHP 5.3.0
+                if (function_exists('gethostname')) {
+                    $this->host = gethostname();
+                } else {
+                    $this->host = php_uname('n');
+                }
             }
+            $server_data['host'] = $this->host;
 
             if ($this->branch) {
                 $server_data['branch'] = $this->branch;
