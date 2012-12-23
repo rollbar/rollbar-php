@@ -66,6 +66,7 @@ class RatchetioNotifier {
     public $environment = 'production';
     public $error_sample_rates = array();
     public $host = null;
+    /** @var iRatchetioLogger */
     public $logger = null;
     public $max_errno = 1024;  // ignore E_STRICT and above
     public $person = null;
@@ -640,4 +641,8 @@ class RatchetioNotifier {
             $this->logger->log($level, $msg);
         }
     }
+}
+
+interface iRatchetioLogger {
+    public function log($level, $msg);
 }
