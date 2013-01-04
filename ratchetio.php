@@ -5,6 +5,7 @@
  * Unless you need multiple RatchetioNotifier instances in the same project, use this.
  */
 class Ratchetio {
+    /** @var RatchetioNotifier */
     public static $instance = null;
 
     public static function init($config, $set_exception_handler = true, $set_error_handler = true) {
@@ -65,6 +66,7 @@ class RatchetioNotifier {
     public $environment = 'production';
     public $error_sample_rates = array();
     public $host = null;
+    /** @var iRatchetioLogger */
     public $logger = null;
     public $max_errno = 1024;  // ignore E_STRICT and above
     public $person = null;
@@ -172,6 +174,9 @@ class RatchetioNotifier {
         }
     }
 
+    /**
+     * @param $exc Exception
+     */
     private function _report_exception($exc) {
         if (!$this->check_config()) {
             return;
@@ -399,6 +404,10 @@ class RatchetioNotifier {
         return isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
     }
 
+    /**
+     * @param $exc Exception
+     * @return array
+     */
     private function build_exception_frames($exc) {
         $frames = array();
         foreach ($exc->getTrace() as $frame) {
@@ -529,6 +538,8 @@ class RatchetioNotifier {
         } else {
             return $this->_person_data;
         }
+
+        return null;
     }
 
     private function build_base_data($level = 'error') {
@@ -630,4 +641,8 @@ class RatchetioNotifier {
             $this->logger->log($level, $msg);
         }
     }
+}
+
+interface iRatchetioLogger {
+    public function log($level, $msg);
 }
