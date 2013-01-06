@@ -38,13 +38,22 @@ class Ratchetio {
     }
 
     public static function report_php_error($errno, $errstr, $errfile, $errline) {
-        if (self::$instance == null) {
-            return;
+        if (self::$instance != null) {
+            self::$instance->report_php_error($errno, $errstr, $errfile, $errline);
         }
-        self::$instance->report_php_error($errno, $errstr, $errfile, $errline);
+        return false;
     }
 
     public static function flush() {
+        // Catch any fatal errors that are causing the shutdown
+        $last_error = error_get_last();
+        if(!is_null($last_error)) {
+            switch($last_error['type']) {
+                case E_ERROR:
+                    self::$instance->report_php_error($last_error['type'], $last_error['message'], $last_error['file'], $last_error['line']);
+                    break;
+            }
+        }
         self::$instance->flush();
     }
 }
@@ -230,6 +239,10 @@ class RatchetioNotifier {
         $level = 'info';
         $constant = '#' . $errno;
         switch ($errno) {
+            case 1:
+                $level = 'error';
+                $constant = 'E_ERROR';
+                break;
             case 2:
                 $level = 'warning';
                 $constant = 'E_WARNING';
