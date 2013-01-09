@@ -47,7 +47,7 @@ class Ratchetio {
     public static function flush() {
         // Catch any fatal errors that are causing the shutdown
         $last_error = error_get_last();
-        if(!is_null($last_error)) {
+        if (!is_null($last_error)) {
             switch($last_error['type']) {
                 case E_ERROR:
                     self::$instance->report_php_error($last_error['type'], $last_error['message'], $last_error['file'], $last_error['line']);
