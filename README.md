@@ -66,6 +66,8 @@ You can also send ratchet log-like messages:
 
 ```php
 Ratchetio::report_message('could not connect to mysql server', 'warning');
+Ratchetio::report_message('Here is a message with some additional data', 'info', 
+    array('x' => 10, 'code' => 'blue'));
 ```
 
 

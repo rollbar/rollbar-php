@@ -30,11 +30,11 @@ class Ratchetio {
         self::$instance->report_exception($exc);
     }
 
-    public static function report_message($message, $level = 'error') {
+    public static function report_message($message, $level = 'error', $extra_data = null) {
         if (self::$instance == null) {
             return;
         }
-        self::$instance->report_message($message, $level);
+        self::$instance->report_message($message, $level, $extra_data);
     }
 
     public static function report_php_error($errno, $errstr, $errfile, $errline) {
@@ -145,9 +145,9 @@ class RatchetioNotifier {
         }
     }
 
-    public function report_message($message, $level = 'error') {
+    public function report_message($message, $level = 'error', $extra_data = null) {
         try {
-            $this->_report_message($message, $level);
+            $this->_report_message($message, $level, $extra_data);
         } catch (Exception $e) {
             try {
                 $this->log_error("Exception while reporting message");
@@ -304,18 +304,27 @@ class RatchetioNotifier {
         $this->send_payload($payload);
     }
 
-    private function _report_message($message, $level) {
+    private function _report_message($message, $level, $extra_data) {
         if (!$this->check_config()) {
             return;
         }
 
         $data = $this->build_base_data();
         $data['level'] = strtolower($level);
-        $data['body'] = array(
-            'message' => array(
-                'body' => $message
-            )
-        );
+
+        $message_obj = array('body' => $message);
+        if ($extra_data !== null && is_array($extra_data)) {
+            // merge keys from $extra_data to $message_obj
+            foreach ($extra_data as $key => $val) {
+                if ($key == 'body') {
+                    // rename to 'body_' to avoid clobbering
+                    $key = 'body_';
+                }
+                $message_obj[$key] = $val;
+            }
+        }
+        $data['body']['message'] = $message_obj;
+
         $data['request'] = $this->build_request_data();
         $data['server'] = $this->build_server_data();
         $data['person'] = $this->build_person_data();
