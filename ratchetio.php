@@ -342,6 +342,7 @@ class RatchetioNotifier {
             $request = array(
                 'url' => $this->current_url(),
                 'user_ip' => $this->user_ip(),
+                'referer' => $this->referer(),
                 'headers' => $this->headers(),
                 'method' => isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : null,
             );
@@ -424,6 +425,10 @@ class RatchetioNotifier {
             return $realip;
         }
         return isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
+    }
+    
+    private function referer() {
+        return $_SERVER['HTTP_REFERER'];
     }
 
     /**
