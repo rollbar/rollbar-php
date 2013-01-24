@@ -61,7 +61,7 @@ class Ratchetio {
 
 class RatchetioNotifier {
 
-    const VERSION = "0.3.6";
+    const VERSION = "0.4.2";
 
     // required
     public $access_token = '';
@@ -81,7 +81,7 @@ class RatchetioNotifier {
     public $person = null;
     public $person_fn = null;
     public $root = '';
-    public $scrub_fields = array('passwd', 'password', 'secret');
+    public $scrub_fields = array('passwd', 'password', 'secret', 'confirm_password', 'password_confirmation');
     public $shift_function = true;
     public $timeout = 3;
 
