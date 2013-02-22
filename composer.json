@@ -1,22 +1,22 @@
 {
-  "name": "ratchetio/ratchetio",
-  "description": "Monitors errors and exceptions and reports them to Ratchet.io",
+  "name": "rollbar/rollbar",
+  "description": "Monitors errors and exceptions and reports them to Rollbar",
   "type": "library",
   "keywords": ["logging", "debugging", "monitoring", "errors", "exceptions"],
-  "version": "0.4.2",
+  "version": "0.5.0",
   "license": "MIT",
-  "homepage": "http://github.com/ratchetio/ratchetio-php",
+  "homepage": "http://github.com/rollbar/rollbar-php",
   "authors": [
     {
       "name": "Brian Rue",
-      "email": "brian@ratchet.io",
+      "email": "brian@rollbar.com",
       "role": "Developer"
     }
   ],
   "support": {
-    "email": "support@ratchet.io"
+    "email": "support@rollbar.com"
   },
   "autoload": {
-    "files": ["ratchetio.php"]
+    "files": ["rollbar.php"]
   }
 }

@@ -1,10 +1,10 @@
 <pre>
 <?php
-require 'ratchetio.php';
+require 'rollbar.php';
 
 class EchoLogger {
     public function log($level, $message) {
-        echo "[Ratchetio] $level $message\n";
+        echo "[Rollbar] $level $message\n";
     }
 }
 
@@ -22,8 +22,8 @@ function main() {
         //'access_token' => 'eb6b9dad914343d7a4231421a75c8458',
         'access_token' => 'fdcc9f0eeecf4a90adccc6ef49e1805c',
         'environment' => 'php-test',
-        'root' => '/Users/brian/www/ratchetio-php',
-        'base_api_url' => 'http://brian.ratchetdev.com/api/1/',
+        'root' => '/Users/brian/www/rollbar-php',
+        'base_api_url' => 'http://brian.rollbardev.com/api/1/',
         'logger' => new EchoLogger(),
         'error_sample_rates' => array(
             E_NOTICE => 0.5,
@@ -38,15 +38,15 @@ function main() {
         'person_fn' => 'get_current_person'
     );
     // $config, $set_exception_handler, $set_error_handler
-    Ratchetio::init($config, true, true);
+    Rollbar::init($config, true, true);
     
     try {
         throw_test_exception("yo");
     } catch (Exception $e) {
-        Ratchetio::report_exception($e);
+        Rollbar::report_exception($e);
     }
 
-    Ratchetio::report_message("hey there", "info");
+    Rollbar::report_message("hey there", "info");
     
     trigger_error("test user error", E_USER_ERROR);
     trigger_error("test user warning", E_USER_WARNING);

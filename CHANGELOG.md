@@ -1,5 +1,8 @@
 # Changelog
 
+**0.5.0**
+- Rename to rollbar
+
 **0.4.2**
 - Added new default scrub params
 

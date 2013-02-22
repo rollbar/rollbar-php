@@ -1,25 +1,25 @@
 <?php
 /**
- * Singleton-style wrapper around RatchetioNotifier
+ * Singleton-style wrapper around RollbarNotifier
  *
- * Unless you need multiple RatchetioNotifier instances in the same project, use this.
+ * Unless you need multiple RollbarNotifier instances in the same project, use this.
  */
-class Ratchetio {
-    /** @var RatchetioNotifier */
+class Rollbar {
+    /** @var RollbarNotifier */
     public static $instance = null;
 
     public static function init($config, $set_exception_handler = true, $set_error_handler = true) {
-        self::$instance = new RatchetioNotifier($config);
+        self::$instance = new RollbarNotifier($config);
 
         if ($set_exception_handler) {
-            set_exception_handler('Ratchetio::report_exception');
+            set_exception_handler('Rollbar::report_exception');
         }
         if ($set_error_handler) {
-            set_error_handler('Ratchetio::report_php_error');
+            set_error_handler('Rollbar::report_php_error');
         }
 
         if (self::$instance->batched) {
-            register_shutdown_function('Ratchetio::flush');
+            register_shutdown_function('Rollbar::flush');
         }
     }
 
@@ -59,15 +59,15 @@ class Ratchetio {
 }
 
 
-class RatchetioNotifier {
+class RollbarNotifier {
 
-    const VERSION = "0.4.2";
+    const VERSION = "0.5.0";
 
     // required
     public $access_token = '';
 
     // optional / defaults
-    public $base_api_url = 'https://submit.ratchet.io/api/1/';
+    public $base_api_url = 'https://api.rollbar.com/api/1/';
     public $batch_size = 50;
     public $batched = true;
     public $branch = 'master';
@@ -75,7 +75,7 @@ class RatchetioNotifier {
     public $environment = 'production';
     public $error_sample_rates = array();
     public $host = null;
-    /** @var iRatchetioLogger */
+    /** @var iRollbarLogger */
     public $logger = null;
     public $max_errno = 1024;  // ignore E_STRICT and above
     public $person = null;
@@ -171,7 +171,7 @@ class RatchetioNotifier {
 
     /**
      * Flushes the queue.
-     * Called internally when the queue exceeds $batch_size, and by Ratchetio::flush
+     * Called internally when the queue exceeds $batch_size, and by Rollbar::flush
      * on shutdown.
      */
     public function flush() {
@@ -441,7 +441,7 @@ class RatchetioNotifier {
             );
         }
 
-        // ratchet expects most recent call to be last, not first
+        // rollbar expects most recent call to be last, not first
         $frames = array_reverse($frames);
 
         // add top-level file and line to end of the reversed array
@@ -458,7 +458,7 @@ class RatchetioNotifier {
     private function shift_method(&$frames) {
         if ($this->shift_function) {
             // shift 'method' values down one frame, so they reflect where the call
-            // occurs (like Ratchet expects), instead of what is being called.
+            // occurs (like Rollbar expects), instead of what is being called.
             for ($i = count($frames) - 1; $i > 0; $i--) {
                 $frames[$i]['method'] = $frames[$i - 1]['method'];
             }
@@ -489,7 +489,7 @@ class RatchetioNotifier {
                 );
             }
 
-            // ratchet expects most recent call last, not first
+            // rollbar expects most recent call last, not first
             $frames = array_reverse($frames);
 
             // add top-level file and line to end of the reversed array
@@ -572,7 +572,7 @@ class RatchetioNotifier {
             'language' => 'php',
             'framework' => 'php',
             'notifier' => array(
-                'name' => 'ratchetio-php',
+                'name' => 'rollbar-php',
                 'version' => self::VERSION
             )
         );
@@ -636,7 +636,7 @@ class RatchetioNotifier {
         curl_close($ch);
 
         if ($status_code != 200) {
-            $this->log_warning('Got unexpected status code from Ratchet.io API ' . $action .
+            $this->log_warning('Got unexpected status code from Rollbar API ' . $action .
                 ': ' .$status_code);
             $this->log_warning('Output: ' .$result);
         } else {
@@ -665,6 +665,6 @@ class RatchetioNotifier {
     }
 }
 
-interface iRatchetioLogger {
+interface iRollbarLogger {
     public function log($level, $msg);
 }
