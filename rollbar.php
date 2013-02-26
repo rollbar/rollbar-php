@@ -58,6 +58,7 @@ class Rollbar {
     }
 }
 
+class_alias('Rollbar', 'Ratchetio');
 
 class RollbarNotifier {
 
