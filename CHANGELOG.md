@@ -1,5 +1,8 @@
 # Changelog
 
+**0.5.1**
+- Adding ability to write to rollbar-agent files
+
 **0.5.0**
 - Rename to rollbar
 

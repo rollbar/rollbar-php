@@ -62,7 +62,7 @@ class_alias('Rollbar', 'Ratchetio');
 
 class RollbarNotifier {
 
-    const VERSION = "0.5.0";
+    const VERSION = "0.5.1";
 
     // required
     public $access_token = '';
@@ -75,6 +75,9 @@ class RollbarNotifier {
     public $capture_error_backtraces = true;
     public $environment = 'production';
     public $error_sample_rates = array();
+    // available handlers: blocking, agent
+    public $handler = 'blocking';
+    public $agent_log_location = '/var/tmp';
     public $host = null;
     /** @var iRollbarLogger */
     public $logger = null;
@@ -87,8 +90,9 @@ class RollbarNotifier {
     public $timeout = 3;
 
     private $config_keys = array('access_token', 'base_api_url', 'batch_size', 'batched', 'branch', 
-        'capture_error_backtraces', 'environment', 'error_sample_rates', 'host', 'logger', 
-        'max_errno', 'person', 'person_fn', 'root', 'scrub_fields', 'shift_function', 'timeout');
+        'capture_error_backtraces', 'environment', 'error_sample_rates', 'handler', 'agent_log_location', 'host', 
+        'logger', 'max_errno', 'person', 'person_fn', 'root', 'scrub_fields', 'shift_function', 
+        'timeout');
 
     // cached values for request/server/person data
     private $_request_data = null;
@@ -97,6 +101,9 @@ class RollbarNotifier {
 
     // payload queue, used when $batched is true
     private $_queue = array();
+
+    // file handle for agent log
+    private $_agent_log = null;
 
     private $_mt_randmax;
 
@@ -132,6 +139,10 @@ class RollbarNotifier {
 
         // cache this value
         $this->_mt_randmax = mt_getrandmax();
+
+        if ($this->handler == 'agent') {
+            $this->_agent_log = fopen($this->agent_log_location . '/rollbar-relay.' . getmypid() . '.rollbar', 'a');
+        }
     }
 
     public function report_exception($exc) {
@@ -603,10 +614,22 @@ class RollbarNotifier {
      * $payload - php array
      */
     private function _send_payload($payload) {
-        $this->log_info("Sending payload");
+        if ($this->handler == 'agent') {
+            $this->_send_payload_agent($payload);
+        } else {
+            $this->_send_payload_blocking($payload);
+        }
+    }
 
+    private function _send_payload_blocking($payload) {
+        $this->log_info("Sending payload");
         $post_data = json_encode($payload);
         $this->make_api_call('item', $post_data);
+    }
+
+    private function _send_payload_agent($payload) {
+        $this->log_info("Writing payload to file");
+        fwrite($this->_agent_log, json_encode($payload) . "\n");
     }
 
     /**
@@ -615,8 +638,23 @@ class RollbarNotifier {
      * $batch - php array of payloads
      */
     private function send_batch($batch) {
-        $this->log_info("Sending batch");
+        if ($this->handler == 'agent') {
+            $this->send_batch_agent($batch);
+        } else {
+            $this->send_batch_blocking($batch);
+        }
+    }
 
+    private function send_batch_agent($batch) {
+        $this->log_info("Writing batch to file");
+        
+        foreach ($batch as $item) {
+            fwrite($this->_agent_log, json_encode($item) . "\n");
+        }
+    }
+
+    private function send_batch_blocking($batch) {
+        $this->log_info("Sending batch");
         $post_data = json_encode($batch);
         $this->make_api_call('item_batch', $post_data);
     }
