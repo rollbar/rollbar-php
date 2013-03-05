@@ -70,12 +70,28 @@ Rollbar::report_message('Here is a message with some additional data', 'info',
     array('x' => 10, 'code' => 'blue'));
 ```
 
+## Asynchronous Reporting
+
+By default, payloads are batched and sent to the Rollbar servers at the end of every script execution (or when the batch size reaches 50, whichever comes first). This is easy to configure but may negatively impact performance. 
+
+With some additional setup, payloads can be written to a local relay file instead; that file will be consumed by [rollbar-agent](https://github.com/rollbar/rollbar-agent) asynchronously. To turn this on, set the following config params:
+
+```php
+$config = array(
+  // ... rest of current config
+  'handler' => 'agent',
+  'agent_log_location' => '/var/www'  // not including final slash. must be writeable by the user php runs as.
+);
+```
+
+You'll also need to run the agent. See the [rollbar-agent docs](https://github.com/rollbar/rollbar-agent) for setup instructions.
 
 ## Configuration reference
 
 All of the following options can be passed as keys in the $config array.
 
 - access_token: your project access token
+- agent_log_location: path to the directory where agent relay log files should be written. Should not include final slash. Only used when handler is "agent". Default: /var/www
 - base_api_url: the base api url to post to (default 'https://api.rollbar.com/api/1/')
 - batch_size: flush batch early if it reaches this size. default: 50
 - batched: true to batch all reports from a single request together. default true.
@@ -83,6 +99,7 @@ All of the following options can be passed as keys in the $config array.
 - capture_error_stacktraces: record full stacktraces for PHP errors. default: true.
 - environment: environment name, e.g. 'production' or 'development'
 - error_sample_rates: associative array mapping error numbers to sample rates. Sample rates are ratio out of 1, e.g. 0 is "never report", 1 is "always report", and 0.1 is "report 10% of the time". Sampling is done on a per-error basis. Default: empty array, meaning all errors are reported.
+- handler: either "blocking" (default) or "agent". "blocking" uses curl to send requests immediately; "agent" writes a relay log to be consumed by rollbar-agent.
 - host: server hostname. Default: null, which will result in a call to `gethostname()` (or `php_uname('n')` if that function does not exist)
 - logger: an object that has a log($level, $message) method. If provided, will be used by RollbarNotifier to log messages.
 - max_errno: max PHP error number to report. e.g. 1024 will ignore all errors above E_USER_NOTICE. default: 1024 (ignore E_STRICT and above).
