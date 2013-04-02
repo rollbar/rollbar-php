@@ -1,5 +1,8 @@
 # Changelog
 
+**0.5.2**
+- Fix compatability issue with PHP 5.2.
+
 **0.5.1**
 - Adding ability to write to rollbar-agent files
 
