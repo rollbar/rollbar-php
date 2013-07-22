@@ -128,7 +128,7 @@ function get_current_user() {
     if ($_SESSION['user_id']) {
         return array(
             'id' => $_SESSION['user_id'], // required - value is a string
-            'username' => '$_SESSION['username'], // optional - value is a string
+            'username' => $_SESSION['username'], // optional - value is a string
             'email' => $_SESSION['user_email'] // optional - value is a string
         );
     }
