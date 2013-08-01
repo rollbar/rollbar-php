@@ -9,7 +9,7 @@ PHP notifier for Rollbar. Catches and reports exceptions to [Rollbar.com](https:
 ```php
 <?php
 // installs global error and exception handlers
-Rollbar::init(array('access_token' => 'your_access_token'));
+Rollbar::init(array('access_token' => 'POST_SERVER_ITEM_ACCESS_TOKEN'));
 
 try {
     throw new Exception('test exception');
@@ -39,7 +39,7 @@ require_once 'rollbar.php';
 
 $config = array(
     // required
-    'access_token' => 'your_rollbar_access_token',
+    'access_token' => 'POST_SERVER_ITEM_ACCESS_TOKEN',
     // optional - environment name. any string will do.
     'environment' => 'production',
     // optional - dir your code is in. used for linking stack traces.
