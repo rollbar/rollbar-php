@@ -65,7 +65,7 @@ if (function_exists('class_alias')) {
 
 class RollbarNotifier {
 
-    const VERSION = "0.5.2";
+    const VERSION = "0.5.3";
 
     // required
     public $access_token = '';
@@ -88,7 +88,8 @@ class RollbarNotifier {
     public $person = null;
     public $person_fn = null;
     public $root = '';
-    public $scrub_fields = array('passwd', 'password', 'secret', 'confirm_password', 'password_confirmation');
+    public $scrub_fields = array('passwd', 'password', 'secret', 'confirm_password', 
+        'password_confirmation', 'auth_token', 'csrf_token');
     public $shift_function = true;
     public $timeout = 3;
 
@@ -368,7 +369,7 @@ class RollbarNotifier {
                 $request['POST'] = $this->scrub_request_params($_POST);
             }
             if (isset($_SESSION) && $_SESSION) {
-                $request['session'] = $_SESSION;
+                $request['session'] = $this->scrub_request_params($_SESSION);
             }
             $this->_request_data = $request;
         }

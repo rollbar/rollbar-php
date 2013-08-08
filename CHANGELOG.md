@@ -1,5 +1,8 @@
 # Changelog
 
+**0.5.3**
+- Scrub fields from session params too (instead of just POST). Add csrf_token and auth_token to list of default scrub fields.
+
 **0.5.2**
 - Fix compatability issue with PHP 5.2.
 

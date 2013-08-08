@@ -3,7 +3,7 @@
   "description": "Monitors errors and exceptions and reports them to Rollbar",
   "type": "library",
   "keywords": ["logging", "debugging", "monitoring", "errors", "exceptions"],
-  "version": "0.5.0",
+  "version": "0.5.3",
   "license": "MIT",
   "homepage": "http://github.com/rollbar/rollbar-php",
   "authors": [

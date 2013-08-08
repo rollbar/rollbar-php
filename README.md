@@ -193,9 +193,9 @@ Default: `1024` (ignore E_STRICT and above)
   </dd>
 
   <dt>scrub_fields</dt>
-  <dd>Array of field names to scrub out of POST. Values will be replaced with astrickses. If overridiing, make sure to list all fields you want to scrub, not just fields you want to add to the default. Param names are converted to lowercase before comparing against the scrub list.
+  <dd>Array of field names to scrub out of _POST and _SESSION. Values will be replaced with astrickses. If overridiing, make sure to list all fields you want to scrub, not just fields you want to add to the default. Param names are converted to lowercase before comparing against the scrub list.
   
-Default: `('passwd', 'password', 'secret', 'confirm_password', 'password_confirmation')`
+Default: `('passwd', 'password', 'secret', 'confirm_password', 'password_confirmation', 'auth_token', 'csrf_token')`
   </dd>
 
   <dt>shift_function</dt>
