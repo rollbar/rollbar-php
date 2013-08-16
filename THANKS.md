@@ -2,4 +2,5 @@ Many thanks to the following contributors, by github username and in alphabetica
 
 - alexthegeek
 - plusbryan
+- rekky
 - steveh

@@ -1,5 +1,8 @@
 # Changelog
 
+**0.5.4**
+- Fix E_WARNING when scrubbing a param that is an array
+
 **0.5.3**
 - Scrub fields from session params too (instead of just POST). Add csrf_token and auth_token to list of default scrub fields.
 

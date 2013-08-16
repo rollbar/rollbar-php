@@ -65,7 +65,7 @@ if (function_exists('class_alias')) {
 
 class RollbarNotifier {
 
-    const VERSION = "0.5.3";
+    const VERSION = "0.5.4";
 
     // required
     public $access_token = '';
