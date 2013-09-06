@@ -1,5 +1,8 @@
 # Changelog
 
+**0.5.5**
+- Added `code_version` configuration setting
+
 **0.5.4**
 - Fix E_WARNING when scrubbing a param that is an array
 

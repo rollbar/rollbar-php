@@ -65,7 +65,7 @@ if (function_exists('class_alias')) {
 
 class RollbarNotifier {
 
-    const VERSION = "0.5.4";
+    const VERSION = "0.5.5";
 
     // required
     public $access_token = '';
@@ -76,6 +76,7 @@ class RollbarNotifier {
     public $batched = true;
     public $branch = 'master';
     public $capture_error_backtraces = true;
+    public $code_version = null;
     public $environment = 'production';
     public $error_sample_rates = array();
     // available handlers: blocking, agent
@@ -94,9 +95,9 @@ class RollbarNotifier {
     public $timeout = 3;
 
     private $config_keys = array('access_token', 'base_api_url', 'batch_size', 'batched', 'branch', 
-        'capture_error_backtraces', 'environment', 'error_sample_rates', 'handler', 'agent_log_location', 'host', 
-        'logger', 'max_errno', 'person', 'person_fn', 'root', 'scrub_fields', 'shift_function', 
-        'timeout');
+        'capture_error_backtraces', 'code_version', 'environment', 'error_sample_rates', 'handler',
+        'agent_log_location', 'host', 'logger', 'max_errno', 'person', 'person_fn', 'root',
+        'scrub_fields', 'shift_function', 'timeout');
 
     // cached values for request/server/person data
     private $_request_data = null;
@@ -582,7 +583,7 @@ class RollbarNotifier {
     }
 
     private function build_base_data($level = 'error') {
-        return array(
+        $data = array(
             'timestamp' => time(),
             'environment' => $this->environment,
             'level' => $level,
@@ -593,6 +594,12 @@ class RollbarNotifier {
                 'version' => self::VERSION
             )
         );
+        
+        if ($this->code_version) {
+            $data['code_version'] = $this->code_version;
+        }
+        
+        return $data;
     }
 
     private function build_payload($data) {
