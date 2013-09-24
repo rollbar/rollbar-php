@@ -27,19 +27,19 @@ class Rollbar {
         if (self::$instance == null) {
             return;
         }
-        self::$instance->report_exception($exc);
+        return self::$instance->report_exception($exc);
     }
 
     public static function report_message($message, $level = 'error', $extra_data = null) {
         if (self::$instance == null) {
             return;
         }
-        self::$instance->report_message($message, $level, $extra_data);
+        return self::$instance->report_message($message, $level, $extra_data);
     }
 
     public static function report_php_error($errno, $errstr, $errfile, $errline) {
         if (self::$instance != null) {
-            self::$instance->report_php_error($errno, $errstr, $errfile, $errline);
+            return self::$instance->report_php_error($errno, $errstr, $errfile, $errline);
         }
         return false;
     }
@@ -65,7 +65,7 @@ if (function_exists('class_alias')) {
 
 class RollbarNotifier {
 
-    const VERSION = "0.5.5";
+    const VERSION = "0.5.6";
 
     // required
     public $access_token = '';
@@ -152,7 +152,7 @@ class RollbarNotifier {
 
     public function report_exception($exc) {
         try {
-            $this->_report_exception($exc);
+            return $this->_report_exception($exc);
         } catch (Exception $e) {
             try {
                 $this->log_error("Exception while reporting exception");
@@ -164,7 +164,7 @@ class RollbarNotifier {
 
     public function report_message($message, $level = 'error', $extra_data = null) {
         try {
-            $this->_report_message($message, $level, $extra_data);
+            return $this->_report_message($message, $level, $extra_data);
         } catch (Exception $e) {
             try {
                 $this->log_error("Exception while reporting message");
@@ -176,7 +176,7 @@ class RollbarNotifier {
 
     public function report_php_error($errno, $errstr, $errfile, $errline) {
         try {
-            $this->_report_php_error($errno, $errstr, $errfile, $errline);
+            return $this->_report_php_error($errno, $errstr, $errfile, $errline);
         } catch (Exception $e) {
             try {
                 $this->log_error("Exception while reporting php error");
@@ -228,6 +228,8 @@ class RollbarNotifier {
 
         $payload = $this->build_payload($data);
         $this->send_payload($payload);
+        
+        return $data['uuid'];
     }
 
     private function _report_php_error($errno, $errstr, $errfile, $errline) {
@@ -319,6 +321,8 @@ class RollbarNotifier {
 
         $payload = $this->build_payload($data);
         $this->send_payload($payload);
+        
+        return $data['uuid'];
     }
 
     private function _report_message($message, $level, $extra_data) {
@@ -348,6 +352,8 @@ class RollbarNotifier {
 
         $payload = $this->build_payload($data);
         $this->send_payload($payload);
+        
+        return $data['uuid'];
     }
 
     private function check_config() {
@@ -592,7 +598,8 @@ class RollbarNotifier {
             'notifier' => array(
                 'name' => 'rollbar-php',
                 'version' => self::VERSION
-            )
+            ),
+            'uuid' => $this->uuid4()
         );
         
         if ($this->code_version) {
@@ -713,6 +720,29 @@ class RollbarNotifier {
         if ($this->logger !== null) {
             $this->logger->log($level, $msg);
         }
+    }
+    
+    // from http://www.php.net/manual/en/function.uniqid.php#94959
+    private function uuid4() {
+        return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+            // 32 bits for "time_low"
+            mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+            
+            // 16 bits for "time_mid"
+            mt_rand(0, 0xffff),
+            
+            // 16 bits for "time_hi_and_version",
+            // four most significant bits holds version number 4
+            mt_rand(0, 0x0fff) | 0x4000,
+            
+            // 16 bits, 8 bits for "clk_seq_hi_res",
+            // 8 bits for "clk_seq_low",
+            // two most significant bits holds zero and one for variant DCE1.1
+            mt_rand(0, 0x3fff) | 0x8000,
+            
+            // 48 bits for "node"
+            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+        );
     }
 }
 

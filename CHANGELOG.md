@@ -1,5 +1,8 @@
 # Changelog
 
+**0.5.6**
+- A uuid is now generated and sent with each item
+
 **0.5.5**
 - Added `code_version` configuration setting
 
