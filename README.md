@@ -1,5 +1,6 @@
 # Rollbar notifier for PHP
 
+<!-- RemoveNext -->
 PHP notifier for Rollbar. Catches and reports exceptions to [Rollbar.com](https://rollbar.com/) for alerts, reporting, and analysis.
 
 <!-- Sub:[TOC] -->
@@ -50,6 +51,8 @@ $config = array(
 Rollbar::init($config);
 ?>
 ```
+<!-- RemoveNextIfProject -->
+Be sure to replace ```POST_SERVER_ITEM_ACCESS_TOKEN``` with your project's ```post_server_item``` access token, which you can find in the Rollbar.com interface.
 
 This will install an exception handler (with `set_exception_handler`) and an error handler (with `set_error_handler`). If you'd rather not do that:
 
