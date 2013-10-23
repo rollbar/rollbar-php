@@ -246,9 +246,13 @@ $config['person_fn'] = 'get_current_user';
 ```
 
 
-## Support
+## Help / Support
 
-If you have any feedback or run into any problems, please contact support at support@rollbar.com
+If you run into any issues, please email us at [support@rollbar.com](mailto:support@rollbar.com)
+
+You can also find us in IRC: [#rollbar on chat.freenode.net](irc://chat.freenode.net/rollbar)
+
+For bug reports, please [open an issue on GitHub](https://github.com/rollbar/rollbar-php/issues/new).
 
 
 ## Contributing
