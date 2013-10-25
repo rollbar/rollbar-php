@@ -86,13 +86,26 @@ Rollbar::report_message('Here is a message with some additional data', 'info',
 ?>
 ```
 
+## Batching
+
+By default, payloads are batched and sent to the Rollbar servers at the end of every script execution via a shutdown handler, or when the batch size reaches 50, whichever comes first. This works well in standard short-lived scripts, like serving web requests.
+
+If you're using Rollbar in a long-running script, such as a Laravel project or a background worker, you may want to manually flush the batch. To flush, simply call:
+
+```php
+Rollbar::flush();
+```
+
+For example, if using Laravel, add the above line to your `App::after()` event handler. Or in a looping background worker, call it at the end of each loop.
+
+You can also tune the max batch size or disable batching altogether. See the `batch_size` and `batched` config variables, documented below.
+
+
 ## Configuration
 
 ### Asynchronous Reporting
 
-By default, payloads are batched and sent to the Rollbar servers at the end of every script execution (or when the batch size reaches 50, whichever comes first). This is easy to configure but may negatively impact performance. 
-
-With some additional setup, payloads can be written to a local relay file instead; that file will be consumed by [rollbar-agent](https://github.com/rollbar/rollbar-agent) asynchronously. To turn this on, set the following config params:
+By default, payloads (batched or not) are sent as part of script execution. This is easy to configure but may negatively impact performance. With some additional setup, payloads can be written to a local relay file instead; that file will be consumed by [rollbar-agent](https://github.com/rollbar/rollbar-agent) asynchronously. To turn this on, set the following config params:
 
 ```php
 <?php
