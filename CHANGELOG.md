@@ -1,5 +1,8 @@
 # Changelog
 
+**0.6.0**
+- Don't report errors suppressed with '@' by default
+
 **0.5.6**
 - A uuid is now generated and sent with each item
 

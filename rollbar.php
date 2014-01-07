@@ -65,7 +65,7 @@ if (function_exists('class_alias')) {
 
 class RollbarNotifier {
 
-    const VERSION = "0.5.6";
+    const VERSION = "0.6.0";
 
     // required
     public $access_token = '';
@@ -93,11 +93,12 @@ class RollbarNotifier {
         'password_confirmation', 'auth_token', 'csrf_token');
     public $shift_function = true;
     public $timeout = 3;
+    public $report_suppressed = false;
 
     private $config_keys = array('access_token', 'base_api_url', 'batch_size', 'batched', 'branch', 
         'capture_error_backtraces', 'code_version', 'environment', 'error_sample_rates', 'handler',
         'agent_log_location', 'host', 'logger', 'max_errno', 'person', 'person_fn', 'root',
-        'scrub_fields', 'shift_function', 'timeout');
+        'scrub_fields', 'shift_function', 'timeout', 'report_suppressed');
 
     // cached values for request/server/person data
     private $_request_data = null;
@@ -207,6 +208,11 @@ class RollbarNotifier {
         if (!$this->check_config()) {
             return;
         }
+        
+        if (error_reporting() === 0 && !$this->report_suppressed) {
+            // ignore
+            return;
+        }
 
         $data = $this->build_base_data();
 
@@ -234,6 +240,11 @@ class RollbarNotifier {
 
     private function _report_php_error($errno, $errstr, $errfile, $errline) {
         if (!$this->check_config()) {
+            return;
+        }
+        
+        if (error_reporting() === 0 && !$this->report_suppressed) {
+            // ignore
             return;
         }
 
@@ -327,6 +338,11 @@ class RollbarNotifier {
 
     private function _report_message($message, $level, $extra_data) {
         if (!$this->check_config()) {
+            return;
+        }
+        
+        if (error_reporting() === 0 && !$this->report_suppressed) {
+            // ignore
             return;
         }
 

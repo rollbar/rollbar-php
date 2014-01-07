@@ -225,6 +225,12 @@ Default: `true`
   
 Default: `3`
   </dd>
+
+  <dt>report_suppressed</dt>
+  <dd>Sets whether errors suppressed with '@' should be reported or not
+  
+Default: `false`
+  </dd>
   </dl>
 
 Example use of error_sample_rates:
