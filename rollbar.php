@@ -445,8 +445,9 @@ class RollbarNotifier {
         
         if (!empty($_SERVER['HTTP_X_FORWARDED_HOST'])) {
             $host = $_SERVER['HTTP_X_FORWARDED_HOST'];
-        } else if (!empty($_SERVER['HOST'])) {
-            $host = $_SERVER['HOST'];
+        } else if (!empty($_SERVER['HTTP_HOST'])) {
+            $parts = explode(':', $_SERVER['HTTP_HOST']);
+            $host = $parts[0];
         } else if (!empty($_SERVER['SERVER_NAME'])) {
             $host = $_SERVER['SERVER_NAME'];
         } else {
@@ -458,7 +459,7 @@ class RollbarNotifier {
         } else if (!empty($_SERVER['SERVER_PORT'])) {
             $port = $_SERVER['SERVER_PORT'];
         } else {
-            $host = 80;
+            $port = 80;
         }
         
         $path = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '/';
