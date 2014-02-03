@@ -1,5 +1,8 @@
 # Changelog
 
+**0.6.1**
+- Respect HTTP_X_FORWARDED_ http headers for request url construction
+
 **0.6.0**
 - Don't report errors suppressed with '@' by default
 
