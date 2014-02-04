@@ -89,7 +89,7 @@ class RollbarNotifier {
     public $person = null;
     public $person_fn = null;
     public $root = '';
-    public $scrub_fields = array('passwd', 'password', 'secret', 'confirm_password', 
+    public $scrub_fields = array('passwd', 'pass', 'password', 'secret', 'confirm_password', 
         'password_confirmation', 'auth_token', 'csrf_token');
     public $shift_function = true;
     public $timeout = 3;
