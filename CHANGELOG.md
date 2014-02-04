@@ -1,5 +1,8 @@
 # Changelog
 
+**0.6.2**
+- Adding "pass" to default scrub fields
+
 **0.6.1**
 - Respect HTTP_X_FORWARDED_ http headers for request url construction
 
