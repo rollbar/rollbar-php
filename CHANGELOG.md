@@ -1,5 +1,8 @@
 # Changelog
 
+**0.6.3**
+- Fix issue where POST params could get clobbered while scrubbing
+
 **0.6.2**
 - Adding "pass" to default scrub fields
 
