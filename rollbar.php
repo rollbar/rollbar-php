@@ -401,14 +401,17 @@ class RollbarNotifier {
     }
     
     protected function scrub_request_params($params) {
+        $scrubbed = array();
         foreach ($params as $k => $v) {
             if (in_array($k, $this->scrub_fields)) {
                 $count = is_array($v) ? count($v) : strlen($v);
-                $params[$k] = str_repeat('*', $count);
+                $scrubbed[$k] = str_repeat('*', $count);
+            } else {
+                $scrubbed[$k] = $v;
             }
         }
         
-        return $params;
+        return $scrubbed;
     }
 
     protected function headers() {
