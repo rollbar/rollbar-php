@@ -58,14 +58,8 @@ class Rollbar {
     }
 }
 
-// Alias old module name. Only available in PHP 5.3+
-if (function_exists('class_alias')) {
-    class_alias('Rollbar', 'Ratchetio');
-}
-
 class RollbarNotifier {
-
-    const VERSION = "0.6.3";
+    const VERSION = "0.6.4";
 
     // required
     public $access_token = '';
@@ -791,3 +785,5 @@ class RollbarNotifier {
 interface iRollbarLogger {
     public function log($level, $msg);
 }
+
+class Ratchetio extends Rollbar {}
