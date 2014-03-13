@@ -1,5 +1,9 @@
 # Changelog
 
+**0.6.4**
+- Composer package defenition optimizations
+- Use subclass for Ratchetio backwards-compatibility layer instead of a class_alias
+
 **0.6.3**
 - Fix issue where POST params could get clobbered while scrubbing
 - Convert internal methods from `private` to `protected` for better extensibility
