@@ -39,7 +39,7 @@ class Rollbar {
 
     public static function report_php_error($errno, $errstr, $errfile, $errline) {
         if (self::$instance != null) {
-            return self::$instance->report_php_error($errno, $errstr, $errfile, $errline);
+            self::$instance->report_php_error($errno, $errstr, $errfile, $errline);
         }
         return false;
     }
