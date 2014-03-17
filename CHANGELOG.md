@@ -1,5 +1,8 @@
 # Changelog
 
+**0.7.0**
+- Fix regression introduced in 0.5.6 which would prevent the default php error handler from running, resulting in scripts no longer halting after such errors.
+
 **0.6.4**
 - Composer package defenition optimizations
 - Use subclass for Ratchetio backwards-compatibility layer instead of a class_alias
@@ -45,4 +48,4 @@
 - Added optional extra_data param to report_message()
 
 **0.4.0**
-- Error handler function (`report_php_error`) now always returns false, so that the default php error handler still runs. This is  a breaking change if your code relied on the old behavior where the error handler did *not* ever halt script execution.
+- Error handler function (`report_php_error`) now always returns false, so that the default php error handler still runs. This is a breaking change if your code relied on the old behavior where the error handler did *not* ever halt script execution.

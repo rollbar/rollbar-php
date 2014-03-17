@@ -37,6 +37,7 @@ class Rollbar {
         return self::$instance->report_message($message, $level, $extra_data);
     }
 
+    // This function must return false so that the default php error handler runs
     public static function report_php_error($errno, $errstr, $errfile, $errline) {
         if (self::$instance != null) {
             self::$instance->report_php_error($errno, $errstr, $errfile, $errline);
@@ -59,7 +60,7 @@ class Rollbar {
 }
 
 class RollbarNotifier {
-    const VERSION = "0.6.4";
+    const VERSION = "0.7.0";
 
     // required
     public $access_token = '';
