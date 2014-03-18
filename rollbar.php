@@ -8,7 +8,7 @@ class Rollbar {
     /** @var RollbarNotifier */
     public static $instance = null;
 
-    public static function init($config, $set_exception_handler = true, $set_error_handler = true) {
+    public static function init($config, $set_exception_handler = true, $set_error_handler = true, $report_fatal_errors = true) {
         self::$instance = new RollbarNotifier($config);
 
         if ($set_exception_handler) {
@@ -17,6 +17,9 @@ class Rollbar {
         if ($set_error_handler) {
             set_error_handler('Rollbar::report_php_error');
         }
+		if($report_fatal_errors) {
+			register_shutdown_function('Rollbar::report_fatal_error');
+		}
 
         if (self::$instance->batched) {
             register_shutdown_function('Rollbar::flush');
@@ -37,6 +40,19 @@ class Rollbar {
         return self::$instance->report_message($message, $level, $extra_data);
     }
 
+	public static function report_fatal_error() {
+		// Catch any fatal errors that are causing the shutdown
+		$last_error = error_get_last();
+		if (!is_null($last_error)) {
+			switch($last_error['type']) {
+				case E_ERROR:
+				case E_USER_ERROR:
+					self::$instance->report_php_error($last_error['type'], $last_error['message'], $last_error['file'], $last_error['line']);
+					break;
+			}
+		}
+	}
+
     // This function must return false so that the default php error handler runs
     public static function report_php_error($errno, $errstr, $errfile, $errline) {
         if (self::$instance != null) {
@@ -46,15 +62,6 @@ class Rollbar {
     }
 
     public static function flush() {
-        // Catch any fatal errors that are causing the shutdown
-        $last_error = error_get_last();
-        if (!is_null($last_error)) {
-            switch($last_error['type']) {
-                case E_ERROR:
-                    self::$instance->report_php_error($last_error['type'], $last_error['message'], $last_error['file'], $last_error['line']);
-                    break;
-            }
-        }
         self::$instance->flush();
     }
 }
