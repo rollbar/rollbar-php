@@ -66,7 +66,7 @@ class Rollbar {
 }
 
 class RollbarNotifier {
-    const VERSION = "0.7.0";
+    const VERSION = "0.7.1";
 
     // required
     public $access_token = '';

@@ -1,5 +1,8 @@
 # Changelog
 
+**0.7.1**
+- Added ability to disable the notifier's fatal error handler ([#18](https://github.com/rollbar/rollbar-php/pull/18))
+
 **0.7.0**
 - Fix regression introduced in 0.5.6 which would prevent the default php error handler from running, resulting in scripts no longer halting after such errors.
 
