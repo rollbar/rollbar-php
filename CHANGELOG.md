@@ -1,6 +1,6 @@
 # Changelog
 
-**0.7.1**
+**0.8.0**
 - Added ability to disable the notifier's fatal error handler ([#18](https://github.com/rollbar/rollbar-php/pull/18))
 
 **0.7.0**
