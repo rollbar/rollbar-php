@@ -264,6 +264,10 @@ $config['person_fn'] = 'get_current_user';
 ?>
 ```
 
+## Related projects
+
+A Laravel-specific package is available for integrating with Laravel: [Laravel-Rollbar](https://github.com/jenssegers/Laravel-Rollbar)
+
 
 ## Help / Support
 
