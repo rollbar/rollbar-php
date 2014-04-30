@@ -30,7 +30,23 @@ throw new Exception('test 2');
 
 ## Installation
 
+### General
+
 Download [rollbar.php](https://raw.github.com/rollbar/rollbar-php/master/rollbar.php) and put it somewhere you can access.
+
+### If Using Composer
+
+Add `rollbar/rollbar` to your `composer.json`:
+
+```json
+{
+    "require": {
+        "rollbar": "~0.8.0"
+    }
+}
+```
+
+## Setup
 
 Add the following code at your application's entry point:
 
@@ -64,7 +80,29 @@ Rollbar::init($config, $set_exception_handler, $set_error_handler);
 ?>
 ```
 
-That's it! If you'd like to report exceptions that you catch yourself:
+### For Heroku Users
+
+First, add the addon:
+
+```
+heroku addons:add rollbar:free
+```
+
+The `access_token` and `root` config variables will be automatically detected, so the config is simply:
+
+```php
+<?php
+Rollbar::init(array(
+    'environment' => 'production'
+));
+?>
+```
+
+## Basic Usage
+
+That's it! Uncaught errors and exceptions will now be reported to Rollbar.
+
+If you'd like to report exceptions that you catch yourself:
 
 ```php
 <?php

@@ -12,12 +12,17 @@ class Rollbar {
         if ($config === null) {
             $config = array();
         }
-        // Use env vars for configuration, if set (Heroku support)
+
+        // Heroku support
+        // Use env vars for configuration, if set
         if (isset($_ENV['ROLLBAR_ACCESS_TOKEN']) && !isset($config['access_token'])) {
             $config['access_token'] = $_ENV['ROLLBAR_ACCESS_TOKEN'];
         }
         if (isset($_ENV['ROLLBAR_ENDPOINT']) && !isset($config['endpoint'])) {
             $config['endpoint'] = $_ENV['ROLLBAR_ENDPOINT'];
+        }
+        if (isset($_ENV['HEROKU_APP_DIR']) && !isset($config['root'])) {
+            $config['root'] = $_ENV['HEROKU_APP_DIR'];
         }
 
         self::$instance = new RollbarNotifier($config);
