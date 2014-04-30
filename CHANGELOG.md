@@ -1,5 +1,8 @@
 # Changelog
 
+**0.8.1**
+- Added support for more seamless configuration on Heroku
+
 **0.8.0**
 - Added ability to disable the notifier's fatal error handler ([#18](https://github.com/rollbar/rollbar-php/pull/18))
 

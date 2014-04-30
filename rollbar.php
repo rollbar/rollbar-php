@@ -82,7 +82,7 @@ class Rollbar {
 }
 
 class RollbarNotifier {
-    const VERSION = "0.8.0";
+    const VERSION = "0.8.1";
 
     // required
     public $access_token = '';
