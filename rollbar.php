@@ -8,11 +8,7 @@ class Rollbar {
     /** @var RollbarNotifier */
     public static $instance = null;
 
-    public static function init($config = null, $set_exception_handler = true, $set_error_handler = true, $report_fatal_errors = true) {
-        if ($config === null) {
-            $config = array();
-        }
-
+    public static function init($config = array(), $set_exception_handler = true, $set_error_handler = true, $report_fatal_errors = true) {
         // Heroku support
         // Use env vars for configuration, if set
         if (isset($_ENV['ROLLBAR_ACCESS_TOKEN']) && !isset($config['access_token'])) {
