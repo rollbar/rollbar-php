@@ -20,7 +20,7 @@ try {
 
 Rollbar::report_message('testing 123', 'info');
 
-// raises an E_NOTICE which will be reported by the error handler
+// raises an E_NOTICE which will *not* be reported by the error handler
 $foo = $bar;
 
 // will be reported by the exception handler
@@ -41,7 +41,7 @@ Add `rollbar/rollbar` to your `composer.json`:
 ```json
 {
     "require": {
-        "rollbar": "~0.8.1"
+        "rollbar": "~0.9.0"
     }
 }
 ```
@@ -61,8 +61,8 @@ $config = array(
     'environment' => 'production',
     // optional - dir your code is in. used for linking stack traces.
     'root' => '/Users/brian/www/myapp',
-    // optional - max error number to report. defaults to -1 (report all errors)
-    'max_errno' => E_USER_NOTICE  // ignore E_STRICT and above
+    // optional - the error levels to report. defaults to E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR
+    'included_errno' => (E_ERROR | E_USER_NOTICE)  // ignore all others
 );
 Rollbar::init($config);
 ?>
@@ -228,10 +228,10 @@ Default: `null`, which will result in a call to `gethostname()` (or `php_uname('
   <dd>An object that has a `log($level, $message)` method. If provided, will be used by RollbarNotifier to log messages.
   </dd>
 
-  <dt>max_errno</dt>
-  <dd>Max PHP error number to report. e.g. 1024 will ignore all errors above E_USER_NOTICE.
+  <dt>included_errno</dt>
+  <dd>A bitmask that includes all of the error levels to report. E.g. (E_ERROR | E_WARNING) to only report E_ERROR and E_WARNING errors.
   
-Default: `1024` (ignore E_STRICT and above)
+Default: (E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR)
   </dd>
 
   <dt>person</dt>

@@ -33,7 +33,8 @@ function main() {
             'username' => 'brian',
             'email' => 'brianrue@gmail.com'
         ),*/
-        'person_fn' => 'get_current_person'
+        'person_fn' => 'get_current_person',
+        'included_errno' => E_USER_ERROR | E_USER_NOTICE
     );
     // $config, $set_exception_handler, $set_error_handler
     Rollbar::init($config, true, true);
@@ -46,9 +47,9 @@ function main() {
 
     Rollbar::report_message("hey there", "info");
     
-    trigger_error("test user error", E_USER_ERROR);
     trigger_error("test user warning", E_USER_WARNING);
     trigger_error("test user notice", E_USER_NOTICE);
+    trigger_error("test user error", E_USER_ERROR);
     
     // raises an E_NOTICE, reported by the error handler
     $foo = $bar2;

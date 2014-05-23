@@ -3,6 +3,7 @@
 **0.9.0**
 - Added the ability to specify which set of error levels to send to Rollbar, (instead of everything below a certain level.)
 - Changed the default settings to no longer send E_NOTICE errors.
+- Removed the max_errno config option.
 - Added a performance optimization which sends the access token as a header.
 
 **0.8.1**

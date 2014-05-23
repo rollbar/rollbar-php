@@ -78,7 +78,7 @@ class Rollbar {
 }
 
 // Send errors that have these levels
-define('INCLUDED_ERRNO_BITMASK', E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
+define('ROLLBAR_INCLUDED_ERRNO_BITMASK', E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
 
 class RollbarNotifier {
     const VERSION = "0.9.0";
@@ -101,7 +101,7 @@ class RollbarNotifier {
     public $host = null;
     /** @var iRollbarLogger */
     public $logger = null;
-    public $included_errno = INCLUDED_ERRNO_BITMASK;
+    public $included_errno = ROLLBAR_INCLUDED_ERRNO_BITMASK;
     public $person = null;
     public $person_fn = null;
     public $root = '';
