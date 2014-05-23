@@ -77,8 +77,11 @@ class Rollbar {
     }
 }
 
+// Send errors that have these levels
+define('INCLUDED_ERRNO_BITMASK', E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
+
 class RollbarNotifier {
-    const VERSION = "0.8.1";
+    const VERSION = "0.9.0";
 
     // required
     public $access_token = '';
@@ -98,7 +101,7 @@ class RollbarNotifier {
     public $host = null;
     /** @var iRollbarLogger */
     public $logger = null;
-    public $max_errno = 1024;  // ignore E_STRICT and above
+    public $included_errno = INCLUDED_ERRNO_BITMASK;
     public $person = null;
     public $person_fn = null;
     public $root = '';
@@ -110,7 +113,7 @@ class RollbarNotifier {
 
     private $config_keys = array('access_token', 'base_api_url', 'batch_size', 'batched', 'branch', 
         'capture_error_backtraces', 'code_version', 'environment', 'error_sample_rates', 'handler',
-        'agent_log_location', 'host', 'logger', 'max_errno', 'person', 'person_fn', 'root',
+        'agent_log_location', 'host', 'logger', 'included_errno', 'person', 'person_fn', 'root',
         'scrub_fields', 'shift_function', 'timeout', 'report_suppressed');
 
     // cached values for request/server/person data
@@ -261,7 +264,7 @@ class RollbarNotifier {
             return;
         }
 
-        if ($this->max_errno != -1 && $errno >= $this->max_errno) {
+        if ($this->included_errno != -1 && ($errno & $this->included_errno) != $errno) {
             // ignore
             return;
         }
@@ -697,8 +700,9 @@ class RollbarNotifier {
 
     protected function _send_payload_blocking($payload) {
         $this->log_info("Sending payload");
+        $access_token = $payload['access_token'];
         $post_data = json_encode($payload);
-        $this->make_api_call('item', $post_data);
+        $this->make_api_call('item', $access_token, $post_data);
     }
 
     protected function _send_payload_agent($payload) {
@@ -729,11 +733,12 @@ class RollbarNotifier {
 
     protected function send_batch_blocking($batch) {
         $this->log_info("Sending batch");
+        $access_token = $batch[0]['access_token'];
         $post_data = json_encode($batch);
-        $this->make_api_call('item_batch', $post_data);
+        $this->make_api_call('item_batch', $access_token, $post_data);
     }
 
-    protected function make_api_call($action, $post_data) {
+    protected function make_api_call($action, $access_token, $post_data) {
         $url = $this->base_api_url . $action . '/';
 
         $ch = curl_init();
@@ -744,6 +749,7 @@ class RollbarNotifier {
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-Rollbar-Access-Token: ' . $access_token));
         $result = curl_exec($ch);
         $status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);

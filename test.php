@@ -18,8 +18,6 @@ function get_current_person() {
 
 function main() {
     $config = array(
-        //'access_token' => '089b0e7847134faf9ed9d3febd3f6d46',
-        //'access_token' => 'eb6b9dad914343d7a4231421a75c8458',
         'access_token' => 'fdcc9f0eeecf4a90adccc6ef49e1805c',
         'environment' => 'php-test',
         'root' => '/Users/brian/www/rollbar-php',
@@ -57,7 +55,6 @@ function main() {
 
     // reported by the exception handler
     throw new Exception("uncaught exception");
-
 }
 
 main();

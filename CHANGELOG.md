@@ -1,5 +1,9 @@
 # Changelog
 
+**0.9.0**
+- Added the ability to specify which set of error levels to send to Rollbar, (instead of everything below a certain level.)
+- Added a performance optimization which sends the access token as a header.
+
 **0.8.1**
 - Added support for more seamless configuration on Heroku
 
