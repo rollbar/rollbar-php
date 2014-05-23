@@ -59,10 +59,8 @@ $config = array(
     'access_token' => 'POST_SERVER_ITEM_ACCESS_TOKEN',
     // optional - environment name. any string will do.
     'environment' => 'production',
-    // optional - dir your code is in. used for linking stack traces.
-    'root' => '/Users/brian/www/myapp',
-    // optional - the error levels to report. defaults to E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR
-    'included_errno' => (E_ERROR | E_USER_NOTICE)  // ignore all others
+    // optional - path to directory your code is in. used for linking stack traces.
+    'root' => '/Users/brian/www/myapp'
 );
 Rollbar::init($config);
 ?>
@@ -223,15 +221,15 @@ Default: `'blocking'`
   
 Default: `null`, which will result in a call to `gethostname()` (or `php_uname('n')` if that function does not exist)
   </dd>
-
-  <dt>logger</dt>
-  <dd>An object that has a `log($level, $message)` method. If provided, will be used by RollbarNotifier to log messages.
-  </dd>
-
+  
   <dt>included_errno</dt>
   <dd>A bitmask that includes all of the error levels to report. E.g. (E_ERROR | E_WARNING) to only report E_ERROR and E_WARNING errors.
   
 Default: (E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR)
+  </dd>
+
+  <dt>logger</dt>
+  <dd>An object that has a `log($level, $message)` method. If provided, will be used by RollbarNotifier to log messages.
   </dd>
 
   <dt>person</dt>
