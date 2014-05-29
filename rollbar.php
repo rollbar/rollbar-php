@@ -161,10 +161,6 @@ class RollbarNotifier {
 
         // cache this value
         $this->_mt_randmax = mt_getrandmax();
-
-        if ($this->handler == 'agent') {
-            $this->_agent_log = fopen($this->agent_log_location . '/rollbar-relay.' . getmypid() . '.rollbar', 'a');
-        }
     }
 
     public function report_exception($exc) {
@@ -706,6 +702,10 @@ class RollbarNotifier {
     }
 
     protected function _send_payload_agent($payload) {
+        // Only open this the first time
+        if (empty($this->_agent_log)) {
+            $this->load_agent_file();
+        }
         $this->log_info("Writing payload to file");
         fwrite($this->_agent_log, json_encode($payload) . "\n");
     }
@@ -725,7 +725,12 @@ class RollbarNotifier {
 
     protected function send_batch_agent($batch) {
         $this->log_info("Writing batch to file");
-        
+
+        // Only open this the first time
+        if (empty($this->_agent_log)) {
+            $this->load_agent_file();
+        }
+
         foreach ($batch as $item) {
             fwrite($this->_agent_log, json_encode($item) . "\n");
         }
@@ -804,6 +809,10 @@ class RollbarNotifier {
             // 48 bits for "node"
             mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
         );
+    }
+
+    protected function load_agent_file() {
+        $this->_agent_log = fopen($this->agent_log_location . '/rollbar-relay.' . getmypid() . '.rollbar', 'a');
     }
 }
 
