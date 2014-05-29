@@ -1,5 +1,8 @@
 # Changelog
 
+**0.9.1**
+- Lazy create the agent log file ([#22](https://github.com/rollbar/rollbar-php/pull/22))
+
 **0.9.0**
 - Added `included_errno`, which allows specifying which set of error levels to send to Rollbar (instead of everything below a certain level). This replaces `max_errno`.
 - Changed the default settings to no longer send E_NOTICE errors.
