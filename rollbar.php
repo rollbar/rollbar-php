@@ -812,7 +812,7 @@ class RollbarNotifier {
     }
 
     protected function load_agent_file() {
-        $this->_agent_log = fopen($this->agent_log_location . '/rollbar-relay.' . getmypid() . '.rollbar', 'a');
+        $this->_agent_log = fopen($this->agent_log_location . '/rollbar-relay.' . getmypid() . '.' . time() . '.rollbar', 'a');
     }
 }
 
