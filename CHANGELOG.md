@@ -1,5 +1,8 @@
 # Changelog
 
+**0.9.2**
+- Append timestamp (in milliseconds) to agent log file names, to prevent collisions.
+
 **0.9.1**
 - Lazy create the agent log file ([#22](https://github.com/rollbar/rollbar-php/pull/22))
 
