@@ -244,10 +244,18 @@ class RollbarNotifier {
         $data['server'] = $this->build_server_data();
         $data['person'] = $this->build_person_data();
 
+        array_walk_recursive($data, array($this, '_sanitize_utf8'));
+
         $payload = $this->build_payload($data);
         $this->send_payload($payload);
         
         return $data['uuid'];
+    }
+
+    protected function _sanitize_utf8(&$value) {
+        if (is_string($value) && function_exists('iconv')) {
+            $value = iconv('UTF-8', 'UTF-8//IGNORE', $value);
+        }
     }
 
     protected function _report_php_error($errno, $errstr, $errfile, $errline) {
@@ -342,6 +350,8 @@ class RollbarNotifier {
         $data['server'] = $this->build_server_data();
         $data['person'] = $this->build_person_data();
 
+        array_walk_recursive($data, array($this, '_sanitize_utf8'));
+
         $payload = $this->build_payload($data);
         $this->send_payload($payload);
         
@@ -377,6 +387,8 @@ class RollbarNotifier {
         $data['request'] = $this->build_request_data();
         $data['server'] = $this->build_server_data();
         $data['person'] = $this->build_person_data();
+
+        array_walk_recursive($data, array($this, '_sanitize_utf8'));
 
         $payload = $this->build_payload($data);
         $this->send_payload($payload);
