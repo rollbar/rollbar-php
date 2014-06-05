@@ -127,6 +127,8 @@ class RollbarNotifier {
     // file handle for agent log
     private $_agent_log = null;
 
+    private $_iconv_available = null;
+
     private $_mt_randmax;
 
     public function __construct($config) {
@@ -253,7 +255,10 @@ class RollbarNotifier {
     }
 
     protected function _sanitize_utf8(&$value) {
-        if (is_string($value) && function_exists('iconv')) {
+        if (!isset($this->_iconv_available)) {
+            $this->_iconv_available = function_exists('iconv');
+        }
+        if (is_string($value) && $this->_iconv_available) {
             $value = iconv('UTF-8', 'UTF-8//IGNORE', $value);
         }
     }
