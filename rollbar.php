@@ -81,7 +81,7 @@ class Rollbar {
 define('ROLLBAR_INCLUDED_ERRNO_BITMASK', E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
 
 class RollbarNotifier {
-    const VERSION = "0.9.2";
+    const VERSION = "0.9.3";
 
     // required
     public $access_token = '';
@@ -105,13 +105,13 @@ class RollbarNotifier {
     public $person = null;
     public $person_fn = null;
     public $root = '';
-    public $scrub_fields = array('passwd', 'pass', 'password', 'secret', 'confirm_password', 
+    public $scrub_fields = array('passwd', 'pass', 'password', 'secret', 'confirm_password',
         'password_confirmation', 'auth_token', 'csrf_token');
     public $shift_function = true;
     public $timeout = 3;
     public $report_suppressed = false;
 
-    private $config_keys = array('access_token', 'base_api_url', 'batch_size', 'batched', 'branch', 
+    private $config_keys = array('access_token', 'base_api_url', 'batch_size', 'batched', 'branch',
         'capture_error_backtraces', 'code_version', 'environment', 'error_sample_rates', 'handler',
         'agent_log_location', 'host', 'logger', 'included_errno', 'person', 'person_fn', 'root',
         'scrub_fields', 'shift_function', 'timeout', 'report_suppressed');
@@ -222,7 +222,7 @@ class RollbarNotifier {
         if (!$this->check_config()) {
             return;
         }
-        
+
         if (error_reporting() === 0 && !$this->report_suppressed) {
             // ignore
             return;
@@ -250,7 +250,7 @@ class RollbarNotifier {
 
         $payload = $this->build_payload($data);
         $this->send_payload($payload);
-        
+
         return $data['uuid'];
     }
 
@@ -267,7 +267,7 @@ class RollbarNotifier {
         if (!$this->check_config()) {
             return;
         }
-        
+
         if (error_reporting() === 0 && !$this->report_suppressed) {
             // ignore
             return;
@@ -359,7 +359,7 @@ class RollbarNotifier {
 
         $payload = $this->build_payload($data);
         $this->send_payload($payload);
-        
+
         return $data['uuid'];
     }
 
@@ -367,7 +367,7 @@ class RollbarNotifier {
         if (!$this->check_config()) {
             return;
         }
-        
+
         if (error_reporting() === 0 && !$this->report_suppressed) {
             // ignore
             return;
@@ -397,7 +397,7 @@ class RollbarNotifier {
 
         $payload = $this->build_payload($data);
         $this->send_payload($payload);
-        
+
         return $data['uuid'];
     }
 
@@ -428,7 +428,7 @@ class RollbarNotifier {
 
         return $this->_request_data;
     }
-    
+
     protected function scrub_request_params($params) {
         $scrubbed = array();
         foreach ($params as $k => $v) {
@@ -439,7 +439,7 @@ class RollbarNotifier {
                 $scrubbed[$k] = $v;
             }
         }
-        
+
         return $scrubbed;
     }
 
@@ -474,7 +474,7 @@ class RollbarNotifier {
         } else {
             $proto = 'http';
         }
-        
+
         if (!empty($_SERVER['HTTP_X_FORWARDED_HOST'])) {
             $host = $_SERVER['HTTP_X_FORWARDED_HOST'];
         } else if (!empty($_SERVER['HTTP_HOST'])) {
@@ -485,7 +485,7 @@ class RollbarNotifier {
         } else {
             $host = 'unknown';
         }
-        
+
         if (!empty($_SERVER['HTTP_X_FORWARDED_PORT'])) {
             $port = $_SERVER['HTTP_X_FORWARDED_PORT'];
         } else if (!empty($_SERVER['SERVER_PORT'])) {
@@ -493,7 +493,7 @@ class RollbarNotifier {
         } else {
             $port = 80;
         }
-        
+
         $path = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '/';
 
         $url = $proto . '://' . $host;
@@ -672,11 +672,11 @@ class RollbarNotifier {
             ),
             'uuid' => $this->uuid4()
         );
-        
+
         if ($this->code_version) {
             $data['code_version'] = $this->code_version;
         }
-        
+
         return $data;
     }
 
@@ -804,25 +804,25 @@ class RollbarNotifier {
             $this->logger->log($level, $msg);
         }
     }
-    
+
     // from http://www.php.net/manual/en/function.uniqid.php#94959
     protected function uuid4() {
         return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
             // 32 bits for "time_low"
             mt_rand(0, 0xffff), mt_rand(0, 0xffff),
-            
+
             // 16 bits for "time_mid"
             mt_rand(0, 0xffff),
-            
+
             // 16 bits for "time_hi_and_version",
             // four most significant bits holds version number 4
             mt_rand(0, 0x0fff) | 0x4000,
-            
+
             // 16 bits, 8 bits for "clk_seq_hi_res",
             // 8 bits for "clk_seq_low",
             // two most significant bits holds zero and one for variant DCE1.1
             mt_rand(0, 0x3fff) | 0x8000,
-            
+
             // 48 bits for "node"
             mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
         );

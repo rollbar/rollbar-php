@@ -1,5 +1,8 @@
 # Changelog
 
+**0.9.3**
+- Walk payloads to ensure strings are correctly utf-8 encoded for json encoding
+
 **0.9.2**
 - Append timestamp (in milliseconds) to agent log file names, to prevent collisions.
 
