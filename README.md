@@ -223,7 +223,7 @@ Default: `null`, which will result in a call to `gethostname()` (or `php_uname('
   </dd>
   
   <dt>included_errno</dt>
-  <dd>A bitmask that includes all of the error levels to report. E.g. (E_ERROR | E_WARNING) to only report E_ERROR and E_WARNING errors.
+  <dd>A bitmask that includes all of the error levels to report. E.g. (E_ERROR | E_WARNING) to only report E_ERROR and E_WARNING errors. This is applied after error_reporting check, if `use_error_reporting` is set to `true`.
   
 Default: (E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR)
   </dd>
@@ -266,6 +266,12 @@ Default: `3`
   <dd>Sets whether errors suppressed with '@' should be reported or not
   
 Default: `false`
+  </dd>
+
+  <dt>use_error_reporting</dt>
+  <dd>Sets whether to respect current `error_reporting()` level or not
+  
+Default: `true`
   </dd>
   </dl>
 

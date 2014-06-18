@@ -110,11 +110,12 @@ class RollbarNotifier {
     public $shift_function = true;
     public $timeout = 3;
     public $report_suppressed = false;
+    public $use_error_reporting = true;
 
     private $config_keys = array('access_token', 'base_api_url', 'batch_size', 'batched', 'branch',
         'capture_error_backtraces', 'code_version', 'environment', 'error_sample_rates', 'handler',
         'agent_log_location', 'host', 'logger', 'included_errno', 'person', 'person_fn', 'root',
-        'scrub_fields', 'shift_function', 'timeout', 'report_suppressed');
+        'scrub_fields', 'shift_function', 'timeout', 'report_suppressed', 'use_error_reporting');
 
     // cached values for request/server/person data
     private $_request_data = null;
@@ -269,6 +270,11 @@ class RollbarNotifier {
         }
 
         if (error_reporting() === 0 && !$this->report_suppressed) {
+            // ignore
+            return;
+        }
+
+        if (!(error_reporting() & $errno) && $this->use_error_reporting) {
             // ignore
             return;
         }
