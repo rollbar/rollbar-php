@@ -271,7 +271,7 @@ Default: `false`
   <dt>use_error_reporting</dt>
   <dd>Sets whether to respect current `error_reporting()` level or not
   
-Default: `true`
+Default: `false`
   </dd>
   </dl>
 

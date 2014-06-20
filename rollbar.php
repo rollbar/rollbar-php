@@ -110,7 +110,7 @@ class RollbarNotifier {
     public $shift_function = true;
     public $timeout = 3;
     public $report_suppressed = false;
-    public $use_error_reporting = true;
+    public $use_error_reporting = false;
 
     private $config_keys = array('access_token', 'base_api_url', 'batch_size', 'batched', 'branch',
         'capture_error_backtraces', 'code_version', 'environment', 'error_sample_rates', 'handler',
@@ -274,7 +274,7 @@ class RollbarNotifier {
             return;
         }
 
-        if (!(error_reporting() & $errno) && $this->use_error_reporting) {
+        if ($this->use_error_reporting && (error_reporting() & $errno) === 0) {
             // ignore
             return;
         }
