@@ -139,7 +139,7 @@ class RollbarNotifier {
             }
         }
 
-        if (!$this->access_token) {
+        if (!$this->access_token && $this->handler != 'agent') {
             $this->log_error('Missing access token');
         }
 
@@ -408,7 +408,7 @@ class RollbarNotifier {
     }
 
     protected function check_config() {
-        return $this->access_token && strlen($this->access_token) == 32;
+        return $this->handler == 'agent' || ($this->access_token && strlen($this->access_token) == 32);
     }
 
     protected function build_request_data() {
@@ -687,10 +687,15 @@ class RollbarNotifier {
     }
 
     protected function build_payload($data) {
-        return array(
-            'access_token' => $this->access_token,
+        $payload = array(
             'data' => $data
         );
+        
+        if ($this->access_token) {
+          $payload['access_token'] = $this->access_token;
+        }
+        
+        return $payload;
     }
 
     protected function send_payload($payload) {
