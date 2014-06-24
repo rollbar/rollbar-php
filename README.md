@@ -223,7 +223,7 @@ Default: `null`, which will result in a call to `gethostname()` (or `php_uname('
   </dd>
   
   <dt>included_errno</dt>
-  <dd>A bitmask that includes all of the error levels to report. E.g. (E_ERROR | E_WARNING) to only report E_ERROR and E_WARNING errors. This is applied after error_reporting check, if `use_error_reporting` is set to `true`.
+  <dd>A bitmask that includes all of the error levels to report. E.g. (E_ERROR | E_WARNING) to only report E_ERROR and E_WARNING errors. This will be used in combination with `error_reporting()` to prevent reporting of errors if `use_error_reporting` is set to `true`.
   
 Default: (E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR)
   </dd>
@@ -327,6 +327,3 @@ For bug reports, please [open an issue on GitHub](https://github.com/rollbar/rol
 3. Commit your changes (`git commit -am 'Added some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
-
-
-
