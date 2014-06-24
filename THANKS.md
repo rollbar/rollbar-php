@@ -8,3 +8,4 @@ Many thanks to the following contributors, by github username and in alphabetica
 - [rfink](https://github.com/rfink)
 - [steveh](https://github.com/steveh)
 - [stof](https://github.com/stof)
+- [vilius-g](https://github.com/vilius-g)

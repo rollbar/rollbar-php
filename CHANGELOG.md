@@ -1,5 +1,9 @@
 # Changelog
 
+**0.9.4**
+- New `use_error_reporting` flag that when enabled will respect the current `error_reporting()` level when deciding to report an error ([#29](https://github.com/rollbar/rollbar-php/pull/29))
+- Access token no longer required if using the agent handler
+
 **0.9.3**
 - Walk payloads to ensure strings are correctly utf-8 encoded for json encoding
 
