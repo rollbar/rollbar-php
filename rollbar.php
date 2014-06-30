@@ -78,7 +78,9 @@ class Rollbar {
 }
 
 // Send errors that have these levels
-define('ROLLBAR_INCLUDED_ERRNO_BITMASK', E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
+if (!defined('ROLLBAR_INCLUDED_ERRNO_BITMASK')) {
+        define('ROLLBAR_INCLUDED_ERRNO_BITMASK', E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
+}
 
 class RollbarNotifier {
     const VERSION = "0.9.4";
