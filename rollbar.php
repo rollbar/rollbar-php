@@ -376,11 +376,6 @@ class RollbarNotifier {
             return;
         }
 
-        if (error_reporting() === 0 && !$this->report_suppressed) {
-            // ignore
-            return;
-        }
-
         $data = $this->build_base_data();
         $data['level'] = strtolower($level);
 
