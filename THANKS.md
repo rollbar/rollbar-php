@@ -3,6 +3,7 @@ Many thanks to the following contributors, by github username and in alphabetica
 - [AlexeyMorozov](https://github.com/AlexeyMorozov)
 - [alexthegeek](https://github.com/alexthegeek)
 - [benjamin-smith](https://github.com/benjamin-smith)
+- [elfif](https://github.com/elfif)
 - [kidk](https://github.com/kidk)
 - [MaffooBristol](https://github.com/MaffooBristol)
 - [plusbryan](https://github.com/plusbryan)
