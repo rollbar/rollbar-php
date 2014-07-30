@@ -133,6 +133,8 @@ class RollbarNotifier {
     private $_iconv_available = null;
 
     private $_mt_randmax;
+    
+    private $_curl_ipresolve_supported;
 
     public function __construct($config) {
         foreach ($this->config_keys as $key) {
@@ -153,6 +155,9 @@ class RollbarNotifier {
         if (defined('E_DEPRECATED')) {
             $levels = array_merge($levels, array(E_DEPRECATED, E_USER_DEPRECATED));
         }
+        
+        // PHP 5.3.0
+        $this->_curl_ipresolve_supported = defined('CURLOPT_IPRESOLVE');
 
         $curr = 1;
         for ($i = 0, $num = count($levels); $i < $num; $i++) {
@@ -780,7 +785,11 @@ class RollbarNotifier {
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-Rollbar-Access-Token: ' . $access_token));
-        curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4 );
+        
+        if ($this->_curl_ipresolve_supported) {
+          curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+        }
+        
         $result = curl_exec($ch);
         $status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
