@@ -267,7 +267,7 @@ class RollbarNotifier {
             $this->_iconv_available = function_exists('iconv');
         }
         if (is_string($value) && $this->_iconv_available) {
-            $value = iconv('UTF-8', 'UTF-8//IGNORE', $value);
+            $value = @iconv('UTF-8', 'UTF-8//IGNORE', $value);
         }
     }
 

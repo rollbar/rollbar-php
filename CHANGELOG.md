@@ -1,5 +1,8 @@
 # Changelog
 
+**0.9.8**
+- Fixes a bug where `iconv()` will sometimes throw an error, (#36).
+
 **0.9.7**
 - Force cURL to use IPV4 (`CURLOPT_IPRESOLVE_V4`) if supported ([#35](https://github.com/rollbar/rollbar-php/pull/35))
 
