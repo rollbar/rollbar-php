@@ -83,7 +83,7 @@ if (!defined('ROLLBAR_INCLUDED_ERRNO_BITMASK')) {
 }
 
 class RollbarNotifier {
-    const VERSION = "0.9.8";
+    const VERSION = "0.9.9";
 
     // required
     public $access_token = '';
@@ -239,12 +239,17 @@ class RollbarNotifier {
         $data = $this->build_base_data();
 
         // exception info
+        $message = 'unknown';
+        if (method_exists($exc, 'getMessage')) {
+            $message = $exc->getMessage();
+        }
+
         $data['body'] = array(
             'trace' => array(
                 'frames' => $this->build_exception_frames($exc),
                 'exception' => array(
                     'class' => get_class($exc),
-                    'message' => $exc->getMessage()
+                    'message' => $message
                 )
             )
         );
@@ -535,6 +540,11 @@ class RollbarNotifier {
      */
     protected function build_exception_frames($exc) {
         $frames = array();
+        
+        if (!method_exists($exc, 'getTrace')) {
+            return $frames;
+        }
+
         foreach ($exc->getTrace() as $frame) {
             $frames[] = array(
                 'filename' => isset($frame['file']) ? $frame['file'] : '<internal>',

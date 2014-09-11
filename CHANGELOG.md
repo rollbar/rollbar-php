@@ -1,5 +1,8 @@
 # Changelog
 
+**0.9.9**
+- Fix an error caused when `report_exception` is called with a non-object (e.g. `null`).
+
 **0.9.8**
 - Fixes a bug where `iconv()` will sometimes throw an error, (#36).
 
