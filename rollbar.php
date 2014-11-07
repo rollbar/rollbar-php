@@ -231,7 +231,7 @@ class RollbarNotifier {
             return;
         }
 
-        if (error_reporting() === 0 && !$this->report_suppressed) {
+        if (error_reporting() === 0 || !$this->report_suppressed) {
             // ignore
             return;
         }
@@ -281,7 +281,7 @@ class RollbarNotifier {
             return;
         }
 
-        if (error_reporting() === 0 && !$this->report_suppressed) {
+        if (error_reporting() === 0 || !$this->report_suppressed) {
             // ignore
             return;
         }
