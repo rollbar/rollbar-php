@@ -199,6 +199,12 @@ Default: `master`
   
 Default: `true`
   </dd>
+  
+  <dt>code_version</dt>
+  <dd>The currently-deployed version of your code/application (e.g. a Git SHA). Should be a string.
+  
+Default: `null`
+  </dd>
 
   <dt>environment</dt>
   <dd>Environment name, e.g. `'production'` or `'development'`
