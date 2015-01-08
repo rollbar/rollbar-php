@@ -41,7 +41,7 @@ Add `rollbar/rollbar` to your `composer.json`:
 ```json
 {
     "require": {
-        "rollbar": "~0.9.2"
+        "rollbar/rollbar": "~0.9.8"
     }
 }
 ```
@@ -199,6 +199,12 @@ Default: `master`
   
 Default: `true`
   </dd>
+  
+  <dt>code_version</dt>
+  <dd>The currently-deployed version of your code/application (e.g. a Git SHA). Should be a string.
+  
+Default: `null`
+  </dd>
 
   <dt>environment</dt>
   <dd>Environment name, e.g. `'production'` or `'development'`
@@ -223,7 +229,7 @@ Default: `null`, which will result in a call to `gethostname()` (or `php_uname('
   </dd>
   
   <dt>included_errno</dt>
-  <dd>A bitmask that includes all of the error levels to report. E.g. (E_ERROR | E_WARNING) to only report E_ERROR and E_WARNING errors.
+  <dd>A bitmask that includes all of the error levels to report. E.g. (E_ERROR | E_WARNING) to only report E_ERROR and E_WARNING errors. This will be used in combination with `error_reporting()` to prevent reporting of errors if `use_error_reporting` is set to `true`.
   
 Default: (E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR)
   </dd>
@@ -245,7 +251,7 @@ Default: (E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOVE
   </dd>
 
   <dt>scrub_fields</dt>
-  <dd>Array of field names to scrub out of _POST and _SESSION. Values will be replaced with astrickses. If overridiing, make sure to list all fields you want to scrub, not just fields you want to add to the default. Param names are converted to lowercase before comparing against the scrub list.
+  <dd>Array of field names to scrub out of _POST and _SESSION. Values will be replaced with asterisks. If overridiing, make sure to list all fields you want to scrub, not just fields you want to add to the default. Param names are converted to lowercase before comparing against the scrub list.
   
 Default: `('passwd', 'password', 'secret', 'confirm_password', 'password_confirmation', 'auth_token', 'csrf_token')`
   </dd>
@@ -264,6 +270,12 @@ Default: `3`
 
   <dt>report_suppressed</dt>
   <dd>Sets whether errors suppressed with '@' should be reported or not
+  
+Default: `false`
+  </dd>
+
+  <dt>use_error_reporting</dt>
+  <dd>Sets whether to respect current `error_reporting()` level or not
   
 Default: `false`
   </dd>
@@ -321,6 +333,3 @@ For bug reports, please [open an issue on GitHub](https://github.com/rollbar/rol
 3. Commit your changes (`git commit -am 'Added some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
-
-
-

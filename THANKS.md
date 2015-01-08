@@ -2,9 +2,13 @@ Many thanks to the following contributors, by github username and in alphabetica
 
 - [AlexeyMorozov](https://github.com/AlexeyMorozov)
 - [alexthegeek](https://github.com/alexthegeek)
+- [benjamin-smith](https://github.com/benjamin-smith)
+- [elfif](https://github.com/elfif)
+- [kidk](https://github.com/kidk)
 - [MaffooBristol](https://github.com/MaffooBristol)
 - [plusbryan](https://github.com/plusbryan)
 - [rekky](https://github.com/rekky)
 - [rfink](https://github.com/rfink)
 - [steveh](https://github.com/steveh)
 - [stof](https://github.com/stof)
+- [vilius-g](https://github.com/vilius-g)

@@ -7,8 +7,8 @@
   "homepage": "http://github.com/rollbar/rollbar-php",
   "authors": [
     {
-      "name": "Brian Rue",
-      "email": "brian@rollbar.com",
+      "name": "Rollbar, Inc.",
+      "email": "support@rollbar.com",
       "role": "Developer"
     }
   ],

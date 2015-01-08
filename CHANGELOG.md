@@ -1,5 +1,27 @@
 # Changelog
 
+**0.9.9**
+- Fix an error caused when `report_exception` is called with a non-object (e.g. `null`).
+
+**0.9.8**
+- Fixes a bug where `iconv()` will sometimes throw an error, (#36).
+
+**0.9.7**
+- Force cURL to use IPV4 (`CURLOPT_IPRESOLVE_V4`) if supported ([#35](https://github.com/rollbar/rollbar-php/pull/35))
+
+**0.9.6**
+- No longer have `error_reporting()` prevent simple log message reports ([#33](https://github.com/rollbar/rollbar-php/pull/33))
+
+**0.9.5**
+- Only define `ROLLBAR_INCLUDED_ERRNO_BITMASK` once to prevent warnings and test framework breakages ([#32](https://github.com/rollbar/rollbar-php/pull/32))
+
+**0.9.4**
+- New `use_error_reporting` flag that when enabled will respect the current `error_reporting()` level when deciding to report an error ([#29](https://github.com/rollbar/rollbar-php/pull/29))
+- Access token no longer required if using the agent handler
+
+**0.9.3**
+- Walk payloads to ensure strings are correctly utf-8 encoded for json encoding
+
 **0.9.2**
 - Append timestamp (in milliseconds) to agent log file names, to prevent collisions.
 

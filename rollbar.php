@@ -78,10 +78,12 @@ class Rollbar {
 }
 
 // Send errors that have these levels
-define('ROLLBAR_INCLUDED_ERRNO_BITMASK', E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
+if (!defined('ROLLBAR_INCLUDED_ERRNO_BITMASK')) {
+    define('ROLLBAR_INCLUDED_ERRNO_BITMASK', E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
+}
 
 class RollbarNotifier {
-    const VERSION = "0.9.2";
+    const VERSION = "0.9.9";
 
     // required
     public $access_token = '';
@@ -105,16 +107,17 @@ class RollbarNotifier {
     public $person = null;
     public $person_fn = null;
     public $root = '';
-    public $scrub_fields = array('passwd', 'pass', 'password', 'secret', 'confirm_password', 
+    public $scrub_fields = array('passwd', 'pass', 'password', 'secret', 'confirm_password',
         'password_confirmation', 'auth_token', 'csrf_token');
     public $shift_function = true;
     public $timeout = 3;
     public $report_suppressed = false;
+    public $use_error_reporting = false;
 
-    private $config_keys = array('access_token', 'base_api_url', 'batch_size', 'batched', 'branch', 
+    private $config_keys = array('access_token', 'base_api_url', 'batch_size', 'batched', 'branch',
         'capture_error_backtraces', 'code_version', 'environment', 'error_sample_rates', 'handler',
         'agent_log_location', 'host', 'logger', 'included_errno', 'person', 'person_fn', 'root',
-        'scrub_fields', 'shift_function', 'timeout', 'report_suppressed');
+        'scrub_fields', 'shift_function', 'timeout', 'report_suppressed', 'use_error_reporting');
 
     // cached values for request/server/person data
     private $_request_data = null;
@@ -127,7 +130,11 @@ class RollbarNotifier {
     // file handle for agent log
     private $_agent_log = null;
 
+    private $_iconv_available = null;
+
     private $_mt_randmax;
+    
+    private $_curl_ipresolve_supported;
 
     public function __construct($config) {
         foreach ($this->config_keys as $key) {
@@ -136,7 +143,7 @@ class RollbarNotifier {
             }
         }
 
-        if (!$this->access_token) {
+        if (!$this->access_token && $this->handler != 'agent') {
             $this->log_error('Missing access token');
         }
 
@@ -148,6 +155,9 @@ class RollbarNotifier {
         if (defined('E_DEPRECATED')) {
             $levels = array_merge($levels, array(E_DEPRECATED, E_USER_DEPRECATED));
         }
+        
+        // PHP 5.3.0
+        $this->_curl_ipresolve_supported = defined('CURLOPT_IPRESOLVE');
 
         $curr = 1;
         for ($i = 0, $num = count($levels); $i < $num; $i++) {
@@ -220,7 +230,7 @@ class RollbarNotifier {
         if (!$this->check_config()) {
             return;
         }
-        
+
         if (error_reporting() === 0 && !$this->report_suppressed) {
             // ignore
             return;
@@ -229,12 +239,17 @@ class RollbarNotifier {
         $data = $this->build_base_data();
 
         // exception info
+        $message = 'unknown';
+        if (method_exists($exc, 'getMessage')) {
+            $message = $exc->getMessage();
+        }
+
         $data['body'] = array(
             'trace' => array(
                 'frames' => $this->build_exception_frames($exc),
                 'exception' => array(
                     'class' => get_class($exc),
-                    'message' => $exc->getMessage()
+                    'message' => $message
                 )
             )
         );
@@ -244,18 +259,34 @@ class RollbarNotifier {
         $data['server'] = $this->build_server_data();
         $data['person'] = $this->build_person_data();
 
+        array_walk_recursive($data, array($this, '_sanitize_utf8'));
+
         $payload = $this->build_payload($data);
         $this->send_payload($payload);
-        
+
         return $data['uuid'];
+    }
+
+    protected function _sanitize_utf8(&$value) {
+        if (!isset($this->_iconv_available)) {
+            $this->_iconv_available = function_exists('iconv');
+        }
+        if (is_string($value) && $this->_iconv_available) {
+            $value = @iconv('UTF-8', 'UTF-8//IGNORE', $value);
+        }
     }
 
     protected function _report_php_error($errno, $errstr, $errfile, $errline) {
         if (!$this->check_config()) {
             return;
         }
-        
+
         if (error_reporting() === 0 && !$this->report_suppressed) {
+            // ignore
+            return;
+        }
+
+        if ($this->use_error_reporting && (error_reporting() & $errno) === 0) {
             // ignore
             return;
         }
@@ -342,19 +373,16 @@ class RollbarNotifier {
         $data['server'] = $this->build_server_data();
         $data['person'] = $this->build_person_data();
 
+        array_walk_recursive($data, array($this, '_sanitize_utf8'));
+
         $payload = $this->build_payload($data);
         $this->send_payload($payload);
-        
+
         return $data['uuid'];
     }
 
     protected function _report_message($message, $level, $extra_data) {
         if (!$this->check_config()) {
-            return;
-        }
-        
-        if (error_reporting() === 0 && !$this->report_suppressed) {
-            // ignore
             return;
         }
 
@@ -378,14 +406,16 @@ class RollbarNotifier {
         $data['server'] = $this->build_server_data();
         $data['person'] = $this->build_person_data();
 
+        array_walk_recursive($data, array($this, '_sanitize_utf8'));
+
         $payload = $this->build_payload($data);
         $this->send_payload($payload);
-        
+
         return $data['uuid'];
     }
 
     protected function check_config() {
-        return $this->access_token && strlen($this->access_token) == 32;
+        return $this->handler == 'agent' || ($this->access_token && strlen($this->access_token) == 32);
     }
 
     protected function build_request_data() {
@@ -411,7 +441,7 @@ class RollbarNotifier {
 
         return $this->_request_data;
     }
-    
+
     protected function scrub_request_params($params) {
         $scrubbed = array();
         foreach ($params as $k => $v) {
@@ -422,7 +452,7 @@ class RollbarNotifier {
                 $scrubbed[$k] = $v;
             }
         }
-        
+
         return $scrubbed;
     }
 
@@ -457,7 +487,7 @@ class RollbarNotifier {
         } else {
             $proto = 'http';
         }
-        
+
         if (!empty($_SERVER['HTTP_X_FORWARDED_HOST'])) {
             $host = $_SERVER['HTTP_X_FORWARDED_HOST'];
         } else if (!empty($_SERVER['HTTP_HOST'])) {
@@ -468,7 +498,7 @@ class RollbarNotifier {
         } else {
             $host = 'unknown';
         }
-        
+
         if (!empty($_SERVER['HTTP_X_FORWARDED_PORT'])) {
             $port = $_SERVER['HTTP_X_FORWARDED_PORT'];
         } else if (!empty($_SERVER['SERVER_PORT'])) {
@@ -476,7 +506,7 @@ class RollbarNotifier {
         } else {
             $port = 80;
         }
-        
+
         $path = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '/';
 
         $url = $proto . '://' . $host;
@@ -510,6 +540,11 @@ class RollbarNotifier {
      */
     protected function build_exception_frames($exc) {
         $frames = array();
+        
+        if (!method_exists($exc, 'getTrace')) {
+            return $frames;
+        }
+
         foreach ($exc->getTrace() as $frame) {
             $frames[] = array(
                 'filename' => isset($frame['file']) ? $frame['file'] : '<internal>',
@@ -655,19 +690,24 @@ class RollbarNotifier {
             ),
             'uuid' => $this->uuid4()
         );
-        
+
         if ($this->code_version) {
             $data['code_version'] = $this->code_version;
         }
-        
+
         return $data;
     }
 
     protected function build_payload($data) {
-        return array(
-            'access_token' => $this->access_token,
+        $payload = array(
             'data' => $data
         );
+        
+        if ($this->access_token) {
+          $payload['access_token'] = $this->access_token;
+        }
+        
+        return $payload;
     }
 
     protected function send_payload($payload) {
@@ -755,6 +795,11 @@ class RollbarNotifier {
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-Rollbar-Access-Token: ' . $access_token));
+        
+        if ($this->_curl_ipresolve_supported) {
+          curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+        }
+        
         $result = curl_exec($ch);
         $status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
@@ -787,25 +832,25 @@ class RollbarNotifier {
             $this->logger->log($level, $msg);
         }
     }
-    
+
     // from http://www.php.net/manual/en/function.uniqid.php#94959
     protected function uuid4() {
         return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
             // 32 bits for "time_low"
             mt_rand(0, 0xffff), mt_rand(0, 0xffff),
-            
+
             // 16 bits for "time_mid"
             mt_rand(0, 0xffff),
-            
+
             // 16 bits for "time_hi_and_version",
             // four most significant bits holds version number 4
             mt_rand(0, 0x0fff) | 0x4000,
-            
+
             // 16 bits, 8 bits for "clk_seq_hi_res",
             // 8 bits for "clk_seq_low",
             // two most significant bits holds zero and one for variant DCE1.1
             mt_rand(0, 0x3fff) | 0x8000,
-            
+
             // 48 bits for "node"
             mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
         );
