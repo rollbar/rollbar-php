@@ -18,10 +18,11 @@ function get_current_person() {
 
 function main() {
     $config = array(
-        'access_token' => 'fdcc9f0eeecf4a90adccc6ef49e1805c',
-        'environment' => 'php-test',
+        // access token for rollbar.com/rollbar/rollbar-php, a public project
+        'access_token' => 'ad865e76e7fb496fab096ac07b1dbabb',
+        'environment' => 'test',
         'root' => '/Users/brian/www/rollbar-php',
-        'base_api_url' => 'http://brian.rollbardev.com/api/1/',
+        //'base_api_url' => 'http://brian.rollbardev.com/api/1/',
         'logger' => new EchoLogger(),
         'error_sample_rates' => array(
             E_NOTICE => 0.5,
@@ -46,6 +47,8 @@ function main() {
     }
 
     Rollbar::report_message("hey there", "info");
+    Rollbar::report_message("hey there", "info", array("extra" => "data"),
+                            array("fingerprint" => "test fingerprint", "title" => "test title"));
     
     trigger_error("test user warning", E_USER_WARNING);
     trigger_error("test user notice", E_USER_NOTICE);

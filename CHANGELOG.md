@@ -1,5 +1,11 @@
 # Changelog
 
+**0.9.10**
+
+New features:
+
+- Add  ability to send fingerprint, title, and other advanced payload options in `Rollbar::report_message()`.
+
 **0.9.9**
 - Fix an error caused when `report_exception` is called with a non-object (e.g. `null`).
 

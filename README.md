@@ -18,7 +18,15 @@ try {
     Rollbar::report_exception($e);
 }
 
+// Message at level 'info'
 Rollbar::report_message('testing 123', 'info');
+
+// With extra data (3rd arg) and custom payload options (4th arg)
+Rollbar::report_message('testing 123', 'info',
+                        // key-value additional data
+                        array("some_key" => "some value"),  
+                        // payload options (overrides defaults) - see api docs
+                        array("fingerprint" => "custom-fingerprint-here"));
 
 // raises an E_NOTICE which will *not* be reported by the error handler
 $foo = $bar;

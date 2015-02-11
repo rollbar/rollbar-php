@@ -45,11 +45,11 @@ class Rollbar {
         return self::$instance->report_exception($exc);
     }
 
-    public static function report_message($message, $level = 'error', $extra_data = null) {
+    public static function report_message($message, $level = 'error', $extra_data = null, $payload_data = null) {
         if (self::$instance == null) {
             return;
         }
-        return self::$instance->report_message($message, $level, $extra_data);
+        return self::$instance->report_message($message, $level, $extra_data, $payload_data);
     }
 
     public static function report_fatal_error() {
@@ -83,7 +83,7 @@ if (!defined('ROLLBAR_INCLUDED_ERRNO_BITMASK')) {
 }
 
 class RollbarNotifier {
-    const VERSION = "0.9.9";
+    const VERSION = "0.9.10";
 
     // required
     public $access_token = '';
@@ -185,9 +185,9 @@ class RollbarNotifier {
         }
     }
 
-    public function report_message($message, $level = 'error', $extra_data = null) {
+    public function report_message($message, $level = 'error', $extra_data = null, $payload_data = null) {
         try {
-            return $this->_report_message($message, $level, $extra_data);
+            return $this->_report_message($message, $level, $extra_data, $payload_data);
         } catch (Exception $e) {
             try {
                 $this->log_error("Exception while reporting message");
@@ -381,7 +381,7 @@ class RollbarNotifier {
         return $data['uuid'];
     }
 
-    protected function _report_message($message, $level, $extra_data) {
+    protected function _report_message($message, $level, $extra_data, $payload_data) {
         if (!$this->check_config()) {
             return;
         }
@@ -405,6 +405,14 @@ class RollbarNotifier {
         $data['request'] = $this->build_request_data();
         $data['server'] = $this->build_server_data();
         $data['person'] = $this->build_person_data();
+
+        // merge $payload_data into $data
+        // (overriding anything already present)
+        if ($payload_data !== null && is_array($payload_data)) {
+            foreach ($payload_data as $key => $val) {
+                $data[$key] = $val;
+            }
+        }
 
         array_walk_recursive($data, array($this, '_sanitize_utf8'));
 
