@@ -113,11 +113,12 @@ class RollbarNotifier {
     public $timeout = 3;
     public $report_suppressed = false;
     public $use_error_reporting = false;
+    public $proxy = null;
 
     private $config_keys = array('access_token', 'base_api_url', 'batch_size', 'batched', 'branch',
         'capture_error_backtraces', 'code_version', 'environment', 'error_sample_rates', 'handler',
         'agent_log_location', 'host', 'logger', 'included_errno', 'person', 'person_fn', 'root',
-        'scrub_fields', 'shift_function', 'timeout', 'report_suppressed', 'use_error_reporting');
+        'scrub_fields', 'shift_function', 'timeout', 'report_suppressed', 'use_error_reporting', 'proxy');
 
     // cached values for request/server/person data
     private $_request_data = null;
@@ -803,6 +804,19 @@ class RollbarNotifier {
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-Rollbar-Access-Token: ' . $access_token));
+
+        if ($this->proxy) {
+            $proxy = is_array($this->proxy) ? $this->proxy : ['address' => $this->proxy];
+
+            if (isset($proxy['address'])) {
+                curl_setopt($ch, CURLOPT_PROXY, $proxy['address']);
+                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            }
+
+            if (isset($proxy['username']) && isset($proxy['password'])) {
+                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $proxy['username'] . ':' . $proxy['password']);
+            }
+        }
         
         if ($this->_curl_ipresolve_supported) {
           curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
