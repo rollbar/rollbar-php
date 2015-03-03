@@ -806,7 +806,7 @@ class RollbarNotifier {
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-Rollbar-Access-Token: ' . $access_token));
 
         if ($this->proxy) {
-            $proxy = is_array($this->proxy) ? $this->proxy : ['address' => $this->proxy];
+            $proxy = is_array($this->proxy) ? $this->proxy : array('address' => $this->proxy);
 
             if (isset($proxy['address'])) {
                 curl_setopt($ch, CURLOPT_PROXY, $proxy['address']);
