@@ -287,6 +287,33 @@ Default: `false`
   
 Default: `false`
   </dd>
+  
+  <dt>proxy</dt>
+  <dd>Send data via a proxy server.
+
+E.g. Using a local proxy with no authentication
+
+```php
+<?php
+$config['proxy'] = "127.0.0.1:8080";
+?>
+```
+
+E.g. Using a local proxy with basic authentication
+
+```php
+<?php
+$config['proxy'] = array(
+    'address' => '127.0.0.1:8080',
+    'username' => 'my_user',
+    'password' => 'my_password'
+);
+?>
+```
+
+Default: No proxy
+  </dd>
+  
   </dl>
 
 Example use of error_sample_rates:
