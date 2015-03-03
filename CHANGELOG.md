@@ -1,5 +1,8 @@
 # Changelog
 
+**0.9.11**
+- Added proxy support. ([#44](https://github.com/rollbar/rollbar-php/pull/44))
+
 **0.9.10**
 
 New features:
