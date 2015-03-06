@@ -1,5 +1,8 @@
 # Changelog
 
+**0.9.12**
+- Fix PHP < 5.4 compatability. (Regression added in 0.9.11)
+
 **0.9.11**
 - Added proxy support. ([#44](https://github.com/rollbar/rollbar-php/pull/44))
 
