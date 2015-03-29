@@ -38,11 +38,11 @@ class Rollbar {
         }
     }
 
-    public static function report_exception($exc) {
+    public static function report_exception($exc, $extra_data = null, $payload_data = null) {
         if (self::$instance == null) {
             return;
         }
-        return self::$instance->report_exception($exc);
+        return self::$instance->report_exception($exc, $extra_data, $payload_data);
     }
 
     public static function report_message($message, $level = 'error', $extra_data = null, $payload_data = null) {
@@ -134,7 +134,7 @@ class RollbarNotifier {
     private $_iconv_available = null;
 
     private $_mt_randmax;
-    
+
     private $_curl_ipresolve_supported;
 
     public function __construct($config) {
@@ -156,7 +156,7 @@ class RollbarNotifier {
         if (defined('E_DEPRECATED')) {
             $levels = array_merge($levels, array(E_DEPRECATED, E_USER_DEPRECATED));
         }
-        
+
         // PHP 5.3.0
         $this->_curl_ipresolve_supported = defined('CURLOPT_IPRESOLVE');
 
@@ -174,9 +174,9 @@ class RollbarNotifier {
         $this->_mt_randmax = mt_getrandmax();
     }
 
-    public function report_exception($exc) {
+    public function report_exception($exc, $extra_data = null, $payload_data = null) {
         try {
-            return $this->_report_exception($exc);
+            return $this->_report_exception($exc, $extra_data, $payload_data);
         } catch (Exception $e) {
             try {
                 $this->log_error("Exception while reporting exception");
@@ -227,7 +227,7 @@ class RollbarNotifier {
     /**
      * @param $exc Exception
      */
-    protected function _report_exception($exc) {
+    protected function _report_exception($exc, $extra_data = null, $payload_data = null) {
         if (!$this->check_config()) {
             return;
         }
@@ -252,13 +252,22 @@ class RollbarNotifier {
                     'class' => get_class($exc),
                     'message' => $message
                 )
-            )
+            ),
+            'custom' => $extra_data
         );
 
         // request, server, person data
         $data['request'] = $this->build_request_data();
         $data['server'] = $this->build_server_data();
         $data['person'] = $this->build_person_data();
+
+        // merge $payload_data into $data
+        // (overriding anything already present)
+        if ($payload_data !== null && is_array($payload_data)) {
+            foreach ($payload_data as $key => $val) {
+                $data[$key] = $val;
+            }
+        }
 
         array_walk_recursive($data, array($this, '_sanitize_utf8'));
 
@@ -549,7 +558,7 @@ class RollbarNotifier {
      */
     protected function build_exception_frames($exc) {
         $frames = array();
-        
+
         if (!method_exists($exc, 'getTrace')) {
             return $frames;
         }
@@ -711,11 +720,11 @@ class RollbarNotifier {
         $payload = array(
             'data' => $data
         );
-        
+
         if ($this->access_token) {
           $payload['access_token'] = $this->access_token;
         }
-        
+
         return $payload;
     }
 
@@ -817,11 +826,11 @@ class RollbarNotifier {
                 curl_setopt($ch, CURLOPT_PROXYUSERPWD, $proxy['username'] . ':' . $proxy['password']);
             }
         }
-        
+
         if ($this->_curl_ipresolve_supported) {
           curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
         }
-        
+
         $result = curl_exec($ch);
         $status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
