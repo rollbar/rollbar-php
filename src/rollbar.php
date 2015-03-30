@@ -216,12 +216,19 @@ class RollbarNotifier {
      * on shutdown.
      */
     public function flush() {
-        $queue_size = count($this->_queue);
+        $queue_size = $this->queueSize();
         if ($queue_size > 0) {
             $this->log_info('Flushing queue of size ' . $queue_size);
             $this->send_batch($this->_queue);
             $this->_queue = array();
         }
+    }
+
+    /**
+     * Returns the current queue size.
+     */
+    public function queueSize() {
+        return count($this->_queue);
     }
 
     /**
