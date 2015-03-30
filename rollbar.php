@@ -260,6 +260,7 @@ class RollbarNotifier {
         $data['server'] = $this->build_server_data();
         $data['person'] = $this->build_person_data();
 
+        $data = $this->_sanitize_keys($data);
         array_walk_recursive($data, array($this, '_sanitize_utf8'));
 
         $payload = $this->build_payload($data);
@@ -275,6 +276,20 @@ class RollbarNotifier {
         if (is_string($value) && $this->_iconv_available) {
             $value = @iconv('UTF-8', 'UTF-8//IGNORE', $value);
         }
+    }
+
+    protected function _sanitize_keys(array $data) {
+        $response = array();
+        foreach ($data as $key => $value) {
+            $this->_sanitize_utf8($key);
+            if (is_array($value)) {
+                $response[$key] = $this->_sanitize_keys($value);
+            } else {
+                $response[$key] = $value;
+            }
+        }
+
+        return $response;
     }
 
     protected function _report_php_error($errno, $errstr, $errfile, $errline) {
