@@ -1,7 +1,9 @@
 # Rollbar notifier for PHP
+# Rollbar notifier for PHP [![Build Status](https://travis-ci.org/rollbar/rollbar-php.png?branch=v0.10.0)](https://travis-ci.org/rollbar/rollbar-php)
 
 <!-- RemoveNext -->
-PHP notifier for Rollbar. Catches and reports exceptions to [Rollbar.com](https://rollbar.com/) for alerts, reporting, and analysis.
+
+This library detects errors and exceptions in your application and reports them to [Rollbar](https://rollbar.com) for alerts, reporting, and analysis.
 
 <!-- Sub:[TOC] -->
 
@@ -40,7 +42,7 @@ throw new Exception('test 2');
 
 ### General
 
-Download [rollbar.php](https://raw.github.com/rollbar/rollbar-php/master/rollbar.php) and put it somewhere you can access.
+Download [rollbar.php](https://raw.github.com/rollbar/rollbar-php/master/src/rollbar.php) and put it somewhere you can access.
 
 ### If Using Composer
 
@@ -49,7 +51,7 @@ Add `rollbar/rollbar` to your `composer.json`:
 ```json
 {
     "require": {
-        "rollbar/rollbar": "~0.9.8"
+        "rollbar/rollbar": "~0.10.0"
     }
 }
 ```
@@ -216,6 +218,8 @@ Default: `null`
 
   <dt>environment</dt>
   <dd>Environment name, e.g. `'production'` or `'development'`
+
+Default: `'production'`
   </dd>
 
   <dt>error_sample_rates</dt>
@@ -368,3 +372,5 @@ For bug reports, please [open an issue on GitHub](https://github.com/rollbar/rol
 3. Commit your changes (`git commit -am 'Added some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
+Tests are in `tests`. To run the tests: `phpunit`

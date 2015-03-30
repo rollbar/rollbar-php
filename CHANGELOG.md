@@ -1,5 +1,20 @@
 # Changelog
 
+**0.10.0**
+
+New features:
+
+- `report_exception` now accepts args for `extra_data` and `payload_data`, providing full access to the Rollbar API
+
+Backwards-incompatible changes:
+
+- Moved `rollbar.php` inside `src/`
+
+Other:
+
+- Added a unit test suite running on Travis CI
+
+
 **0.9.12**
 - Fix PHP < 5.4 compatability. (Regression added in 0.9.11)
 
