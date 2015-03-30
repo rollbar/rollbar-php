@@ -12,4 +12,5 @@ Many thanks to the following contributors, by github username and in alphabetica
 - [steveh](https://github.com/steveh)
 - [stof](https://github.com/stof)
 - [unix1](https://github.com/unix1)
+- [veloper](https://github.com/veloper)
 - [vilius-g](https://github.com/vilius-g)
