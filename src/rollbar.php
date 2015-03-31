@@ -259,9 +259,12 @@ class RollbarNotifier {
                     'class' => get_class($exc),
                     'message' => $message
                 )
-            ),
-            'custom' => $extra_data
+            )
         );
+
+        if ($extra_data !== null) {
+            $data['body']['trace']['extra'] = $extra_data;
+        }
 
         // request, server, person data
         $data['request'] = $this->build_request_data();
@@ -752,7 +755,7 @@ class RollbarNotifier {
 
     protected function send_payload($payload) {
         if ($this->batched) {
-            if (count($this->_queue) >= $this->batch_size) {
+            if ($this->queueSize() >= $this->batch_size) {
                 // flush queue before adding payload to queue
                 $this->flush();
             }

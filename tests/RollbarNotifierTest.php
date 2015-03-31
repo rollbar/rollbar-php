@@ -1,5 +1,7 @@
 <?php
 
+use \Mockery as m;
+
 if (!defined('ROLLBAR_TEST_TOKEN')) {
     define('ROLLBAR_TEST_TOKEN', 'ad865e76e7fb496fab096ac07b1dbabb');
 }
@@ -10,8 +12,20 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
         'access_token' => ROLLBAR_TEST_TOKEN,
         'environment' => 'test',
         'root' => '/path/to/code/root',
-        'code_version' => RollbarNotifier::VERSION
+        'code_version' => RollbarNotifier::VERSION,
+        'batched' => false
     );
+
+    private $_server;
+
+    public function setUp() {
+        $this->_server = $_SERVER;
+    }
+
+    public function tearDown() {
+        m::close();
+        $_SERVER = $this->_server;
+    }
 
     public function testConstruct() {
         $notifier = new RollbarNotifier(self::$simpleConfig);
@@ -21,17 +35,19 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testSimpleMessage() {
-        $notifier = new RollbarNotifier(self::$simpleConfig);
+        $notifier = m::mock('RollbarNotifier[_send_payload_blocking]', array(self::$simpleConfig))
+            ->shouldAllowMockingProtectedMethods();
+        $notifier->shouldReceive('_send_payload_blocking')->once();
 
         $uuid = $notifier->report_message("Hello world");
-        $this->assertStringMatchesFormat('%x-%x-%x-%x-%x', $uuid);
+        $this->assertValidUUID($uuid);
     }
 
     public function testSimpleError() {
         $notifier = new RollbarNotifier(self::$simpleConfig);
         
         $uuid = $notifier->report_php_error(E_ERROR, "Runtime error", "the_file.php", 1);
-        $this->assertStringMatchesFormat('%x-%x-%x-%x-%x', $uuid);
+        $this->assertValidUUID($uuid);
     }
 
     public function testSimpleException() {
@@ -44,11 +60,13 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
             $uuid = $notifier->report_exception($e);
         }
 
-        $this->assertStringMatchesFormat('%x-%x-%x-%x-%x', $uuid);
+        $this->assertValidUUID($uuid);
     }
 
     public function testFlush() {
-        $notifier = new RollbarNotifier(self::$simpleConfig);
+        $config = self::$simpleConfig;
+        $config['batched'] = true;
+        $notifier = new RollbarNotifier($config);
         $this->assertEquals(0, $notifier->queueSize());
         
         $notifier->report_message("Hello world");
@@ -61,25 +79,43 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
     public function testMessageWithStaticPerson() {
         $config = self::$simpleConfig;
         $config['person'] = array('id' => '123', 'username' => 'example', 'email' => 'example@example.com');
-        $notifier = new RollbarNotifier($config);
+        $notifier = m::mock('RollbarNotifier[send_payload]', array($config))
+            ->shouldAllowMockingProtectedMethods();
+        $notifier->shouldReceive('send_payload')->once()
+            ->with(m::on(function($input) use (&$payload) {
+                $payload = $input;
+                return true;
+            }));
 
         $uuid = $notifier->report_message('Hello world');
 
-        // TODO assert that the payload actually contains the person
-        
-        $this->assertStringMatchesFormat('%x-%x-%x-%x-%x', $uuid);
+        $this->assertEquals('Hello world', $payload['data']['body']['message']['body']);
+        $this->assertEquals('123', $payload['data']['person']['id']);
+        $this->assertEquals('example', $payload['data']['person']['username']);
+        $this->assertEquals('example@example.com', $payload['data']['person']['email']);
+
+        $this->assertValidUUID($uuid);
     }
     
     public function testMessageWithDynamicPerson() {
         $config = self::$simpleConfig;
         $config['person_fn'] = 'dummy_rollbar_person_fn';
-        $notifier = new RollbarNotifier($config);
+        $notifier = m::mock('RollbarNotifier[send_payload]', array($config))
+            ->shouldAllowMockingProtectedMethods();
+        $notifier->shouldReceive('send_payload')->once()
+            ->with(m::on(function($input) use (&$payload) {
+                $payload = $input;
+                return true;
+            }));
 
         $uuid = $notifier->report_message('Hello world');
 
-        // TODO assert that the payload actually contains the person
+        $this->assertEquals('Hello world', $payload['data']['body']['message']['body']);
+        $this->assertEquals('456', $payload['data']['person']['id']);
+        $this->assertEquals('dynamic', $payload['data']['person']['username']);
+        $this->assertEquals('dynamic@example.com', $payload['data']['person']['email']);
         
-        $this->assertStringMatchesFormat('%x-%x-%x-%x-%x', $uuid);
+        $this->assertValidUUID($uuid);
     }
 
     public function testExceptionWithInvalidConfig() {
@@ -103,17 +139,17 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
         $notifier = new RollbarNotifier($config);
 
         $uuid = $notifier->report_php_error(E_WARNING, 'Some warning', 'the_file.php', 2);
-        
-        $this->assertStringMatchesFormat('%x-%x-%x-%x-%x', $uuid);
+        $this->assertValidUUID($uuid);
     }
 
     public function testAgentBatched() {
         $config = self::$simpleConfig;
         $config['handler'] = 'agent';
+        $config['batched'] = true;
         $notifier = new RollbarNotifier($config);
 
         $uuid = $notifier->report_message('Hello world');
-        $this->assertStringMatchesFormat('%x-%x-%x-%x-%x', $uuid);
+        $this->assertValidUUID($uuid);
 
         $notifier->flush();
 
@@ -127,7 +163,22 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
         $notifier = new RollbarNotifier($config);
 
         $uuid = $notifier->report_message('Hello world');
-        $this->assertStringMatchesFormat('%x-%x-%x-%x-%x', $uuid);
+        $this->assertValidUUID($uuid);
+
+        $this->assertEquals(0, $notifier->queueSize());
+    }
+    
+    public function testBlockingBatched() {
+        $config = self::$simpleConfig;
+        $config['batched'] = true;
+        $notifier = new RollbarNotifier($config);
+
+        $uuid = $notifier->report_message('Hello world');
+        $this->assertValidUUID($uuid);
+
+        $this->assertEquals(1, $notifier->queueSize());
+
+        $notifier->flush();
 
         $this->assertEquals(0, $notifier->queueSize());
     }
@@ -138,15 +189,161 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
         $notifier = new RollbarNotifier($config);
 
         $uuid = $notifier->report_message('Hello world');
-        $this->assertStringMatchesFormat('%x-%x-%x-%x-%x', $uuid);
+        $this->assertValidUUID($uuid);
 
         $this->assertEquals(0, $notifier->queueSize());
     }
 
+    public function testFlushAtBatchSize() {
+        $config = self::$simpleConfig;
+        $config['batched'] = true;
+        $config['batch_size'] = 2;
+        
+        $notifier = new RollbarNotifier($config);
+
+        $notifier->report_message("one");
+        $this->assertEquals(1, $notifier->queueSize());
+
+        $notifier->report_message("two");
+        $this->assertEquals(2, $notifier->queueSize());
+        
+        $notifier->report_message("three");
+        $this->assertEquals(1, $notifier->queueSize());
+    }
+
+    public function testExceptionWithExtraAndPayloadData() {
+        $notifier = m::mock('RollbarNotifier[send_payload]', array(self::$simpleConfig))
+            ->shouldAllowMockingProtectedMethods();
+        $notifier->shouldReceive('send_payload')->once()
+            ->with(m::on(function($input) use (&$payload) {
+                $payload = $input;
+                return true;
+            }));
+
+        $uuid = null;
+        try {
+            throw new Exception("test");
+        } catch (Exception $e) {
+            $uuid = $notifier->report_exception($uuid, array('this_is' => 'extra'), array('title' => 'custom title'));
+        }
+        
+        $this->assertEquals('extra', $payload['data']['body']['trace']['extra']['this_is']);
+        $this->assertEquals('custom title', $payload['data']['title']);
+
+        $this->assertValidUUID($uuid);
+    }
+
+    public function testMessageWithExtraAndPayloadData() {
+        $notifier = m::mock('RollbarNotifier[send_payload]', array(self::$simpleConfig))
+            ->shouldAllowMockingProtectedMethods();
+        $notifier->shouldReceive('send_payload')->once()
+            ->with(m::on(function($input) use (&$payload) {
+                $payload = $input;
+                return true;
+            }));
+
+        $uuid = $notifier->report_message('Hello', 'info', array('extra_key' => 'extra_val'), 
+            array('title' => 'custom title', 'level' => 'warning'));
+
+        $this->assertEquals('Hello', $payload['data']['body']['message']['body']);
+        $this->assertEquals('warning', $payload['data']['level']);  // payload data takes precedence
+        $this->assertEquals('extra_val', $payload['data']['body']['message']['extra_key']);
+        $this->assertEquals('custom title', $payload['data']['title']);
+
+        $this->assertValidUUID($uuid);
+    }
+
+    public function testMessageWithRequestData() {
+        $_GET = array('get_key' => 'get_value');
+        $_POST = array(
+            'post_key' => 'post_value',
+            'password' => 'hunter2',
+            'something_special' => 'excalibur'
+        );
+        $_SESSION = array('session_key' => 'session_value');
+        $_SERVER = array(
+            'HTTP_HOST' => 'example.com',
+            'REQUEST_URI' => '/example.php',
+            'REQUEST_METHOD' => 'POST',
+            'REMOTE_ADDR' => '127.0.0.1'
+        );
+
+        $config = self::$simpleConfig;
+        $config['scrub_fields'] = array('password', 'something_special');
+        
+        $notifier = m::mock('RollbarNotifier[send_payload]', array($config))
+            ->shouldAllowMockingProtectedMethods();
+        $notifier->shouldReceive('send_payload')->once()
+            ->with(m::on(function($input) use (&$payload) {
+                $payload = $input;
+                return true;
+            }));
+
+        $uuid = $notifier->report_message('Hello');
+
+        $this->assertEquals('get_value', $payload['data']['request']['GET']['get_key']);
+        $this->assertEquals('post_value', $payload['data']['request']['POST']['post_key']);
+        $this->assertEquals('*******', $payload['data']['request']['POST']['password']);
+        $this->assertEquals('*********', $payload['data']['request']['POST']['something_special']);
+        $this->assertEquals('session_value', $payload['data']['request']['session']['session_key']);
+        $this->assertEquals('http://example.com/example.php', $payload['data']['request']['url']);
+        $this->assertEquals('POST', $payload['data']['request']['method']);
+        $this->assertEquals('127.0.0.1', $payload['data']['request']['user_ip']);
+        $this->assertEquals('example.com', $payload['data']['request']['headers']['Host']);
+    }
+
+
+    /* --- Internal exceptions --- */
+
+    public function testInternalExceptionInReportException() {
+        $notifier = m::mock('RollbarNotifier[_report_exception,log_error]', array(self::$simpleConfig))
+            ->shouldAllowMockingProtectedMethods();
+        $notifier->shouldReceive('_report_exception')->once()->andThrow(new Exception("internal error"));
+        $notifier->shouldReceive('log_error')->once();
+
+        $uuid = 'dummy';
+        try {
+            throw new Exception("test");
+        } catch (Exception $e) {
+            $uuid = $notifier->report_exception($e);
+        }
+
+        $this->assertNull($uuid);
+    }
+    
+    public function testInternalExceptionInReportMessage() {
+        $notifier = m::mock('RollbarNotifier[_report_message,log_error]', array(self::$simpleConfig))
+            ->shouldAllowMockingProtectedMethods();
+        $notifier->shouldReceive('_report_message')->once()->andThrow(new Exception("internal error"));
+        $notifier->shouldReceive('log_error')->once();
+
+        $uuid = $notifier->report_message("hello");
+        $this->assertNull($uuid);
+    }
+    
+    public function testInternalExceptionInReportPhpError() {
+        $notifier = m::mock('RollbarNotifier[_report_php_error,log_error]', array(self::$simpleConfig))
+            ->shouldAllowMockingProtectedMethods();
+        $notifier->shouldReceive('_report_php_error')->once()->andThrow(new Exception("internal error"));
+        $notifier->shouldReceive('log_error')->once();
+
+        $uuid = $notifier->report_php_error(E_NOTICE, "Some notice", "the_file.php", 123);
+        $this->assertNull($uuid);
+    }
+    
+
+    /* --- Helper methods --- */
+
+    private function assertValidUUID($uuid) {
+        $this->assertStringMatchesFormat('%x-%x-%x-%x-%x', $uuid);
+    }
+
+
+
 }
 
 function dummy_rollbar_person_fn() {
-    return array('id' >= 456, 'username' => 'example', 'email' => 'example@example.com');
+    return array('id' => 456, 'username' => 'dynamic', 'email' => 'dynamic@example.com');
 }
 
 ?>
