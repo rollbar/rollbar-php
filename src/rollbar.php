@@ -599,7 +599,7 @@ class RollbarNotifier {
      */
     protected function build_exception_trace_chain(Exception $exc)
     {
-        $chain = [];
+        $chain = array();
         $previous = $exc->getPrevious();
 
         while ($previous instanceof Exception ) {
