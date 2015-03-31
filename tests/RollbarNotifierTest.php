@@ -224,13 +224,38 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
         try {
             throw new Exception("test");
         } catch (Exception $e) {
-            $uuid = $notifier->report_exception($uuid, array('this_is' => 'extra'), array('title' => 'custom title'));
+            $uuid = $notifier->report_exception($e, array('this_is' => 'extra'), array('title' => 'custom title'));
         }
         
         $this->assertEquals('extra', $payload['data']['body']['trace']['extra']['this_is']);
         $this->assertEquals('custom title', $payload['data']['title']);
 
         $this->assertValidUUID($uuid);
+    }
+
+    public function testExceptionWithPreviousExceptions()
+    {
+        $first = new Exception('First exception');
+        $second = new Exception('Second exception', null, $first);
+        $third = new Exception('Third exception', null, $second);
+
+        $notifier = m::mock('RollbarNotifier[send_payload]', array(self::$simpleConfig))
+            ->shouldAllowMockingProtectedMethods();
+        $notifier->shouldReceive('send_payload')
+            ->once()
+            ->with(m::on(function($input) use (&$payload) {
+                $payload = $input;
+                return true;
+            }));
+
+        $uuid = $notifier->report_exception($third);
+        $chain = isset($payload['data']['body']['trace_chain']) ? $payload['data']['body']['trace_chain'] : null;
+
+        $this->assertValidUUID($uuid);
+        $this->assertInternalType('array', $chain);
+        $this->assertEquals(2, count($chain));
+        $this->assertEquals($second->getMessage(), $chain[0]['exception']['message']);
+        $this->assertEquals($first->getMessage(), $chain[1]['exception']['message']);
     }
 
     public function testMessageWithExtraAndPayloadData() {
