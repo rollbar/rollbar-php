@@ -4,7 +4,8 @@
 
 New features:
 
-- `report_exception` now accepts args for `extra_data` and `payload_data`, providing full access to the Rollbar API
+- `report_exception` now accepts args for `extra_data` and `payload_data`, providing full access to the Rollbar API. See [#47](https://github.com/rollbar/rollbar-php/pull/47)
+- Fix a json_encode warning with utf8 request param keys. See [#42](https://github.com/rollbar/rollbar-php/pull/42)
 
 Backwards-incompatible changes:
 
@@ -12,7 +13,7 @@ Backwards-incompatible changes:
 
 Other:
 
-- Added a unit test suite running on Travis CI
+- Added a unit test suite running on Travis CI (running for PHP 5.3 and higher)
 
 
 **0.9.12**
