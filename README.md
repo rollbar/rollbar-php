@@ -1,4 +1,3 @@
-# Rollbar notifier for PHP
 # Rollbar notifier for PHP [![Build Status](https://travis-ci.org/rollbar/rollbar-php.png?branch=v0.10.0)](https://travis-ci.org/rollbar/rollbar-php)
 
 <!-- RemoveNext -->
