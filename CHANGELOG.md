@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.11.0
+
+New features:
+
+- Added support for nested exceptions. See [#51](https://github.com/rollbar/rollbar-php/pull/51)
+
+Possible breaking changes:
+
+- Calling report_exception with a non-exception will result in the data being dropped and a message being logged to the Rollbar logger, instead of an empty message being reported
+- Exceptions are now sent as trace_chain, not trace, so any Custom Grouping Rules in the Rollbar UI will need to be updated to use `body.trace_chain.*.` in place of `body.trace.`
+
 ## 0.10.0
 
 New features:

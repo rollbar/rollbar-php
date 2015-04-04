@@ -5,6 +5,7 @@ Many thanks to the following contributors, by github username and in alphabetica
 - [benjamin-smith](https://github.com/benjamin-smith)
 - [elfif](https://github.com/elfif)
 - [kidk](https://github.com/kidk)
+- [lindyhopchris](https://github.com/lindyhopchris)
 - [MaffooBristol](https://github.com/MaffooBristol)
 - [plusbryan](https://github.com/plusbryan)
 - [rekky](https://github.com/rekky)
