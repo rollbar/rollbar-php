@@ -250,12 +250,12 @@ class RollbarNotifier {
 
         $data = $this->build_base_data();
 
-        $data['body'] = array(
-            'trace' => $this->build_exception_trace($exc, $extra_data),
-        );
+        $trace_chain = $this->build_exception_trace_chain($exc, $extra_data);
 
-        if ($exc->getPrevious() instanceof Exception) {
-            $data['body']['trace_chain'] = $this->build_exception_trace_chain($exc);
+        if (count($trace_chain) > 1) {
+            $data['body']['trace_chain'] = $trace_chain;
+        } else {
+            $data['body']['trace'] = $trace_chain[0];
         }
 
         // request, server, person data
@@ -595,14 +595,17 @@ class RollbarNotifier {
 
     /**
      * @param Exception $exc
+     * @param array $extra_data
      * @return array
      */
-    protected function build_exception_trace_chain(Exception $exc)
+    protected function build_exception_trace_chain(Exception $exc, $extra_data = null)
     {
         $chain = array();
+        $chain[] = $this->build_exception_trace($exc, $extra_data);
+
         $previous = $exc->getPrevious();
 
-        while ($previous instanceof Exception ) {
+        while ($previous instanceof Exception) {
             $chain[] = $this->build_exception_trace($previous);
             $previous = $previous->getPrevious();
         }
