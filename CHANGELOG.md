@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.11.1
+
+- Add in dependency for cURL library to warn users if they do not have the cURL extension installed ([#54](https://github.com/rollbar/rollbar-php/pull/54))
+
 ## 0.11.0
 
 New features:
