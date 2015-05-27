@@ -57,6 +57,7 @@ class Rollbar {
         $last_error = error_get_last();
         if (!is_null($last_error)) {
             switch ($last_error['type']) {
+                case E_PARSE:
                 case E_ERROR:
                     self::$instance->report_php_error($last_error['type'], $last_error['message'], $last_error['file'], $last_error['line']);
                     break;
