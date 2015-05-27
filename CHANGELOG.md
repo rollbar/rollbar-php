@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.11.2
+
+Bug fixes:
+
+- Fix issue where fatal E_PARSE errors were not reported. See [#55](https://github.com/rollbar/rollbar-php/issues/55)
+
 ## 0.11.1
 
 - Add in dependency for cURL library to warn users if they do not have the cURL extension installed ([#54](https://github.com/rollbar/rollbar-php/pull/54))
