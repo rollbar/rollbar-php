@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.12.0
+
+Possibly-breaking changes (all related to param scrubbing):
+
+- Param scrubbing now accepts a regex string for the key name. Key names starting with `/` are assumed to be a regex.
+- Headers are now scrubbed
+- Arrays are recursively scrubbed
+
 ## 0.11.2
 
 Bug fixes:
