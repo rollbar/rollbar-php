@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.12.1
+
+Bug fixes:
+
+- `branch` now defaults to null (meaning it will not be set) instead of `master`. This fixes a bug where the Rollbar UI wouldn't use the "default branch" setting because it was being overridden by the value sent by rollbar-php. See [#58](https://github.com/rollbar/rollbar-php/pull/58).
+
 ## 0.12.0
 
 Possibly-breaking changes (all related to param scrubbing):
