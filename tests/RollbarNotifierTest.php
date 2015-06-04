@@ -330,6 +330,9 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
             'post_key' => 'post_value',
             'PASSWORD' => 'hunter2',
             'something_special' => 'excalibur',
+            'array_token' => array(
+                'secret_key' => 'secret_value'
+            ),
             'array_key' => array(
                 'subarray_key' => 'subarray_value',
                 'subarray_password' => 'hunter2',
@@ -372,6 +375,7 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
             'post_key' => 'post_value',
             'PASSWORD' => '*******',
             'something_special' => '*********',
+            'array_token' => '*',
             'array_key' => array(
                 'subarray_key' => 'subarray_value',
                 'subarray_password' => '*******',
