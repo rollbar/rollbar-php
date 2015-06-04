@@ -500,7 +500,7 @@ class RollbarNotifier {
     protected function _key_should_be_scrubbed($key, $potential_regex_filters) {
         if (in_array($key, $this->scrub_fields)) return true;
         foreach ($potential_regex_filters as $potential_regex) {
-            if (preg_match($potential_regex, $key)) return true;
+            if (@preg_match($potential_regex, $key)) return true;
         }
         return false;
     }
