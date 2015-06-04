@@ -328,7 +328,7 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
         );
         $_POST = array(
             'post_key' => 'post_value',
-            'password' => 'hunter2',
+            'PASSWORD' => 'hunter2',
             'something_special' => 'excalibur',
             'array_key' => array(
                 'subarray_key' => 'subarray_value',
@@ -338,7 +338,7 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
         );
         $_SESSION = array(
             'session_key' => 'session_value',
-            'session_password' => 'hunter2'
+            'SeSsIoN_pAssWoRd' => 'hunter2'
         );
         $_SERVER = array(
             'HTTP_HOST' => 'example.com',
@@ -370,7 +370,7 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
 
         $this->assertSame(array(
             'post_key' => 'post_value',
-            'password' => '*******',
+            'PASSWORD' => '*******',
             'something_special' => '*********',
             'array_key' => array(
                 'subarray_key' => 'subarray_value',
@@ -381,7 +381,7 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
 
         $this->assertSame(array(
             'session_key' => 'session_value',
-            'session_password' => '*******',
+            'SeSsIoN_pAssWoRd' => '*******',
         ), $payload['data']['request']['session']);
 
         $this->assertSame(array(
