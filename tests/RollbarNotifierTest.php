@@ -395,6 +395,39 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
         ), $payload['data']['request']['headers']);
     }
 
+    public function testServerBranchDefaultsEmpty() {
+        $config = self::$simpleConfig;
+
+        $notifier = m::mock('RollbarNotifier[send_payload]', array($config))
+            ->shouldAllowMockingProtectedMethods();
+        $notifier->shouldReceive('send_payload')->once()
+            ->with(m::on(function($input) use (&$payload) {
+                $payload = $input;
+                return true;
+            }));
+
+        $uuid = $notifier->report_message('Hello');
+
+        $this->assertFalse(isset($payload['data']['server']['branch']));
+    }
+
+    public function testServerBranchConfig() {
+        $config = self::$simpleConfig;
+        $config['branch'] = 'my-branch';
+
+        $notifier = m::mock('RollbarNotifier[send_payload]', array($config))
+            ->shouldAllowMockingProtectedMethods();
+        $notifier->shouldReceive('send_payload')->once()
+            ->with(m::on(function($input) use (&$payload) {
+                $payload = $input;
+                return true;
+            }));
+
+        $uuid = $notifier->report_message('Hello');
+
+        $this->assertEquals($payload['data']['server']['branch'], 'my-branch');
+    }
+
     /* --- Internal exceptions --- */
 
     public function testInternalExceptionInReportException() {
