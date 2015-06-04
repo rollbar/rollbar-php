@@ -320,6 +320,80 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals('example.com', $payload['data']['request']['headers']['Host']);
     }
 
+    public function testParamScrubbing() {
+        $_GET = array(
+            'get_key' => 'get_value',
+            'auth_token' => '12345',
+            'client_password' => 'hunter2',
+        );
+        $_POST = array(
+            'post_key' => 'post_value',
+            'PASSWORD' => 'hunter2',
+            'something_special' => 'excalibur',
+            'array_token' => array(
+                'secret_key' => 'secret_value'
+            ),
+            'array_key' => array(
+                'subarray_key' => 'subarray_value',
+                'subarray_password' => 'hunter2',
+                'something_special' => 'excalibur'
+            )
+        );
+        $_SESSION = array(
+            'session_key' => 'session_value',
+            'SeSsIoN_pAssWoRd' => 'hunter2'
+        );
+        $_SERVER = array(
+            'HTTP_HOST' => 'example.com',
+            'REQUEST_URI' => '/example.php',
+            'REQUEST_METHOD' => 'POST',
+            'HTTP_PASSWORD' => 'hunter2',
+            'HTTP_AUTH_TOKEN' => '12345',
+            'REMOTE_ADDR' => '127.0.0.1'
+        );
+
+        $config = self::$simpleConfig;
+        $config['scrub_fields'] = array('something_special', '/token|password/i');
+        
+        $notifier = m::mock('RollbarNotifier[send_payload]', array($config))
+            ->shouldAllowMockingProtectedMethods();
+        $notifier->shouldReceive('send_payload')->once()
+            ->with(m::on(function($input) use (&$payload) {
+                $payload = $input;
+                return true;
+            }));
+
+        $uuid = $notifier->report_message('Hello');
+
+        $this->assertSame(array(
+            'get_key' => 'get_value',
+            'auth_token' => '*****',
+            'client_password' => '*******',
+        ), $payload['data']['request']['GET']);
+
+        $this->assertSame(array(
+            'post_key' => 'post_value',
+            'PASSWORD' => '*******',
+            'something_special' => '*********',
+            'array_token' => '*',
+            'array_key' => array(
+                'subarray_key' => 'subarray_value',
+                'subarray_password' => '*******',
+                'something_special' => '*********',
+            )
+        ), $payload['data']['request']['POST']);
+
+        $this->assertSame(array(
+            'session_key' => 'session_value',
+            'SeSsIoN_pAssWoRd' => '*******',
+        ), $payload['data']['request']['session']);
+
+        $this->assertSame(array(
+            'Host' => 'example.com',
+            'Password' => '*******',
+            'Auth-Token' => '*****',
+        ), $payload['data']['request']['headers']);
+    }
 
     /* --- Internal exceptions --- */
 
