@@ -464,7 +464,7 @@ class RollbarNotifier {
             );
 
             if ($_GET) {
-                $request['GET'] = $_GET;
+                $request['GET'] = $this->scrub_request_params($_GET);
             }
             if ($_POST) {
                 $request['POST'] = $this->scrub_request_params($_POST);
@@ -480,10 +480,15 @@ class RollbarNotifier {
 
     protected function scrub_request_params($params) {
         $scrubbed = array();
+        $potential_regex_filters = array_filter($this->scrub_fields, function($field) {
+            return strpos($field, '/') === 0;
+        });
         foreach ($params as $k => $v) {
-            if (in_array($k, $this->scrub_fields)) {
-                $count = is_array($v) ? count($v) : strlen($v);
-                $scrubbed[$k] = str_repeat('*', $count);
+            if ($this->_key_should_be_scrubbed($k, $potential_regex_filters)) {
+                $scrubbed[$k] = $this->_scrub($v);
+            } elseif (is_array($v)) {
+                // recursively handle array params
+                $scrubbed[$k] = $this->scrub_request_params($v);
             } else {
                 $scrubbed[$k] = $v;
             }
@@ -492,9 +497,22 @@ class RollbarNotifier {
         return $scrubbed;
     }
 
+    protected function _key_should_be_scrubbed($key, $potential_regex_filters) {
+        if (in_array($key, $this->scrub_fields)) return true;
+        foreach ($potential_regex_filters as $potential_regex) {
+            if (preg_match($potential_regex, $key)) return true;
+        }
+        return false;
+    }
+
+    protected function _scrub($value) {
+        $count = is_array($value) ? count($value) : strlen($value);
+        return str_repeat('*', $count);
+    }
+
     protected function headers() {
         $headers = array();
-        foreach ($_SERVER as $key => $val) {
+        foreach ($this->scrub_request_params($_SERVER) as $key => $val) {
             if (substr($key, 0, 5) == 'HTTP_') {
                 // convert HTTP_CONTENT_TYPE to Content-Type, HTTP_HOST to Host, etc.
                 $name = strtolower(substr($key, 5));
