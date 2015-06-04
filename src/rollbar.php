@@ -93,7 +93,7 @@ class RollbarNotifier {
     public $base_api_url = 'https://api.rollbar.com/api/1/';
     public $batch_size = 50;
     public $batched = true;
-    public $branch = 'master';
+    public $branch = null;
     public $capture_error_backtraces = true;
     public $code_version = null;
     public $environment = 'production';
