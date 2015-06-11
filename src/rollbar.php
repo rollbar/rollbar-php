@@ -498,7 +498,7 @@ class RollbarNotifier {
                 $scrubbed[$k] = $this->_scrub($v, $replacement);
             } elseif (is_array($v)) {
                 // recursively handle array params
-                $scrubbed[$k] = $this->scrub_request_params($v);
+                $scrubbed[$k] = $this->scrub_request_params($v, $replacement);
             } else {
                 $scrubbed[$k] = $v;
             }

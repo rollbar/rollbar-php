@@ -401,6 +401,7 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
         return  array(
             array("/example.php", array('blah'), "http://example.com/example.php"),
             array("/example.php?blah=hello", array('blah'), "http://example.com/example.php?blah=xxxxx"),
+            array("/example.php?nested%5Bblah%5D=hello", array('blah'), "http://example.com/example.php?nested%5Bblah%5D=xxxxx"),
             array("/nonsense39423t#$Y*%@(Y", array('blah'), "http://example.com/nonsense39423t#$Y*%@(Y"),
             array("/nonsense_params?39423t=#$Y*%@(Y", array('blah'), "http://example.com/nonsense_params?39423t=#$Y*%@(Y"),
             array("/nonsense_with_spaces?39423t=#$Y *%@(Y", array('blah'), "http://example.com/nonsense_with_spaces?39423t=#$Y *%@(Y"),
