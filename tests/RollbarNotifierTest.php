@@ -397,6 +397,40 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
         $this->assertSame("http://example.com/example.php?access_token=xxxxx&harry=potter", $payload['data']['request']['url']);
     }
 
+    public function urlScrubbingEdgeCasesDataProvider() {
+        return  array(
+            array("/example.php", array('blah'), "http://example.com/example.php"),
+            array("/example.php?blah=hello", array('blah'), "http://example.com/example.php?blah=xxxxx"),
+            array("/nonsense39423t#$Y*%@(Y", array('blah'), "http://example.com/nonsense39423t#$Y*%@(Y"),
+            array("/nonsense_params?39423t=#$Y*%@(Y", array('blah'), "http://example.com/nonsense_params?39423t=#$Y*%@(Y"),
+            array("/nonsense_with_spaces?39423t=#$Y *%@(Y", array('blah'), "http://example.com/nonsense_with_spaces?39423t=#$Y *%@(Y"),
+            array("", array('blah'), "http://example.com"),
+        );
+    }
+
+    /** @dataProvider urlScrubbingEdgeCasesDataProvider */
+    public function testUrlScrubbingEdgeCases($uri, $scrub_fields, $expected_scrubbed_url) {
+        $_SERVER = array(
+            'HTTP_HOST' => "example.com",
+            'REQUEST_URI' => $uri,
+            'REMOTE_ADDR' => '127.0.0.1'
+        );
+        $config = self::$simpleConfig;
+        $config['scrub_fields'] = $scrub_fields;
+
+        $notifier = m::mock('RollbarNotifier[send_payload]', array($config))
+            ->shouldAllowMockingProtectedMethods();
+        $notifier->shouldReceive('send_payload')->once()
+            ->with(m::on(function($input) use (&$payload) {
+                $payload = $input;
+                return true;
+            }));
+
+        $uuid = $notifier->report_message('Hello');
+
+        $this->assertSame($expected_scrubbed_url, $payload['data']['request']['url']);
+    }
+
     public function testServerBranchDefaultsEmpty() {
         $config = self::$simpleConfig;
 
