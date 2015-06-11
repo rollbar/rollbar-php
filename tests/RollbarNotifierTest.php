@@ -394,8 +394,7 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
             'Auth-Token' => '*****',
         ), $payload['data']['request']['headers']);
 
-        // %2A is the the urlencoded version of *
-        $this->assertSame("http://example.com/example.php?access_token=%2A%2A%2A%2A%2A&harry=potter", $payload['data']['request']['url']);
+        $this->assertSame("http://example.com/example.php?access_token=xxxxx&harry=potter", $payload['data']['request']['url']);
     }
 
     public function testServerBranchDefaultsEmpty() {
