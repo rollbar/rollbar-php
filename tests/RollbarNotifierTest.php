@@ -345,7 +345,7 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
         );
         $_SERVER = array(
             'HTTP_HOST' => 'example.com',
-            'REQUEST_URI' => '/example.php',
+            'REQUEST_URI' => '/example.php?access_token=12345&harry=potter',
             'REQUEST_METHOD' => 'POST',
             'HTTP_PASSWORD' => 'hunter2',
             'HTTP_AUTH_TOKEN' => '12345',
@@ -393,6 +393,9 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
             'Password' => '*******',
             'Auth-Token' => '*****',
         ), $payload['data']['request']['headers']);
+
+        // %2A is the the urlencoded version of *
+        $this->assertSame("http://example.com/example.php?access_token=%2A%2A%2A%2A%2A&harry=potter", $payload['data']['request']['url']);
     }
 
     public function testServerBranchDefaultsEmpty() {

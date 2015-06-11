@@ -457,7 +457,7 @@ class RollbarNotifier {
     protected function build_request_data() {
         if ($this->_request_data === null) {
             $request = array(
-                'url' => $this->current_url(),
+                'url' => $this->scrub_url($this->current_url()),
                 'user_ip' => $this->user_ip(),
                 'headers' => $this->headers(),
                 'method' => isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : null,
@@ -476,6 +476,15 @@ class RollbarNotifier {
         }
 
         return $this->_request_data;
+    }
+
+    protected function scrub_url($url) {
+        $url_query = parse_url($url, PHP_URL_QUERY);
+        if (!$url_query) return $url;
+        parse_str($url_query, $parsed_output);
+        $scrubbed_params = $this->scrub_request_params($parsed_output);
+        $scrubbed_url = str_replace($url_query, http_build_query($scrubbed_params), $url);
+        return $scrubbed_url;
     }
 
     protected function scrub_request_params($params) {
