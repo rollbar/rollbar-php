@@ -1,4 +1,4 @@
-# Rollbar notifier for PHP [![Build Status](https://travis-ci.org/rollbar/rollbar-php.png?branch=v0.12.1)](https://travis-ci.org/rollbar/rollbar-php)
+# Rollbar notifier for PHP [![Build Status](https://travis-ci.org/rollbar/rollbar-php.png?branch=v0.13.0)](https://travis-ci.org/rollbar/rollbar-php)
 
 <!-- RemoveNext -->
 
@@ -50,7 +50,7 @@ Add `rollbar/rollbar` to your `composer.json`:
 ```json
 {
     "require": {
-        "rollbar/rollbar": "~0.12.1"
+        "rollbar/rollbar": "~0.13.0"
     }
 }
 ```

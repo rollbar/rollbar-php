@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.13.0
+
+Possibly-breaking changes (again relating to param scrubbing):
+
+- Param scrubbing is now applied to query string params inside the request URL. See [#59](https://github.com/rollbar/rollbar-php/pull/59)
+
+
 ## 0.12.1
 
 Bug fixes:
