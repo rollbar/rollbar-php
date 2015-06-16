@@ -457,7 +457,7 @@ class RollbarNotifier {
     protected function build_request_data() {
         if ($this->_request_data === null) {
             $request = array(
-                'url' => $this->current_url(),
+                'url' => $this->scrub_url($this->current_url()),
                 'user_ip' => $this->user_ip(),
                 'headers' => $this->headers(),
                 'method' => isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : null,
@@ -478,17 +478,27 @@ class RollbarNotifier {
         return $this->_request_data;
     }
 
-    protected function scrub_request_params($params) {
+    protected function scrub_url($url) {
+        $url_query = parse_url($url, PHP_URL_QUERY);
+        if (!$url_query) return $url;
+        parse_str($url_query, $parsed_output);
+        // using x since * requires URL-encoding
+        $scrubbed_params = $this->scrub_request_params($parsed_output, 'x');
+        $scrubbed_url = str_replace($url_query, http_build_query($scrubbed_params), $url);
+        return $scrubbed_url;
+    }
+
+    protected function scrub_request_params($params, $replacement = '*') {
         $scrubbed = array();
         $potential_regex_filters = array_filter($this->scrub_fields, function($field) {
             return strpos($field, '/') === 0;
         });
         foreach ($params as $k => $v) {
             if ($this->_key_should_be_scrubbed($k, $potential_regex_filters)) {
-                $scrubbed[$k] = $this->_scrub($v);
+                $scrubbed[$k] = $this->_scrub($v, $replacement);
             } elseif (is_array($v)) {
                 // recursively handle array params
-                $scrubbed[$k] = $this->scrub_request_params($v);
+                $scrubbed[$k] = $this->scrub_request_params($v, $replacement);
             } else {
                 $scrubbed[$k] = $v;
             }
@@ -505,9 +515,9 @@ class RollbarNotifier {
         return false;
     }
 
-    protected function _scrub($value) {
+    protected function _scrub($value, $replacement = '*') {
         $count = is_array($value) ? count($value) : strlen($value);
-        return str_repeat('*', $count);
+        return str_repeat($replacement, $count);
     }
 
     protected function headers() {
