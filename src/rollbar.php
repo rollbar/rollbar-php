@@ -952,6 +952,7 @@ class RollbarNotifier {
 
     // from http://www.php.net/manual/en/function.uniqid.php#94959
     protected function uuid4() {
+        mt_srand();
         return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
             // 32 bits for "time_low"
             mt_rand(0, 0xffff), mt_rand(0, 0xffff),
