@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.14.0
+
+Possibly-breaking changes:
+
+- Fix bug where generated UUIDs could overlap if the application calls mt_srand() with a predictable value, and then Rollbar methods are called later. Rollbar now calls `mt_srand()` itself. This shouldn't affect anyone, unless you happen to be relying on the sequence of numbers coming from mt_rand across Rollbar calls.
+
 ## 0.13.0
 
 Possibly-breaking changes (again relating to param scrubbing):
