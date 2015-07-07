@@ -7,7 +7,7 @@ if (!defined('ROLLBAR_TEST_TOKEN')) {
 }
 
 class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
-    
+
     private static $simpleConfig = array(
         'access_token' => ROLLBAR_TEST_TOKEN,
         'environment' => 'test',
@@ -45,7 +45,7 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
 
     public function testSimpleError() {
         $notifier = new RollbarNotifier(self::$simpleConfig);
-        
+
         $uuid = $notifier->report_php_error(E_ERROR, "Runtime error", "the_file.php", 1);
         $this->assertValidUUID($uuid);
     }
@@ -68,10 +68,10 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
         $config['batched'] = true;
         $notifier = new RollbarNotifier($config);
         $this->assertEquals(0, $notifier->queueSize());
-        
+
         $notifier->report_message("Hello world");
         $this->assertEquals(1, $notifier->queueSize());
-        
+
         $notifier->flush();
         $this->assertEquals(0, $notifier->queueSize());
     }
@@ -96,7 +96,7 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
 
         $this->assertValidUUID($uuid);
     }
-    
+
     public function testMessageWithDynamicPerson() {
         $config = self::$simpleConfig;
         $config['person_fn'] = 'dummy_rollbar_person_fn';
@@ -114,7 +114,7 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals('456', $payload['data']['person']['id']);
         $this->assertEquals('dynamic', $payload['data']['person']['username']);
         $this->assertEquals('dynamic@example.com', $payload['data']['person']['email']);
-        
+
         $this->assertValidUUID($uuid);
     }
 
@@ -155,7 +155,7 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
 
         $this->assertEquals(0, $notifier->queueSize());
     }
-    
+
     public function testAgentNonbatched() {
         $config = self::$simpleConfig;
         $config['handler'] = 'agent';
@@ -167,7 +167,7 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
 
         $this->assertEquals(0, $notifier->queueSize());
     }
-    
+
     public function testBlockingBatched() {
         $config = self::$simpleConfig;
         $config['batched'] = true;
@@ -182,7 +182,7 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
 
         $this->assertEquals(0, $notifier->queueSize());
     }
-    
+
     public function testBlockingNonbatched() {
         $config = self::$simpleConfig;
         $config['batched'] = false;
@@ -198,7 +198,7 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
         $config = self::$simpleConfig;
         $config['batched'] = true;
         $config['batch_size'] = 2;
-        
+
         $notifier = new RollbarNotifier($config);
 
         $notifier->report_message("one");
@@ -206,7 +206,7 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
 
         $notifier->report_message("two");
         $this->assertEquals(2, $notifier->queueSize());
-        
+
         $notifier->report_message("three");
         $this->assertEquals(1, $notifier->queueSize());
     }
@@ -226,7 +226,7 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
         } catch (Exception $e) {
             $uuid = $notifier->report_exception($e, array('this_is' => 'extra'), array('title' => 'custom title'));
         }
-        
+
         $this->assertEquals('extra', $payload['data']['body']['trace']['extra']['this_is']);
         $this->assertEquals('custom title', $payload['data']['title']);
 
@@ -270,7 +270,7 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
                 return true;
             }));
 
-        $uuid = $notifier->report_message('Hello', 'info', array('extra_key' => 'extra_val'), 
+        $uuid = $notifier->report_message('Hello', 'info', array('extra_key' => 'extra_val'),
             array('title' => 'custom title', 'level' => 'warning'));
 
         $this->assertEquals('Hello', $payload['data']['body']['message']['body']);
@@ -298,7 +298,7 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
 
         $config = self::$simpleConfig;
         $config['scrub_fields'] = array('password', 'something_special');
-        
+
         $notifier = m::mock('RollbarNotifier[send_payload]', array($config))
             ->shouldAllowMockingProtectedMethods();
         $notifier->shouldReceive('send_payload')->once()
@@ -354,7 +354,7 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
 
         $config = self::$simpleConfig;
         $config['scrub_fields'] = array('something_special', '/token|password/i');
-        
+
         $notifier = m::mock('RollbarNotifier[send_payload]', array($config))
             ->shouldAllowMockingProtectedMethods();
         $notifier->shouldReceive('send_payload')->once()
@@ -399,13 +399,13 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
 
     public function urlScrubbingEdgeCasesDataProvider() {
         return  array(
-            array("/example.php", array('blah'), "http://example.com/example.php"),
-            array("/example.php?blah=hello", array('blah'), "http://example.com/example.php?blah=xxxxx"),
-            array("/example.php?nested%5Bblah%5D=hello", array('blah'), "http://example.com/example.php?nested%5Bblah%5D=xxxxx"),
-            array("/nonsense39423t#$Y*%@(Y", array('blah'), "http://example.com/nonsense39423t#$Y*%@(Y"),
-            array("/nonsense_params?39423t=#$Y*%@(Y", array('blah'), "http://example.com/nonsense_params?39423t=#$Y*%@(Y"),
-            array("/nonsense_with_spaces?39423t=#$Y *%@(Y", array('blah'), "http://example.com/nonsense_with_spaces?39423t=#$Y *%@(Y"),
-            array("", array('blah'), "http://example.com"),
+            array('/example.php', array('blah'), 'http://example.com/example.php'),
+            array('/example.php?blah=hello', array('blah'), 'http://example.com/example.php?blah=xxxxx'),
+            array('/example.php?nested%5Bblah%5D=hello', array('blah'), 'http://example.com/example.php?nested%5Bblah%5D=xxxxx'),
+            array('/nonsense39423t#$Y*%@(Y', array('blah'), 'http://example.com/nonsense39423t#$Y*%@(Y'),
+            array('/nonsense_params?39423t=#$Y*%@(Y', array('blah'), 'http://example.com/nonsense_params?39423t=#$Y*%@(Y'),
+            array('/nonsense_with_spaces?39423t=#$Y *%@(Y', array('blah'), 'http://example.com/nonsense_with_spaces?39423t=#$Y *%@(Y'),
+            array('', array('blah'), 'http://example.com'),
         );
     }
 
@@ -482,7 +482,7 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
 
         $this->assertNull($uuid);
     }
-    
+
     public function testInternalExceptionInReportMessage() {
         $notifier = m::mock('RollbarNotifier[_report_message,log_error]', array(self::$simpleConfig))
             ->shouldAllowMockingProtectedMethods();
@@ -492,7 +492,7 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
         $uuid = $notifier->report_message("hello");
         $this->assertNull($uuid);
     }
-    
+
     public function testInternalExceptionInReportPhpError() {
         $notifier = m::mock('RollbarNotifier[_report_php_error,log_error]', array(self::$simpleConfig))
             ->shouldAllowMockingProtectedMethods();
@@ -502,7 +502,7 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
         $uuid = $notifier->report_php_error(E_NOTICE, "Some notice", "the_file.php", 123);
         $this->assertNull($uuid);
     }
-    
+
 
     /* --- Helper methods --- */
 
