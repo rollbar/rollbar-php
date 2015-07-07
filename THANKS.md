@@ -4,6 +4,7 @@ Many thanks to the following contributors, by github username and in alphabetica
 - [alexthegeek](https://github.com/alexthegeek)
 - [benjamin-smith](https://github.com/benjamin-smith)
 - [chanind](https://github.com/chanind)
+- [dimkalinux](https://github.com/dimkalinux)
 - [diogopms](https://github.com/diogopms)
 - [elfif](https://github.com/elfif)
 - [kidk](https://github.com/kidk)
