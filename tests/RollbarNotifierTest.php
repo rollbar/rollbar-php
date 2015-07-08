@@ -325,23 +325,27 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
             'get_key' => 'get_value',
             'auth_token' => '12345',
             'client_password' => 'hunter2',
+            'Something_Special_CaSeS' => 'number-six'
         );
         $_POST = array(
             'post_key' => 'post_value',
             'PASSWORD' => 'hunter2',
             'something_special' => 'excalibur',
+            'Something_Special_CaSeS' => 'number-six',
             'array_token' => array(
                 'secret_key' => 'secret_value'
             ),
             'array_key' => array(
                 'subarray_key' => 'subarray_value',
                 'subarray_password' => 'hunter2',
-                'something_special' => 'excalibur'
+                'something_special' => 'excalibur',
+                'Something_Special_CaSeS' => 'number-six'
             )
         );
         $_SESSION = array(
             'session_key' => 'session_value',
-            'SeSsIoN_pAssWoRd' => 'hunter2'
+            'SeSsIoN_pAssWoRd' => 'hunter2',
+            'Something_Special_CaSeS' => '**********'
         );
         $_SERVER = array(
             'HTTP_HOST' => 'example.com',
@@ -353,7 +357,7 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
         );
 
         $config = self::$simpleConfig;
-        $config['scrub_fields'] = array('something_special', '/token|password/i');
+        $config['scrub_fields'] = array('something_special', 'something_special_cases', '/token|password/i');
 
         $notifier = m::mock('RollbarNotifier[send_payload]', array($config))
             ->shouldAllowMockingProtectedMethods();
@@ -369,23 +373,27 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
             'get_key' => 'get_value',
             'auth_token' => '*****',
             'client_password' => '*******',
+            'Something_Special_CaSeS' => '**********',
         ), $payload['data']['request']['GET']);
 
         $this->assertSame(array(
             'post_key' => 'post_value',
             'PASSWORD' => '*******',
             'something_special' => '*********',
+            'Something_Special_CaSeS' => '**********',
             'array_token' => '*',
             'array_key' => array(
                 'subarray_key' => 'subarray_value',
                 'subarray_password' => '*******',
                 'something_special' => '*********',
+                'Something_Special_CaSeS' => '**********',
             )
         ), $payload['data']['request']['POST']);
 
         $this->assertSame(array(
             'session_key' => 'session_value',
             'SeSsIoN_pAssWoRd' => '*******',
+            'Something_Special_CaSeS' => '**********',
         ), $payload['data']['request']['session']);
 
         $this->assertSame(array(
