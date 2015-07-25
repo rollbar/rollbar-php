@@ -81,6 +81,55 @@ class RollbarTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(0, Rollbar::$instance->queueSize());
     }
 
+    public function testScrub() {
+        Rollbar::init(self::$simpleConfig);
+
+        $method = new ReflectionMethod(get_class(Rollbar::$instance), 'scrub_request_params');
+        $method->setAccessible(true);
+
+        Rollbar::$instance->scrub_fields = array('secret', 'scrubme');
+
+        $this->assertEquals(
+            $method->invoke(
+                Rollbar::$instance,
+                array(
+                    'some_item',
+                    'apples' => array(
+                        'green',
+                        'red'
+                    ),
+                    'bananas' => array(
+                        'yellow'
+                    ),
+                    'secret' => 'shh',
+                    'a' => array(
+                        'b' => array(
+                            'secret' => 'deep',
+                            'scrubme' => 'secrets'
+                        )
+                    )
+                )
+            ),
+            array(
+                'some_item',
+                'apples' => array(
+                    'green',
+                    'red'
+                ),
+                'bananas' => array(
+                    'yellow'
+                ),
+                'secret' => '***',
+                'a' => array(
+                    'b' => array(
+                        'secret' => '****',
+                        'scrubme' => '*******'
+                    )
+                )
+            )
+        );
+    }
+
 }
 
 ?>
