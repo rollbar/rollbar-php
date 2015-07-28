@@ -567,7 +567,7 @@ class RollbarNotifier {
             $port = $_SERVER['HTTP_X_FORWARDED_PORT'];
         } else if (!empty($_SERVER['SERVER_PORT'])) {
             $port = $_SERVER['SERVER_PORT'];
-        } else if ($proto == 'https') {
+        } else if ($proto === 'https') {
             $port = 443;
         } else {
             $port = 80;
