@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.15.0
+
+Bug fixes (all of which are unlikely, but possibly, breaking changes):
+
+- Fix bug where `scrub_fields` were case-sensitive, instead of case-insensitive as the docs say. See [#63](https://github.com/rollbar/rollbar-php/pull/63)
+- Fix bug where integer 0 keys would always be scrubbed. See [#64](https://github.com/rollbar/rollbar-php/pull/64) and [#65](https://github.com/rollbar/rollbar-php/pull/65)
+- Fix detection of the current URL when the protocol is `https` but no `SERVER_PORT` is set. See [#50](https://github.com/rollbar/rollbar-php/pull/50)
+
 ## 0.14.0
 
 Possibly-breaking changes:
