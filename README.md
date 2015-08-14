@@ -87,6 +87,10 @@ Rollbar::init($config, $set_exception_handler, $set_error_handler);
 ?>
 ```
 
+### For CodeIgniter Users
+
+If you are using CodeIgniter and wish to report on E_NOTICE level errors you'll have to be sure to run `Rollbar::init` from inside the Controller constructor.
+
 ### For Heroku Users
 
 First, add the addon:
