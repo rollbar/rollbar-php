@@ -348,6 +348,9 @@ class RollbarNotifier {
                 $level = 'warning';
                 $constant = 'E_WARNING';
                 break;
+            case 4:
+                $level = 'critical';
+                $constant = 'E_PARSE';
             case 8:
                 $level = 'info';
                 $constant = 'E_NOTICE';
