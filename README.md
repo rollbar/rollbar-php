@@ -354,6 +354,9 @@ $config['person_fn'] = 'get_current_user';
 
 A Laravel-specific package is available for integrating with Laravel: [Laravel-Rollbar](https://github.com/jenssegers/Laravel-Rollbar)
 
+A CakePHP-specific package is avaliable for integrating with CakePHP 2.x:
+[CakeRollbar](https://github.com/tranfuga25s/CakeRollbar)
+
 
 ## Help / Support
 
