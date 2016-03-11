@@ -16,7 +16,10 @@
     "email": "support@rollbar.com"
   },
   "autoload": {
-    "classmap": ["src/rollbar.php"]
+    "classmap": [
+      "src/Level.php",
+      "src/rollbar.php"
+    ]
   },
   "require": {
     "ext-curl": "*"
