@@ -660,7 +660,7 @@ class RollbarNotifier {
      */
     protected function build_exception_frames(Exception $exc) {
         $frames = array();
-        $foo = $exc->getTrace();
+        
         foreach ($exc->getTrace() as $frame) {
             $framedata = array(
                 'filename' => isset($frame['file']) ? $frame['file'] : '<internal>',
