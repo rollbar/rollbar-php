@@ -115,11 +115,14 @@ class RollbarNotifier {
     public $report_suppressed = false;
     public $use_error_reporting = false;
     public $proxy = null;
+    public $include_error_code_context = false;
+    public $include_exception_code_context = false;
 
     private $config_keys = array('access_token', 'base_api_url', 'batch_size', 'batched', 'branch',
         'capture_error_backtraces', 'code_version', 'environment', 'error_sample_rates', 'handler',
         'agent_log_location', 'host', 'logger', 'included_errno', 'person', 'person_fn', 'root',
-        'scrub_fields', 'shift_function', 'timeout', 'report_suppressed', 'use_error_reporting', 'proxy');
+        'scrub_fields', 'shift_function', 'timeout', 'report_suppressed', 'use_error_reporting', 'proxy',
+        'include_error_code_context', 'include_exception_code_context');
 
     // cached values for request/server/person data
     private $_request_data = null;
@@ -655,22 +658,32 @@ class RollbarNotifier {
         $frames = array();
 
         foreach ($exc->getTrace() as $frame) {
-            $frames[] = array(
+            $framedata = array(
                 'filename' => isset($frame['file']) ? $frame['file'] : '<internal>',
                 'lineno' =>  isset($frame['line']) ? $frame['line'] : 0,
                 'method' => $frame['function']
                 // TODO include args? need to sanitize first.
             );
+            if($this->include_exception_code_context && isset($frame['file']) && isset($frame['line'])) {
+                $this->add_frame_code_context($frame['file'], $frame['line'], $framedata);
+            }
+            $frames[] = $framedata;
         }
 
         // rollbar expects most recent call to be last, not first
         $frames = array_reverse($frames);
 
         // add top-level file and line to end of the reversed array
-        $frames[] = array(
-            'filename' => $exc->getFile(),
-            'lineno' => $exc->getLine()
+        $file = $exc->getFile();
+        $line = $exc->getLine();
+        $framedata = array(
+            'filename' => $file,
+            'lineno' => $line
         );
+        if($this->include_exception_code_context) {
+            $this->add_frame_code_context($file, $line, $framedata);
+        }
+        $frames[] = $framedata;
 
         $this->shift_method($frames);
 
@@ -702,23 +715,31 @@ class RollbarNotifier {
                     continue;
                 }
 
-                $frames[] = array(
+                $framedata = array(
                     // Sometimes, file and line are not set. See:
                     // http://stackoverflow.com/questions/4581969/why-is-debug-backtrace-not-including-line-number-sometimes
                     'filename' => isset($frame['file']) ? $frame['file'] : "<internal>",
                     'lineno' =>  isset($frame['line']) ? $frame['line'] : 0,
                     'method' => $frame['function']
                 );
+                if($this->include_error_code_context && isset($frame['file']) && isset($frame['line'])) {
+                    $this->add_frame_code_context($frame['file'], $frame['line'], $framedata);
+                }
+                $frames[] = $framedata;
             }
 
             // rollbar expects most recent call last, not first
             $frames = array_reverse($frames);
 
             // add top-level file and line to end of the reversed array
-            $frames[] = array(
+            $framedata = array(
                 'filename' => $errfile,
                 'lineno' => $errline
             );
+            if($this->include_error_code_context) {
+                $this->add_frame_code_context($errfile, $errline, $framedata);
+            }
+            $frames[] = $framedata;
 
             $this->shift_method($frames);
 
@@ -981,6 +1002,25 @@ class RollbarNotifier {
 
     protected function load_agent_file() {
         $this->_agent_log = fopen($this->agent_log_location . '/rollbar-relay.' . getmypid() . '.' . microtime(true) . '.rollbar', 'a');
+    }
+
+    protected function add_frame_code_context($file, $line, array &$framedata) {
+        $source = @file($file);
+        if(is_array($source)) {
+            $source = str_replace(array("\n", "\t", "\r"), '', $source);
+            $total = count($source);
+            $line = $line - 1;
+            $framedata['code'] = $source[$line];
+            $offset = 6;
+            $min = max($line - $offset, 0);
+            if($min !== $line) {
+                $framedata['context']['pre'] = array_slice($source, $min, $line - $min);
+            }
+            $max = min($line + $offset, $total);
+            if($max !== $line) {
+                $framedata['context']['post'] = array_slice($source, $line + 1, $max - $line);
+            }
+        }
     }
 }
 
