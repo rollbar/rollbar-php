@@ -15,6 +15,17 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
         'code_version' => RollbarNotifier::VERSION,
         'batched' => false
     );
+    
+    private static $mockErrorFileSource = array(
+        "<?php\n",
+        "\n",
+        "class Foo extends Bar {\n",
+        "\n",
+        'public function getBaz($qux) { return $qux; }',
+        "\n",
+        "private function getFred() { return 123; }\n",
+        "}\n"
+    );
 
     private $_server;
 
@@ -472,7 +483,116 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
 
         $this->assertEquals($payload['data']['server']['branch'], 'my-branch');
     }
+    
+    public function testErrorPrePostCodeContextPayloadData() {
+        
+        // arrange
+        $mock_error_file_path = '/foo/bar/baz.php';
+        $mock_error_file_source = self::$mockErrorFileSource;
+        $payload = null;
+        $config = self::$simpleConfig;
+        $config['include_error_code_context'] = true;
+        $notifier = m::mock('RollbarNotifier[send_payload,get_source_file_reader]', array($config))
+            ->shouldAllowMockingProtectedMethods();
+        $notifier->shouldReceive('send_payload')->once()
+            ->with(m::on(function($input) use (&$payload) {
+                $payload = $input;
+                return true;
+            }));
+        $reader = m::mock('SourceFileReader');
+        $reader->shouldReceive('read_as_array')
+            ->atLeast()
+            ->once()
+            ->andReturnUsing(function($file) use ($mock_error_file_path, $mock_error_file_source) {
+                if ($file === $mock_error_file_path) {
+                    return $mock_error_file_source;
+                }
+                return file($file);
+            });
+        $notifier->shouldReceive('get_source_file_reader')
+            ->andReturn($reader);
 
+        // act
+        $notifier->report_php_error(1, 'foo', $mock_error_file_path, 5);
+        
+        // assert
+        $mock_error_file_frame = null;
+        foreach($payload['data']['body']['trace']['frames'] as $frame) {
+            if($frame['filename'] === $mock_error_file_path)  {
+                $mock_error_file_frame = $frame;
+                break;
+            }       
+        }
+        $this->assertNotNull($mock_error_file_frame);
+        $this->assertEquals('public function getBaz($qux) { return $qux; }', $mock_error_file_frame['code']);
+        $this->assertEquals(array(
+            '<?php',
+            '',
+            'class Foo extends Bar {',
+            ''
+        ), $mock_error_file_frame['context']['pre']);
+        $this->assertEquals(array(
+            '',
+            'private function getFred() { return 123; }',
+            '}'
+        ), $mock_error_file_frame['context']['post']);
+    }
+    
+    public function testExceptionPrePostCodeContextPayloadData() {
+        
+        // arrange
+        $mock_error_file_path = '/foo/bar/baz.php';
+        $mock_error_file_source = self::$mockErrorFileSource;
+        $payload = null;
+        $config = self::$simpleConfig;
+        $config['include_exception_code_context'] = true;
+        $notifier = m::mock('RollbarNotifier[send_payload,get_source_file_reader]', array($config))
+            ->shouldAllowMockingProtectedMethods();
+        $notifier->shouldReceive('send_payload')->once()
+            ->with(m::on(function($input) use (&$payload) {
+                $payload = $input;
+                return true;
+            }));
+        $reader = m::mock('SourceFileReader');
+        $reader->shouldReceive('read_as_array')
+            ->atLeast()
+            ->once()
+            ->andReturnUsing(function($file) use ($mock_error_file_path, $mock_error_file_source) {
+                if ($file === $mock_error_file_path) {
+                    return $mock_error_file_source;
+                }
+                return file($file);
+            });
+        $notifier->shouldReceive('get_source_file_reader')
+            ->andReturn($reader);
+        $Exception = new ErrorException('foo', 1, 1, $mock_error_file_path, 5);
+        
+        // act
+        $notifier->report_exception($Exception);
+        
+        // assert
+        $mock_error_file_frame = null;
+        foreach($payload['data']['body']['trace']['frames'] as $frame) {
+            if($frame['filename'] === $mock_error_file_path)  {
+                $mock_error_file_frame = $frame;
+                break;
+            }       
+        }
+        $this->assertNotNull($mock_error_file_frame);
+        $this->assertEquals('public function getBaz($qux) { return $qux; }', $mock_error_file_frame['code']);
+        $this->assertEquals(array(
+            '<?php',
+            '',
+            'class Foo extends Bar {',
+            ''
+        ), $mock_error_file_frame['context']['pre']);
+        $this->assertEquals(array(
+            '',
+            'private function getFred() { return 123; }',
+            '}'
+        ), $mock_error_file_frame['context']['post']);
+    }
+    
     /* --- Internal exceptions --- */
 
     public function testInternalExceptionInReportException() {

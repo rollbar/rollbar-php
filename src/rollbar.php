@@ -140,13 +140,17 @@ class RollbarNotifier {
     private $_mt_randmax;
 
     private $_curl_ipresolve_supported;
-
+    
+    /** @var iSourceFileReader $_source_file_reader */
+    private $_source_file_reader;
+    
     public function __construct($config) {
         foreach ($this->config_keys as $key) {
             if (isset($config[$key])) {
                 $this->$key = $config[$key];
             }
         }
+        $this->_source_file_reader = new SourceFileReader();    
 
         if (!$this->access_token && $this->handler != 'agent') {
             $this->log_error('Missing access token');
@@ -656,7 +660,7 @@ class RollbarNotifier {
      */
     protected function build_exception_frames(Exception $exc) {
         $frames = array();
-
+        $foo = $exc->getTrace();
         foreach ($exc->getTrace() as $frame) {
             $framedata = array(
                 'filename' => isset($frame['file']) ? $frame['file'] : '<internal>',
@@ -1005,23 +1009,25 @@ class RollbarNotifier {
     }
 
     protected function add_frame_code_context($file, $line, array &$framedata) {
-        $source = file($file);
-        if(is_array($source)) {
+        $source = $this->get_source_file_reader()->read_as_array($file);
+        if (is_array($source)) {
             $source = str_replace(array("\n", "\t", "\r"), '', $source);
             $total = count($source);
             $line = $line - 1;
             $framedata['code'] = $source[$line];
             $offset = 6;
             $min = max($line - $offset, 0);
-            if($min !== $line) {
+            if ($min !== $line) {
                 $framedata['context']['pre'] = array_slice($source, $min, $line - $min);
             }
             $max = min($line + $offset, $total);
-            if($max !== $line) {
+            if ($max !== $line) {
                 $framedata['context']['post'] = array_slice($source, $line + 1, $max - $line);
             }
         }
     }
+
+    protected function get_source_file_reader() { return $this->_source_file_reader; }
 }
 
 interface iRollbarLogger {
@@ -1029,3 +1035,17 @@ interface iRollbarLogger {
 }
 
 class Ratchetio extends Rollbar {}
+
+interface iSourceFileReader {
+
+    /**
+     * @param string $file_path
+     * @return string[]
+     */
+    public function read_as_array($file_path);
+}
+
+class SourceFileReader implements iSourceFileReader {
+
+    public function read_as_array($file_path) { return file($file_path); }
+}
