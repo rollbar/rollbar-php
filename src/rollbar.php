@@ -1005,7 +1005,7 @@ class RollbarNotifier {
     }
 
     protected function add_frame_code_context($file, $line, array &$framedata) {
-        $source = @file($file);
+        $source = file($file);
         if(is_array($source)) {
             $source = str_replace(array("\n", "\t", "\r"), '', $source);
             $total = count($source);
