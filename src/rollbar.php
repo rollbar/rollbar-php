@@ -122,6 +122,7 @@ class RollbarNotifier {
         'scrub_fields', 'shift_function', 'timeout', 'report_suppressed', 'use_error_reporting', 'proxy');
 
     // cached values for request/server/person data
+    private $_php_context = null;
     private $_request_data = null;
     private $_server_data = null;
     private $_person_data = null;
@@ -260,7 +261,9 @@ class RollbarNotifier {
         }
 
         // request, server, person data
-        $data['request'] = $this->build_request_data();
+        if ('http' === $this->_php_context) {
+            $data['request'] = $this->build_request_data();
+        }
         $data['server'] = $this->build_server_data();
         $data['person'] = $this->build_person_data();
 
@@ -746,6 +749,7 @@ class RollbarNotifier {
                 }
             }
             $server_data['host'] = $this->host;
+            $server_data['argv'] = isset($_SERVER['argv']) ? $_SERVER['argv'] : null;
 
             if ($this->branch) {
                 $server_data['branch'] = $this->branch;
@@ -787,12 +791,17 @@ class RollbarNotifier {
     }
 
     protected function build_base_data($level = 'error') {
+        if (null === $this->_php_context) {
+            $this->_php_context = $this->get_php_context();
+        }
+
         $data = array(
             'timestamp' => time(),
             'environment' => $this->environment,
             'level' => $level,
             'language' => 'php',
             'framework' => 'php',
+            'php_context' => $this->_php_context,
             'notifier' => array(
                 'name' => 'rollbar-php',
                 'version' => self::VERSION
@@ -813,7 +822,7 @@ class RollbarNotifier {
         );
 
         if ($this->access_token) {
-          $payload['access_token'] = $this->access_token;
+            $payload['access_token'] = $this->access_token;
         }
 
         return $payload;
@@ -892,6 +901,10 @@ class RollbarNotifier {
         $this->make_api_call('item_batch', $access_token, $post_data);
     }
 
+    protected function get_php_context() {
+        return php_sapi_name() === 'cli' || defined('STDIN') ? 'cli' : 'http';
+    }
+
     protected function make_api_call($action, $access_token, $post_data) {
         $url = $this->base_api_url . $action . '/';
 
@@ -919,7 +932,7 @@ class RollbarNotifier {
         }
 
         if ($this->_curl_ipresolve_supported) {
-          curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+            curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
         }
 
         $result = curl_exec($ch);

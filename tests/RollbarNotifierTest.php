@@ -320,6 +320,33 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals('example.com', $payload['data']['request']['headers']['Host']);
     }
 
+    public function testMessageWithCliData() {
+        $_SERVER = array(
+            'REMOTE_ADDR' => '127.0.0.1',
+            'argv' => array(
+                'somescript',
+                '-vvvvv',
+                'test:command',
+                '--arg=value',
+            )
+        );
+        $config = self::$simpleConfig;
+
+        $notifier = m::mock('RollbarNotifier[send_payload]', array($config))
+            ->shouldAllowMockingProtectedMethods();
+        $notifier->shouldReceive('send_payload')->once()
+            ->with(m::on(function($input) use (&$payload) {
+                $payload = $input;
+                return true;
+            }));
+
+        $notifier->report_message('Hello');
+
+        $this->assertEquals('127.0.0.1', $payload['data']['request']['user_ip']);
+        $this->assertEquals($_SERVER['argv'], $payload['data']['server']['argv']);
+        $this->assertEquals(php_sapi_name(), $payload['data']['php_context']);
+    }
+
     public function testParamScrubbing() {
         $_GET = array(
             'get_key' => 'get_value',
