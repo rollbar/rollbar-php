@@ -1,5 +1,11 @@
 # Changelog
 
+## Next release
+
+Bug fixes:
+
+- Fixed the severity level that E_PARSE errors are reproted at. See [#75](https://github.com/rollbar/rollbar-php/pull/75)
+
 ## 0.15.0
 
 Bug fixes (all of which are unlikely, but possibly, breaking changes):
