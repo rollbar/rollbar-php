@@ -11,4 +11,6 @@ sudo: false
 
 install: composer install --no-interaction
 
-script: vendor/bin/phpunit
+script:
+  - vendor/bin/phpunit
+  - vendor/bin/phpcs src/rollbar.php

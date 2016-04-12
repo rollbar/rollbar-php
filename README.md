@@ -369,6 +369,12 @@ For bug reports, please [open an issue on GitHub](https://github.com/rollbar/rol
 
 ## Contributing
 
+We use codesniffer to check our code.  Install globally like so:
+
+`composer global require 'squizlabs/php_codesniffer'`
+
+Check your changes against the standards with `phpcs rollbar.php`.
+
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Added some feature'`)
