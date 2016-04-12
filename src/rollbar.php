@@ -249,7 +249,7 @@ class RollbarNotifier {
     {
         try {
             if (is_callable($this->checkIgnore)
-                && call_user_func_array($this->checkIgnore, [$isUncaught,$caller_args,$payload])
+                && call_user_func_array($this->checkIgnore, array($isUncaught,$caller_args,$payload))
             ) {
                 $this->log_info('This item was not sent to Rollbar because it was ignored. '
                     . 'This can happen if a custom checkIgnore() function was used.');
