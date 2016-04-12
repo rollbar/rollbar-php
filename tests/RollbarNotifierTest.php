@@ -63,6 +63,29 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
         $this->assertValidUUID($uuid);
     }
 
+    public function testCheckIgnore() {
+        $config = self::$simpleConfig;
+        $config['checkIgnore'] = function ($isUncaught, $caller_args, $payload) {
+            if (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Baiduspider') !== false) {
+                // ignore baidu spider
+                return true;
+            }
+
+            // no other ignores
+            return false;
+        };
+
+        $notifier = new RollbarNotifier($config);
+
+        // Should ignore this exception.
+        $_SERVER = array('HTTP_USER_AGENT' => 'Baiduspider');
+        $this->assertNull($notifier->report_exception(new Exception("test exception")));
+        
+        // Shouldn't ignore this exception.
+        $_SERVER = array();
+        $this->assertValidUUID($notifier->report_exception(new Exception("test exception")));
+    }
+
     public function testFlush() {
         $config = self::$simpleConfig;
         $config['batched'] = true;

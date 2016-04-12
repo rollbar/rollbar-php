@@ -108,6 +108,7 @@ class RollbarNotifier {
     public $person = null;
     public $person_fn = null;
     public $root = '';
+    public $checkIgnore = null;
     public $scrub_fields = array('passwd', 'pass', 'password', 'secret', 'confirm_password',
         'password_confirmation', 'auth_token', 'csrf_token');
     public $shift_function = true;
@@ -118,7 +119,7 @@ class RollbarNotifier {
 
     private $config_keys = array('access_token', 'base_api_url', 'batch_size', 'batched', 'branch',
         'capture_error_backtraces', 'code_version', 'environment', 'error_sample_rates', 'handler',
-        'agent_log_location', 'host', 'logger', 'included_errno', 'person', 'person_fn', 'root',
+        'agent_log_location', 'host', 'logger', 'included_errno', 'person', 'person_fn', 'root', 'checkIgnore',
         'scrub_fields', 'shift_function', 'timeout', 'report_suppressed', 'use_error_reporting', 'proxy');
 
     // cached values for request/server/person data
@@ -237,6 +238,35 @@ class RollbarNotifier {
     }
 
     /**
+     * Run the checkIgnore function and determine whether to send the Exception to the API or not.
+     *
+     * @param  bool  $isUncaught
+     * @param  mixed $caller_args
+     * @param  mixed $payload
+     * @return bool
+     */
+    protected function _shouldIgnore($isUncaught, $caller_args, $payload)
+    {
+        try {
+            if (is_callable($this->checkIgnore)
+                && call_user_func_array($this->checkIgnore, [$isUncaught,$caller_args,$payload])
+            ) {
+                $this->log_info('This item was not sent to Rollbar because it was ignored. '
+                    . 'This can happen if a custom checkIgnore() function was used.');
+
+                return true;
+            }
+        } catch (Exception $e) {
+            // Disable the custom checkIgnore and report errors in the checkIgnore function
+            $this->checkIgnore = null;
+            $this->log_error("Removing custom checkIgnore(). Error while calling custom checkIgnore function:\n"
+                . $e->getMessage());
+        }
+
+        return false;
+    }
+
+    /**
      * @param Exception $exc
      */
     protected function _report_exception(Exception $exc, $extra_data = null, $payload_data = null) {
@@ -246,6 +276,10 @@ class RollbarNotifier {
 
         if (error_reporting() === 0 && !$this->report_suppressed) {
             // ignore
+            return;
+        }
+
+        if ($this->_shouldIgnore(true, $extra_data, $payload_data)) {
             return;
         }
 
@@ -334,6 +368,10 @@ class RollbarNotifier {
             }
         }
 
+        if ($this->_shouldIgnore(true, null, null)) {
+            return;
+        }
+
         $data = $this->build_base_data();
 
         // set error level and error constant name
@@ -415,6 +453,10 @@ class RollbarNotifier {
 
     protected function _report_message($message, $level, $extra_data, $payload_data) {
         if (!$this->check_config()) {
+            return;
+        }
+
+        if ($this->_shouldIgnore(false, $extra_data, $payload_data)) {
             return;
         }
 
