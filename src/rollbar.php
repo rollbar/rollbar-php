@@ -78,6 +78,36 @@ class Rollbar {
     }
 }
 
+class RollbarException {
+    private $level;
+    private $message;
+    private $err;
+    private $custom;
+
+    public function __construct($level, $message, Exception $err = null, $custom = null) {
+        $this->level = $level;
+        $this->message = $message;
+        $this->err = $err;
+        $this->custom = $custom;
+    }
+
+    public function getLevel() {
+        return $this->level;
+    }
+
+    public function getMessage() {
+        return $this->message;
+    }
+
+    public function getException() {
+        return $this->err;
+    }
+
+    public function getCustom() {
+        return $this->custom;
+    }
+}
+
 // Send errors that have these levels
 if (!defined('ROLLBAR_INCLUDED_ERRNO_BITMASK')) {
     define('ROLLBAR_INCLUDED_ERRNO_BITMASK', E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
@@ -240,12 +270,12 @@ class RollbarNotifier {
     /**
      * Run the checkIgnore function and determine whether to send the Exception to the API or not.
      *
-     * @param  bool  $isUncaught
-     * @param  mixed $caller_args
-     * @param  mixed $payload
+     * @param  bool             $isUncaught
+     * @param  RollbarException $caller_args [level, message, err, custom]
+     * @param  array            $payload     Data being sent to the API
      * @return bool
      */
-    protected function _shouldIgnore($isUncaught, $caller_args, $payload)
+    protected function _shouldIgnore($isUncaught, RollbarException $caller_args, array $payload)
     {
         try {
             if (is_callable($this->checkIgnore)
@@ -279,10 +309,6 @@ class RollbarNotifier {
             return;
         }
 
-        if ($this->_shouldIgnore(true, $extra_data, $payload_data)) {
-            return;
-        }
-
         $data = $this->build_base_data();
 
         $trace_chain = $this->build_exception_trace_chain($exc, $extra_data);
@@ -310,6 +336,12 @@ class RollbarNotifier {
         array_walk_recursive($data, array($this, '_sanitize_utf8'));
 
         $payload = $this->build_payload($data);
+
+        // Determine whether to send the request to the API.
+        if ($this->_shouldIgnore(true, new RollbarException($data['level'], $exc->getMessage(), $exc), $payload)) {
+            return;
+        }
+
         $this->send_payload($payload);
 
         return $data['uuid'];
@@ -366,10 +398,6 @@ class RollbarNotifier {
                 // skip
                 return;
             }
-        }
-
-        if ($this->_shouldIgnore(true, null, null)) {
-            return;
         }
 
         $data = $this->build_base_data();
@@ -446,6 +474,12 @@ class RollbarNotifier {
         array_walk_recursive($data, array($this, '_sanitize_utf8'));
 
         $payload = $this->build_payload($data);
+
+        // Determine whether to send the request to the API.
+        if ($this->_shouldIgnore(true, new RollbarException($level, $errstr), $payload)) {
+            return;
+        }
+
         $this->send_payload($payload);
 
         return $data['uuid'];
@@ -453,10 +487,6 @@ class RollbarNotifier {
 
     protected function _report_message($message, $level, $extra_data, $payload_data) {
         if (!$this->check_config()) {
-            return;
-        }
-
-        if ($this->_shouldIgnore(false, $extra_data, $payload_data)) {
             return;
         }
 
@@ -491,6 +521,12 @@ class RollbarNotifier {
         array_walk_recursive($data, array($this, '_sanitize_utf8'));
 
         $payload = $this->build_payload($data);
+
+        // Determine whether to send the request to the API.
+        if ($this->_shouldIgnore(true, new RollbarException($level, $message), $payload)) {
+            return;
+        }
+
         $this->send_payload($payload);
 
         return $data['uuid'];
