@@ -79,20 +79,12 @@ class Rollbar {
 }
 
 class RollbarException {
-    private $level;
     private $message;
-    private $err;
-    private $custom;
+    private $exception;
 
-    public function __construct($level, $message, Exception $err = null, $custom = null) {
-        $this->level = $level;
+    public function __construct( $message, Exception $exception = null) {
         $this->message = $message;
-        $this->err = $err;
-        $this->custom = $custom;
-    }
-
-    public function getLevel() {
-        return $this->level;
+        $this->exception = $exception;
     }
 
     public function getMessage() {
@@ -100,11 +92,7 @@ class RollbarException {
     }
 
     public function getException() {
-        return $this->err;
-    }
-
-    public function getCustom() {
-        return $this->custom;
+        return $this->exception;
     }
 }
 
@@ -271,15 +259,15 @@ class RollbarNotifier {
      * Run the checkIgnore function and determine whether to send the Exception to the API or not.
      *
      * @param  bool             $isUncaught
-     * @param  RollbarException $caller_args [level, message, err, custom]
-     * @param  array            $payload     Data being sent to the API
+     * @param  RollbarException $exception
+     * @param  array            $payload    Data being sent to the API
      * @return bool
      */
-    protected function _shouldIgnore($isUncaught, RollbarException $caller_args, array $payload)
+    protected function _shouldIgnore($isUncaught, RollbarException $exception, array $payload)
     {
         try {
             if (is_callable($this->checkIgnore)
-                && call_user_func_array($this->checkIgnore, array($isUncaught,$caller_args,$payload))
+                && call_user_func_array($this->checkIgnore, array($isUncaught,$exception,$payload))
             ) {
                 $this->log_info('This item was not sent to Rollbar because it was ignored. '
                     . 'This can happen if a custom checkIgnore() function was used.');
@@ -338,7 +326,7 @@ class RollbarNotifier {
         $payload = $this->build_payload($data);
 
         // Determine whether to send the request to the API.
-        if ($this->_shouldIgnore(true, new RollbarException($data['level'], $exc->getMessage(), $exc), $payload)) {
+        if ($this->_shouldIgnore(true, new RollbarException($exc->getMessage(), $exc), $payload)) {
             return;
         }
 
@@ -476,7 +464,8 @@ class RollbarNotifier {
         $payload = $this->build_payload($data);
 
         // Determine whether to send the request to the API.
-        if ($this->_shouldIgnore(true, new RollbarException($level, $errstr), $payload)) {
+        $exception = new ErrorException($error_class, 0, $errno, $errfile, $errline);
+        if ($this->_shouldIgnore(true, new RollbarException($exception->getMessage(), $exception), $payload)) {
             return;
         }
 
@@ -523,7 +512,7 @@ class RollbarNotifier {
         $payload = $this->build_payload($data);
 
         // Determine whether to send the request to the API.
-        if ($this->_shouldIgnore(true, new RollbarException($level, $message), $payload)) {
+        if ($this->_shouldIgnore(true, new RollbarException($message), $payload)) {
             return;
         }
 
