@@ -4,6 +4,10 @@
  *
  * Unless you need multiple RollbarNotifier instances in the same project, use this.
  */
+if ( !defined( 'BASE_EXCEPTION' ) ) {
+	define( 'BASE_EXCEPTION', version_compare( phpversion(), '7.0', '<' )? '\Exception': '\Throwable' );
+}
+
 class Rollbar {
     /** @var RollbarNotifier */
     public static $instance = null;
@@ -177,8 +181,8 @@ class RollbarNotifier {
 
     public function report_exception($exc, $extra_data = null, $payload_data = null) {
         try {
-            if (!$exc instanceof \Throwable) {
-                throw new Exception('Report exception requires an instance of \Throwable.');
+            if ( !is_a( $exc, BASE_EXCEPTION ) ) {
+                throw new Exception(sprintf('Report exception requires an instance of %s.', BASE_EXCEPTION ));
             }
 
             return $this->_report_exception($exc, $extra_data, $payload_data);
@@ -237,9 +241,9 @@ class RollbarNotifier {
     }
 
     /**
-     * @param \Throwable $exc
+     * @param \Throwable|\Exception $exc
      */
-    protected function _report_exception(\Throwable $exc, $extra_data = null, $payload_data = null) {
+    protected function _report_exception( $exc, $extra_data = null, $payload_data = null) {
         if (!$this->check_config()) {
             return;
         }
@@ -604,11 +608,11 @@ class RollbarNotifier {
     }
 
     /**
-     * @param \Throwable $exc
+     * @param \Throwable|\Exception $exc
      * @param mixed $extra_data
      * @return array
      */
-    protected function build_exception_trace(\Throwable $exc, $extra_data = null)
+    protected function build_exception_trace($exc, $extra_data = null)
     {
         $message = $exc->getMessage();
 
@@ -628,18 +632,18 @@ class RollbarNotifier {
     }
 
     /**
-     * @param \Throwable $exc
+     * @param \Throwable|\Exception $exc
      * @param array $extra_data
      * @return array
      */
-    protected function build_exception_trace_chain(\Throwable $exc, $extra_data = null)
+    protected function build_exception_trace_chain( $exc, $extra_data = null)
     {
         $chain = array();
         $chain[] = $this->build_exception_trace($exc, $extra_data);
 
         $previous = $exc->getPrevious();
 
-        while ($previous instanceof \Throwable) {
+        while ( is_a( $previous, BASE_EXCEPTION ) ) {
             $chain[] = $this->build_exception_trace($previous);
             $previous = $previous->getPrevious();
         }
@@ -648,10 +652,10 @@ class RollbarNotifier {
     }
 
     /**
-     * @param \Throwable $exc
+     * @param \Throwable|\Exception $exc
      * @return array
      */
-    protected function build_exception_frames(\Throwable $exc) {
+    protected function build_exception_frames($exc) {
         $frames = array();
 
         foreach ($exc->getTrace() as $frame) {
