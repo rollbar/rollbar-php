@@ -1,4 +1,6 @@
 <?php
+include 'Level.php';
+
 /**
  * Singleton-style wrapper around RollbarNotifier
  *
@@ -45,7 +47,7 @@ class Rollbar {
         return self::$instance->report_exception($exc, $extra_data, $payload_data);
     }
 
-    public static function report_message($message, $level = 'error', $extra_data = null, $payload_data = null) {
+    public static function report_message($message, $level = Level::ERROR, $extra_data = null, $payload_data = null) {
         if (self::$instance == null) {
             return;
         }
@@ -141,17 +143,17 @@ class RollbarNotifier {
     private $_mt_randmax;
 
     private $_curl_ipresolve_supported;
-    
+
     /** @var iSourceFileReader $_source_file_reader */
     private $_source_file_reader;
-    
+
     public function __construct($config) {
         foreach ($this->config_keys as $key) {
             if (isset($config[$key])) {
                 $this->$key = $config[$key];
             }
         }
-        $this->_source_file_reader = new SourceFileReader();    
+        $this->_source_file_reader = new SourceFileReader();
 
         if (!$this->access_token && $this->handler != 'agent') {
             $this->log_error('Missing access token');
@@ -199,7 +201,7 @@ class RollbarNotifier {
         }
     }
 
-    public function report_message($message, $level = 'error', $extra_data = null, $payload_data = null) {
+    public function report_message($message, $level = Level::ERROR, $extra_data = null, $payload_data = null) {
         try {
             return $this->_report_message($message, $level, $extra_data, $payload_data);
         } catch (Exception $e) {
@@ -347,51 +349,51 @@ class RollbarNotifier {
         $data = $this->build_base_data();
 
         // set error level and error constant name
-        $level = 'info';
+        $level = Level::INFO;
         $constant = '#' . $errno;
         switch ($errno) {
             case 1:
-                $level = 'error';
+                $level = Level::ERROR;
                 $constant = 'E_ERROR';
                 break;
             case 2:
-                $level = 'warning';
+                $level = Level::WARNING;
                 $constant = 'E_WARNING';
                 break;
             case 4:
-                $level = 'critical';
+                $level = Level::CRITICAL;
                 $constant = 'E_PARSE';
 		break;
             case 8:
-                $level = 'info';
+                $level = Level::INFO;
                 $constant = 'E_NOTICE';
                 break;
             case 256:
-                $level = 'error';
+                $level = Level::ERROR;
                 $constant = 'E_USER_ERROR';
                 break;
             case 512:
-                $level = 'warning';
+                $level = Level::WARNING;
                 $constant = 'E_USER_WARNING';
                 break;
             case 1024:
-                $level = 'info';
+                $level = Level::INFO;
                 $constant = 'E_USER_NOTICE';
                 break;
             case 2048:
-                $level = 'info';
+                $level = Level::INFO;
                 $constant = 'E_STRICT';
                 break;
             case 4096:
-                $level = 'error';
+                $level = Level::ERROR;
                 $constant = 'E_RECOVERABLE_ERROR';
                 break;
             case 8192:
-                $level = 'info';
+                $level = Level::INFO;
                 $constant = 'E_DEPRECATED';
                 break;
             case 16384:
-                $level = 'info';
+                $level = Level::INFO;
                 $constant = 'E_USER_DEPRECATED';
                 break;
         }
@@ -664,7 +666,7 @@ class RollbarNotifier {
      */
     protected function build_exception_frames(Exception $exc) {
         $frames = array();
-        
+
         foreach ($exc->getTrace() as $frame) {
             $framedata = array(
                 'filename' => isset($frame['file']) ? $frame['file'] : '<internal>',
@@ -816,7 +818,7 @@ class RollbarNotifier {
         return null;
     }
 
-    protected function build_base_data($level = 'error') {
+    protected function build_base_data($level = Level::ERROR) {
         if (null === $this->_php_context) {
             $this->_php_context = $this->get_php_context();
         }
