@@ -20,10 +20,10 @@ try {
 }
 
 // Message at level 'info'
-Rollbar::report_message('testing 123', 'info');
+Rollbar::report_message('testing 123', Level::INFO);
 
 // With extra data (3rd arg) and custom payload options (4th arg)
-Rollbar::report_message('testing 123', 'info',
+Rollbar::report_message('testing 123', Level::INFO,
                         // key-value additional data
                         array("some_key" => "some value"),  
                         // payload options (overrides defaults) - see api docs
@@ -125,9 +125,9 @@ You can also send Rollbar log-like messages:
 
 ```php
 <?php
-Rollbar::report_message('could not connect to mysql server', 'warning');
-Rollbar::report_message('Here is a message with some additional data', 'info', 
-    array('x' => 10, 'code' => 'blue'));
+Rollbar::report_message('could not connect to mysql server', Level::WARNING);
+Rollbar::report_message('Here is a message with some additional data',
+    Level::INFO, array('x' => 10, 'code' => 'blue'));
 ?>
 ```
 
@@ -172,46 +172,46 @@ All of the following options can be passed as keys in the `$config` array.
   <dt>access_token</dt>
   <dd>Your project access token.
   </dd>
-  
+
   <dt>agent_log_location</dt>
   <dd>Path to the directory where agent relay log files should be written. Should not include final slash. Only used when handler is `agent`.
-  
+
 Default: `/var/www`
   </dd>
-  
+
   <dt>base_api_url</dt>
   <dd>The base api url to post to.
-  
+
 Default: `https://api.rollbar.com/api/1/`
   </dd>
 
   <dt>batch_size</dt>
   <dd>Flush batch early if it reaches this size.
-  
+
 Default: `50`
   </dd>
 
   <dt>batched</dt>
   <dd>True to batch all reports from a single request together.
-  
+
 Default: `true`
   </dd>
 
   <dt>branch</dt>
   <dd>Name of the current branch.
-  
+
 Default: `master`
   </dd>
 
   <dt>capture_error_stacktraces</dt>
   <dd>Record full stacktraces for PHP errors.
-  
+
 Default: `true`
   </dd>
-  
+
   <dt>code_version</dt>
   <dd>The currently-deployed version of your code/application (e.g. a Git SHA). Should be a string.
-  
+
 Default: `null`
   </dd>
 
@@ -223,25 +223,39 @@ Default: `'production'`
 
   <dt>error_sample_rates</dt>
   <dd>Associative array mapping error numbers to sample rates. Sample rates are ratio out of 1, e.g. 0 is "never report", 1 is "always report", and 0.1 is "report 10% of the time". Sampling is done on a per-error basis.
-  
+
 Default: empty array, meaning all errors are reported.
   </dd>
 
   <dt>handler</dt>
   <dd>Either `'blocking'` or `'agent'`. `'blocking'` uses curl to send requests immediately; `'agent'` writes a relay log to be consumed by [rollbar-agent](https://github.com/rollbar/rollbar-agent).
-  
+
 Default: `'blocking'`
   </dd>
 
   <dt>host</dt>
   <dd>Server hostname.
-  
+
 Default: `null`, which will result in a call to `gethostname()` (or `php_uname('n')` if that function does not exist)
   </dd>
-  
+
+  <dt>include_error_code_context</dt>
+  <dd>A boolean that indicates you wish to gather code context for instances of PHP Errors.
+    This can take a while because it requires reading the file from disk, so it's off by default.
+
+Default: false
+  </dd>
+
+  <dt>include_exception_code_context</dt>
+  <dd>A boolean that indicates you wish to gather code context for instances of PHP Exeptions.
+    This can take a while because it requires reading the file from disk, so it's off by default.
+
+Default: false
+  </dd>
+
   <dt>included_errno</dt>
   <dd>A bitmask that includes all of the error levels to report. E.g. (E_ERROR | E_WARNING) to only report E_ERROR and E_WARNING errors. This will be used in combination with `error_reporting()` to prevent reporting of errors if `use_error_reporting` is set to `true`.
-  
+
 Default: (E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR)
   </dd>
 
@@ -263,34 +277,34 @@ Default: (E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOVE
 
   <dt>scrub_fields</dt>
   <dd>Array of field names to scrub out of _POST and _SESSION. Values will be replaced with asterisks. If overridiing, make sure to list all fields you want to scrub, not just fields you want to add to the default. Param names are converted to lowercase before comparing against the scrub list.
-  
+
 Default: `('passwd', 'password', 'secret', 'confirm_password', 'password_confirmation', 'auth_token', 'csrf_token')`
   </dd>
 
   <dt>shift_function</dt>
   <dd>Whether to shift function names in stack traces down one frame, so that the function name correctly reflects the context of each frame.
-  
+
 Default: `true`
   </dd>
 
   <dt>timeout</dt>
   <dd>Request timeout for posting to rollbar, in seconds.
-  
+
 Default: `3`
   </dd>
 
   <dt>report_suppressed</dt>
   <dd>Sets whether errors suppressed with '@' should be reported or not
-  
+
 Default: `false`
   </dd>
 
   <dt>use_error_reporting</dt>
   <dd>Sets whether to respect current `error_reporting()` level or not
-  
+
 Default: `false`
   </dd>
-  
+
   <dt>proxy</dt>
   <dd>Send data via a proxy server.
 
@@ -316,7 +330,7 @@ $config['proxy'] = array(
 
 Default: No proxy
   </dd>
-  
+
   </dl>
 
 Example use of error_sample_rates:
