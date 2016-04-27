@@ -117,6 +117,8 @@ try {
     do_something();
 } catch (Exception $e) {
     Rollbar::report_exception($e);
+    // or
+    Rollbar::report_exception($e, array("my" => "extra", "data" => 42));
 }
 ?>
 ```
