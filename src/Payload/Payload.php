@@ -7,7 +7,7 @@ class Payload {
     private $accessToken;
 
     public function __construct(Body $body, string $accessToken = null) {
-        setBody($body);
-        setAccessToken($accessToken);
+        $this->body = $body;
+        $this->accessToken = $accessToken;
     }
 }
