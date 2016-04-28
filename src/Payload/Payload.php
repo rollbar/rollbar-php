@@ -18,4 +18,8 @@ class Payload {
         }
         $this->accessToken = $accessToken;
     }
+
+    public function getAccessToken() {
+        return $this->accessToken;
+    }
 }
