@@ -1,13 +1,20 @@
 <?php namespace Rollbar\Payload;
 
-class Body extends \JsonSerializable {
-    private $content;
+use Rollbar\Utilities;
 
-    public function __construct(ContentInterface content) {
-        $this->content = content;
+class Body implements \JsonSerializable {
+    private $value;
+
+    public function __construct(ContentInterface $value) {
+        $this->value = $value;
     }
 
     public function jsonSerialize() {
+        $returnVal = array();
 
+        $key = Utilities::pascaleToCamel(get_class($value));
+        $returnVal[key] = $value;
+
+        return $returnVal;
     }
 }
