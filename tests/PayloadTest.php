@@ -15,4 +15,10 @@ class PayloadTest extends \PHPUnit_Framework_TestCase {
         $bodyContent = m::mock("Rollbar\Payload\ContentInterface");
         $payload = new Payload(new Body($bodyContent));
     }
+
+    public function testPayloadConstructorAcceptsAccessToken() {
+        $bodyContent = m::mock("Rollbar\Payload\ContentInterface");
+        $accessToken = "abcdef0123456789abcdef0123456789";
+        $payload = new Payload(new Body($bodyContent), $accessToken);
+    }
 }
