@@ -36,10 +36,15 @@
 
   "require-dev": {
     "phpunit/phpunit": "4.8.*",
-    "mockery/mockery": "0.9.*"
+    "mockery/mockery": "0.9.*",
+    "squizlabs/php_codesniffer": "2.*"
   },
 
   "scripts": {
-    "test": "phpunit"
+    "test": [
+      "phpunit",
+      "phpcs --standard=PSR1,PSR2 src"
+    ],
+    "fix": "phpcbf --standard=PSR1,PSR1 src"
   }
 }
