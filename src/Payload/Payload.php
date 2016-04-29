@@ -12,6 +12,10 @@ class Payload {
         $this->setAccessToken($accessToken);
     }
 
+    public function getBody() {
+        return $this->body;
+    }
+
     public function setAccessToken($accessToken) {
         if (!is_null($accessToken)) {
             Utilities::isString($accessToken, "accessToken", 32);
