@@ -2,17 +2,27 @@
 
 final class Utilities
 {
+    // Modified from: http://stackoverflow.com/a/1176023/456188
     public static function pascaleToCamel($input)
     {
-        return ltrim(strtolower(preg_replace('/[A-Z]/', '_$0', $input)), '_');
+        $s1 = preg_replace('/([^_])([A-Z][a-z]+)/', '$1_$2', $input);
+        return strtolower(preg_replace('/([a-z0-9])([A-Z])/', '$1_$2', $s1));
     }
 
-    public static function isString($input, $name, $len)
+    public static function validateString(
+        $input,
+        $name = "?",
+        $len = null,
+        $allowNull = true
+    )
     {
-        if (!is_string($input)) {
-            throw new \InvalidArgumentException("\$$name must ba a string");
+        if (!$allowNull && is_null($input)) {
+            throw new \InvalidArgumentException("\$$name must not be null");
         }
-        if (!is_null($len) && strlen($input) != $len) {
+        if (!is_null($input) && !is_string($input)) {
+            throw new \InvalidArgumentException("\$$name must be a string");
+        }
+        if (!is_null($input) && !is_null($len) && strlen($input) != $len) {
             throw new \InvalidArgumentException("\$$name must be $len characters long, was '$input'");
         }
     }

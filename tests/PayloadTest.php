@@ -4,14 +4,17 @@ use \Mockery as m;
 use Rollbar\Payload\Payload;
 use Rollbar\Payload\Body;
 
-class PayloadTest extends \PHPUnit_Framework_TestCase {
-    public function testPayloadConstructorRequiresBody() {
+class PayloadTest extends \PHPUnit_Framework_TestCase
+{
+    public function testPayloadConstructorRequiresBody()
+    {
         // PHPUnit converts errors to exceptions
         $this->setExpectedException("\PHPUnit_Framework_Error");
         $payload = new Payload();
     }
 
-    public function testPayloadBody() {
+    public function testPayloadBody()
+    {
         $bodyContent = m::mock("Rollbar\Payload\ContentInterface");
         $body = new Body($bodyContent);
         $payload = new Payload($body);
@@ -19,7 +22,8 @@ class PayloadTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals($body, $payload->getBody());
     }
 
-    public function testPayloadAccessToken() {
+    public function testPayloadAccessToken()
+    {
         $bodyContent = m::mock("Rollbar\Payload\ContentInterface");
         $body = new Body($bodyContent);
 

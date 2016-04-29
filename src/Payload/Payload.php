@@ -22,7 +22,7 @@ class Payload
     public function setAccessToken($accessToken)
     {
         if (!is_null($accessToken)) {
-            Utilities::isString($accessToken, "accessToken", 32);
+            Utilities::validateString($accessToken, "accessToken", 32);
         }
         $this->accessToken = $accessToken;
     }
