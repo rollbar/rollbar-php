@@ -14,8 +14,8 @@ final class Utilities
         $name = "?",
         $len = null,
         $allowNull = true
-    )
-    {
+    ) {
+    
         if (!$allowNull && is_null($input)) {
             throw new \InvalidArgumentException("\$$name must not be null");
         }

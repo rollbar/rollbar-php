@@ -35,8 +35,7 @@ class UtilitiesTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($e->getMessage(), "\$number must be a string");
         }
 
-        try
-        {
+        try {
             Utilities::validateString("1", "str", 2);
         } catch (\InvalidArgumentException $e) {
             $this->assertEquals($e->getMessage(), "\$str must be 2 characters long, was '1'");
