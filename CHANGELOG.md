@@ -1,10 +1,21 @@
 # Changelog
 
-## Next release
+## 0.17.0
+
+- Accidental tag of documentation change. No API change present.
+
+## 0.16.0
+
+Features:
+
+- Added support for reporting errors in Command Line Scripts.
+- Added (opt-in) support for capturing line of code and context around that code in stack traces. See [#76](https://github.com/rollbar/rollbar-php/pull/76)
+- Added Level class with string constants for Level values.
 
 Bug fixes:
 
 - Fixed the severity level that E_PARSE errors are reproted at. See [#75](https://github.com/rollbar/rollbar-php/pull/75)
+- Captured \Throwable rather than \Exception if using PHP 7
 
 ## 0.15.0
 
