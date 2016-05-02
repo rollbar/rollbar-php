@@ -15,7 +15,7 @@ final class Utilities
         $len = null,
         $allowNull = true
     ) {
-    
+
         if (!$allowNull && is_null($input)) {
             throw new \InvalidArgumentException("\$$name must not be null");
         }
@@ -25,5 +25,26 @@ final class Utilities
         if (!is_null($input) && !is_null($len) && strlen($input) != $len) {
             throw new \InvalidArgumentException("\$$name must be $len characters long, was '$input'");
         }
+    }
+
+    public static function serializeForRollbar(
+        $obj,
+        array $overrideNames = null,
+        array $customKeys = null
+    ) {
+        $returnVal = array();
+        $overrideNames = $overrideNames == null ? array() : $overrideNames;
+        $customKeys = $customKeys == null ? array() : $customKeys;
+
+        foreach ($obj as $key => $val) {
+            $newKey = array_key_exists($key, $overrideNames)
+                ? $overrideNames[$key]
+                : Utilities::pascaleToCamel($key);
+            if (!is_null($val) || array_key_exists($key, $customKeys)) {
+                $returnVal[$newKey] = $val;
+            }
+        }
+
+        return $returnVal;
     }
 }

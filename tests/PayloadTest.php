@@ -2,51 +2,61 @@
 
 use \Mockery as m;
 use Rollbar\Payload\Payload;
-use Rollbar\Payload\Body;
+use Rollbar\Payload\Data;
 
 class PayloadTest extends \PHPUnit_Framework_TestCase
 {
-    public function testPayloadConstructorRequiresBody()
+    public function testPayloadConstructorRequiresData()
     {
         // PHPUnit converts errors to exceptions
         $this->setExpectedException("\PHPUnit_Framework_Error");
         $payload = new Payload();
     }
 
-    public function testPayloadBody()
+    public function testPayloadData()
     {
-        $bodyContent = m::mock("Rollbar\Payload\ContentInterface");
-        $body = new Body($bodyContent);
-        $payload = new Payload($body);
+        $data = m::mock("Rollbar\Payload\Data");
+        $payload = new Payload($data);
 
-        $this->assertEquals($body, $payload->getBody());
+        $this->assertEquals($data, $payload->getData());
     }
 
     public function testPayloadAccessToken()
     {
-        $bodyContent = m::mock("Rollbar\Payload\ContentInterface");
-        $body = new Body($bodyContent);
-
+        $data = m::mock("Rollbar\Payload\Data");
+        ;
         $accessToken = null;
-        $payload = new Payload($body, $accessToken);
+
+        $payload = new Payload($data, $accessToken);
         $this->assertNull($payload->getAccessToken());
 
         $accessToken = "too_short";
         try {
-            new Payload($body, $accessToken);
+            new Payload($data, $accessToken);
         } catch (\InvalidArgumentException $e) {
             $this->assertContains("32", $e->getMessage());
         }
 
         $accessToken = "too_longtoo_longtoo_longtoo_longtoo_longtoo_long";
         try {
-            new Payload($body, $accessToken);
+            new Payload($data, $accessToken);
         } catch (\InvalidArgumentException $e) {
             $this->assertContains("32", $e->getMessage());
         }
 
         $accessToken = "012345678901234567890123456789ab";
-        $payload = new Payload($body, $accessToken);
+        $payload = new Payload($data, $accessToken);
         $this->assertEquals($accessToken, $payload->getAccessToken());
+    }
+
+    public function testEncode()
+    {
+        $data = m::mock('Rollbar\Payload\Data[jsonSerialize]')
+            ->shouldReceive('jsonSerialize')
+            ->andReturn(new \ArrayObject())
+            ->mock();
+        $payload = new Payload($data);
+        $encoded = json_encode($payload);
+        $this->assertEquals('{"data":{}}', $encoded);
     }
 }

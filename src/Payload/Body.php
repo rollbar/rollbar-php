@@ -13,11 +13,10 @@ class Body implements \JsonSerializable
 
     public function jsonSerialize()
     {
-        $returnVal = array();
-
-        $key = Utilities::pascaleToCamel(get_class($value));
-        $returnVal[key] = $value;
-
-        return $returnVal;
+        $overrideNames = array(
+            "content" => Utilities::pascaleToCamel(get_class($value))
+        );
+        $obj = get_object_vars($this);
+        return Utilities::serializeForRollbar($obj, $overrideNames);
     }
 }
