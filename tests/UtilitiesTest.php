@@ -41,4 +41,29 @@ class UtilitiesTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($e->getMessage(), "\$str must be 2 characters long, was '1'");
         }
     }
+
+    public function testValidateInteger()
+    {
+        Utilities::validateInteger(null);
+        Utilities::validateInteger(0);
+        Utilities::validateInteger(1, "one", 0, 2);
+
+        try {
+            Utilities::validateInteger(null, "null", null, null, false);
+        } catch (\InvalidArgumentException $e) {
+            $this->assertEquals($e->getMessage(), "\$null must not be null");
+        }
+
+        try {
+            Utilities::validateInteger(0, "zero", 1);
+        } catch (\InvalidArgumentException $e) {
+            $this->assertEquals($e->getMessage(), "\$zero must be >= 1");
+        }
+
+        try {
+            Utilities::validateInteger(0, "zero", null, -1);
+        } catch (\InvalidArgumentException $e) {
+            $this->assertEquals($e->getMessage(), "\$zero must be <= -1");
+        }
+    }
 }

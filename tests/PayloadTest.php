@@ -6,13 +6,6 @@ use Rollbar\Payload\Data;
 
 class PayloadTest extends \PHPUnit_Framework_TestCase
 {
-    public function testPayloadConstructorRequiresData()
-    {
-        // PHPUnit converts errors to exceptions
-        $this->setExpectedException("\PHPUnit_Framework_Error");
-        $payload = new Payload();
-    }
-
     public function testPayloadData()
     {
         $data = m::mock("Rollbar\Payload\Data");
@@ -51,7 +44,7 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
 
     public function testEncode()
     {
-        $data = m::mock('Rollbar\Payload\Data[jsonSerialize]')
+        $data = m::mock('Rollbar\Payload\Data')
             ->shouldReceive('jsonSerialize')
             ->andReturn(new \ArrayObject())
             ->mock();

@@ -15,15 +15,43 @@ final class Utilities
         $len = null,
         $allowNull = true
     ) {
-
-        if (!$allowNull && is_null($input)) {
-            throw new \InvalidArgumentException("\$$name must not be null");
+        if (is_null($input)) {
+            if (!$allowNull) {
+                throw new \InvalidArgumentException("\$$name must not be null");
+            }
+            return;
         }
-        if (!is_null($input) && !is_string($input)) {
+
+        if (!is_string($input)) {
             throw new \InvalidArgumentException("\$$name must be a string");
         }
-        if (!is_null($input) && !is_null($len) && strlen($input) != $len) {
+        if (!is_null($len) && strlen($input) != $len) {
             throw new \InvalidArgumentException("\$$name must be $len characters long, was '$input'");
+        }
+    }
+
+    public static function validateInteger(
+        $input,
+        $name = "?",
+        $minValue = null,
+        $maxValue = null,
+        $allowNull = true
+    ) {
+        if (is_null($input)) {
+            if (!$allowNull) {
+                throw new \InvalidArgumentException("\$$name must not be null");
+            }
+            return;
+        }
+
+        if (!is_integer($input)) {
+            throw new \InvalidArgumentException("\$$name must be an integer");
+        }
+        if (!is_null($minValue) && $input < $minValue) {
+            throw new \InvalidArgumentException("\$$name must be >= $minValue");
+        }
+        if (!is_null($maxValue) && $input > $maxValue) {
+            throw new \InvalidArgumentException("\$$name must be <= $maxValue");
         }
     }
 
