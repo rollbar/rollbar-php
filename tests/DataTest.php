@@ -147,4 +147,56 @@ class DataTest extends \PHPUnit_Framework_TestCase
         $this->data->setNotifier($notifier);
         $this->assertEquals($notifier, $this->data->getNotifier());
     }
+
+    public function testEncode()
+    {
+        $data = new Data("env", $this->mockSerialize($this->body, "{BODY}"));
+
+        $data->setLevel($this->mockSerialize("Rollbar\Payload\Level", "{LEVEL}"));
+        $time = time();
+        $data->setTimestamp($time);
+        $data->setCodeVersion("v0.17.3");
+        $data->setPlatform("LAMP");
+        $data->setLanguage("PHP 5.4");
+        $data->setFramework("CakePHP");
+        $data->setContext("AppController->updatePerson");
+        $data->setRequest($this->mockSerialize("Rollbar\Payload\Request", "{REQUEST}"));
+        $data->setPerson($this->mockSerialize("Rollbar\Payload\Person", "{PERSON}"));
+        $data->setServer($this->mockSerialize("Rollbar\Payload\Server", "{SERVER}"));
+        $data->setCustom(array("x" => "hello", "extra" => new \ArrayObject()));
+        $data->setFingerprint("big-fingerprint");
+        $data->setTitle("The Title");
+        $data->setUuid("123e4567-e89b-12d3-a456-426655440000");
+        $data->setNotifier($this->mockSerialize("Rollbar\Payload\Notifier", "{NOTIFIER}"));
+
+        $encoded = json_encode($data);
+
+        $this->assertContains("\"environment\":\"env\"", $encoded);
+        $this->assertContains("\"body\":\"{BODY}\"", $encoded);
+        $this->assertContains("\"level\":\"{LEVEL}\"", $encoded);
+        $this->assertContains("\"timestamp\":$time", $encoded);
+        $this->assertContains("\"code_version\":\"v0.17.3\"", $encoded);
+        $this->assertContains("\"platform\":\"LAMP\"", $encoded);
+        $this->assertContains("\"language\":\"PHP 5.4\"", $encoded);
+        $this->assertContains("\"framework\":\"CakePHP\"", $encoded);
+        $this->assertContains("\"context\":\"AppController->updatePerson\"", $encoded);
+        $this->assertContains("\"request\":\"{REQUEST}\"", $encoded);
+        $this->assertContains("\"person\":\"{PERSON}\"", $encoded);
+        $this->assertContains("\"server\":\"{SERVER}\"", $encoded);
+        $this->assertContains("\"custom\":{\"x\":\"hello\",\"extra\":{}}", $encoded);
+        $this->assertContains("\"fingerprint\":\"big-fingerprint\"", $encoded);
+        $this->assertContains("\"title\":\"The Title\"", $encoded);
+        $this->assertContains("\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"", $encoded);
+        $this->assertContains("\"notifier\":\"{NOTIFIER}\"", $encoded);
+    }
+
+    private function mockSerialize($mock, $returnVal)
+    {
+        if (is_string($mock)) {
+            $mock = m::mock("$mock, \JsonSerializable");
+        }
+        return $mock->shouldReceive("jsonSerialize")
+            ->andReturn($returnVal)
+            ->mock();
+    }
 }
