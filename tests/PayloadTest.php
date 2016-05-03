@@ -2,7 +2,6 @@
 
 use \Mockery as m;
 use Rollbar\Payload\Payload;
-use Rollbar\Payload\Data;
 
 class PayloadTest extends \PHPUnit_Framework_TestCase
 {
