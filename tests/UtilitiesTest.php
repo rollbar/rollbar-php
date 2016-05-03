@@ -66,4 +66,32 @@ class UtilitiesTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($e->getMessage(), "\$zero must be <= -1");
         }
     }
+
+    public function testSerializeForRollbar()
+    {
+        $obj = array(
+            "OneTwo" => [1, 2],
+            "klass" => "Numbers",
+            "PHPUnitTest" => "testSerializeForRollbar",
+            "myCustomKey" => null,
+            "myNullValue" => null,
+        );
+        $result = Utilities::serializeForRollbar($obj, array("klass" => "class"), array("myCustomKey"));
+
+        $this->assertArrayNotHasKey("OneTwo", $result);
+        $this->assertArrayHasKey("one_two", $result);
+
+        $this->assertArrayNotHasKey("klass", $result);
+        $this->assertArrayHasKey("class", $result);
+
+        $this->assertArrayNotHasKey("PHPUnitTest", $result);
+        $this->assertArrayHasKey("php_unit_test", $result);
+
+        $this->assertArrayNotHasKey("my_custom_key", $result);
+        $this->assertArrayHasKey("myCustomKey", $result);
+        $this->assertNull($result["myCustomKey"]);
+
+        $this->assertArrayNotHasKey("myNullValue", $result);
+        $this->assertArrayNotHasKey("my_null_value", $result);
+    }
 }

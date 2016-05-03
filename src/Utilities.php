@@ -68,7 +68,9 @@ final class Utilities
             $newKey = array_key_exists($key, $overrideNames)
                 ? $overrideNames[$key]
                 : Utilities::pascaleToCamel($key);
-            if (!is_null($val) || array_key_exists($key, $customKeys)) {
+            if (in_array($key, $customKeys)) {
+                $returnVal[$key] = $val;
+            } elseif (!is_null($val)) {
                 $returnVal[$newKey] = $val;
             }
         }
