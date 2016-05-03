@@ -25,6 +25,7 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
         $accessToken = "too_short";
         try {
             new Payload($data, $accessToken);
+            $this->fail("Above should throw");
         } catch (\InvalidArgumentException $e) {
             $this->assertContains("32", $e->getMessage());
         }
@@ -32,6 +33,7 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
         $accessToken = "too_longtoo_longtoo_longtoo_longtoo_longtoo_long";
         try {
             new Payload($data, $accessToken);
+            $this->fail("Above should throw");
         } catch (\InvalidArgumentException $e) {
             $this->assertContains("32", $e->getMessage());
         }

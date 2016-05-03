@@ -25,18 +25,21 @@ class UtilitiesTest extends \PHPUnit_Framework_TestCase
 
         try {
             Utilities::validateString(null, "null", null, false);
+            $this->fail("Above should throw");
         } catch (\InvalidArgumentException $e) {
             $this->assertEquals($e->getMessage(), "\$null must not be null");
         }
 
         try {
             Utilities::validateString(1, "number");
+            $this->fail("Above should throw");
         } catch (\InvalidArgumentException $e) {
             $this->assertEquals($e->getMessage(), "\$number must be a string");
         }
 
         try {
             Utilities::validateString("1", "str", 2);
+            $this->fail("Above should throw");
         } catch (\InvalidArgumentException $e) {
             $this->assertEquals($e->getMessage(), "\$str must be 2 characters long, was '1'");
         }
@@ -50,18 +53,21 @@ class UtilitiesTest extends \PHPUnit_Framework_TestCase
 
         try {
             Utilities::validateInteger(null, "null", null, null, false);
+            $this->fail("Above should throw");
         } catch (\InvalidArgumentException $e) {
             $this->assertEquals($e->getMessage(), "\$null must not be null");
         }
 
         try {
             Utilities::validateInteger(0, "zero", 1);
+            $this->fail("Above should throw");
         } catch (\InvalidArgumentException $e) {
             $this->assertEquals($e->getMessage(), "\$zero must be >= 1");
         }
 
         try {
             Utilities::validateInteger(0, "zero", null, -1);
+            $this->fail("Above should throw");
         } catch (\InvalidArgumentException $e) {
             $this->assertEquals($e->getMessage(), "\$zero must be <= -1");
         }
