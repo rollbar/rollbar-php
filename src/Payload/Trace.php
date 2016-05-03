@@ -9,8 +9,18 @@ class Trace extends ContentInterface
 
     public function __construct(array $frames, ExceptionInfo $exception)
     {
-        $this->frames = $frames;
+        $this->setFrames($frames);
         $this->exception = $exception;
+    }
+
+    private function setFrames(array $frames)
+    {
+        foreach ($frames as $frame) {
+            if (!$frame instanceof Frame) {
+                throw new \InvalidArgumentException("\$frames must all be Rollbar\Payload\Frames");
+            }
+        }
+        $this->frames = $frames;
     }
 
     public function getFrames()
