@@ -18,7 +18,7 @@ class Trace extends ContentInterface
         return $this->frames;
     }
 
-    private function setFrames(array $frames)
+    public function setFrames(array $frames)
     {
         foreach ($frames as $frame) {
             if (!$frame instanceof Frame) {
@@ -26,6 +26,7 @@ class Trace extends ContentInterface
             }
         }
         $this->frames = $frames;
+        return $this;
     }
 
     public function getException()
@@ -36,6 +37,7 @@ class Trace extends ContentInterface
     public function setException(ExceptionInfo $exception)
     {
         $this->exception = $exception;
+        return $this;
     }
 
     public function jsonSerialize()

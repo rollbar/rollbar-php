@@ -2,18 +2,10 @@
 
 use \Mockery as m;
 use Rollbar\Payload\Trace;
+use rollbar\Payload\Frame;
 
 class TraceTest extends \PHPUnit_Framework_TestCase
 {
-    public function testTraceValue()
-    {
-        $frames = array();
-        $exc = m::mock("Rollbar\Payload\ExceptionInfo");
-        $trace = new Trace($frames, $exc);
-        $this->assertEquals($frames, $trace->getFrames());
-        $this->assertEquals($exc, $trace->getException());
-    }
-
     public function testTraceConstructor()
     {
         $exc = m::mock("Rollbar\Payload\ExceptionInfo");
@@ -34,6 +26,27 @@ class TraceTest extends \PHPUnit_Framework_TestCase
         } catch (\InvalidArgumentException $e) {
             $this->assertEquals("\$frames must all be Rollbar\Payload\Frames", $e->getMessage());
         }
+    }
+
+    public function testFrames()
+    {
+        $frames = array(
+            new Frame("one.php"),
+            new Frame("two.php")
+        );
+        $exc = m::mock("Rollbar\Payload\ExceptionInfo");
+        $trace = new Trace(array(), $exc);
+        $this->assertEquals($frames, $trace->setFrames($frames)->getFrames());
+    }
+
+    public function testException()
+    {
+        $exc = m::mock("Rollbar\Payload\ExceptionInfo");
+        $trace = new Trace(array(), $exc);
+        $this->assertEquals($exc, $trace->getException());
+
+        $exc2 = m::mock("Rollbar\Payload\ExceptionInfo");
+        $this->assertEquals($exc2, $trace->setException($exc2)->getException());
     }
 
     public function testEncode()
