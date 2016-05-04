@@ -10,7 +10,7 @@ class Payload implements \JsonSerializable
 
     public function __construct(Data $data, $accessToken = null)
     {
-        $this->data = $data;
+        $this->setData($data);
         $this->setAccessToken($accessToken);
     }
 
@@ -19,17 +19,22 @@ class Payload implements \JsonSerializable
         return $this->data;
     }
 
+    public function setData(Data $data)
+    {
+        $this->data = $data;
+    }
+
+    public function getAccessToken()
+    {
+        return $this->accessToken;
+    }
+
     public function setAccessToken($accessToken)
     {
         if (!is_null($accessToken)) {
             Utilities::validateString($accessToken, "accessToken", 32);
         }
         $this->accessToken = $accessToken;
-    }
-
-    public function getAccessToken()
-    {
-        return $this->accessToken;
     }
 
     public function jsonSerialize()

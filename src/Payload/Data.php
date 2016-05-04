@@ -25,10 +25,8 @@ class Data implements \JsonSerializable
 
     public function __construct($environment, Body $body)
     {
-        Utilities::validateString($environment, "environment", null, false);
-        $this->environment = $environment;
-
-        $this->body = $body;
+        $this->setEnvironment($environment);
+        $this->setBody($body);
     }
 
     public function getEnvironment()
@@ -36,9 +34,20 @@ class Data implements \JsonSerializable
         return $this->environment;
     }
 
+    public function setEnvironment($environment)
+    {
+        Utilities::validateString($environment, "environment", null, false);
+        $this->environment = $environment;
+    }
+
     public function getBody()
     {
         return $this->body;
+    }
+
+    public function setBody(Body $body)
+    {
+        $this->body = $body;
     }
 
     public function getLevel()

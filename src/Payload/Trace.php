@@ -10,7 +10,12 @@ class Trace extends ContentInterface
     public function __construct(array $frames, ExceptionInfo $exception)
     {
         $this->setFrames($frames);
-        $this->exception = $exception;
+        $this->setException($exception);
+    }
+
+    public function getFrames()
+    {
+        return $this->frames;
     }
 
     private function setFrames(array $frames)
@@ -23,14 +28,14 @@ class Trace extends ContentInterface
         $this->frames = $frames;
     }
 
-    public function getFrames()
-    {
-        return $this->frames;
-    }
-
     public function getException()
     {
         return $this->exception;
+    }
+
+    public function setException(ExceptionInfo $exception)
+    {
+        $this->exception = $exception;
     }
 
     public function jsonSerialize()

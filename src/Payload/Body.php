@@ -8,12 +8,17 @@ class Body implements \JsonSerializable
 
     public function __construct(ContentInterface $value)
     {
-        $this->value = $value;
+        $this->setValue($value);
     }
 
     public function getValue()
     {
         return $this->value;
+    }
+
+    public function setValue(ContentInterface $value)
+    {
+        $this->value = $value;
     }
 
     public function jsonSerialize()
