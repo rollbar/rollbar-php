@@ -38,6 +38,7 @@ class Data implements \JsonSerializable
     {
         Utilities::validateString($environment, "environment", null, false);
         $this->environment = $environment;
+        return $this;
     }
 
     public function getBody()
@@ -48,6 +49,7 @@ class Data implements \JsonSerializable
     public function setBody(Body $body)
     {
         $this->body = $body;
+        return $this;
     }
 
     public function getLevel()
@@ -58,6 +60,7 @@ class Data implements \JsonSerializable
     public function setLevel(Level $level)
     {
         $this->level = $level;
+        return $this;
     }
 
     public function getTimestamp()
@@ -69,6 +72,7 @@ class Data implements \JsonSerializable
     {
         Utilities::validateInteger($timestamp, "timestamp");
         $this->timestamp = $timestamp;
+        return $this;
     }
 
     public function getCodeVersion()
@@ -80,6 +84,7 @@ class Data implements \JsonSerializable
     {
         Utilities::validateString($codeVersion, "codeVersion");
         $this->codeVersion = $codeVersion;
+        return $this;
     }
 
     public function getPlatform()
@@ -91,6 +96,7 @@ class Data implements \JsonSerializable
     {
         Utilities::validateString($platform, "platform");
         $this->platform = $platform;
+        return $this;
     }
 
     public function getLanguage()
@@ -102,6 +108,7 @@ class Data implements \JsonSerializable
     {
         Utilities::validateString($language, "language");
         $this->language = $language;
+        return $this;
     }
 
     public function getFramework()
@@ -113,6 +120,7 @@ class Data implements \JsonSerializable
     {
         Utilities::validateString($framework, "framework");
         $this->framework = $framework;
+        return $this;
     }
 
     public function getContext()
@@ -124,6 +132,7 @@ class Data implements \JsonSerializable
     {
         Utilities::validateString($context, "context");
         $this->context = $context;
+        return $this;
     }
 
     public function getRequest()
@@ -134,6 +143,7 @@ class Data implements \JsonSerializable
     public function setRequest(Request $request)
     {
         $this->request = $request;
+        return $this;
     }
 
     public function getPerson()
@@ -144,6 +154,7 @@ class Data implements \JsonSerializable
     public function setPerson(Person $person)
     {
         $this->person = $person;
+        return $this;
     }
 
     public function getServer()
@@ -154,6 +165,7 @@ class Data implements \JsonSerializable
     public function setServer(Server $server)
     {
         $this->server = $server;
+        return $this;
     }
 
     public function getCustom()
@@ -164,6 +176,7 @@ class Data implements \JsonSerializable
     public function setCustom(array $custom)
     {
         $this->custom = $custom;
+        return $this;
     }
 
     public function getFingerprint()
@@ -175,6 +188,7 @@ class Data implements \JsonSerializable
     {
         Utilities::validateString($fingerprint, "fingerprint");
         $this->fingerprint = $fingerprint;
+        return $this;
     }
 
     public function getTitle()
@@ -186,6 +200,7 @@ class Data implements \JsonSerializable
     {
         Utilities::validateString($title, "title");
         $this->title = $title;
+        return $this;
     }
 
     public function getUuid()
@@ -197,6 +212,7 @@ class Data implements \JsonSerializable
     {
         Utilities::validateString($uuid, "uuid");
         $this->uuid = $uuid;
+        return $this;
     }
 
     public function getNotifier()
@@ -207,6 +223,7 @@ class Data implements \JsonSerializable
     public function setNotifier(Notifier $notifier)
     {
         $this->notifier = $notifier;
+        return $this;
     }
 
     public function jsonSerialize()

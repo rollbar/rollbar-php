@@ -32,83 +32,78 @@ class DataTest extends \PHPUnit_Framework_TestCase
 
         $data = new Data("env", $this->body);
         $this->assertEquals("env", $data->getEnvironment());
+
+        $this->assertEquals("test", $data->setEnvironment("test")->getEnvironment());
     }
 
     public function testBody()
     {
         $data = new Data("env", $this->body);
         $this->assertEquals($this->body, $data->getBody());
+
+        $body2 = m::mock("Rollbar\Payload\Body");
+        $this->assertEquals($body2, $data->setBody($body2)->getBody());
     }
 
     public function testLevel()
     {
         $level = m::mock("Rollbar\Payload\Level");
-        $this->data->setLevel($level);
-        $this->assertEquals($level, $this->data->getLevel());
+        $this->assertEquals($level, $this->data->setLevel($level)->getLevel());
     }
 
     public function testTimestamp()
     {
         $timestamp = time();
-        $this->data->setTimestamp($timestamp);
-        $this->assertEquals($timestamp, $this->data->getTimestamp());
+        $this->assertEquals($timestamp, $this->data->setTimestamp($timestamp)->getTimestamp());
     }
 
     public function testCodeVersion()
     {
         $codeVersion = "v0.18.1";
-        $this->data->setCodeVersion($codeVersion);
-        $this->assertEquals($codeVersion, $this->data->getCodeVersion());
+        $this->assertEquals($codeVersion, $this->data->setCodeVersion($codeVersion)->getCodeVersion());
     }
 
     public function testPlatform()
     {
         $platform = "Linux";
-        $this->data->setPlatform($platform);
-        $this->assertEquals($platform, $this->data->getPlatform());
+        $this->assertEquals($platform, $this->data->setPlatform($platform)->getPlatform());
     }
 
     public function testLanguage()
     {
         $language = "PHP";
-        $this->data->setLanguage($language);
-        $this->assertEquals($language, $this->data->getLanguage());
+        $this->assertEquals($language, $this->data->setLanguage($language)->getLanguage());
     }
 
     public function testFramework()
     {
         $framework = "Laravel";
-        $this->data->setFramework($framework);
-        $this->assertEquals($framework, $this->data->getFramework());
+        $this->assertEquals($framework, $this->data->setFramework($framework)->getFramework());
     }
 
     public function testContext()
     {
         $context = "SuperController->getResource()";
-        $this->data->setContext($context);
-        $this->assertEquals($context, $this->data->getContext());
+        $this->assertEquals($context, $this->data->setContext($context)->getContext());
     }
 
     public function testRequest()
     {
         $request = m::mock("Rollbar\Payload\Request");
-        $this->data->setRequest($request);
-        $this->assertEquals($request, $this->data->getRequest());
+        $this->assertEquals($request, $this->data->setRequest($request)->getRequest());
     }
 
     public function testPerson()
     {
         $person = m::mock("Rollbar\Payload\Person");
         ;
-        $this->data->setPerson($person);
-        $this->assertEquals($person, $this->data->getPerson());
+        $this->assertEquals($person, $this->data->setPerson($person)->getPerson());
     }
 
     public function testServer()
     {
         $server = m::mock("Rollbar\Payload\server");
-        $this->data->setServer($server);
-        $this->assertEquals($server, $this->data->getServer());
+        $this->assertEquals($server, $this->data->setServer($server)->getServer());
     }
 
     public function testCustom()
@@ -118,62 +113,65 @@ class DataTest extends \PHPUnit_Framework_TestCase
             "y" => 2,
             "z" => 3,
         );
-        $this->data->setCustom($custom);
-        $this->assertEquals($custom, $this->data->getCustom());
+        $this->assertEquals($custom, $this->data->setCustom($custom)->getCustom());
     }
 
     public function testFingerprint()
     {
         $fingerprint = "bad-error-with-database";
-        $this->data->setFingerprint($fingerprint);
-        $this->assertEquals($fingerprint, $this->data->getFingerprint());
+        $this->assertEquals($fingerprint, $this->data->setFingerprint($fingerprint)->getFingerprint());
     }
 
     public function testTitle()
     {
         $title = "End of the World as we know it";
-        $this->data->setTitle($title);
-        $this->assertEquals($title, $this->data->getTitle());
+        $this->assertEquals($title, $this->data->setTitle($title)->getTitle());
     }
 
     public function testUuid()
     {
         $uuid = "21EC2020-3AEA-4069-A2DD-08002B30309D";
-        $this->data->setUuid($uuid);
-        $this->assertEquals($uuid, $this->data->getUuid());
+        $this->assertEquals($uuid, $this->data->setUuid($uuid)->getUuid());
     }
 
     public function testNotifier()
     {
         $notifier = m::mock("Rollbar\Payload\Notifier");
-        $this->data->setNotifier($notifier);
-        $this->assertEquals($notifier, $this->data->getNotifier());
+        $this->assertEquals($notifier, $this->data->setNotifier($notifier)->getNotifier());
     }
 
     public function testEncode()
     {
-        $data = new Data("env", $this->mockSerialize($this->body, "{BODY}"));
-
-        $data->setLevel($this->mockSerialize("Rollbar\Payload\Level", "{LEVEL}"));
         $time = time();
-        $data->setTimestamp($time);
-        $data->setCodeVersion("v0.17.3");
-        $data->setPlatform("LAMP");
-        $data->setLanguage("PHP 5.4");
-        $data->setFramework("CakePHP");
-        $data->setContext("AppController->updatePerson");
-        $data->setRequest($this->mockSerialize("Rollbar\Payload\Request", "{REQUEST}"));
-        $data->setPerson($this->mockSerialize("Rollbar\Payload\Person", "{PERSON}"));
-        $data->setServer($this->mockSerialize("Rollbar\Payload\Server", "{SERVER}"));
-        $data->setCustom(array("x" => "hello", "extra" => new \ArrayObject()));
-        $data->setFingerprint("big-fingerprint");
-        $data->setTitle("The Title");
-        $data->setUuid("123e4567-e89b-12d3-a456-426655440000");
-        $data->setNotifier($this->mockSerialize("Rollbar\Payload\Notifier", "{NOTIFIER}"));
+        $level = $this->mockSerialize("Rollbar\Payload\Level", "{LEVEL}");
+        $body = $this->mockSerialize($this->body, "{BODY}");
+        $request = $this->mockSerialize("Rollbar\Payload\Request", "{REQUEST}");
+        $person = $this->mockSerialize("Rollbar\Payload\Person", "{PERSON}");
+        $server = $this->mockSerialize("Rollbar\Payload\Server", "{SERVER}");
+        $notifier = $this->mockSerialize("Rollbar\Payload\Notifier", "{NOTIFIER}");
+
+        $data = $this->data
+            ->setEnvironment("testing")
+            ->setBody($body)
+            ->setLevel($level)
+            ->setTimestamp($time)
+            ->setCodeVersion("v0.17.3")
+            ->setPlatform("LAMP")
+            ->setLanguage("PHP 5.4")
+            ->setFramework("CakePHP")
+            ->setContext("AppController->updatePerson")
+            ->setRequest($request)
+            ->setPerson($person)
+            ->setServer($server)
+            ->setCustom(array("x" => "hello", "extra" => new \ArrayObject()))
+            ->setFingerprint("big-fingerprint")
+            ->setTitle("The Title")
+            ->setUuid("123e4567-e89b-12d3-a456-426655440000")
+            ->setNotifier($notifier);
 
         $encoded = json_encode($data);
 
-        $this->assertContains("\"environment\":\"env\"", $encoded);
+        $this->assertContains("\"environment\":\"testing\"", $encoded);
         $this->assertContains("\"body\":\"{BODY}\"", $encoded);
         $this->assertContains("\"level\":\"{LEVEL}\"", $encoded);
         $this->assertContains("\"timestamp\":$time", $encoded);
