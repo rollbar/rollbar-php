@@ -27,6 +27,7 @@ class Frame implements \JsonSerializable
     {
         Utilities::validateString($filename, "filename", null, false);
         $this->filename = $filename;
+        return $this;
     }
 
     public function getLineno()
@@ -38,6 +39,7 @@ class Frame implements \JsonSerializable
     {
         Utilities::validateInteger($lineno, "lineno");
         $this->lineno = $lineno;
+        return $this;
     }
 
     public function getColno()
@@ -49,6 +51,7 @@ class Frame implements \JsonSerializable
     {
         Utilities::validateInteger($lineno, "lineno");
         $this->colno = $colno;
+        return $this;
     }
 
     public function getMethod()
@@ -60,6 +63,7 @@ class Frame implements \JsonSerializable
     {
         Utilities::validateString($method, "method");
         $this->method = $method;
+        return $this;
     }
 
     public function getCode()
@@ -71,6 +75,7 @@ class Frame implements \JsonSerializable
     {
         Utilities::validateString($code, "code");
         $this->code = $code;
+        return $this;
     }
 
     public function getContext()
@@ -81,6 +86,7 @@ class Frame implements \JsonSerializable
     public function setContext(Context $context)
     {
         $this->context = $context;
+        return $this;
     }
 
     public function getArgs()
@@ -91,6 +97,7 @@ class Frame implements \JsonSerializable
     public function setArgs(array $args)
     {
         $this->args = $args;
+        return $this;
     }
 
     public function getKwargs()
@@ -101,6 +108,7 @@ class Frame implements \JsonSerializable
     public function setKwargs(array $kwargs)
     {
         $this->kwargs = $kwargs;
+        return $this;
     }
 
 

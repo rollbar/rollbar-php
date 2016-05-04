@@ -70,6 +70,34 @@ class FrameTest extends \PHPUnit_Framework_TestCase
 
     public function testEncode()
     {
-        
+        $context = m::mock("Rollbar\Payload\Context, \JsonSerializable")
+            ->shouldReceive("jsonSerialize")
+            ->andReturn("{CONTEXT}")
+            ->mock();
+        $this->exception
+            ->shouldReceive("jsonSerialize")
+            ->andReturn("{EXC}")
+            ->mock();
+        $this->frame->setFilename("rollbar.php")
+            ->setLineno(1024)
+            ->setColno(42)
+            ->setMethod("testEncode()")
+            ->setCode('$frame->setFilename("rollbar.php")')
+            ->setContext($context)
+            ->setArgs(array("hello", "world"))
+            ->setKwargs(array("whatever" => "Faked"));
+
+        $actual = json_encode($this->frame);
+        $expected = '{' .
+                '"filename":"rollbar.php",' .
+                '"lineno":1024,"colno":42,' .
+                '"method":"testEncode()",' .
+                '"code":"$frame->setFilename(\"rollbar.php\")",' .
+                '"context":"{CONTEXT}",' .
+                '"args":["hello","world"],' .
+                '"kwargs":{"whatever":"Faked"}' .
+            '}';
+
+        $this->assertEquals($expected, $actual);
     }
 }

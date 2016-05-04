@@ -45,7 +45,7 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
 
     public function testEncode()
     {
-        $data = m::mock('Rollbar\Payload\Data')
+        $data = m::mock('Rollbar\Payload\Data, \JsonSerializable')
             ->shouldReceive('jsonSerialize')
             ->andReturn(new \ArrayObject())
             ->mock();
