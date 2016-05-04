@@ -22,6 +22,7 @@ class Payload implements \JsonSerializable
     public function setData(Data $data)
     {
         $this->data = $data;
+        return $this;
     }
 
     public function getAccessToken()
@@ -35,6 +36,7 @@ class Payload implements \JsonSerializable
             Utilities::validateString($accessToken, "accessToken", 32);
         }
         $this->accessToken = $accessToken;
+        return $this;
     }
 
     public function jsonSerialize()

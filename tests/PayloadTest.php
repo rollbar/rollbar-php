@@ -11,6 +11,9 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
         $payload = new Payload($data);
 
         $this->assertEquals($data, $payload->getData());
+
+        $data2 = m::mock("Rollbar\Payload\Data");
+        $this->assertEquals($data2, $payload->setData($data2)->getData());
     }
 
     public function testPayloadAccessToken()
@@ -41,6 +44,9 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
         $accessToken = "012345678901234567890123456789ab";
         $payload = new Payload($data, $accessToken);
         $this->assertEquals($accessToken, $payload->getAccessToken());
+
+        $at2 = "ab012345678901234567890123456789";
+        $this->assertEquals($at2, $payload->setAccessToken($at2)->getAccessToken());
     }
 
     public function testEncode()
