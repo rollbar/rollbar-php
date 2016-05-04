@@ -10,6 +10,9 @@ class BodyTest extends \PHPUnit_Framework_TestCase
         $value = m::mock("Rollbar\Payload\ContentInterface");
         $body = new Body($value);
         $this->assertEquals($value, $body->getValue());
+
+        $mock2 = m::mock("Rollbar\Payload\ContentInterface");
+        $this->assertEquals($mock2, $body->setValue($mock2)->getValue());
     }
 
     public function testEncode()

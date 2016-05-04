@@ -19,6 +19,7 @@ class Body implements \JsonSerializable
     public function setValue(ContentInterface $value)
     {
         $this->value = $value;
+        return $this;
     }
 
     public function jsonSerialize()
