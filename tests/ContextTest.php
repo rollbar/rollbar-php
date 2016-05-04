@@ -12,7 +12,6 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($pre, $context->getPre());
 
         $pre2 = array("lineone", "linetwo");
-        ;
         $this->assertEquals($pre2, $context->setPre($pre2)->getPre());
     }
 
