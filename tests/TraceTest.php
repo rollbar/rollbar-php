@@ -46,4 +46,10 @@ class TraceTest extends \PHPUnit_Framework_TestCase
         $encoded = json_encode($trace);
         $this->assertEquals("{\"frames\":[],\"exception\":\"{EXCEPTION}\"}", $encoded);
     }
+
+    public function testTraceKey()
+    {
+        $trace = new Trace(array(), m::mock("Rollbar\Payload\ExceptionInfo"));
+        $this->assertEquals("trace", $trace->getKey());
+    }
 }

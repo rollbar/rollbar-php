@@ -1,10 +1,12 @@
 <?php namespace Rollbar\Payload;
 
+use Rollbar\Utilities;
+
 abstract class ContentInterface implements \JsonSerializable
 {
     public function getKey()
     {
-        $name = get_class($this);
-        return str_replace("Rollbar\\Payload\\", "", $name);
+        $className = str_replace("Rollbar\\Payload\\", "", get_class($this));
+        return Utilities::pascaleToCamel($className);
     }
 }
