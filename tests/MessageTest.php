@@ -25,13 +25,13 @@ class MessageTest extends \PHPUnit_Framework_TestCase
     public function testMessageCustom()
     {
         $msg = new Message("Test");
-        $msg->custom_data = "custom data";
+        $msg->CustomData = "custom data";
         $msg->whatever = 15;
 
-        $this->assertEquals("custom data", $msg->custom_data);
+        $this->assertEquals("custom data", $msg->CustomData);
         $this->assertEquals(15, $msg->whatever);
 
-        $expected = '{"body":"Test","custom_data":"custom data","whatever":15}';
+        $expected = '{"body":"Test","CustomData":"custom data","whatever":15}';
         $this->assertEquals($expected, json_encode($msg));
     }
 

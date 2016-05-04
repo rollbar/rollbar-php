@@ -48,6 +48,6 @@ class Message extends ContentInterface
         foreach ($this->extra as $key => $value) {
             $toSerialize[$key] = $value;
         }
-        return Utilities::serializeForRollbar($toSerialize);
+        return Utilities::serializeForRollbar($toSerialize, null, array_keys($this->extra));
     }
 }
