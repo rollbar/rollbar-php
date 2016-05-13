@@ -1,10 +1,10 @@
 {
-  "name": "rollbar/rollbar",
+  "name": "make-test/rollbar",
   "description": "Monitors errors and exceptions and reports them to Rollbar",
   "type": "library",
   "keywords": ["logging", "debugging", "monitoring", "errors", "exceptions"],
   "license": "MIT",
-  "homepage": "http://github.com/rollbar/rollbar-php",
+  "homepage": "http://github.com/make-test/rollbar-php",
   "authors": [
     {
       "name": "Rollbar, Inc.",
@@ -16,10 +16,9 @@
     "email": "support@rollbar.com"
   },
   "autoload": {
-    "classmap": [
-      "src/Level.php",
-      "src/rollbar.php"
-    ]
+    "psr-0": {
+      "Rollbar": "src",
+    }
   },
   "require": {
     "ext-curl": "*"

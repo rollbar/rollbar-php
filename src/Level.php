@@ -1,5 +1,8 @@
 <?php
 
+namespace Rollbar;
+
+
 abstract class Level {
     const ERROR = 'error';
     const CRITICAL = 'critical';
