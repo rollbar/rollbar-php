@@ -672,5 +672,3 @@ class RollbarNotifierTest extends PHPUnit_Framework_TestCase {
 function dummy_rollbar_person_fn() {
     return array('id' => 456, 'username' => 'dynamic', 'email' => 'dynamic@example.com');
 }
-
-?>
