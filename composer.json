@@ -17,7 +17,7 @@
   },
   "autoload": {
     "psr-0": {
-      "Rollbar": "src",
+      "Rollbar": "src"
     }
   },
   "require": {
