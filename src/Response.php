@@ -30,7 +30,7 @@ class Response
 
     public function wasSuccessful()
     {
-        return $this->status == 200;
+        return $this->status >= 200 && $this->status < 300;
     }
 
     public function getOccurrenceUrl()
