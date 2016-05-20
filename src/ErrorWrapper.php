@@ -33,13 +33,8 @@ class ErrorWrapper extends Exception
     public $errorLine;
     public $backTrace;
 
-    public function __construct(
-        $errorLevel,
-        $errorMessage,
-        $errorFile,
-        $errorLine,
-        $backTrace
-    ) {
+    public function __construct($errorLevel, $errorMessage, $errorFile, $errorLine, $backTrace)
+    {
         parent::__construct($errorMessage, $errorLevel);
         $this->errorLevel = $errorLevel;
         $this->errorMessage = $errorMessage;
@@ -55,7 +50,7 @@ class ErrorWrapper extends Exception
 
     public function getClassName()
     {
-        $constName = self::getConstName($this->errorLevel) || "#$this->errorLevel";
+        $constName = Utilities::coalesce(self::getConstName($this->errorLevel), "#$this->errorLevel");
         return "$constName: $this->errMessage";
     }
 }
