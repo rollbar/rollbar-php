@@ -2,6 +2,25 @@
 
 final class Utilities
 {
+    // In order to support < 5.6 we had to use __callStatic to define
+    // coalesce, because the splat operator was introduced in 5.6
+    public static function __callStatic($name, $args)
+    {
+        if ($name == 'coalesce') {
+            return self::coalesceArray($args);
+        }
+    }
+
+    public static function coalesceArray(array $values)
+    {
+        foreach ($values as $key => $val) {
+            if ($val) {
+                return $val;
+            }
+        }
+        return null;
+    }
+
     // Modified from: http://stackoverflow.com/a/1176023/456188
     public static function pascaleToCamel($input)
     {
