@@ -4,6 +4,13 @@ use Rollbar\Utilities;
 
 class UtilitiesTest extends \PHPUnit_Framework_TestCase
 {
+    public function testCoalesce()
+    {
+        $this->assertTrue(Utilities::coalesce(false, false, true));
+        $this->assertNull(Utilities::coalesce(false, false));
+        $this->assertEquals(5, Utilities::coalesce(false, false, 5));
+    }
+
     public function testPascaleToCamel()
     {
         $toTest = array(
