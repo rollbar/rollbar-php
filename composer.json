@@ -31,7 +31,8 @@
   },
 
   "require": {
-    "ext-curl": "*"
+    "ext-curl": "*",
+    "psr/log": "dev-master"
   },
 
   "require-dev": {

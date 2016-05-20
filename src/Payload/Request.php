@@ -121,7 +121,7 @@ class Request implements \JsonSerializable
 
     public function __get($key)
     {
-        return $this->extra[$key];
+        return isset($this->extra[$key]) ? $this->extra[$key] : null;
     }
 
     public function __set($key, $val)

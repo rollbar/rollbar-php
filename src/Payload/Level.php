@@ -8,26 +8,47 @@ class Level implements \JsonSerializable
     {
         if (is_null(self::$values)) {
             self::$values = array(
-                "critical" => new Level("critical"),
-                "error" => new Level("error"),
-                "warning" => new Level("warning"),
-                "info" => new Level("info"),
-                "debug" => new Level("debug")
+                "critical" => new Level("critical", 100000),
+                "error" => new Level("error", 10000),
+                "warning" => new Level("warning", 1000),
+                "info" => new Level("info", 100),
+                "debug" => new Level("debug", 10),
+                "ignored" => new Level("ignore", 0),
+                "ignore" => new Level("ignore", 0)
+
             );
         }
     }
 
     public static function __callStatic($name, $args)
     {
+        return self::fromName($name);
+    }
+
+    public static function fromName($name)
+    {
         self::init();
-        return self::$values[strtolower($name)];
+        $name = strtolower($name);
+        return isset(self::$values, $name) ? self::$values[$name] : null;
     }
 
     private $level;
+    private $val;
 
-    private function __construct($level)
+    private function __construct($level, $val)
     {
         $this->level = $level;
+        $this->val = $val;
+    }
+
+    public function __toString()
+    {
+        return $this->level;
+    }
+
+    public function toInt()
+    {
+        return $this->val;
     }
 
     public function jsonSerialize()

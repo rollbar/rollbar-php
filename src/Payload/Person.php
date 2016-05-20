@@ -55,34 +55,12 @@ class Person implements \JsonSerializable
 
     public function __get($name)
     {
-        switch ($name) {
-            case 'id':
-                return $this->getId();
-            case 'username':
-                return $this->getUsername();
-            case 'email':
-                return $this->getEmail();
-            default:
-                return $this->extra[$name];
-        }
+        return isset($this->extra[$name]) ? $this->extra[$name] : null;
     }
 
     public function __set($name, $val)
     {
-        switch ($name) {
-            case 'id':
-                $this->setId($val);
-                break;
-            case 'username':
-                $this->setUsername($val);
-                break;
-            case 'email':
-                $this->setEmail($val);
-                break;
-            default:
-                $this->extra[$name] = $val;
-                break;
-        }
+        $this->extra[$name] = $val;
     }
 
     public function jsonSerialize()

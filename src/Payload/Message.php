@@ -26,20 +26,12 @@ class Message extends ContentInterface
 
     public function __set($key, $val)
     {
-        if ($key == "body") {
-            $this->setBody($val);
-        } else {
-            $this->extra[$key] = $val;
-        }
+        $this->extra[$key] = $val;
     }
 
     public function __get($key)
     {
-        if ($key == "body") {
-            return $this->getBody();
-        } else {
-            return $this->extra[$key];
-        }
+        return isset($this->extra[$key]) ? $this->extra[$key] : null;
     }
 
     public function jsonSerialize()
