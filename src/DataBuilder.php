@@ -2,10 +2,17 @@
 
 use Rollbar\Defaults;
 use Rollbar\Payload\Message;
+use Rollbar\Payload\Body;
+use Rollbar\Payload\Level;
+use Rollbar\Payload\Server;
+use Rollbar\Payload\Request;
+use Rollbar\Payload\Data;
 use Rollbar\Payload\Trace;
 use Rollbar\Payload\Frame;
 use Rollbar\Payload\TraceChain;
 use Rollbar\Payload\ExceptionInfo;
+use Rollbar\Utilities;
+use Rollbar\ErrorWrapper;
 
 class DataBuilder implements DataBuilderInterface
 {
@@ -215,7 +222,7 @@ class DataBuilder implements DataBuilderInterface
     protected function setBaseException($c)
     {
         $fromConfig = $this->tryGet($c, 'baseException');
-        $this->notifier = self::$defaults->baseException($fromConfig);
+        $this->baseException = self::$defaults->baseException($fromConfig);
     }
 
     public function makeData($level, $toLog, $context)
@@ -287,7 +294,7 @@ class DataBuilder implements DataBuilderInterface
     {
         $frames = $this->makeFrames($exception);
         $excInfo = new ExceptionInfo(
-            $classOverride || get_class($exception),
+            Utilities::coalesce($classOverride, get_class($exception)),
             $exception->getMessage()
         );
         new Trace($frames, $excInfo);
@@ -296,9 +303,9 @@ class DataBuilder implements DataBuilderInterface
     public function makeFrames($exception)
     {
         $frames = array();
-        foreach ($exception->getTrace() as $frame) {
-            $filename = $this->tryGet($frame, 'file') || '<internal>';
-            $lineno = $this->tryGet($frame, 'line') || 0;
+        foreach ($this->getTrace($exception) as $frame) {
+            $filename = Utilities::coalesce($this->tryGet($frame, 'file'), '<internal>');
+            $lineno = Utilities::coalesce($this->tryGet($frame, 'line'), 0);
             $method = $frame['function'];
             // TODO 4 (arguments are in $frame)
             // TODO 5 Code Context
@@ -308,6 +315,15 @@ class DataBuilder implements DataBuilderInterface
         }
         array_reverse($frames);
         return $frames;
+    }
+
+    private function getTrace($exc)
+    {
+        if ($exc instanceof ErrorWrapper) {
+            return $exc->getBacktrace();
+        } else {
+            return $exc->getTrace();
+        }
     }
 
     protected function getMessage($toLog, $context)
@@ -327,7 +343,7 @@ class DataBuilder implements DataBuilderInterface
             }
         }
         $level = strtolower($level);
-        return $this->tryGet($this->psrLevels, $level);
+        return Level::fromName($this->tryGet($this->psrLevels, $level));
     }
 
     protected function getTimestamp($level, $toLog, $context)
@@ -369,11 +385,15 @@ class DataBuilder implements DataBuilderInterface
             ->setHeaders($this->getScrubbedHeaders($scrubFields))
             ->setParams($this->getRequestParams($level, $toLog, $context))
             ->setGet(self::scrub($_GET, $scrubFields))
-            ->setQueryString(self::scrub($this->tryGet($_SERVER, "QUERY_STRING"), $scrubFields))
+            ->setQueryString(self::scrubUrl($this->tryGet($_SERVER, "QUERY_STRING"), $scrubFields))
             ->setPost(self::scrub($_POST, $scrubFields))
-            ->setBody($this->getRequestBody())
+            ->setBody($this->getRequestBody($level, $toLog, $context))
             ->setuserIp($this->getUserIp());
-        foreach ($this->getRequestExtras($level, $toLog, $context) as $key => $val) {
+        $extras = $this->getRequestExtras($level, $toLog, $context);
+        if (!$extras) {
+            $extras = array();
+        }
+        foreach ($extras as $key => $val) {
             if (in_array($scrubFields, $key)) {
                 $request->$key = str_repeat("*", 8);
             } else {
@@ -417,7 +437,7 @@ class DataBuilder implements DataBuilderInterface
             $port = 80;
         }
 
-        $path = $this->tryGet($_SERVER, 'REQUEST_URI') || '/';
+        $path = Utilities::coalesce($this->tryGet($_SERVER, 'REQUEST_URI'), '/');
         $url = $proto . '://' . $host;
         if (($proto == 'https' && $port != 443) || ($proto == 'http' && $port != 80)) {
             $url .= ':' . $port;
@@ -499,7 +519,11 @@ class DataBuilder implements DataBuilderInterface
             ->setBranch($this->getServerBranch($level, $toLog, $context))
             ->setCodeVersion($this->getServerCodeVersion($level, $toLog, $context));
         $scrubFields = $this->getScrubFields($level, $toLog, $context);
-        foreach ($this->getServerExtras($level, $toLog, $context) as $key => $val) {
+        $extras = $this->getServerExtras($level, $toLog, $context);
+        if (!$extras) {
+            $extras = array();
+        }
+        foreach ($extras as $key => $val) {
             if (in_array($scrubFields, $key)) {
                 $server->$key = str_repeat("*", 8);
             } {
@@ -539,6 +563,8 @@ class DataBuilder implements DataBuilderInterface
         // Make this an array if possible:
         if ($custom instanceof \JsonSerializable) {
             $custom = $custom->jsonSerialize();
+        } elseif (is_null($custom)) {
+            return null;
         } elseif (!is_array($custom)) {
             $custom = get_object_vars($custom);
         }
@@ -583,14 +609,14 @@ class DataBuilder implements DataBuilderInterface
         return $this->getOrCall('scrubFields', $level, $toLog, $context);
     }
 
-    protected static function scrub($arr, $fields, $replacement = '*')
+    protected function scrub($arr, $fields, $replacement = '*')
     {
-        if (!$fields) {
+        if (!$fields || !$arr) {
             return $fields;
         }
         $fields = $this->getScrubFields($level, $toLog, $context);
         $scrubber = function ($key, &$val) use ($fields) {
-        
+
             if (in_array($key, $arr)) {
                 $val = str_repeat($replacement, 8);
             }
@@ -599,7 +625,7 @@ class DataBuilder implements DataBuilderInterface
         return $arr;
     }
 
-    protected static function scrubUrl($url, $fields)
+    protected function scrubUrl($url, $fields)
     {
         $urlQuery = parse_url($url, PHP_URL_QUERY);
         if (!$urlQuery) {

@@ -44,7 +44,7 @@ class Request implements \JsonSerializable
         return $this->headers;
     }
 
-    public function setHeaders(array $headers)
+    public function setHeaders(array $headers = null)
     {
         $this->headers = $headers;
         return $this;
@@ -55,7 +55,7 @@ class Request implements \JsonSerializable
         return $this->params;
     }
 
-    public function setParams(array $params)
+    public function setParams(array $params = null)
     {
         $this->params = $params;
         return $this;
@@ -66,7 +66,7 @@ class Request implements \JsonSerializable
         return $this->get;
     }
 
-    public function setGet(array $get)
+    public function setGet(array $get = null)
     {
         $this->get = $get;
         return $this;
@@ -89,7 +89,7 @@ class Request implements \JsonSerializable
         return $this->post;
     }
 
-    public function setPost(array $post)
+    public function setPost(array $post = null)
     {
         $this->post = $post;
         return $this;

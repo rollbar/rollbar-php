@@ -5,6 +5,7 @@
  * https://github.com/segmentio/analytics-php/blob/master/lib/Segment/Consumer/Socket.php
  */
 
+use Rollbar\Response;
 use Rollbar\Payload\Payload;
 use Rollbar\Utilities;
 
@@ -49,14 +50,15 @@ class CurlSender implements SenderInterface
         curl_close($ch);
 
         $uuid = $payload->getData()->getUuid();
-        return new Response($statusCode, json_decode($result), $uuid);
+        return new Response($statusCode, json_decode($result, true), $uuid);
     }
 
     public function setCurlOptions($ch, Payload $payload, $accessToken)
     {
         curl_setopt($ch, CURLOPT_URL, $this->endpoint);
         curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        $encoded = json_encode($payload);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $encoded);
         curl_setopt($ch, CURLOPT_VERBOSE, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

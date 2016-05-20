@@ -16,7 +16,7 @@ class TraceChain extends ContentInterface
 
     public function setTraces($traces)
     {
-        if (count($traces) <= 1) {
+        if (count($traces) < 1) {
             throw new \InvalidArgumentException('$traces must contain at least 1 Trace');
         }
         foreach ($traces as $trace) {

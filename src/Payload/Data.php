@@ -140,7 +140,7 @@ class Data implements \JsonSerializable
         return $this->request;
     }
 
-    public function setRequest(Request $request)
+    public function setRequest(Request $request = null)
     {
         $this->request = $request;
         return $this;
@@ -151,7 +151,7 @@ class Data implements \JsonSerializable
         return $this->person;
     }
 
-    public function setPerson(Person $person)
+    public function setPerson(Person $person = null)
     {
         $this->person = $person;
         return $this;
@@ -162,7 +162,7 @@ class Data implements \JsonSerializable
         return $this->server;
     }
 
-    public function setServer(Server $server)
+    public function setServer(Server $server = null)
     {
         $this->server = $server;
         return $this;
@@ -173,7 +173,7 @@ class Data implements \JsonSerializable
         return $this->custom;
     }
 
-    public function setCustom(array $custom)
+    public function setCustom(array $custom = null)
     {
         $this->custom = $custom;
         return $this;

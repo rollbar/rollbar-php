@@ -204,7 +204,7 @@ class Config
 
     public function send($payload, $accessToken)
     {
-        $this->sender->send($payload, $accessToken);
+        return $this->sender->send($payload, $accessToken);
     }
 
     public function handleResponse($payload, $response)

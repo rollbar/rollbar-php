@@ -1,12 +1,13 @@
 <?php namespace Rollbar;
 
-class ErrorWrapper extends Exception
+class ErrorWrapper extends \Exception
 {
     private static $constName;
+
     private static function getConstName($const)
     {
         if (is_null(self::$constName)) {
-            $this->constName = array(
+            self::$constName = array(
                 E_ERROR => "E_ERROR",
                 E_WARNING => "E_WARNING",
                 E_PARSE => "E_PARSE",
@@ -43,7 +44,7 @@ class ErrorWrapper extends Exception
         $this->backTrace = $backTrace;
     }
 
-    public function getTrace()
+    public function getBacktrace()
     {
         return $this->backTrace;
     }
@@ -51,6 +52,6 @@ class ErrorWrapper extends Exception
     public function getClassName()
     {
         $constName = Utilities::coalesce(self::getConstName($this->errorLevel), "#$this->errorLevel");
-        return "$constName: $this->errMessage";
+        return "$constName: $this->errorMessage";
     }
 }

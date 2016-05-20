@@ -1,6 +1,6 @@
 <?php namespace Rollbar\Payload;
 
-class ExceptionInfoTest
+class ExceptionInfoTest extends \PHPUnit_Framework_TestCase
 {
     public function testClass()
     {
@@ -8,13 +8,13 @@ class ExceptionInfoTest
         $exc = new ExceptionInfo($class, "message");
         $this->assertEquals($class, $exc->getClass());
 
-        $exc->assertEquals("TestClass", $exc->setClass("TestClass")->getClass());
+        $this->assertEquals("TestClass", $exc->setClass("TestClass")->getClass());
     }
 
     public function testMessage()
     {
         $message = "A message";
-        $exc = new Exception("C", $message);
+        $exc = new ExceptionInfo("C", $message);
         $this->assertEquals($message, $exc->getMessage());
 
         $this->assertEquals("Another", $exc->setMessage("Another")->getMessage());
@@ -23,7 +23,7 @@ class ExceptionInfoTest
     public function testDescription()
     {
         $description = "long form";
-        $exc = new Exception("C", "s", $description);
+        $exc = new ExceptionInfo("C", "s", $description);
         $this->assertEquals($description, $exc->getDescription());
 
         $this->assertEquals("longer form", $exc->setDescription("longer form")->getDescription());

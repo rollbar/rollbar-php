@@ -1,6 +1,8 @@
 <?php namespace Rollbar;
 
-class ServerTest
+use Rollbar\Payload\Server;
+
+class ServerTest extends \PHPUnit_Framework_TestCase
 {
     public function testHost()
     {

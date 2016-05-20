@@ -8,7 +8,7 @@ class Payload implements \JsonSerializable
     private $data;
     private $accessToken;
 
-    public function __construct(Data $data, $accessToken = null)
+    public function __construct(Data $data, $accessToken)
     {
         $this->setData($data);
         $this->setAccessToken($accessToken);
@@ -32,9 +32,7 @@ class Payload implements \JsonSerializable
 
     public function setAccessToken($accessToken)
     {
-        if (!is_null($accessToken)) {
-            Utilities::validateString($accessToken, "accessToken", 32);
-        }
+        Utilities::validateString($accessToken, "accessToken", 32, false);
         $this->accessToken = $accessToken;
         return $this;
     }

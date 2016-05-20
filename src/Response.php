@@ -43,4 +43,12 @@ class Response
         }
         return "https://rollbar.com/occurrence/uuid/?uuid=" . $this->uuid;
     }
+
+    public function __toString()
+    {
+        $url = $this->getOccurrenceUrl();
+        return "Status: $this->status\n" .
+               "Body: " . json_encode($this->info) . "\n" .
+               "URL: $url";
+    }
 }

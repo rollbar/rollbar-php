@@ -110,21 +110,21 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                 ->shouldReceive('getLevel')
                 ->andReturn(Level::DEBUG())
                 ->mock();
-            $debug = new Payload($debugData, $this->accessToken);
+            $debug = new Payload($debugData, $this->token);
             $this->assertTrue($config->checkIgnored($debug, null));
 
             $criticalData = m::mock("Rollbar\Payload\Data")
                 ->shouldReceive('getLevel')
                 ->andReturn(Level::CRITICAL())
                 ->mock();
-            $critical = new Payload($criticalData, $this->accessToken);
+            $critical = new Payload($criticalData, $this->token);
             $this->assertFalse($config->checkIgnored($critical, null));
 
             $warningData = m::mock("Rollbar\Payload\Data")
                 ->shouldReceive('getLevel')
                 ->andReturn(Level::warning())
                 ->mock();
-            $warning = new Payload($warningData, $this->accessToken);
+            $warning = new Payload($warningData, $this->token);
             $this->assertFalse($config->checkIgnored($warning, null));
         };
 
