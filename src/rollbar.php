@@ -299,6 +299,7 @@ class RollbarNotifier {
     }
 
     /**
+     * @param \Throwable|\Exception $exc
      */
     protected function _report_exception( $exc, $extra_data = null, $payload_data = null) {
         if (!$this->check_config()) {
