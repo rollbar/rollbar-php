@@ -84,6 +84,24 @@ class Rollbar {
     }
 }
 
+class RollbarException {
+    private $message;
+    private $exception;
+
+    public function __construct( $message, Exception $exception = null) {
+        $this->message = $message;
+        $this->exception = $exception;
+    }
+
+    public function getMessage() {
+        return $this->message;
+    }
+
+    public function getException() {
+        return $this->exception;
+    }
+}
+
 // Send errors that have these levels
 if (!defined('ROLLBAR_INCLUDED_ERRNO_BITMASK')) {
     define('ROLLBAR_INCLUDED_ERRNO_BITMASK', E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
@@ -114,6 +132,7 @@ class RollbarNotifier {
     public $person = null;
     public $person_fn = null;
     public $root = '';
+    public $checkIgnore = null;
     public $scrub_fields = array('passwd', 'pass', 'password', 'secret', 'confirm_password',
         'password_confirmation', 'auth_token', 'csrf_token');
     public $shift_function = true;
@@ -126,7 +145,7 @@ class RollbarNotifier {
 
     private $config_keys = array('access_token', 'base_api_url', 'batch_size', 'batched', 'branch',
         'capture_error_backtraces', 'code_version', 'environment', 'error_sample_rates', 'handler',
-        'agent_log_location', 'host', 'logger', 'included_errno', 'person', 'person_fn', 'root',
+        'agent_log_location', 'host', 'logger', 'included_errno', 'person', 'person_fn', 'root', 'checkIgnore',
         'scrub_fields', 'shift_function', 'timeout', 'report_suppressed', 'use_error_reporting', 'proxy',
         'include_error_code_context', 'include_exception_code_context');
 
@@ -251,7 +270,35 @@ class RollbarNotifier {
     }
 
     /**
-     * @param \Throwable|\Exception $exc
+     * Run the checkIgnore function and determine whether to send the Exception to the API or not.
+     *
+     * @param  bool             $isUncaught
+     * @param  RollbarException $exception
+     * @param  array            $payload    Data being sent to the API
+     * @return bool
+     */
+    protected function _shouldIgnore($isUncaught, RollbarException $exception, array $payload)
+    {
+        try {
+            if (is_callable($this->checkIgnore)
+                && call_user_func_array($this->checkIgnore, array($isUncaught,$exception,$payload))
+            ) {
+                $this->log_info('This item was not sent to Rollbar because it was ignored. '
+                    . 'This can happen if a custom checkIgnore() function was used.');
+
+                return true;
+            }
+        } catch (Exception $e) {
+            // Disable the custom checkIgnore and report errors in the checkIgnore function
+            $this->checkIgnore = null;
+            $this->log_error("Removing custom checkIgnore(). Error while calling custom checkIgnore function:\n"
+                . $e->getMessage());
+        }
+
+        return false;
+    }
+
+    /**
      */
     protected function _report_exception( $exc, $extra_data = null, $payload_data = null) {
         if (!$this->check_config()) {
@@ -292,6 +339,12 @@ class RollbarNotifier {
         array_walk_recursive($data, array($this, '_sanitize_utf8'));
 
         $payload = $this->build_payload($data);
+
+        // Determine whether to send the request to the API.
+        if ($this->_shouldIgnore(true, new RollbarException($exc->getMessage(), $exc), $payload)) {
+            return;
+        }
+
         $this->send_payload($payload);
 
         return $data['uuid'];
@@ -424,6 +477,13 @@ class RollbarNotifier {
         array_walk_recursive($data, array($this, '_sanitize_utf8'));
 
         $payload = $this->build_payload($data);
+
+        // Determine whether to send the request to the API.
+        $exception = new ErrorException($error_class, 0, $errno, $errfile, $errline);
+        if ($this->_shouldIgnore(true, new RollbarException($exception->getMessage(), $exception), $payload)) {
+            return;
+        }
+
         $this->send_payload($payload);
 
         return $data['uuid'];
@@ -465,6 +525,12 @@ class RollbarNotifier {
         array_walk_recursive($data, array($this, '_sanitize_utf8'));
 
         $payload = $this->build_payload($data);
+
+        // Determine whether to send the request to the API.
+        if ($this->_shouldIgnore(true, new RollbarException($message), $payload)) {
+            return;
+        }
+
         $this->send_payload($payload);
 
         return $data['uuid'];
