@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.18.0
+
+- Added support for checkIgnore function See [#82](https://github.com/rollbar/rollbar-php/pull/82)
+
 ## 0.17.0
 
 - Accidental tag of documentation change. No API change present.

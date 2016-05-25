@@ -211,6 +211,12 @@ Default: `master`
 Default: `true`
   </dd>
 
+  <dt>checkIgnore</dt>
+  <dd>Function called before sending payload to Rollbar, return true to stop the error from being sent to Rollbar.
+
+Default: `null`
+  </dd>
+
   <dt>code_version</dt>
   <dd>The currently-deployed version of your code/application (e.g. a Git SHA). Should be a string.
 
