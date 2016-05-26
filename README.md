@@ -41,7 +41,8 @@ throw new Exception('test 2');
 
 ### General
 
-Download [rollbar.php](https://raw.github.com/rollbar/rollbar-php/master/src/rollbar.php) and put it somewhere you can access.
+Download [rollbar.php](https://raw.github.com/rollbar/rollbar-php/master/src/rollbar.php) and [Level.php](https://raw.githubusercontent.com/rollbar/rollbar-php/master/src/Level.php) 
+and put them together somewhere you can access.
 
 ### If Using Composer
 
@@ -50,7 +51,7 @@ Add `rollbar/rollbar` to your `composer.json`:
 ```json
 {
     "require": {
-        "rollbar/rollbar": "~0.15.0"
+        "rollbar/rollbar": "~0.18.0"
     }
 }
 ```
