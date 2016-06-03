@@ -150,7 +150,7 @@ You can also tune the max batch size or disable batching altogether. See the `ba
 
 ## Using Monolog
 
-Here is an example of how to use monolog along with Rollbar:
+Here is an example of how to use Rollbar as a handler for Monolog:
 
 ```
 use Monolog\Logger;
