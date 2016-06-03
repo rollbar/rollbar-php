@@ -148,6 +148,28 @@ For example, if using Laravel, add the above line to your `App::after()` event h
 
 You can also tune the max batch size or disable batching altogether. See the `batch_size` and `batched` config variables, documented below.
 
+## Using Monolog
+
+Here is an example of how to use monolog along with Rollbar:
+
+```
+use Monolog\Logger;
+use Monolog\Handler\RollbarHandler;
+
+$config = array('access_token' => 'POST_SERVER_ITEM_ACCESS_TOKEN');
+
+// installs global error and exception handlers
+Rollbar::init($config);
+
+$log = new Logger('test');
+$log->pushHandler(new RollbarHandler(Rollbar::$instance));
+
+try {
+    throw new Exception('exception for monolog');
+} catch (Exception $e) {
+    $log->error($e);
+}
+```
 
 ## Configuration
 
