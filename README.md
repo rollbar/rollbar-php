@@ -4,7 +4,27 @@
 
 This library detects errors and exceptions in your application and reports them to [Rollbar](https://rollbar.com) for alerts, reporting, and analysis.
 
-<!-- Sub:[TOC] -->
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+##Table of Contents
+
+- [Quick start](#quick-start)
+- [Installation](#installation)
+  - [General](#general)
+  - [If Using Composer](#if-using-composer)
+- [Setup](#setup)
+  - [For Heroku Users](#for-heroku-users)
+- [Basic Usage](#basic-usage)
+- [Batching](#batching)
+- [Using Monolog](#using-monolog)
+- [Configuration](#configuration)
+  - [Asynchronous Reporting](#asynchronous-reporting)
+  - [Configuration reference](#configuration-reference)
+- [Related projects](#related-projects)
+- [Help / Support](#help--support)
+- [Contributing](#contributing)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Quick start
 
@@ -148,6 +168,28 @@ For example, if using Laravel, add the above line to your `App::after()` event h
 
 You can also tune the max batch size or disable batching altogether. See the `batch_size` and `batched` config variables, documented below.
 
+## Using Monolog
+
+Here is an example of how to use Rollbar as a handler for Monolog:
+
+```
+use Monolog\Logger;
+use Monolog\Handler\RollbarHandler;
+
+$config = array('access_token' => 'POST_SERVER_ITEM_ACCESS_TOKEN');
+
+// installs global error and exception handlers
+Rollbar::init($config);
+
+$log = new Logger('test');
+$log->pushHandler(new RollbarHandler(Rollbar::$instance));
+
+try {
+    throw new Exception('exception for monolog');
+} catch (Exception $e) {
+    $log->error($e);
+}
+```
 
 ## Configuration
 
