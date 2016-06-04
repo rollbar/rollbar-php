@@ -80,7 +80,7 @@ class Rollbar {
     }
 
     public static function flush() {
-    	if (self::$instance == null) {
+        if (self::$instance == null) {
             return;
         }
         self::$instance->flush();
