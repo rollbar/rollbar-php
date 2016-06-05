@@ -155,7 +155,7 @@ class DataBuilder implements DataBuilderInterface
 
     protected function setRequestBody($c)
     {
-        $this->requestBody = $this->tryGet(c, 'requestBody');
+        $this->requestBody = $this->tryGet($c, 'requestBody');
     }
 
     protected function setRequestExtras($c)
@@ -450,11 +450,11 @@ class DataBuilder implements DataBuilderInterface
 
     protected function getScrubbedHeaders($scrubFields)
     {
-        $headers = $this->getHeaders($level, $toLog, $context);
+        $headers = $this->getHeaders();
         return self::scrub($headers, $scrubFields);
     }
 
-    protected function getHeaders($level, $toLog, $context)
+    protected function getHeaders()
     {
         $headers = array();
         foreach ($_SERVER as $key => $val) {

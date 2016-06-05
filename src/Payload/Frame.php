@@ -49,7 +49,7 @@ class Frame implements \JsonSerializable
 
     public function setColno($colno)
     {
-        Utilities::validateInteger($lineno, "lineno");
+        Utilities::validateInteger($colno, "colno");
         $this->colno = $colno;
         return $this;
     }

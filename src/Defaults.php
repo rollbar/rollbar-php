@@ -75,6 +75,7 @@ class Defaults
     private $defaultMessageLevel = "warning";
     private $defaultExceptionLevel = "error";
     private $defaultPsrLevels;
+    private $defaultCodeVersion;
     private $defaultErrorLevels;
     private $defaultGitHash;
     private $defaultGitBranch;
@@ -128,6 +129,7 @@ class Defaults
         $this->defaultNotifier = self::getNotifier();
         $this->defaultBaseException = self::getBaseException();
         $this->defaultScrubFields = self::getScrubFields();
+        $this->defaultCodeVersion = "";
     }
 
     public function messageLevel($level = null)

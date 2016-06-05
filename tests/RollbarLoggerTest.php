@@ -5,6 +5,12 @@ use Psr\Log\LogLevel;
 
 class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
 {
+    public function __construct()
+    {
+        $_SESSION = array();
+    }
+
+
     public function testConfigure()
     {
         $l = new RollbarLogger(array(

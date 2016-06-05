@@ -29,7 +29,7 @@ class Level implements \JsonSerializable
     {
         self::init();
         $name = strtolower($name);
-        return isset(self::$values, $name) ? self::$values[$name] : null;
+        return array_key_exists($name, self::$values) ? self::$values[$name] : null;
     }
 
     private $level;

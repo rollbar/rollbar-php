@@ -2,6 +2,9 @@
 
 class Rollbar
 {
+    /**
+     * @var RollbarLogger
+     */
     private static $logger = null;
 
     public static function init(
@@ -10,16 +13,16 @@ class Rollbar
         $handleError = true,
         $handleFatal = true
     ) {
-        if (is_null($logger)) {
+        if (is_null(self::$logger)) {
             self::$logger = new RollbarLogger($config);
 
             if ($handleException) {
                 self::setupExceptionHandling();
             }
-            if ($handleException) {
+            if ($handleError) {
                 self::setupErrorHandling();
             }
-            if ($handleException) {
+            if ($handleFatal) {
                 self::setupFatalHandling();
             }
         } else {
@@ -49,7 +52,7 @@ class Rollbar
     public static function log($exc, $extra = null, $level = null)
     {
         if (is_null(self::$logger)) {
-            return self::$getNotInitializedResponse();
+            return self::getNotInitializedResponse();
         }
         return self::$logger->log($level, $exc, $extra);
     }
@@ -62,9 +65,9 @@ class Rollbar
     public static function errorHandler($errno, $errstr, $errfile, $errline)
     {
         if (is_null(self::$logger)) {
-            return self::$getNotInitializedResponse();
+            return self::getNotInitializedResponse();
         }
-        $exception = self::$generateErrorWrapper($errno, $errstr, $errfile, $errline);
+        $exception = self::generateErrorWrapper($errno, $errstr, $errfile, $errline);
         self::$logger->log(null, $exception);
     }
 
@@ -81,7 +84,7 @@ class Rollbar
             $errstr = $last_error['message'];
             $errfile = $last_error['file'];
             $errline = $last_error['line'];
-            $exception = self::$generateErrorWrapper($errno, $errstr, $errfile, $errline);
+            $exception = self::generateErrorWrapper($errno, $errstr, $errfile, $errline);
             self::$logger->log(null, $exception);
         }
     }
@@ -91,7 +94,7 @@ class Rollbar
         // removing this function and the handler function to make sure they're
         // not part of the backtrace
         $backTrace = array_slice(debug_backtrace(), 2);
-         return new ErrorWrapper($errno, $errstr, $errfile, $errline, $backTrace);
+        return new ErrorWrapper($errno, $errstr, $errfile, $errline, $backTrace);
     }
 
     private static function getNotInitializedResponse()

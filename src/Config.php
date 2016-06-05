@@ -15,6 +15,7 @@ class Config
     private $transformer;
     private $filter;
     private $minimumLevel;
+    private $responseHandler;
 
     public function __construct(array $configArray)
     {
