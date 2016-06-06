@@ -225,7 +225,7 @@ Parameters:
 ```
 $config = array(
     'access_token' => '...',
-    'checkIgnore' => function ($isUncaught, $caller_args, $payload) {
+    'checkIgnore' => function ($isUncaught, $exception, $payload) {
         if (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Baiduspider') !== false) {
           // ignore baidu spider
           return true;
