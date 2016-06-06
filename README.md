@@ -61,7 +61,7 @@ throw new Exception('test 2');
 
 ### General
 
-Download [rollbar.php](https://raw.github.com/rollbar/rollbar-php/master/src/rollbar.php) and [Level.php](https://raw.githubusercontent.com/rollbar/rollbar-php/master/src/Level.php) 
+Download [rollbar.php](https://raw.github.com/rollbar/rollbar-php/master/src/rollbar.php) and [Level.php](https://raw.githubusercontent.com/rollbar/rollbar-php/master/src/Level.php)
 and put them together somewhere you can access.
 
 ### If Using Composer
@@ -258,6 +258,27 @@ Default: `true`
   <dd>Function called before sending payload to Rollbar, return true to stop the error from being sent to Rollbar.
 
 Default: `null`
+<br/>
+Parameters:
+* $isUncaught: boolean value set to true if the error was an uncaught exception.
+* $exception: a RollbarException instance that will allow you to get the message or exception
+* $payload: an array containing the payload as it will be sent to Rollbar. Payload schema can be found at https://rollbar.com/docs/api/items_post/
+<br/>
+```
+$config = array(
+    'access_token' => '...',
+    'checkIgnore' => function ($isUncaught, $exception, $payload) {
+        if (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Baiduspider') !== false) {
+          // ignore baidu spider
+          return true;
+        }
+
+        // no other ignores
+        return false;
+    }; 
+);
+Rollbar::init($config);
+```
   </dd>
 
   <dt>code_version</dt>
@@ -327,7 +348,7 @@ Default: (E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOVE
   </dd>
 
   <dt>scrub_fields</dt>
-  <dd>Array of field names to scrub out of _POST and _SESSION. Values will be replaced with asterisks. If overridiing, make sure to list all fields you want to scrub, not just fields you want to add to the default. Param names are converted to lowercase before comparing against the scrub list.
+  <dd>Array of field names to scrub out of _POST and _SESSION. Values will be replaced with asterisks. If overriding, make sure to list all fields you want to scrub, not just fields you want to add to the default. Param names are converted to lowercase before comparing against the scrub list.
 
 Default: `('passwd', 'password', 'secret', 'confirm_password', 'password_confirmation', 'auth_token', 'csrf_token')`
   </dd>
