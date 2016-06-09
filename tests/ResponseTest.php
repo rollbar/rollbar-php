@@ -24,9 +24,12 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
 
     public function testWasSuccessful()
     {
-        $this->assertTrue((new Response(200, null))->wasSuccessful());
-        $this->assertFalse((new Response(199, null))->wasSuccessful());
-        $this->assertFalse((new Response(300, null))->wasSuccessful());
+        $response = new Response(200, null);
+        $this->assertTrue($response->wasSuccessful());
+        $response = new Response(199, null);
+        $this->assertFalse($response->wasSuccessful());
+        $response = new Response(300, null);
+        $this->assertFalse($response->wasSuccessful());
     }
 
     public function testUrl()

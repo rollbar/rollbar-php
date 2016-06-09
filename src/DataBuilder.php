@@ -513,8 +513,8 @@ class DataBuilder implements DataBuilderInterface
 
     protected function getServer($level, $toLog, $context)
     {
-        $server = (new Server())
-            ->setHost(gethostname())
+        $server = new Server();
+        $server->setHost(gethostname())
             ->setRoot($this->getServerRoot($level, $toLog, $context))
             ->setBranch($this->getServerBranch($level, $toLog, $context))
             ->setCodeVersion($this->getServerCodeVersion($level, $toLog, $context));
