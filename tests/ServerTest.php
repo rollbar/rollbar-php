@@ -7,8 +7,8 @@ class ServerTest extends \PHPUnit_Framework_TestCase
     public function testHost()
     {
         $val = "TEST";
-        $server = (new Server())
-            ->setHost($val);
+        $server = new Server();
+        $server->setHost($val);
         $this->assertEquals($val, $server->getHost());
 
         $val2 = "TEST2";
@@ -18,8 +18,8 @@ class ServerTest extends \PHPUnit_Framework_TestCase
     public function testRoot()
     {
         $val = "TEST";
-        $server = (new Server())
-            ->setRoot($val);
+        $server = new Server();
+        $server->setRoot($val);
         $this->assertEquals($val, $server->getRoot());
 
         $val2 = "TEST2";
@@ -29,8 +29,8 @@ class ServerTest extends \PHPUnit_Framework_TestCase
     public function testBranch()
     {
         $val = "TEST";
-        $server = (new Server())
-            ->setBranch($val);
+        $server = new Server();
+        $server->setBranch($val);
         $this->assertEquals($val, $server->getBranch());
 
         $val2 = "TEST2";
@@ -40,8 +40,8 @@ class ServerTest extends \PHPUnit_Framework_TestCase
     public function testCodeVersion()
     {
         $val = "TEST";
-        $server = (new Server())
-            ->setCodeVersion($val);
+        $server = new Server();
+        $server->setCodeVersion($val);
         $this->assertEquals($val, $server->getCodeVersion());
 
         $val2 = "TEST2";
@@ -57,8 +57,8 @@ class ServerTest extends \PHPUnit_Framework_TestCase
 
     public function testEncode()
     {
-        $server = (new Server())
-            ->setHost("server2-ec-us")
+        $server = new Server();
+        $server->setHost("server2-ec-us")
             ->setRoot("/home/app/testingRollbar")
             ->setBranch("master")
             ->setCodeVersion("#dca015");
