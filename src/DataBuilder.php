@@ -513,7 +513,7 @@ class DataBuilder implements DataBuilderInterface
 
     protected function getServer($level, $toLog, $context)
     {
-        $server = new Server();
+        $server = new \Rollbar\Payload\Server(); // need fully qualified namespace here for HHVM
         $server->setHost(gethostname())
             ->setRoot($this->getServerRoot($level, $toLog, $context))
             ->setBranch($this->getServerBranch($level, $toLog, $context))

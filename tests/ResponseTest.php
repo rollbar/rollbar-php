@@ -35,6 +35,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     public function testUrl()
     {
         $expected = "https://rollbar.com/occurrence/uuid/?uuid=abc123";
-        $this->assertEquals($expected, (new Response(200, "fake", "abc123"))->getOccurrenceUrl());
+        $response = new Response(200, "fake", "abc123");
+        $this->assertEquals($expected, $response->getOccurrenceUrl());
     }
 }
