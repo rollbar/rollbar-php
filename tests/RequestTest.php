@@ -122,8 +122,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     public function testEncode()
     {
-        $request = (new Request())
-            ->setUrl("www.rollbar.com/account/project")
+        $request = new Request();
+        $request->setUrl("www.rollbar.com/account/project")
             ->setMethod("GET")
             ->setHeaders(array(
                 "CSRF-TOKEN" => "42",
