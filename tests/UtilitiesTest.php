@@ -82,8 +82,9 @@ class UtilitiesTest extends \PHPUnit_Framework_TestCase
 
     public function testSerializeForRollbar()
     {
+        $oneTwoArray = [1, 2];
         $obj = array(
-            "OneTwo" => [1, 2],
+            "OneTwo" => $oneTwoArray, // php 5.3 compatibility
             "klass" => "Numbers",
             "PHPUnitTest" => "testSerializeForRollbar",
             "myCustomKey" => null,
