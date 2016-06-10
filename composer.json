@@ -32,7 +32,8 @@
 
   "require": {
     "ext-curl": "*",
-    "psr/log": "dev-master"
+    "psr/log": "dev-master",
+    "packfire/php5.3-compat": "*"
   },
 
   "require-dev": {
