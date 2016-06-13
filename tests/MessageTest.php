@@ -19,7 +19,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         $msg->hello = "Świat"; // Polish for "World"
         $this->assertEquals("Świat", $msg->hello);
         // Unicode Ś == u015a
-        $this->assertEquals('{"body":"M","hello":"\u015awiat"}', json_encode($msg));
+        $this->assertEquals('{"body":"M","hello":"\u015awiat"}', json_encode($msg->jsonSerialize()));
     }
 
     public function testMessageCustom()
@@ -32,7 +32,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(15, $msg->whatever);
 
         $expected = '{"body":"Test","CustomData":"custom data","whatever":15}';
-        $this->assertEquals($expected, json_encode($msg));
+        $this->assertEquals($expected, json_encode($msg->jsonSerialize()));
     }
 
     public function testMessageKey()

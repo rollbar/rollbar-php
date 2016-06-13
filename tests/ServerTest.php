@@ -76,6 +76,6 @@ class ServerTest extends \PHPUnit_Framework_TestCase
                     '[]' .
                 ']' .
             '}';
-        $this->assertEquals($expected, json_encode($server));
+        $this->assertEquals($expected, json_encode($server->jsonSerialize()));
     }
 }

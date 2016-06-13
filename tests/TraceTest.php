@@ -56,7 +56,7 @@ class TraceTest extends \PHPUnit_Framework_TestCase
             ->andReturn("{EXCEPTION}")
             ->mock();
         $trace = new Trace(array(), $value);
-        $encoded = json_encode($trace);
+        $encoded = json_encode($trace->jsonSerialize());
         $this->assertEquals("{\"frames\":[],\"exception\":\"{EXCEPTION}\"}", $encoded);
     }
 

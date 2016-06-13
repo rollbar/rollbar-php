@@ -84,6 +84,9 @@ final class Utilities
         $customKeys = $customKeys == null ? array() : $customKeys;
 
         foreach ($obj as $key => $val) {
+            if ($val instanceof \JsonSerializable) {
+                $val = $val->jsonSerialize();
+            }
             $newKey = array_key_exists($key, $overrideNames)
                 ? $overrideNames[$key]
                 : Utilities::pascaleToCamel($key);

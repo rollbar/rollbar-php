@@ -28,11 +28,11 @@ class ContextTest extends \PHPUnit_Framework_TestCase
     public function testEncode()
     {
         $context = new Context(array(), array());
-        $encoded = json_encode($context);
+        $encoded = json_encode($context->jsonSerialize());
         $this->assertEquals('{"pre":[],"post":[]}', $encoded);
 
         $context = new Context(array("one"), array("three"));
-        $encoded = json_encode($context);
+        $encoded = json_encode($context->jsonSerialize());
         $this->assertEquals('{"pre":["one"],"post":["three"]}', $encoded);
     }
 }

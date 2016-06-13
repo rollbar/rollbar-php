@@ -169,7 +169,7 @@ class DataTest extends \PHPUnit_Framework_TestCase
             ->setUuid("123e4567-e89b-12d3-a456-426655440000")
             ->setNotifier($notifier);
 
-        $encoded = json_encode($data);
+        $encoded = json_encode($data->jsonSerialize());
 
         $this->assertContains("\"environment\":\"testing\"", $encoded);
         $this->assertContains("\"body\":\"{BODY}\"", $encoded);

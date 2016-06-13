@@ -18,6 +18,6 @@ class LevelTest extends \PHPUnit_Framework_TestCase
         $l = Level::Info();
         $this->assertNotNull($l);
         $this->assertSame(Level::INFO(), $l);
-        $this->assertSame('"info"', json_encode($l));
+        $this->assertSame('"info"', json_encode($l->jsonSerialize()));
     }
 }

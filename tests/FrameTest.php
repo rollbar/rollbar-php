@@ -87,7 +87,7 @@ class FrameTest extends \PHPUnit_Framework_TestCase
             ->setArgs(array("hello", "world"))
             ->setKwargs(array("whatever" => "Faked"));
 
-        $actual = json_encode($this->frame);
+        $actual = json_encode($this->frame->jsonSerialize());
         $expected = '{' .
                 '"filename":"rollbar.php",' .
                 '"lineno":1024,"colno":42,' .

@@ -30,6 +30,12 @@ class TraceChain extends ContentInterface
 
     public function jsonSerialize()
     {
-        return $this->traces;
+        $mapValue = function ($value) {
+            if ($value instanceof \JsonSerializable) {
+                return $value->jsonSerialize();
+            }
+            return $value;
+        };
+        return array_map($mapValue, $this->traces);
     }
 }

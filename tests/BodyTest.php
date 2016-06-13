@@ -24,7 +24,7 @@ class BodyTest extends \PHPUnit_Framework_TestCase
             ->andReturn("content_interface")
             ->mock();
         $body = new Body($value);
-        $encoded = json_encode($body);
+        $encoded = json_encode($body->jsonSerialize());
         $this->assertEquals("{\"content_interface\":\"{CONTENT}\"}", $encoded);
     }
 }

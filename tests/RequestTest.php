@@ -161,6 +161,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
              '"test":"testing"' .
         '}';
 
-        $this->assertEquals($expected, json_encode($request));
+        $this->assertEquals($expected, json_encode($request->jsonSerialize()));
     }
 }

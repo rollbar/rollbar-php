@@ -50,7 +50,7 @@ class PersonTest extends \PHPUnit_Framework_TestCase
         $person->Settings = array(
             "send_email" => true
         );
-        $encoded = json_encode($person);
+        $encoded = json_encode($person->jsonSerialize());
         $expected ='{"id":"1024","username":"username","email":"user@gmail.com","Settings":{"send_email":true}}';
         $this->assertEquals($expected, $encoded);
     }

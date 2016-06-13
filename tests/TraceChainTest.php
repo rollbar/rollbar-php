@@ -43,6 +43,6 @@ class TraceChainTest extends \PHPUnit_Framework_TestCase
             ->andReturn("TRACE2")
             ->mock();
         $chain = new TraceChain(array($trace1, $trace2));
-        $this->assertEquals('["TRACE1","TRACE2"]', json_encode($chain));
+        $this->assertEquals('["TRACE1","TRACE2"]', json_encode($chain->jsonSerialize()));
     }
 }

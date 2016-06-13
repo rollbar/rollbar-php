@@ -55,7 +55,7 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
             ->andReturn(new \ArrayObject())
             ->mock();
         $payload = new Payload($data, "012345678901234567890123456789ab");
-        $encoded = json_encode($payload);
+        $encoded = json_encode($payload->jsonSerialize());
         $json = '{"data":{},"access_token":"012345678901234567890123456789ab"}';
         $this->assertEquals($json, $encoded);
     }

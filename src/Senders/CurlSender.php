@@ -57,7 +57,7 @@ class CurlSender implements SenderInterface
     {
         curl_setopt($ch, CURLOPT_URL, $this->endpoint);
         curl_setopt($ch, CURLOPT_POST, true);
-        $encoded = json_encode($payload);
+        $encoded = json_encode($payload->jsonSerialize());
         curl_setopt($ch, CURLOPT_POSTFIELDS, $encoded);
         curl_setopt($ch, CURLOPT_VERBOSE, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
