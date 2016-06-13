@@ -229,8 +229,8 @@ class DataBuilder implements DataBuilderInterface
     {
         $env = $this->getEnvironment($level, $toLog, $context);
         $body = $this->getBody($level, $toLog, $context);
-        return (new Data($env, $body))
-            ->setLevel($this->getLevel($level, $toLog, $context))
+        $data = new Data($env, $body);
+        $data->setLevel($this->getLevel($level, $toLog, $context))
             ->setTimestamp($this->getTimestamp($level, $toLog, $context))
             ->setCodeVersion($this->getCodeVersion($level, $toLog, $context))
             ->setPlatform($this->getPlatform($level, $toLog, $context))
@@ -245,6 +245,7 @@ class DataBuilder implements DataBuilderInterface
             ->setTitle($this->getTitle($level, $toLog, $context))
             ->setUuid($this->getUuid($level, $toLog, $context))
             ->setNotifier($this->getNotifier($level, $toLog, $context));
+        return $data;
     }
 
     protected function getEnvironment($level, $toLog, $context)
@@ -309,9 +310,10 @@ class DataBuilder implements DataBuilderInterface
             $method = $frame['function'];
             // TODO 4 (arguments are in $frame)
             // TODO 5 Code Context
-            $frames[] = (new Frame($filename))
-                ->setLine($lineno)
+            $frame = new Frame($filename);
+            $frame->setLine($lineno)
                 ->setMethod($method);
+            $frames[] = $frame;
         }
         array_reverse($frames);
         return $frames;
@@ -379,8 +381,8 @@ class DataBuilder implements DataBuilderInterface
     protected function getRequest($level, $toLog, $context)
     {
         $scrubFields = $this->getScrubFields($level, $toLog, $context);
-        $request = (new Request())
-            ->setUrl($this->getUrl($scrubFields))
+        $request = new Request();
+        $request->setUrl($this->getUrl($scrubFields))
             ->setMethod($this->tryGet($_SERVER, 'REQUEST_METHOD'))
             ->setHeaders($this->getScrubbedHeaders($scrubFields))
             ->setParams($this->getRequestParams($level, $toLog, $context))
@@ -614,7 +616,7 @@ class DataBuilder implements DataBuilderInterface
         if (!$fields || !$arr) {
             return $fields;
         }
-        $fields = $this->getScrubFields($level, $toLog, $context);
+        $fields = $this->scrubFields;
         $scrubber = function ($key, &$val) use ($fields) {
 
             if (in_array($key, $arr)) {
