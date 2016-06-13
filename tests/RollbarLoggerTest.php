@@ -29,7 +29,6 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
             "environment" => "testing-php"
         ));
         $response = $l->log(LogLevel::WARNING, "Testing PHP Notifier", array());
-        var_dump("\n\n" . (string) $response . "\n\n");
         $this->assertEquals(200, $response->getStatus());
     }
 }
