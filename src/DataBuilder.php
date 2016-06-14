@@ -517,10 +517,7 @@ class DataBuilder implements DataBuilderInterface
     {
         $server = new Server();
         fwrite(STDERR, print_r($server, true));
-        $refClass = new \ReflectionClass('\Rollbar\Payload\server');
-        fwrite(STDERR, $refClass->getFileName());
-        $refClass = new \ReflectionClass('\Rollbar\Payload\Server');
-        fwrite(STDERR, $refClass->getFileName());
+        fwrite(STDERR, implode(PHP_EOL, get_included_files()));
         $server->setHost(gethostname())
             ->setRoot($this->getServerRoot($level, $toLog, $context))
             ->setBranch($this->getServerBranch($level, $toLog, $context))
