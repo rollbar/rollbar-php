@@ -32,6 +32,9 @@ class Level implements \JsonSerializable
         return array_key_exists($name, self::$values) ? self::$values[$name] : null;
     }
 
+    /**
+     * @var string
+     */
     private $level;
     private $val;
 

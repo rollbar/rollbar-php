@@ -1,6 +1,5 @@
 <?php namespace Rollbar\Payload;
 
-use Rollbar\Payload\Data;
 use Rollbar\Utilities;
 
 class Payload implements \JsonSerializable
@@ -14,6 +13,9 @@ class Payload implements \JsonSerializable
         $this->setAccessToken($accessToken);
     }
 
+    /**
+     * @return Data
+     */
     public function getData()
     {
         return $this->data;

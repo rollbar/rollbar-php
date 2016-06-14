@@ -1,10 +1,6 @@
 <?php namespace Rollbar;
 
-use Rollbar\Utilities;
-use Rollbar\FilterInterface;
 use Rollbar\SenderInterface;
-use Rollbar\TransformerInterface;
-use Rollbar\ResponseHandlerInterface;
 use Rollbar\Payload\Level;
 
 class Config
@@ -18,7 +14,15 @@ class Config
     private $transformer;
     private $filter;
     private $minimumLevel;
+    /**
+     * @var ResponseHandlerInterface
+     */
     private $responseHandler;
+    /**
+     * @var \Rollbar\Senders\SenderInterface
+     */
+    private $sender;
+    private $reportSuppressed;
 
     public function __construct(array $configArray)
     {

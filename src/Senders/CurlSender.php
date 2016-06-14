@@ -27,20 +27,21 @@ class CurlSender implements SenderInterface
         }
         if (array_key_exists('timeout', $opts)) {
             Utilities::validateInteger($opts['timeout'], 'opts["timeout"]', 0, null, false);
-            $this->timeout = $timeout;
+            $this->timeout = $opts['timeout'];
         }
         if (array_key_exists('proxy', $opts)) {
-            $this->proxy = $proxy;
+            $this->proxy = $opts['proxy'];
         }
 
         if (array_key_exists('verifyPeer', $opts)) {
             Utilities::validateBoolean($opts['verifyPeer'], 'opts["verifyPeer"]', false);
-            $this->verifyPeer = $verifyPeer;
+            $this->verifyPeer = $opts['verifyPeer'];
         }
     }
 
     public function send(Payload $payload, $accessToken)
     {
+
         $ch = curl_init();
 
         $this->setCurlOptions($ch, $payload, $accessToken);

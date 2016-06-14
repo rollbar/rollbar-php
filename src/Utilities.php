@@ -9,6 +9,7 @@ final class Utilities
         if ($name == 'coalesce') {
             return self::coalesceArray($args);
         }
+        return null;
     }
 
     public static function coalesceArray(array $values)
