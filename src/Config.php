@@ -10,6 +10,9 @@ use Rollbar\Payload\Level;
 class Config
 {
     private $accessToken;
+    /**
+     * @var DataBuilder
+     */
     private $dataBuilder;
     private $configArray;
     private $transformer;
