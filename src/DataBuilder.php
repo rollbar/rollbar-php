@@ -516,8 +516,6 @@ class DataBuilder implements DataBuilderInterface
     protected function getServer($level, $toLog, $context)
     {
         $server = new Server();
-        fwrite(STDERR, print_r($server, true));
-        fwrite(STDERR, implode(PHP_EOL, get_included_files()));
         $server->setHost(gethostname())
             ->setRoot($this->getServerRoot($level, $toLog, $context))
             ->setBranch($this->getServerBranch($level, $toLog, $context))

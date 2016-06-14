@@ -102,7 +102,7 @@ class DataTest extends \PHPUnit_Framework_TestCase
 
     public function testServer()
     {
-        $server = m::mock("Rollbar\Payload\server");
+        $server = m::mock("Rollbar\Payload\Server");
         $this->assertEquals($server, $this->data->setServer($server)->getServer());
     }
 
