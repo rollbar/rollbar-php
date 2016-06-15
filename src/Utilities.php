@@ -50,6 +50,23 @@ final class Utilities
         }
     }
 
+    public static function validateBoolean(
+        $input,
+        $name = "?",
+        $allowNull = true
+    ) {
+        if (is_null($input)) {
+            if (!$allowNull) {
+                throw new \InvalidArgumentException("\$$name must not be null");
+            }
+            return;
+        }
+
+        if (!is_bool($input)) {
+            throw new \InvalidArgumentException("\$$name must be a boolean");
+        }
+    }
+
     public static function validateInteger(
         $input,
         $name = "?",

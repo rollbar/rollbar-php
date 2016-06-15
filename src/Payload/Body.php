@@ -4,6 +4,9 @@ use Rollbar\Utilities;
 
 class Body implements \JsonSerializable
 {
+    /**
+     * @var ContentInterface
+     */
     private $value;
 
     public function __construct(ContentInterface $value)

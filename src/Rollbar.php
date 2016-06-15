@@ -65,7 +65,7 @@ class Rollbar
     public static function errorHandler($errno, $errstr, $errfile, $errline)
     {
         if (is_null(self::$logger)) {
-            return self::getNotInitializedResponse();
+            return;
         }
         $exception = self::generateErrorWrapper($errno, $errstr, $errfile, $errline);
         self::$logger->log(null, $exception);

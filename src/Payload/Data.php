@@ -1,6 +1,5 @@
 <?php namespace Rollbar\Payload;
 
-use Rollbar\Payload\Body;
 use Rollbar\Utilities;
 
 class Data implements \JsonSerializable
@@ -52,6 +51,9 @@ class Data implements \JsonSerializable
         return $this;
     }
 
+    /**
+     * @return Level
+     */
     public function getLevel()
     {
         return $this->level;

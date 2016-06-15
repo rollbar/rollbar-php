@@ -1,11 +1,7 @@
 <?php namespace Rollbar;
 
 use Psr\Log\AbstractLogger;
-use Rollbar\Payload\Level;
 use Rollbar\Payload\Payload;
-use Rollbar\Utilities;
-use Rollbar\Response;
-use Rollbar\Config;
 
 class RollbarLogger extends AbstractLogger
 {

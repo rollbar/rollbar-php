@@ -1,6 +1,6 @@
 <?php namespace Rollbar;
 
-use Rollbar\SenderInterface;
+use Rollbar\Payload\Payload;
 use Rollbar\Payload\Level;
 
 class Config
@@ -11,7 +11,13 @@ class Config
      */
     private $dataBuilder;
     private $configArray;
+    /**
+     * @var TransformerInterface
+     */
     private $transformer;
+    /**
+     * @var FilterInterface
+     */
     private $filter;
     private $minimumLevel;
     /**
@@ -87,7 +93,10 @@ class Config
         } elseif ($c['minimumLevel'] instanceof Level) {
             $this->minimumLevel = $c['minimumLevel']->toInt();
         } elseif (is_string($c['minimumLevel'])) {
-            $this->minimumLevel = Level::fromName($c['minimumLevel'])->toInt();
+            $level = Level::fromName($c['minimumLevel']);
+            if ($level !== null) {
+                $this->minimumLevel = $level->toInt();
+            }
         } elseif (is_int($c['minimumLevel'])) {
             $this->minimumLevel = $c['minimumLevel'];
         } else {
@@ -135,6 +144,11 @@ class Config
      * `new MySender(array("speed"=>11,"protocol"=>"First Contact"));`
      * You can also just pass an instance in directly. (In which case options
      * are ignored)
+     * @param $c
+     * @param $keyName
+     * @param $expectedType
+     * @param mixed $defaultClass
+     * @param bool $passWholeConfig
      */
     protected function setupWithOptions(
         $c,
@@ -200,6 +214,10 @@ class Config
         return false;
     }
 
+    /**
+     * @param Payload $payload
+     * @return bool
+     */
     private function levelTooLow($payload)
     {
         return $payload->getData()->getLevel()->toInt() < $this->minimumLevel;

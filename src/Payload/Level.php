@@ -25,6 +25,10 @@ class Level implements \JsonSerializable
         return self::fromName($name);
     }
 
+    /**
+     * @param string $name level name
+     * @return Level
+     */
     public static function fromName($name)
     {
         self::init();

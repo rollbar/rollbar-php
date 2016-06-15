@@ -1,6 +1,5 @@
 <?php namespace Rollbar;
 
-use Rollbar\Defaults;
 use Rollbar\Payload\Message;
 use Rollbar\Payload\Body;
 use Rollbar\Payload\Level;
@@ -11,8 +10,6 @@ use Rollbar\Payload\Trace;
 use Rollbar\Payload\Frame;
 use Rollbar\Payload\TraceChain;
 use Rollbar\Payload\ExceptionInfo;
-use Rollbar\Utilities;
-use Rollbar\ErrorWrapper;
 
 class DataBuilder implements DataBuilderInterface
 {
@@ -227,51 +224,55 @@ class DataBuilder implements DataBuilderInterface
 
     public function makeData($level, $toLog, $context)
     {
-        $env = $this->getEnvironment($level, $toLog, $context);
-        $body = $this->getBody($level, $toLog, $context);
+        $env = $this->getEnvironment();
+        $body = $this->getBody($toLog, $context);
         $data = new Data($env, $body);
-        $data->setLevel($this->getLevel($level, $toLog, $context))
-            ->setTimestamp($this->getTimestamp($level, $toLog, $context))
-            ->setCodeVersion($this->getCodeVersion($level, $toLog, $context))
-            ->setPlatform($this->getPlatform($level, $toLog, $context))
-            ->setLanguage($this->getLanguage($level, $toLog, $context))
-            ->setFramework($this->getFramework($level, $toLog, $context))
-            ->setContext($this->getContext($level, $toLog, $context))
-            ->setRequest($this->getRequest($level, $toLog, $context))
-            ->setPerson($this->getPerson($level, $toLog, $context))
-            ->setServer($this->getServer($level, $toLog, $context))
-            ->setCustom($this->getCustom($level, $toLog, $context))
-            ->setFingerprint($this->getFingerprint($level, $toLog, $context))
-            ->setTitle($this->getTitle($level, $toLog, $context))
-            ->setUuid($this->getUuid($level, $toLog, $context))
-            ->setNotifier($this->getNotifier($level, $toLog, $context));
+        $data->setLevel($this->getLevel($level, $toLog))
+            ->setTimestamp($this->getTimestamp())
+            ->setCodeVersion($this->getCodeVersion())
+            ->setPlatform($this->getPlatform())
+            ->setLanguage($this->getLanguage())
+            ->setFramework($this->getFramework())
+            ->setContext($this->getContext())
+            ->setRequest($this->getRequest())
+            ->setPerson($this->getPerson())
+            ->setServer($this->getServer())
+            ->setCustom($this->getCustom($toLog, $context))
+            ->setFingerprint($this->getFingerprint())
+            ->setTitle($this->getTitle())
+            ->setUuid($this->getUuid())
+            ->setNotifier($this->getNotifier());
         return $data;
     }
 
-    protected function getEnvironment($level, $toLog, $context)
+    protected function getEnvironment()
     {
-        return $this->getOrCall('environment', $level, $toLog, $context);
+        return $this->environment;
     }
 
-    protected function getBody($level, $toLog, $context)
+    protected function getBody($toLog, $context)
     {
-        $baseException = $this->getBaseException($level, $toLog, $context);
+        $baseException = $this->getBaseException();
         if ($toLog instanceof ErrorWrapper) {
             $content = $this->getErrorTrace($toLog);
         } elseif ($toLog instanceof $baseException) {
-            $content = $this->getExceptionTrace($toLog, $baseException);
+            $content = $this->getExceptionTrace($baseException);
         } else {
-            $scrubFields = $this->getScrubFields($level, $toLog, $context);
+            $scrubFields = $this->getScrubFields();
             $content = $this->getMessage($toLog, self::scrub($context, $scrubFields));
         }
         return new Body($content);
     }
 
-    protected function getErrorTrace($error)
+    protected function getErrorTrace(ErrorWrapper $error)
     {
         return $this->makeTrace($error, $error->getClassName());
     }
 
+    /**
+     * @param \Throwable|\Exception $exc
+     * @return Trace|TraceChain
+     */
     protected function getExceptionTrace($exc)
     {
         $chain = array();
@@ -288,9 +289,14 @@ class DataBuilder implements DataBuilderInterface
         if (count($chain) > 1) {
             return new TraceChain($chain);
         }
-        return new Trace($chain[0]);
+        return new Trace($chain[0], $chain[0]->getException());
     }
 
+    /**
+     * @param \Throwable|\Exception $exception
+     * @param string $classOverride
+     * @return Trace
+     */
     public function makeTrace($exception, $classOverride = null)
     {
         $frames = $this->makeFrames($exception);
@@ -298,7 +304,7 @@ class DataBuilder implements DataBuilderInterface
             Utilities::coalesce($classOverride, get_class($exception)),
             $exception->getMessage()
         );
-        new Trace($frames, $excInfo);
+        return new Trace($frames, $excInfo);
     }
 
     public function makeFrames($exception)
@@ -333,7 +339,7 @@ class DataBuilder implements DataBuilderInterface
         return new Message((string)$toLog, $context);
     }
 
-    protected function getLevel($level, $toLog, $context)
+    protected function getLevel($level, $toLog)
     {
         if (is_null($level)) {
             if ($toLog instanceof ErrorWrapper) {
@@ -348,50 +354,50 @@ class DataBuilder implements DataBuilderInterface
         return Level::fromName($this->tryGet($this->psrLevels, $level));
     }
 
-    protected function getTimestamp($level, $toLog, $context)
+    protected function getTimestamp()
     {
         return time();
     }
 
-    protected function getCodeVersion($level, $toLog, $context)
+    protected function getCodeVersion()
     {
-        return $this->getOrCall('codeVersion', $level, $toLog, $context);
+        return $this->codeVersion;
     }
 
-    protected function getPlatform($level, $toLog, $context)
+    protected function getPlatform()
     {
-        return $this->getOrCall('platform', $level, $toLog, $context);
+        return $this->platform;
     }
 
-    protected function getLanguage($level, $toLog, $context)
+    protected function getLanguage()
     {
         return "PHP " . phpversion();
     }
 
-    protected function getFramework($level, $toLog, $context)
+    protected function getFramework()
     {
-        return $this->getOrCall('framework', $level, $toLog, $context);
+        return $this->framework;
     }
 
-    protected function getContext($level, $toLog, $context)
+    protected function getContext()
     {
-        return $this->getOrCall('context', $level, $toLog, $context);
+        return $this->context;
     }
 
-    protected function getRequest($level, $toLog, $context)
+    protected function getRequest()
     {
-        $scrubFields = $this->getScrubFields($level, $toLog, $context);
+        $scrubFields = $this->getScrubFields();
         $request = new Request();
         $request->setUrl($this->getUrl($scrubFields))
             ->setMethod($this->tryGet($_SERVER, 'REQUEST_METHOD'))
             ->setHeaders($this->getScrubbedHeaders($scrubFields))
-            ->setParams($this->getRequestParams($level, $toLog, $context))
+            ->setParams($this->getRequestParams())
             ->setGet(self::scrub($_GET, $scrubFields))
             ->setQueryString(self::scrubUrl($this->tryGet($_SERVER, "QUERY_STRING"), $scrubFields))
             ->setPost(self::scrub($_POST, $scrubFields))
-            ->setBody($this->getRequestBody($level, $toLog, $context))
-            ->setuserIp($this->getUserIp());
-        $extras = $this->getRequestExtras($level, $toLog, $context);
+            ->setBody($this->getRequestBody())
+            ->setUserIp($this->getUserIp());
+        $extras = $this->getRequestExtras();
         if (!$extras) {
             $extras = array();
         }
@@ -478,50 +484,50 @@ class DataBuilder implements DataBuilderInterface
         }
     }
 
-    protected function getRequestParams($level, $toLog, $context)
+    protected function getRequestParams()
     {
-        return $this->getOrCall('requestParams', $level, $toLog, $context);
+        return $this->requestParams;
     }
 
-    protected function getRequestBody($level, $toLog, $context)
+    protected function getRequestBody()
     {
-        return $this->getOrCall('requestBody', $level, $toLog, $context);
+        return $this->requestBody;
     }
 
     protected function getUserIp()
     {
-        $forwardfor = $this->tryGet($_SERVER, 'HTTP_X_FORWARDED_FOR');
-        if ($forwardfor) {
+        $forwardFor = $this->tryGet($_SERVER, 'HTTP_X_FORWARDED_FOR');
+        if ($forwardFor) {
             // return everything until the first comma
-            $parts = explode(',', $forwardfor);
+            $parts = explode(',', $forwardFor);
             return $parts[0];
         }
-        $realip = $this->tryGet($_SERVER, 'HTTP_X_REAL_IP');
-        if ($realip) {
-            return $realip;
+        $realIp = $this->tryGet($_SERVER, 'HTTP_X_REAL_IP');
+        if ($realIp) {
+            return $realIp;
         }
         return $this->tryGet($_SERVER, 'REMOTE_ADDR');
     }
 
-    protected function getRequestExtras($level, $toLog, $context)
+    protected function getRequestExtras()
     {
-        return $this->getOrCall('requestExtras', $level, $toLog, $context);
+        return $this->requestExtras;
     }
 
-    protected function getPerson($level, $toLog, $context)
+    protected function getPerson()
     {
-        return $this->getOrCall('person', $level, $toLog, $context);
+        return $this->person;
     }
 
-    protected function getServer($level, $toLog, $context)
+    protected function getServer()
     {
         $server = new Server();
         $server->setHost(gethostname())
-            ->setRoot($this->getServerRoot($level, $toLog, $context))
-            ->setBranch($this->getServerBranch($level, $toLog, $context))
-            ->setCodeVersion($this->getServerCodeVersion($level, $toLog, $context));
-        $scrubFields = $this->getScrubFields($level, $toLog, $context);
-        $extras = $this->getServerExtras($level, $toLog, $context);
+            ->setRoot($this->getServerRoot())
+            ->setBranch($this->getServerBranch())
+            ->setCodeVersion($this->getServerCodeVersion());
+        $scrubFields = $this->getScrubFields();
+        $extras = $this->getServerExtras();
         if (!$extras) {
             $extras = array();
         }
@@ -538,29 +544,29 @@ class DataBuilder implements DataBuilderInterface
         return $server;
     }
 
-    protected function getServerRoot($level, $toLog, $context)
+    protected function getServerRoot()
     {
-        return $this->getOrCall('serverRoot', $level, $toLog, $context);
+        return $this->serverRoot;
     }
 
-    protected function getServerBranch($level, $toLog, $context)
+    protected function getServerBranch()
     {
-        return $this->getOrCall('serverBranch', $level, $toLog, $context);
+        return $this->serverBranch;
     }
 
-    protected function getServerCodeVersion($level, $toLog, $context)
+    protected function getServerCodeVersion()
     {
-        return $this->getOrCall('serverCodeVersion', $level, $toLog, $context);
+        return $this->serverCodeVersion;
     }
 
-    protected function getServerExtras($level, $toLog, $context)
+    protected function getServerExtras()
     {
-        return $this->getOrCall('serverExtras', $level, $toLog, $context);
+        return $this->serverExtras;
     }
 
-    protected function getCustom($level, $toLog, $context)
+    protected function getCustom($toLog, $context)
     {
-        $custom = $this->getOrCall('custom', $level, $toLog, $context);
+        $custom = $this->custom;
 
         // Make this an array if possible:
         if ($custom instanceof \JsonSerializable) {
@@ -570,45 +576,45 @@ class DataBuilder implements DataBuilderInterface
         } elseif (!is_array($custom)) {
             $custom = get_object_vars($custom);
         }
-        // If toLog is a message:
-        $baseException = $this->getBaseException($level, $toLog, $context);
+
+        $baseException = $this->getBaseException();
         if (!$toLog instanceof $baseException) {
             return array_replace_recursive(array(), $custom);
         }
 
-        $scrubFields = $this->getScrubFields($level, $toLog, $context);
+        $scrubFields = $this->getScrubFields();
         $custom = self::scrub($custom, $scrubFields);
         return array_replace_recursive(array(), $context, $custom);
     }
 
-    protected function getFingerprint($level, $toLog, $context)
+    protected function getFingerprint()
     {
-        return $this->getOrCall('fingerprint', $level, $toLog, $context);
+        return $this->fingerprint;
     }
 
-    protected function getTitle($level, $toLog, $context)
+    protected function getTitle()
     {
-        return $this->getOrCall('title', $level, $toLog, $context);
+        return $this->title;
     }
 
-    protected function getUuid($level, $toLog, $context)
+    protected function getUuid()
     {
         return self::uuid4();
     }
 
-    protected function getNotifier($level, $toLog, $context)
+    protected function getNotifier()
     {
-        return $this->getOrCall('notifier', $level, $toLog, $context);
+        return $this->notifier;
     }
 
-    protected function getBaseException($level, $toLog, $context)
+    protected function getBaseException()
     {
-        return $this->getOrCall('baseException', $level, $toLog, $context);
+        return $this->baseException;
     }
 
-    protected function getScrubFields($level, $toLog, $context)
+    protected function getScrubFields()
     {
-        return $this->getOrCall('scrubFields', $level, $toLog, $context);
+        return $this->scrubFields;
     }
 
     protected function scrub($arr, $fields, $replacement = '*')
@@ -617,7 +623,7 @@ class DataBuilder implements DataBuilderInterface
             return $fields;
         }
         $fields = $this->scrubFields;
-        $scrubber = function ($key, &$val) use ($fields) {
+        $scrubber = function ($key, &$val) use ($fields, $replacement) {
 
             if (in_array($key, $arr)) {
                 $val = str_repeat($replacement, 8);

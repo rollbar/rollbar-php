@@ -1,9 +1,9 @@
 <?php namespace Rollbar\Payload;
 
-use Rollbar\Payload\Trace;
-
 class TraceChain extends ContentInterface
 {
+    private $traces;
+
     public function __construct(array $traces)
     {
         $this->setTraces($traces);
