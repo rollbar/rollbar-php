@@ -80,13 +80,13 @@ class UtilitiesTest extends \PHPUnit_Framework_TestCase
 
     public function testValidateBooleanThrowsException()
     {
-        $this->setExpectedException(\InvalidArgumentException::class);
+        $this->setExpectedException(get_class(new \InvalidArgumentException()));
         Utilities::validateBoolean(null, "foo", false);
     }
 
     public function testValidateBooleanWithInvalidBoolean()
     {
-        $this->setExpectedException(\InvalidArgumentException::class);
+        $this->setExpectedException(get_class(new \InvalidArgumentException()));
         Utilities::validateBoolean("not a boolean");
     }
 
