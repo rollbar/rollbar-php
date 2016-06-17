@@ -187,6 +187,13 @@ class Config
         return $this->dataBuilder->makeData($level, $toLog, $context);
     }
 
+    /**
+     * @param Payload $payload
+     * @param Level $level
+     * @param \Exception | \Throwable $toLog
+     * @param array $context
+     * @return Payload
+     */
     public function transform($payload, $level, $toLog, $context)
     {
         if (is_null($this->transformer)) {

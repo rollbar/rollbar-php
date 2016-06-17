@@ -78,6 +78,25 @@ class UtilitiesTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testValidateBooleanThrowsException()
+    {
+        $this->setExpectedException(\InvalidArgumentException::class);
+        Utilities::validateBoolean(null, "foo", false);
+    }
+
+    public function testValidateBooleanWithInvalidBoolean()
+    {
+        $this->setExpectedException(\InvalidArgumentException::class);
+        Utilities::validateBoolean("not a boolean");
+    }
+
+    public function testValidateBoolean()
+    {
+        Utilities::validateBoolean(true, "foo", false);
+        Utilities::validateBoolean(true);
+        Utilities::validateBoolean(null);
+    }
+
     public function testSerializeForRollbar()
     {
         $obj = array(

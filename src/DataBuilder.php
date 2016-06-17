@@ -222,6 +222,12 @@ class DataBuilder implements DataBuilderInterface
         $this->baseException = self::$defaults->baseException($fromConfig);
     }
 
+    /**
+     * @param Level $level
+     * @param \Exception | \Throwable $toLog
+     * @param $context
+     * @return Data
+     */
     public function makeData($level, $toLog, $context)
     {
         $env = $this->getEnvironment();
@@ -408,7 +414,7 @@ class DataBuilder implements DataBuilderInterface
                 $request->$key = $val;
             }
         }
-        if (is_array($_SESSION)) {
+        if (is_array($_SESSION) && count($_SESSION) > 0) {
             $request->session = self::scrub($_SESSION, $scrubFields);
         }
         return $request;
@@ -452,6 +458,9 @@ class DataBuilder implements DataBuilderInterface
         }
 
         $url .= $path;
+
+        if ($host == 'unknown')
+            $url = null;
 
         return self::scrubUrl($url, $scrubFields);
     }
@@ -620,9 +629,9 @@ class DataBuilder implements DataBuilderInterface
     protected function scrub($arr, $fields, $replacement = '*')
     {
         if (!$fields || !$arr) {
-            return $fields;
+            return null;
         }
-        $fields = $this->scrubFields;
+
         $scrubber = function ($key, &$val) use ($fields, $replacement) {
 
             if (in_array($key, $arr)) {
