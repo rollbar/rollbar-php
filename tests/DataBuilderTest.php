@@ -2,7 +2,6 @@
 
 namespace Rollbar;
 
-
 use Rollbar\Payload\Level;
 
 class DataBuilderTest extends \PHPUnit_Framework_TestCase

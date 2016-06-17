@@ -459,8 +459,9 @@ class DataBuilder implements DataBuilderInterface
 
         $url .= $path;
 
-        if ($host == 'unknown')
+        if ($host == 'unknown') {
             $url = null;
+        }
 
         return self::scrubUrl($url, $scrubFields);
     }
