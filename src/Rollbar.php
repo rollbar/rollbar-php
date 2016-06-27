@@ -46,7 +46,7 @@ class Rollbar
 
     public static function setupExceptionHandling()
     {
-        set_exception_handler('Rollbar::log');
+        set_exception_handler('Rollbar\Rollbar::log');
     }
 
     public static function log($exc, $extra = null, $level = null)
@@ -59,7 +59,7 @@ class Rollbar
 
     public static function setupErrorHandling()
     {
-        set_error_handler('Rollbar::errorHandler');
+        set_error_handler('Rollbar\Rollbar::errorHandler');
     }
 
     public static function errorHandler($errno, $errstr, $errfile, $errline)
@@ -73,7 +73,7 @@ class Rollbar
 
     public static function setupFatalHandling()
     {
-        register_shutdown_function('Rollbar::fatalHandler');
+        register_shutdown_function('Rollbar\Rollbar::fatalHandler');
     }
 
     public static function fatalHandler()

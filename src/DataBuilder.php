@@ -323,7 +323,7 @@ class DataBuilder implements DataBuilderInterface
             // TODO 4 (arguments are in $frame)
             // TODO 5 Code Context
             $frame = new Frame($filename);
-            $frame->setLine($lineno)
+            $frame->setLineno($lineno)
                 ->setMethod($method);
             $frames[] = $frame;
         }

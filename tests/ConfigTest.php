@@ -19,7 +19,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function testAccessToken()
     {
         $config = new Config(array(
-            'accessToken' => $this->token,
+            'access_token' => $this->token,
             'environment' => $this->env
         ));
         $this->assertEquals($this->token, $config->getAccessToken());
@@ -28,7 +28,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function testDataBuilder()
     {
         $arr = array(
-            "accessToken" => $this->token,
+            "access_token" => $this->token,
             "environment" => $this->env,
             "dataBuilder" => "Rollbar\FakeDataBuilder",
             "dataBuilderOptions" => array("options")
@@ -40,13 +40,13 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function testExtend()
     {
         $arr = array(
-            "accessToken" => $this->token,
+            "access_token" => $this->token,
             "environment" => $this->env
         );
         $config = new Config($arr);
         $extended = $config->extend(array("one" => 1, "arr" => array()));
         $expected = array(
-            "accessToken" => $this->token,
+            "access_token" => $this->token,
             "environment" => $this->env,
             "one" => 1,
             "arr" => array()
@@ -57,13 +57,13 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function testConfigure()
     {
         $arr = array(
-            "accessToken" => $this->token,
+            "access_token" => $this->token,
             "environment" => $this->env
         );
         $config = new Config($arr);
         $config->configure(array("one" => 1, "arr" => array()));
         $expected = array(
-            "accessToken" => $this->token,
+            "access_token" => $this->token,
             "environment" => $this->env,
             "one" => 1,
             "arr" => array()
@@ -75,7 +75,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     {
         $fdb = new FakeDataBuilder(array());
         $arr = array(
-            "accessToken" => $this->token,
+            "access_token" => $this->token,
             "environment" => $this->env,
             "dataBuilder" => $fdb
         );
@@ -96,7 +96,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             ->andReturn($pPrime)
             ->mock();
         $config = new Config(array(
-            "accessToken" => $this->token,
+            "access_token" => $this->token,
             "environment" => $this->env,
             "transformer" => $transformer
         ));
@@ -106,7 +106,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function testMinimumLevel()
     {
         $c = new Config(array(
-            "accessToken" => $this->token,
+            "access_token" => $this->token,
             "environment" => $this->env,
             "minimumLevel" => "warning"
         ));
@@ -164,7 +164,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             ->andReturn(true, false)
             ->mock();
         $c = new Config(array(
-            "accessToken" => $this->token,
+            "access_token" => $this->token,
             "environment" => $this->env,
             "filter" => $filter
         ));
@@ -181,15 +181,10 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             ->once()
             ->mock();
         $c = new Config(array(
-            "accessToken" => $this->token,
+            "access_token" => $this->token,
             "environment" => $this->env,
             "sender" => $sender
         ));
         $c->send($p, $this->token);
-    }
-
-    public function testHandleResponse()
-    {
-
     }
 }

@@ -69,8 +69,8 @@ class Config
         if (isset($_ENV['ROLLBAR_ACCESS_TOKEN']) && !isset($config['access_token'])) {
             $config['access_token'] = $_ENV['ROLLBAR_ACCESS_TOKEN'];
         }
-        Utilities::validateString($c['accessToken'], "config['accessToken']", 32, false);
-        $this->accessToken = $c['accessToken'];
+        Utilities::validateString($c['access_token'], "config['access_token']", 32, false);
+        $this->accessToken = $c['access_token'];
     }
 
     private function setDataBuilder($c)
@@ -118,6 +118,15 @@ class Config
     {
         $expected = "Rollbar\Senders\SenderInterface";
         $default = "Rollbar\Senders\CurlSender";
+
+        if (array_key_exists('handler', $c) && $c['handler'] == 'agent') {
+            $default = "Rollbar\Senders\AgentSender";
+            if (array_key_exists('agent_log_location', $c)) {
+                $c['senderOptions'] = array(
+                    'agentLogLocation' => $c['agent_log_location']
+                );
+            }
+        }
         $this->setupWithOptions($c, "sender", $expected, $default);
     }
 
