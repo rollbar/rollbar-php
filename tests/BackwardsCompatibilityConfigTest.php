@@ -2,7 +2,6 @@
 
 namespace Rollbar;
 
-
 class BackwardsCompatibilityConfigTest extends \PHPUnit_Framework_TestCase
 {
     public function testConfigValues()
@@ -16,7 +15,9 @@ class BackwardsCompatibilityConfigTest extends \PHPUnit_Framework_TestCase
             'branch' => 'other',
             'capture_error_stacktraces' => true,
             'checkIgnore' => function ($isUncaught, $exception, $payload) {
-                if (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Baiduspider') !== false) {
+                $check = isset($_SERVER['HTTP_USER_AGENT']) &&
+                    strpos($_SERVER['HTTP_USER_AGENT'], 'Baiduspider') !== false;
+                if ($check) {
                     // ignore baidu spider
                     return true;
                 }
@@ -40,7 +41,7 @@ class BackwardsCompatibilityConfigTest extends \PHPUnit_Framework_TestCase
                 'username' => 'test-user',
                 'email' => 'test@rollbar.com'
             ),
-            'person_fn' => function() {
+            'person_fn' => function () {
                 return array(
                     'id' => 1,
                     'username' => 'test-user',

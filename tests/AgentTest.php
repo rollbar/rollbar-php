@@ -4,7 +4,8 @@ namespace Rollbar\Senders; // in a different namespace, so we can monkey-patch m
 
 use Rollbar;
 
-function microtime($getAsFloat) {
+function microtime($getAsFloat)
+{
     return 2;
 }
 
@@ -19,7 +20,8 @@ class AgentTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testAgent() {
+    public function testAgent()
+    {
         Rollbar\Rollbar::init(array(
             'access_token' => 'ad865e76e7fb496fab096ac07b1dbabb',
             'environment' => 'testing',
@@ -38,7 +40,7 @@ class AgentTest extends \PHPUnit_Framework_TestCase
         $this->rrmdir($this->path);
     }
 
-    function rrmdir($dir)
+    private function rrmdir($dir)
     {
         if (!is_dir($dir)) {
             return;

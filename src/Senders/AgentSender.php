@@ -28,6 +28,7 @@ class AgentSender implements SenderInterface
 
     private function loadAgentFile()
     {
-        $this->agentLog = fopen($this->agentLogLocation . '/rollbar-relay.' . getmypid() . '.' . microtime(true) . '.rollbar', 'a');
+        $filename = $this->agentLogLocation . '/rollbar-relay.' . getmypid() . '.' . microtime(true) . '.rollbar';
+        $this->agentLog = fopen($filename, 'a');
     }
 }
