@@ -23,7 +23,7 @@ class AgentSender implements SenderInterface
         if (empty($this->agentLog)) {
             $this->loadAgentFile();
         }
-        fwrite($this->agentLog, json_encode($payload) . "\n");
+        fwrite($this->agentLog, json_encode($payload->jsonSerialize()) . "\n");
     }
 
     private function loadAgentFile()
