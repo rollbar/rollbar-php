@@ -2,7 +2,10 @@
 
 use \Mockery as m;
 use Rollbar\FakeDataBuilder;
+use Rollbar\Payload\Body;
+use Rollbar\Payload\Data;
 use Rollbar\Payload\Level;
+use Rollbar\Payload\Message;
 use Rollbar\Payload\Payload;
 use Psr\Log\LogLevel;
 
@@ -186,5 +189,22 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             "sender" => $sender
         ));
         $c->send($p, $this->token);
+    }
+
+    public function testCheckIgnore()
+    {
+        $called = false;
+        $c = new Config(array(
+            "access_token" => $this->token,
+            "environment" => $this->env,
+            "checkIgnore" => function() use (&$called) {
+                $called = true;
+            }
+        ));
+        $data = new Data($this->env, new Body(new Message("test")));
+        $data->setLevel(Level::fromName('error'));
+        $c->checkIgnored(new Payload($data, $this->token), $this->token);
+
+        $this->assertTrue($called);
     }
 }

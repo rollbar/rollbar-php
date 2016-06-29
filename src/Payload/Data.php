@@ -1,5 +1,6 @@
 <?php namespace Rollbar\Payload;
 
+use Rollbar\Defaults;
 use Rollbar\Utilities;
 
 class Data implements \JsonSerializable
@@ -159,6 +160,9 @@ class Data implements \JsonSerializable
         return $this;
     }
 
+    /**
+     * @return Server
+     */
     public function getServer()
     {
         return $this->server;

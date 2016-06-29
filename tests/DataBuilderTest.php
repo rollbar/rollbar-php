@@ -6,6 +6,12 @@ use Rollbar\Payload\Level;
 
 class DataBuilderTest extends \PHPUnit_Framework_TestCase
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $_SESSION = array();
+    }
+
     /**
      * @var DataBuilder
      */
@@ -23,5 +29,17 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $output = $this->dataBuilder->makeData(Level::fromName('error'), "testing", array());
         $this->assertEquals('tests', $output->getEnvironment());
+    }
+
+    public function testBranchKey()
+    {
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'branch' => 'test-branch'
+        ));
+
+        $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
+        $this->assertEquals('test-branch', $output->getServer()->getBranch());
     }
 }

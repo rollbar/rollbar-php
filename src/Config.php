@@ -53,7 +53,7 @@ class Config
     protected function updateConfig($c)
     {
         $this->configArray = $c;
-
+        
         $this->setAccessToken($c);
         $this->setDataBuilder($c);
         $this->setTransformer($c);
@@ -118,6 +118,10 @@ class Config
     {
         $expected = "Rollbar\Senders\SenderInterface";
         $default = "Rollbar\Senders\CurlSender";
+
+        if (array_key_exists('base_api_url', $c)) {
+            $c['senderOptions']['endpoint'] = $c['base_api_url'];
+        }
 
         if (array_key_exists('handler', $c) && $c['handler'] == 'agent') {
             $default = "Rollbar\Senders\AgentSender";
@@ -226,6 +230,9 @@ class Config
         }
         if (!is_null($this->filter)) {
             return $this->filter->shouldSend($payload, $accessToken);
+        }
+        if (isset($this->checkIgnoreFunction)) {
+
         }
         return false;
     }

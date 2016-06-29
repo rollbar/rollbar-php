@@ -1,6 +1,5 @@
 <?php namespace Rollbar;
 
-use Rollbar\RollbarLogger;
 use Psr\Log\LogLevel;
 
 class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
