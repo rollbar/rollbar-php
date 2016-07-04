@@ -111,7 +111,7 @@ if (!defined('ROLLBAR_INCLUDED_ERRNO_BITMASK')) {
 }
 
 class RollbarNotifier {
-    const VERSION = "0.18.0";
+    const VERSION = "0.18.1";
 
     // required
     public $access_token = '';
@@ -145,12 +145,13 @@ class RollbarNotifier {
     public $proxy = null;
     public $include_error_code_context = false;
     public $include_exception_code_context = false;
+    public $enable_utf8_sanitization = true;
 
     private $config_keys = array('access_token', 'base_api_url', 'batch_size', 'batched', 'branch',
         'capture_error_backtraces', 'code_version', 'environment', 'error_sample_rates', 'handler',
         'agent_log_location', 'host', 'logger', 'included_errno', 'person', 'person_fn', 'root', 'checkIgnore',
         'scrub_fields', 'shift_function', 'timeout', 'report_suppressed', 'use_error_reporting', 'proxy',
-        'include_error_code_context', 'include_exception_code_context');
+        'include_error_code_context', 'include_exception_code_context', 'enable_utf8_sanitization');
 
     // cached values for request/server/person data
     private $_php_context = null;
@@ -303,6 +304,9 @@ class RollbarNotifier {
 
     /**
      * @param \Throwable|\Exception $exc
+     * @param mixed $extra_data
+     * @param mixed$payload_data
+     * @return string the uuid of the occurrence
      */
     protected function _report_exception( $exc, $extra_data = null, $payload_data = null) {
         if (!$this->check_config()) {
@@ -355,6 +359,9 @@ class RollbarNotifier {
     }
 
     protected function _sanitize_utf8(&$value) {
+        if (!$this->enable_utf8_sanitization)
+            return;
+
         if (!isset($this->_iconv_available)) {
             $this->_iconv_available = function_exists('iconv');
         }

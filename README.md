@@ -292,6 +292,12 @@ Rollbar::init($config);
 
 Default: `null`
   </dd>
+  
+  <dt>enable_utf8_sanizations</dt>
+  <dd>set to false, to disable running iconv on the payload, may be needed if there is invalid characters, and the payload is being destroyed
+  
+Default: `true`
+  </dd>
 
   <dt>environment</dt>
   <dd>Environment name, e.g. `'production'` or `'development'`
