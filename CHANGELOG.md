@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.18.2
+
+- removed type hinting from RollbarException
+
+## 0.18.1
+
+- added configuration switch for disabling utf 8 sanitization
+
 ## 0.18.0
 
 - Added support for checkIgnore function See [#82](https://github.com/rollbar/rollbar-php/pull/82)

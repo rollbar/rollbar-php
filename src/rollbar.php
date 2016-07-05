@@ -116,7 +116,7 @@ if (!defined('ROLLBAR_INCLUDED_ERRNO_BITMASK')) {
 }
 
 class RollbarNotifier {
-    const VERSION = "0.18.1";
+    const VERSION = "0.18.2";
 
     // required
     public $access_token = '';
