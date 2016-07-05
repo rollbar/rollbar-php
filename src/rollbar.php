@@ -91,7 +91,12 @@ class RollbarException {
     private $message;
     private $exception;
 
-    public function __construct($message, Exception $exception = null) {
+    /**
+     * RollbarException constructor.
+     * @param string $message
+     * @param Exception | Error $exception
+     */
+    public function __construct($message, $exception = null) {
         $this->message = $message;
         $this->exception = $exception;
     }
