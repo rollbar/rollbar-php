@@ -293,7 +293,7 @@ Rollbar::init($config);
 Default: `null`
   </dd>
   
-  <dt>enable_utf8_sanizations</dt>
+  <dt>enable_utf8_sanitization</dt>
   <dd>set to false, to disable running iconv on the payload, may be needed if there is invalid characters, and the payload is being destroyed
   
 Default: `true`
