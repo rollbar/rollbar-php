@@ -174,8 +174,9 @@ class DataBuilder implements DataBuilderInterface
     protected function setServerBranch($c)
     {
         $fromConfig = $this->tryGet($c, 'serverBranch');
-        if (!isset($fromConfig))
+        if (!isset($fromConfig)) {
             $fromConfig = $this->tryGet($c, 'branch');
+        }
         $this->serverBranch = self::$defaults->gitBranch($fromConfig);
     }
 

@@ -197,7 +197,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $c = new Config(array(
             "access_token" => $this->token,
             "environment" => $this->env,
-            "checkIgnore" => function() use (&$called) {
+            "checkIgnore" => function () use (&$called) {
                 $called = true;
             }
         ));

@@ -29,6 +29,10 @@ class Config
      */
     private $sender;
     private $reportSuppressed;
+    /**
+     * @var callable
+     */
+    private $checkIgnore;
 
     public function __construct(array $configArray)
     {
@@ -62,6 +66,7 @@ class Config
         $this->setFilters($c);
         $this->setSender($c);
         $this->setResponseHandler($c);
+        $this->setCheckIgnoreFunction($c);
     }
 
     private function setAccessToken($c)
@@ -137,6 +142,15 @@ class Config
     private function setResponseHandler($c)
     {
         $this->setupWithOptions($c, "responseHandler", "Rollbar\ResponseHandlerInterface");
+    }
+
+    private function setCheckIgnoreFunction($c)
+    {
+        if (!isset($c['checkIgnore'])) {
+            return;
+        }
+
+        $this->checkIgnore = $c['checkIgnore'];
     }
 
     /**
@@ -225,14 +239,14 @@ class Config
         if ($this->shouldSupppress()) {
             return true;
         }
+        if (isset($this->checkIgnore) && call_user_func($this->checkIgnore)) {
+            return true;
+        }
         if ($this->levelTooLow($payload)) {
             return true;
         }
         if (!is_null($this->filter)) {
             return $this->filter->shouldSend($payload, $accessToken);
-        }
-        if (isset($this->checkIgnoreFunction)) {
-
         }
         return false;
     }
