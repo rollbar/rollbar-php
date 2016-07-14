@@ -42,4 +42,15 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
         $this->assertEquals('test-branch', $output->getServer()->getBranch());
     }
+
+    public function testCodeVersion()
+    {
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'code_version' => '3.4.1'
+        ));
+        $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
+        $this->assertEquals('3.4.1', $output->getCodeVersion());
+    }
 }

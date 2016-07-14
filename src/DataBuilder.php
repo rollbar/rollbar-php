@@ -126,6 +126,9 @@ class DataBuilder implements DataBuilderInterface
     protected function setCodeVersion($c)
     {
         $fromConfig = $this->tryGet($c, 'codeVersion');
+        if (!isset($fromConfig)) {
+            $fromConfig = $this->tryGet($c, 'code_version');
+        }
         $this->codeVersion = self::$defaults->codeVersion($fromConfig);
     }
 
@@ -636,7 +639,7 @@ class DataBuilder implements DataBuilderInterface
             return null;
         }
 
-        $scrubber = function ($key, &$val) use ($fields, $replacement) {
+        $scrubber = function ($key, &$val) use ($fields, $replacement, $arr) {
 
             if (in_array($key, $arr)) {
                 $val = str_repeat($replacement, 8);

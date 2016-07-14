@@ -33,10 +33,31 @@ class Config
      * @var callable
      */
     private $checkIgnore;
+    private $error_sample_rates = array();
+    private $mt_randmax;
 
     public function __construct(array $configArray)
     {
         $this->updateConfig($configArray);
+
+        if (isset($configArray['error_sample_rates'])) {
+            $this->error_sample_rates = $configArray['error_sample_rates'];
+        }
+
+        $levels = array(E_WARNING, E_NOTICE, E_USER_ERROR, E_USER_WARNING,
+            E_USER_NOTICE, E_STRICT, E_RECOVERABLE_ERROR);
+        // PHP 5.3.0
+        if (defined('E_DEPRECATED')) {
+            $levels = array_merge($levels, array(E_DEPRECATED, E_USER_DEPRECATED));
+        }
+        $curr = 1;
+        for ($i = 0, $num = count($levels); $i < $num; $i++) {
+            $level = $levels[$i];
+            if (!isset($this->error_sample_rates[$level])) {
+                $this->error_sample_rates[$level] = $curr;
+            }
+        }
+        $this->mt_randmax = mt_getrandmax();
     }
 
     public function configure($config)
@@ -234,7 +255,7 @@ class Config
         return $this->accessToken;
     }
 
-    public function checkIgnored($payload, $accessToken)
+    public function checkIgnored($payload, $accessToken, $toLog)
     {
         if ($this->shouldSupppress()) {
             return true;
@@ -247,6 +268,19 @@ class Config
         }
         if (!is_null($this->filter)) {
             return $this->filter->shouldSend($payload, $accessToken);
+        }
+
+        if ($toLog instanceof ErrorWrapper) {
+            $errno = $toLog->errorLevel;
+            if (isset($this->error_sample_rates[$errno])) {
+                // get a float in the range [0, 1)
+                // mt_rand() is inclusive, so add 1 to mt_randmax
+                $float_rand = mt_rand() / ($this->mt_randmax + 1);
+                if ($float_rand > $this->error_sample_rates[$errno]) {
+                    // skip
+                    return true;
+                }
+            }
         }
         return false;
     }

@@ -129,21 +129,21 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             ->andReturn(Level::DEBUG())
             ->mock();
         $debug = new Payload($debugData, $this->token);
-        $this->assertTrue($config->checkIgnored($debug, null));
+        $this->assertTrue($config->checkIgnored($debug, null, new \Error()));
 
         $criticalData = m::mock("Rollbar\Payload\Data")
             ->shouldReceive('getLevel')
             ->andReturn(Level::CRITICAL())
             ->mock();
         $critical = new Payload($criticalData, $this->token);
-        $this->assertFalse($config->checkIgnored($critical, null));
+        $this->assertFalse($config->checkIgnored($critical, null, new \Error()));
 
         $warningData = m::mock("Rollbar\Payload\Data")
             ->shouldReceive('getLevel')
             ->andReturn(Level::warning())
             ->mock();
         $warning = new Payload($warningData, $this->token);
-        $this->assertFalse($config->checkIgnored($warning, null));
+        $this->assertFalse($config->checkIgnored($warning, null, new \Error()));
     }
 
     public function testReportSuppressed()
@@ -171,8 +171,8 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             "environment" => $this->env,
             "filter" => $filter
         ));
-        $this->assertTrue($c->checkIgnored($p, "fake_access_token"));
-        $this->assertFalse($c->checkIgnored($p, "fake_access_token"));
+        $this->assertTrue($c->checkIgnored($p, "fake_access_token", new \Error()));
+        $this->assertFalse($c->checkIgnored($p, "fake_access_token", new \Error()));
     }
 
     public function testSender()
@@ -203,7 +203,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         ));
         $data = new Data($this->env, new Body(new Message("test")));
         $data->setLevel(Level::fromName('error'));
-        $c->checkIgnored(new Payload($data, $this->token), $this->token);
+        $c->checkIgnored(new Payload($data, $this->token), $this->token, new \Error());
 
         $this->assertTrue($called);
     }

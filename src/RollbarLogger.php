@@ -31,7 +31,7 @@ class RollbarLogger extends AbstractLogger
     {
         $accessToken = $this->getAccessToken();
         $payload = $this->getPayload($accessToken, $level, $toLog, $context);
-        $response = $this->sendOrIgnore($payload, $accessToken);
+        $response = $this->sendOrIgnore($payload, $accessToken, $toLog);
         $this->handleResponse($payload, $response);
         return $response;
     }
@@ -51,11 +51,12 @@ class RollbarLogger extends AbstractLogger
     /**
      * @param Payload $payload
      * @param string $accessToken
+     * @param mixed $toLog
      * @return Response
      */
-    protected function sendOrIgnore($payload, $accessToken)
+    protected function sendOrIgnore($payload, $accessToken, $toLog)
     {
-        if ($this->config->checkIgnored($payload, $accessToken)) {
+        if ($this->config->checkIgnored($payload, $accessToken, $toLog)) {
             return new Response(0, "Ignored");
         }
 

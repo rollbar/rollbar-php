@@ -30,4 +30,17 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
         $response = $l->log(LogLevel::WARNING, "Testing PHP Notifier", array());
         $this->assertEquals(200, $response->getStatus());
     }
+
+    public function testErrorSampleRates()
+    {
+        $l = new RollbarLogger(array(
+            "access_token" => "ad865e76e7fb496fab096ac07b1dbabb",
+            "environment" => "testing-php",
+            "error_sample_rates" => array(
+                E_ERROR => 0
+            )
+        ));
+        $response = $l->log(null, new ErrorWrapper(E_ERROR, '', null, null, array()), array());
+        $this->assertEquals(0, $response->getStatus());
+    }
 }
