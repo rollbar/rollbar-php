@@ -28,6 +28,7 @@ class DataBuilder implements DataBuilderInterface
     protected $requestParams;
     protected $requestBody;
     protected $requestExtras;
+    protected $host;
     protected $person;
     protected $serverRoot;
     protected $serverBranch;
@@ -56,6 +57,7 @@ class DataBuilder implements DataBuilderInterface
         $this->setRequestParams($config);
         $this->setRequestBody($config);
         $this->setRequestExtras($config);
+        $this->setHost($config);
         $this->setPerson($config);
         $this->setServerRoot($config);
         $this->setServerBranch($config);
@@ -226,6 +228,11 @@ class DataBuilder implements DataBuilderInterface
     {
         $fromConfig = $this->tryGet($c, 'baseException');
         $this->baseException = self::$defaults->baseException($fromConfig);
+    }
+
+    protected function setHost($c)
+    {
+        $this->host = $this->tryGet($c, 'host');
     }
 
     /**
@@ -538,7 +545,7 @@ class DataBuilder implements DataBuilderInterface
     protected function getServer()
     {
         $server = new Server();
-        $server->setHost(gethostname())
+        $server->setHost($this->getHost())
             ->setRoot($this->getServerRoot())
             ->setBranch($this->getServerBranch())
             ->setCodeVersion($this->getServerCodeVersion());
@@ -558,6 +565,14 @@ class DataBuilder implements DataBuilderInterface
             $server->argv = $_SERVER['argv'];
         }
         return $server;
+    }
+
+    protected function getHost()
+    {
+        if (isset($this->host)) {
+            return $this->host;
+        }
+        return gethostname();
     }
 
     protected function getServerRoot()
