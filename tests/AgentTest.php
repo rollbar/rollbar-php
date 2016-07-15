@@ -58,6 +58,5 @@ class AgentTest extends \PHPUnit_Framework_TestCase
         }
         reset($objects);
         rmdir($dir);
-
     }
 }
