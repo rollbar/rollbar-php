@@ -11,6 +11,13 @@ use Psr\Log\LogLevel;
 
 class ConfigTest extends \PHPUnit_Framework_TestCase
 {
+    private $error;
+
+    public function setUp()
+    {
+        $this->error = new ErrorWrapper(E_ERROR, "test", null, null, null);
+    }
+
     public function tearDown()
     {
         m::close();
@@ -129,21 +136,21 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             ->andReturn(Level::DEBUG())
             ->mock();
         $debug = new Payload($debugData, $this->token);
-        $this->assertTrue($config->checkIgnored($debug, null, new \Error()));
+        $this->assertTrue($config->checkIgnored($debug, null, new ErrorWrapper()));
 
         $criticalData = m::mock("Rollbar\Payload\Data")
             ->shouldReceive('getLevel')
             ->andReturn(Level::CRITICAL())
             ->mock();
         $critical = new Payload($criticalData, $this->token);
-        $this->assertFalse($config->checkIgnored($critical, null, new \Error()));
+        $this->assertFalse($config->checkIgnored($critical, null, new ErrorWrapper()));
 
         $warningData = m::mock("Rollbar\Payload\Data")
             ->shouldReceive('getLevel')
             ->andReturn(Level::warning())
             ->mock();
         $warning = new Payload($warningData, $this->token);
-        $this->assertFalse($config->checkIgnored($warning, null, new \Error()));
+        $this->assertFalse($config->checkIgnored($warning, null, new ErrorWrapper()));
     }
 
     public function testReportSuppressed()
@@ -171,8 +178,8 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             "environment" => $this->env,
             "filter" => $filter
         ));
-        $this->assertTrue($c->checkIgnored($p, "fake_access_token", new \Error()));
-        $this->assertFalse($c->checkIgnored($p, "fake_access_token", new \Error()));
+        $this->assertTrue($c->checkIgnored($p, "fake_access_token", $this->error));
+        $this->assertFalse($c->checkIgnored($p, "fake_access_token", $this->error));
     }
 
     public function testSender()
@@ -203,7 +210,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         ));
         $data = new Data($this->env, new Body(new Message("test")));
         $data->setLevel(Level::fromName('error'));
-        $c->checkIgnored(new Payload($data, $this->token), $this->token, new \Error());
+        $c->checkIgnored(new Payload($data, $this->token), $this->token, new ErrorWrapper());
 
         $this->assertTrue($called);
     }
