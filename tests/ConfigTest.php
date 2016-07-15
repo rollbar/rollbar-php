@@ -136,21 +136,21 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             ->andReturn(Level::DEBUG())
             ->mock();
         $debug = new Payload($debugData, $this->token);
-        $this->assertTrue($config->checkIgnored($debug, null, new ErrorWrapper()));
+        $this->assertTrue($config->checkIgnored($debug, null, $this->error));
 
         $criticalData = m::mock("Rollbar\Payload\Data")
             ->shouldReceive('getLevel')
             ->andReturn(Level::CRITICAL())
             ->mock();
         $critical = new Payload($criticalData, $this->token);
-        $this->assertFalse($config->checkIgnored($critical, null, new ErrorWrapper()));
+        $this->assertFalse($config->checkIgnored($critical, null, $this->error));
 
         $warningData = m::mock("Rollbar\Payload\Data")
             ->shouldReceive('getLevel')
             ->andReturn(Level::warning())
             ->mock();
         $warning = new Payload($warningData, $this->token);
-        $this->assertFalse($config->checkIgnored($warning, null, new ErrorWrapper()));
+        $this->assertFalse($config->checkIgnored($warning, null, $this->error));
     }
 
     public function testReportSuppressed()
@@ -210,7 +210,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         ));
         $data = new Data($this->env, new Body(new Message("test")));
         $data->setLevel(Level::fromName('error'));
-        $c->checkIgnored(new Payload($data, $this->token), $this->token, new ErrorWrapper());
+        $c->checkIgnored(new Payload($data, $this->token), $this->token, $this->error);
 
         $this->assertTrue($called);
     }
