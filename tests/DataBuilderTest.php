@@ -64,4 +64,47 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
         $this->assertEquals('my host', $output->getServer()->getHost());
     }
+
+    public function testFramesWithoutContext()
+    {
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'include_error_code_context' => false
+        ));
+        $output = $dataBuilder->makeFrames(new \Exception());
+        $this->assertNull($output[0]->getContext());
+    }
+
+    public function testFramesWithContext()
+    {
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'include_error_code_context' => true
+        ));
+        $backTrace = array(
+            array(
+                'file' => __DIR__ . '/DataBuilderTest.php',
+                'line' => 68,
+                'function' => 'testFramesWithoutContext'
+            ),
+            array(
+                'file' => __DIR__ . '/DataBuilderTest.php',
+                'line' => 79,
+                'function' => 'testFramesWithContext'
+            ),
+        );
+        $output = $dataBuilder->makeFrames(new ErrorWrapper(null, null, null, null, $backTrace));
+        $pre = $output[0]->getContext()->getPre();
+        $expected = array(
+            '            \'host\' => \'my host\'',
+            '        ));',
+            '        $output = $dataBuilder->makeData(Level::fromName(\'error\'), "testing", array());',
+            '        $this->assertEquals(\'my host\', $output->getServer()->getHost());',
+            '    }',
+            ''
+        );
+        $this->assertEquals($expected, $pre);
+    }
 }

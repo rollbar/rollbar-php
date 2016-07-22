@@ -1,5 +1,6 @@
 <?php namespace Rollbar;
 
+use Rollbar\Payload\Context;
 use Rollbar\Payload\Message;
 use Rollbar\Payload\Body;
 use Rollbar\Payload\Level;
@@ -39,6 +40,7 @@ class DataBuilder implements DataBuilderInterface
     protected $title;
     protected $notifier;
     protected $baseException;
+    protected $includeCodeContext;
 
     public function __construct($config)
     {
@@ -68,6 +70,7 @@ class DataBuilder implements DataBuilderInterface
         $this->setTitle($config);
         $this->setNotifier($config);
         $this->setBaseException($config);
+        $this->setIncludeCodeContext($config);
     }
 
     protected function getOrCall($name, $level, $toLog, $context)
@@ -230,6 +233,15 @@ class DataBuilder implements DataBuilderInterface
         $this->baseException = self::$defaults->baseException($fromConfig);
     }
 
+    protected function setIncludeCodeContext($c)
+    {
+        $fromConfig = $this->tryGet($c, 'include_error_code_context');
+        $this->includeCodeContext = true;
+        if ($fromConfig != null) {
+            $this->includeCodeContext = $fromConfig;
+        }
+    }
+
     protected function setHost($c)
     {
         $this->host = $this->tryGet($c, 'host');
@@ -329,19 +341,53 @@ class DataBuilder implements DataBuilderInterface
     public function makeFrames($exception)
     {
         $frames = array();
-        foreach ($this->getTrace($exception) as $frame) {
-            $filename = Utilities::coalesce($this->tryGet($frame, 'file'), '<internal>');
-            $lineno = Utilities::coalesce($this->tryGet($frame, 'line'), 0);
-            $method = $frame['function'];
+        foreach ($this->getTrace($exception) as $frameInfo) {
+            $filename = Utilities::coalesce($this->tryGet($frameInfo, 'file'), '<internal>');
+            $lineno = Utilities::coalesce($this->tryGet($frameInfo, 'line'), 0);
+            $method = $frameInfo['function'];
             // TODO 4 (arguments are in $frame)
-            // TODO 5 Code Context
+
             $frame = new Frame($filename);
             $frame->setLineno($lineno)
                 ->setMethod($method);
+
+            if ($this->includeCodeContext) {
+                $this->addCodeContextToFrame($frame, $filename, $lineno);
+            }
+
             $frames[] = $frame;
         }
         array_reverse($frames);
         return $frames;
+    }
+
+    private function addCodeContextToFrame(Frame $frame, $filename, $line)
+    {
+        if (!file_exists($filename)) {
+            return;
+        }
+
+        $source = explode(PHP_EOL, file_get_contents($filename));
+        if (!is_array($source)) {
+            return;
+        }
+
+        $source = str_replace(array("\n", "\t", "\r"), '', $source);
+        $total = count($source);
+        $line = $line - 1;
+        $frame->setCode($source[$line]);
+        $offset = 6;
+        $min = max($line - $offset, 0);
+        $pre = null;
+        $post = null;
+        if ($min !== $line) {
+            $pre = array_slice($source, $min, $line - $min);
+        }
+        $max = min($line + $offset, $total);
+        if ($max !== $line) {
+            $post = array_slice($source, $line + 1, $max - $line);
+        }
+        $frame->setContext(new Context($pre, $post));
     }
 
     private function getTrace($exc)
