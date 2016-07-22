@@ -36,6 +36,8 @@ class Config
     private $error_sample_rates = array();
     private $mt_randmax;
 
+    private $included_errno = E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR;
+
     public function __construct(array $configArray)
     {
         $this->updateConfig($configArray);
@@ -88,6 +90,10 @@ class Config
         $this->setSender($c);
         $this->setResponseHandler($c);
         $this->setCheckIgnoreFunction($c);
+
+        if (isset($c['included_errno'])) {
+            $this->included_errno = $c['included_errno'];
+        }
     }
 
     private function setAccessToken($c)
@@ -272,6 +278,12 @@ class Config
 
         if ($toLog instanceof ErrorWrapper) {
             $errno = $toLog->errorLevel;
+
+            if ($this->included_errno != -1 && ($errno & $this->included_errno) != $errno) {
+                // ignore
+                return true;
+            }
+
             if (isset($this->error_sample_rates[$errno])) {
                 // get a float in the range [0, 1)
                 // mt_rand() is inclusive, so add 1 to mt_randmax

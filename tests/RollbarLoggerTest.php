@@ -43,4 +43,15 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
         $response = $l->log(null, new ErrorWrapper(E_ERROR, '', null, null, array()), array());
         $this->assertEquals(0, $response->getStatus());
     }
+
+    public function testIncludedErrNo()
+    {
+        $l = new RollbarLogger(array(
+            "access_token" => "ad865e76e7fb496fab096ac07b1dbabb",
+            "environment" => "testing-php",
+            "included_errno" => E_ERROR | E_WARNING
+        ));
+        $response = $l->log(null, new ErrorWrapper(E_USER_ERROR, '', null, null, array()), array());
+        $this->assertEquals(0, $response->getStatus());
+    }
 }
