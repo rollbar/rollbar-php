@@ -3,6 +3,13 @@
 use Rollbar\Payload\Payload;
 use Rollbar\Payload\Level;
 
+if (!defined('ROLLBAR_INCLUDED_ERRNO_BITMASK')) {
+    define(
+        'ROLLBAR_INCLUDED_ERRNO_BITMASK',
+        E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR
+    );
+}
+
 class Config
 {
     private $accessToken;
@@ -36,7 +43,7 @@ class Config
     private $error_sample_rates = array();
     private $mt_randmax;
 
-    private $included_errno = E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR;
+    private $included_errno = ROLLBAR_INCLUDED_ERRNO_BITMASK;
 
     public function __construct(array $configArray)
     {
