@@ -122,6 +122,9 @@ class DataBuilder implements DataBuilderInterface
     protected function setScrubFields($config)
     {
         $fromConfig = $this->tryGet($config, 'scrubFields');
+        if (!isset($fromConfig)) {
+            $fromConfig = $this->tryGet($config, 'scrub_fields');
+        }
         $this->scrubFields = self::$defaults->scrubFields($fromConfig);
     }
 
@@ -184,6 +187,9 @@ class DataBuilder implements DataBuilderInterface
     protected function setServerRoot($c)
     {
         $fromConfig = $this->tryGet($c, 'serverRoot');
+        if (!isset($fromConfig)) {
+            $fromConfig = $this->tryGet($c, 'root');
+        }
         $this->serverRoot = self::$defaults->serverRoot($fromConfig);
     }
 
@@ -733,9 +739,9 @@ class DataBuilder implements DataBuilderInterface
             return null;
         }
 
-        $scrubber = function ($key, &$val) use ($fields, $replacement, $arr) {
+        $scrubber = function (&$val, $key) use ($fields, $replacement, $arr) {
 
-            if (in_array($key, $arr)) {
+            if (key_exists($key, $arr)) {
                 $val = str_repeat($replacement, 8);
             }
         };

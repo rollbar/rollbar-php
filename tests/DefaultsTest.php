@@ -7,6 +7,9 @@ use Psr\Log\LogLevel;
 
 class DefaultsTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var Defaults
+     */
     private $d;
 
     public function setUp()

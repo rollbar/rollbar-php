@@ -138,6 +138,9 @@ class Data implements \JsonSerializable
         return $this;
     }
 
+    /**
+     * @return Request
+     */
     public function getRequest()
     {
         return $this->request;

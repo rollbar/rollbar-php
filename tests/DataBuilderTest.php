@@ -137,4 +137,27 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
         $this->assertEquals('test@test.com', $output->getPerson()->getEmail());
     }
+
+    public function testRoot()
+    {
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'root' => '/var/www/app'
+        ));
+        $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
+        $this->assertEquals('/var/www/app', $output->getServer()->getRoot());
+    }
+
+    public function testScrubFields()
+    {
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'scrub_fields' => array('test')
+        ));
+        $_POST['test'] = 'blah';
+        $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
+        $this->assertEquals('********', $output->getRequest()->getPost()['test']);
+    }
 }
