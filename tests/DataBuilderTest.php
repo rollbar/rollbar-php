@@ -158,6 +158,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         ));
         $_POST['test'] = 'blah';
         $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
-        $this->assertEquals('********', $output->getRequest()->getPost()['test']);
+        $post = $output->getRequest()->getPost();
+        $this->assertEquals('********', $post['test']);
     }
 }
