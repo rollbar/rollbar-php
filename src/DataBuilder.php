@@ -4,6 +4,7 @@ use Rollbar\Payload\Context;
 use Rollbar\Payload\Message;
 use Rollbar\Payload\Body;
 use Rollbar\Payload\Level;
+use Rollbar\Payload\Person;
 use Rollbar\Payload\Server;
 use Rollbar\Payload\Request;
 use Rollbar\Payload\Data;
@@ -31,6 +32,7 @@ class DataBuilder implements DataBuilderInterface
     protected $requestExtras;
     protected $host;
     protected $person;
+    protected $personFunc;
     protected $serverRoot;
     protected $serverBranch;
     protected $serverCodeVersion;
@@ -61,6 +63,7 @@ class DataBuilder implements DataBuilderInterface
         $this->setRequestExtras($config);
         $this->setHost($config);
         $this->setPerson($config);
+        $this->setPersonFunc($config);
         $this->setServerRoot($config);
         $this->setServerBranch($config);
         $this->setServerCodeVersion($config);
@@ -171,6 +174,11 @@ class DataBuilder implements DataBuilderInterface
     protected function setPerson($c)
     {
         $this->person = $this->tryGet($c, 'person');
+    }
+
+    protected function setPersonFunc($c)
+    {
+        $this->personFunc = $this->tryGet($c, 'person_fn');
     }
 
     protected function setServerRoot($c)
@@ -583,9 +591,34 @@ class DataBuilder implements DataBuilderInterface
         return $this->requestExtras;
     }
 
+    /**
+     * @return Person
+     */
     protected function getPerson()
     {
-        return $this->person;
+        $personData = $this->person;
+        if (!isset($personData) && is_callable($this->personFunc)) {
+            $personData = call_user_func($this->personFunc);
+        }
+
+        if (!isset($personData['id'])) {
+            return null;
+        }
+
+        $id = $personData['id'];
+
+        $email = null;
+        if (isset($personData['email'])) {
+            $email = $personData['email'];
+        }
+
+        $username = null;
+        if (isset($personData['username'])) {
+            $username = $personData['username'];
+        }
+
+        unset($personData['id'], $personData['email'], $personData['username']);
+        return new Person($id, $username, $email, $personData);
     }
 
     protected function getServer()

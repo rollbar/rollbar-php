@@ -149,6 +149,9 @@ class Data implements \JsonSerializable
         return $this;
     }
 
+    /**
+     * @return Person
+     */
     public function getPerson()
     {
         return $this->person;

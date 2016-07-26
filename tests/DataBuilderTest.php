@@ -107,4 +107,34 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals($expected, $pre);
     }
+
+    public function testPerson()
+    {
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'person' => array(
+                'id' => '123',
+                'email' => 'test@test.com'
+            )
+        ));
+        $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
+        $this->assertEquals('test@test.com', $output->getPerson()->getEmail());
+    }
+
+    public function testPersonFunc()
+    {
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'person_fn' => function () {
+                return array(
+                    'id' => '123',
+                    'email' => 'test@test.com'
+                );
+            }
+        ));
+        $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
+        $this->assertEquals('test@test.com', $output->getPerson()->getEmail());
+    }
 }
