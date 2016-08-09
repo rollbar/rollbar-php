@@ -52,7 +52,7 @@ class BackwardsCompatibilityConfigTest extends \PHPUnit_Framework_TestCase
             'scrub_fields' => array('test'),
             'shift_function' => false,
             'timeout' => 10,
-            'report_suppresed' => true,
+            'report_suppressed' => true,
             'use_error_reporting' => true,
             'proxy' => array(
                 'address' => '127.0.0.1:8080',

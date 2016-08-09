@@ -146,6 +146,9 @@ class Config
     private function setReportSuppressed($c)
     {
         $this->reportSuppressed = isset($c['reportSuppressed']) && $c['reportSuppressed'];
+        if (!isset($this->reportSuppressed)) {
+            $this->reportSuppressed = isset($c['report_suppressed']) && $c['report_suppressed'];
+        }
     }
 
     private function setFilters($c)
@@ -160,6 +163,14 @@ class Config
 
         if (array_key_exists('base_api_url', $c)) {
             $c['senderOptions']['endpoint'] = $c['base_api_url'];
+        }
+
+        if (array_key_exists('timeout', $c)) {
+            $c['senderOptions']['timeout'] = $c['timeout'];
+        }
+
+        if (array_key_exists('proxy', $c)) {
+            $c['senderOptions']['proxy'] = $c['proxy'];
         }
 
         if (array_key_exists('handler', $c) && $c['handler'] == 'agent') {
@@ -270,7 +281,7 @@ class Config
 
     public function checkIgnored($payload, $accessToken, $toLog)
     {
-        if ($this->shouldSupppress()) {
+        if ($this->shouldSuppress()) {
             return true;
         }
         if (isset($this->checkIgnore) && call_user_func($this->checkIgnore)) {
@@ -313,7 +324,7 @@ class Config
         return $payload->getData()->getLevel()->toInt() < $this->minimumLevel;
     }
 
-    private function shouldSupppress()
+    private function shouldSuppress()
     {
         return error_reporting() === 0 && !$this->reportSuppressed;
     }

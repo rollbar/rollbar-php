@@ -43,6 +43,7 @@ class DataBuilder implements DataBuilderInterface
     protected $notifier;
     protected $baseException;
     protected $includeCodeContext;
+    protected $shiftFunction;
 
     public function __construct($config)
     {
@@ -74,6 +75,11 @@ class DataBuilder implements DataBuilderInterface
         $this->setNotifier($config);
         $this->setBaseException($config);
         $this->setIncludeCodeContext($config);
+
+        $this->shiftFunction = $this->tryGet($config, 'shift_function');
+        if (!isset($this->shiftFunction)) {
+            $this->shiftFunction = true;
+        }
     }
 
     protected function getOrCall($name, $level, $toLog, $context)
@@ -372,6 +378,14 @@ class DataBuilder implements DataBuilderInterface
             $frames[] = $frame;
         }
         array_reverse($frames);
+
+        if ($this->shiftFunction && count($frames) > 0) {
+            for ($i = count($frames) - 1; $i > 0; $i--) {
+                $frames[$i]->setMethod($frames[$i - 1]->getMethod());
+            }
+            $frames[0]->setMethod('<main>');
+        }
+
         return $frames;
     }
 
