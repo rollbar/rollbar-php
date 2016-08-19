@@ -17,7 +17,7 @@ class UtilitiesTest extends \PHPUnit_Framework_TestCase
             array("PHPUnit_Framework_TestCase", "php_unit_framework_test_case"),
         );
         foreach ($toTest as $vals) {
-            $this->assertEquals($vals[1], Utilities::pascaleToCamel($vals[0]));
+            $this->assertEquals($vals[1], Utilities::pascalToCamel($vals[0]));
         }
     }
 

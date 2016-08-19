@@ -7,6 +7,6 @@ abstract class ContentInterface implements \JsonSerializable
     public function getKey()
     {
         $className = str_replace("Rollbar\\Payload\\", "", get_class($this));
-        return Utilities::pascaleToCamel($className);
+        return Utilities::pascalToCamel($className);
     }
 }

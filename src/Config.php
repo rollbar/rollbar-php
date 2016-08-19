@@ -127,7 +127,7 @@ class Config
 
     private function setMinimumLevel($c)
     {
-        if (!isset($c['minimumLevel']) || is_null($c['minimumLevel'])) {
+        if (empty($c['minimumLevel'])) {
             $this->minimumLevel = 0;
         } elseif ($c['minimumLevel'] instanceof Level) {
             $this->minimumLevel = $c['minimumLevel']->toInt();

@@ -23,7 +23,7 @@ final class Utilities
     }
 
     // Modified from: http://stackoverflow.com/a/1176023/456188
-    public static function pascaleToCamel($input)
+    public static function pascalToCamel($input)
     {
         $s1 = preg_replace('/([^_])([A-Z][a-z]+)/', '$1_$2', $input);
         return strtolower(preg_replace('/([a-z0-9])([A-Z])/', '$1_$2', $s1));
@@ -107,7 +107,7 @@ final class Utilities
             }
             $newKey = array_key_exists($key, $overrideNames)
                 ? $overrideNames[$key]
-                : Utilities::pascaleToCamel($key);
+                : Utilities::pascalToCamel($key);
             if (in_array($key, $customKeys)) {
                 $returnVal[$key] = $val;
             } elseif (!is_null($val)) {
