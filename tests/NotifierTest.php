@@ -17,11 +17,11 @@ class NotifierTest extends \PHPUnit_Framework_TestCase
 
     public function testVersion()
     {
-        $version = "1.0.0";
+        $version = Notifier::VERSION;
         $notifier = new Notifier("PHP-Rollbar", $version);
         $this->assertEquals($version, $notifier->getVersion());
 
-        $version2 = "1.0.1";
+        $version2 = "0.9";
         $this->assertEquals($version2, $notifier->setVersion($version2)->getVersion());
     }
 
@@ -29,6 +29,6 @@ class NotifierTest extends \PHPUnit_Framework_TestCase
     {
         $notifier = Notifier::defaultNotifier();
         $encoded = json_encode($notifier->jsonSerialize());
-        $this->assertEquals('{"name":"rollbar-php","version":"1.0.0"}', $encoded);
+        $this->assertEquals('{"name":"rollbar-php","version":"1.0.0-beta"}', $encoded);
     }
 }
