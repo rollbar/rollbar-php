@@ -105,8 +105,8 @@ class Config
 
     private function setAccessToken($c)
     {
-        if (isset($_ENV['ROLLBAR_ACCESS_TOKEN']) && !isset($config['access_token'])) {
-            $config['access_token'] = $_ENV['ROLLBAR_ACCESS_TOKEN'];
+        if (isset($_ENV['ROLLBAR_ACCESS_TOKEN']) && !isset($c['access_token'])) {
+            $c['access_token'] = $_ENV['ROLLBAR_ACCESS_TOKEN'];
         }
         Utilities::validateString($c['access_token'], "config['access_token']", 32, false);
         $this->accessToken = $c['access_token'];

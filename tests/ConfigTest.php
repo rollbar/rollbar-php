@@ -35,6 +35,15 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->token, $config->getAccessToken());
     }
 
+    public function testAccessTokenFromEnvironment()
+    {
+        $_ENV['ROLLBAR_ACCESS_TOKEN'] = $this->token;
+        $config = new Config(array(
+            'environment' => 'testing'
+        ));
+        $this->assertEquals($this->token, $config->getAccessToken());
+    }
+
     public function testDataBuilder()
     {
         $arr = array(
