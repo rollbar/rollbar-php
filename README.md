@@ -1,10 +1,36 @@
+---
+layout: page
+sidebar: rollbar_sidebar
+permalink: /notifiers/rollbar-php/
+toc: false
+---
 # Rollbar notifier for PHP [![Build Status](https://travis-ci.org/rollbar/rollbar-php.png?branch=v0.15.0)](https://travis-ci.org/rollbar/rollbar-php)
 
 <!-- RemoveNext -->
 
 This library detects errors and exceptions in your application and reports them to [Rollbar](https://rollbar.com) for alerts, reporting, and analysis.
 
-<!-- Sub:[TOC] -->
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+##Table of Contents
+
+- [Quick start](#quick-start)
+- [Installation](#installation)
+  - [General](#general)
+  - [If Using Composer](#if-using-composer)
+- [Setup](#setup)
+  - [For Heroku Users](#for-heroku-users)
+- [Basic Usage](#basic-usage)
+- [Batching](#batching)
+- [Using Monolog](#using-monolog)
+- [Configuration](#configuration)
+  - [Asynchronous Reporting](#asynchronous-reporting)
+  - [Configuration reference](#configuration-reference)
+- [Related projects](#related-projects)
+- [Help / Support](#help--support)
+- [Contributing](#contributing)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Quick start
 
@@ -41,7 +67,8 @@ throw new Exception('test 2');
 
 ### General
 
-Download [rollbar.php](https://raw.github.com/rollbar/rollbar-php/master/src/rollbar.php) and put it somewhere you can access.
+Download [rollbar.php](https://raw.github.com/rollbar/rollbar-php/master/src/rollbar.php) and [Level.php](https://raw.githubusercontent.com/rollbar/rollbar-php/master/src/Level.php)
+and put them together somewhere you can access.
 
 ### If Using Composer
 
@@ -50,7 +77,7 @@ Add `rollbar/rollbar` to your `composer.json`:
 ```json
 {
     "require": {
-        "rollbar/rollbar": "~0.15.0"
+        "rollbar/rollbar": "~0.18.0"
     }
 }
 ```
@@ -147,6 +174,28 @@ For example, if using Laravel, add the above line to your `App::after()` event h
 
 You can also tune the max batch size or disable batching altogether. See the `batch_size` and `batched` config variables, documented below.
 
+## Using Monolog
+
+Here is an example of how to use Rollbar as a handler for Monolog:
+
+```
+use Monolog\Logger;
+use Monolog\Handler\RollbarHandler;
+
+$config = array('access_token' => 'POST_SERVER_ITEM_ACCESS_TOKEN');
+
+// installs global error and exception handlers
+Rollbar::init($config);
+
+$log = new Logger('test');
+$log->pushHandler(new RollbarHandler(Rollbar::$instance));
+
+try {
+    throw new Exception('exception for monolog');
+} catch (Exception $e) {
+    $log->error($e);
+}
+```
 
 ## Configuration
 
@@ -211,10 +260,43 @@ Default: `master`
 Default: `true`
   </dd>
 
+  <dt>checkIgnore</dt>
+  <dd>Function called before sending payload to Rollbar, return true to stop the error from being sent to Rollbar.
+
+Default: `null`
+<br/>
+Parameters:
+* $isUncaught: boolean value set to true if the error was an uncaught exception.
+* $exception: a RollbarException instance that will allow you to get the message or exception
+* $payload: an array containing the payload as it will be sent to Rollbar. Payload schema can be found at https://rollbar.com/docs/api/items_post/
+<br/>
+```
+$config = array(
+    'access_token' => '...',
+    'checkIgnore' => function ($isUncaught, $exception, $payload) {
+        if (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Baiduspider') !== false) {
+          // ignore baidu spider
+          return true;
+        }
+
+        // no other ignores
+        return false;
+    }; 
+);
+Rollbar::init($config);
+```
+  </dd>
+
   <dt>code_version</dt>
   <dd>The currently-deployed version of your code/application (e.g. a Git SHA). Should be a string.
 
 Default: `null`
+  </dd>
+  
+  <dt>enable_utf8_sanitization</dt>
+  <dd>set to false, to disable running iconv on the payload, may be needed if there is invalid characters, and the payload is being destroyed
+  
+Default: `true`
   </dd>
 
   <dt>environment</dt>
@@ -278,7 +360,7 @@ Default: (E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOVE
   </dd>
 
   <dt>scrub_fields</dt>
-  <dd>Array of field names to scrub out of _POST and _SESSION. Values will be replaced with asterisks. If overridiing, make sure to list all fields you want to scrub, not just fields you want to add to the default. Param names are converted to lowercase before comparing against the scrub list.
+  <dd>Array of field names to scrub out of _POST and _SESSION. Values will be replaced with asterisks. If overriding, make sure to list all fields you want to scrub, not just fields you want to add to the default. Param names are converted to lowercase before comparing against the scrub list.
 
 Default: `('passwd', 'password', 'secret', 'confirm_password', 'password_confirmation', 'auth_token', 'csrf_token')`
   </dd>
