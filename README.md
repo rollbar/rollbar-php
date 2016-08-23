@@ -67,7 +67,7 @@ throw new Exception('test 2');
 
 ### General
 
-Download [rollbar.php](https://raw.github.com/rollbar/rollbar-php/master/src/rollbar.php) and [Level.php](https://raw.githubusercontent.com/rollbar/rollbar-php/master/src/Level.php)
+Download [rollbar.php](https://raw.githubusercontent.com/rollbar/rollbar-php/v0.18.2/src/rollbar.php) and [Level.php](https://raw.githubusercontent.com/rollbar/rollbar-php/v0.18.2/src/Level.php)
 and put them together somewhere you can access.
 
 ### If Using Composer
