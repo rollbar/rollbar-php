@@ -82,6 +82,19 @@ Add `rollbar/rollbar` to your `composer.json`:
 }
 ```
 
+### Upcoming release
+
+If you'd like to run the next release of rollbar-php, you can use it via composer by adding the following to
+your `composer.json`
+
+```json
+{
+    "require": {
+        "rollbar/rollbar": "~1.0.0-beta"
+    }
+}
+```
+
 ## Setup
 
 Add the following code at your application's entry point:
