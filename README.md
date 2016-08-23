@@ -82,7 +82,7 @@ Add `rollbar/rollbar` to your `composer.json`:
 }
 ```
 
-### Upcoming release
+### Upcoming Release
 
 If you'd like to run the next release of rollbar-php, you can use it via composer by adding the following to
 your `composer.json`
