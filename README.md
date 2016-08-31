@@ -1,9 +1,3 @@
----
-layout: page
-sidebar: rollbar_sidebar
-permalink: /notifiers/rollbar-php/
-toc: false
----
 # Rollbar notifier for PHP [![Build Status](https://travis-ci.org/rollbar/rollbar-php.png?branch=v0.15.0)](https://travis-ci.org/rollbar/rollbar-php)
 
 <!-- RemoveNext -->
@@ -233,57 +227,65 @@ You'll also need to run the agent. See the [rollbar-agent docs](https://github.c
 All of the following options can be passed as keys in the `$config` array.
 
   <dl>
-  <dt>access_token</dt>
-  <dd>Your project access token.
-  </dd>
+<dt>access_token
+</dt>
+<dd>Your project access token.
+</dd>
 
-  <dt>agent_log_location</dt>
-  <dd>Path to the directory where agent relay log files should be written. Should not include final slash. Only used when handler is `agent`.
+<dt>agent_log_location
+</dt>
+<dd>Path to the directory where agent relay log files should be written. Should not include final slash. Only used when handler is `agent`.
 
 Default: `/var/www`
-  </dd>
+</dd>
 
-  <dt>base_api_url</dt>
-  <dd>The base api url to post to.
+<dt>base_api_url
+</dt>
+<dd>The base api url to post to.
 
 Default: `https://api.rollbar.com/api/1/`
-  </dd>
+</dd>
 
-  <dt>batch_size</dt>
-  <dd>Flush batch early if it reaches this size.
+<dt>batch_size
+</dt>
+<dd>Flush batch early if it reaches this size.
 
 Default: `50`
-  </dd>
+</dd>
 
-  <dt>batched</dt>
-  <dd>True to batch all reports from a single request together.
+<dt>batched
+</dt>
+<dd>True to batch all reports from a single request together.
 
 Default: `true`
-  </dd>
+</dd>
 
-  <dt>branch</dt>
-  <dd>Name of the current branch.
+<dt>branch
+</dt>
+<dd>Name of the current branch.
 
 Default: `master`
-  </dd>
+</dd>
 
-  <dt>capture_error_stacktraces</dt>
-  <dd>Record full stacktraces for PHP errors.
+<dt>capture_error_stacktraces
+</dt>
+<dd>Record full stacktraces for PHP errors.
 
 Default: `true`
-  </dd>
+</dd>
 
-  <dt>checkIgnore</dt>
-  <dd>Function called before sending payload to Rollbar, return true to stop the error from being sent to Rollbar.
+<dt>checkIgnore
+</dt>
+<dd>Function called before sending payload to Rollbar, return true to stop the error from being sent to Rollbar.
 
 Default: `null`
-<br/>
+
 Parameters:
 * $isUncaught: boolean value set to true if the error was an uncaught exception.
 * $exception: a RollbarException instance that will allow you to get the message or exception
 * $payload: an array containing the payload as it will be sent to Rollbar. Payload schema can be found at https://rollbar.com/docs/api/items_post/
-<br/>
-```
+
+```php
 $config = array(
     'access_token' => '...',
     'checkIgnore' => function ($isUncaught, $exception, $payload) {
@@ -294,116 +296,133 @@ $config = array(
 
         // no other ignores
         return false;
-    }; 
+    };
 );
 Rollbar::init($config);
 ```
-  </dd>
 
-  <dt>code_version</dt>
-  <dd>The currently-deployed version of your code/application (e.g. a Git SHA). Should be a string.
+</dd>
+
+<dt>code_version
+</dt>
+<dd>The currently-deployed version of your code/application (e.g. a Git SHA). Should be a string.
 
 Default: `null`
-  </dd>
-  
-  <dt>enable_utf8_sanitization</dt>
-  <dd>set to false, to disable running iconv on the payload, may be needed if there is invalid characters, and the payload is being destroyed
-  
-Default: `true`
-  </dd>
+</dd>
 
-  <dt>environment</dt>
-  <dd>Environment name, e.g. `'production'` or `'development'`
+<dt>enable_utf8_sanitization
+</dt>
+<dd>set to false, to disable running iconv on the payload, may be needed if there is invalid characters, and the payload is being destroyed
+
+Default: `true`
+</dd>
+
+<dt>environment
+</dt>
+<dd>Environment name, e.g. `'production'` or `'development'`
 
 Default: `'production'`
-  </dd>
+</dd>
 
-  <dt>error_sample_rates</dt>
-  <dd>Associative array mapping error numbers to sample rates. Sample rates are ratio out of 1, e.g. 0 is "never report", 1 is "always report", and 0.1 is "report 10% of the time". Sampling is done on a per-error basis.
+<dt>error_sample_rates
+</dt>
+<dd>Associative array mapping error numbers to sample rates. Sample rates are ratio out of 1, e.g. 0 is "never report", 1 is "always report", and 0.1 is "report 10% of the time". Sampling is done on a per-error basis.
 
 Default: empty array, meaning all errors are reported.
-  </dd>
+</dd>
 
-  <dt>handler</dt>
-  <dd>Either `'blocking'` or `'agent'`. `'blocking'` uses curl to send requests immediately; `'agent'` writes a relay log to be consumed by [rollbar-agent](https://github.com/rollbar/rollbar-agent).
+<dt>handler
+</dt>
+<dd>Either `'blocking'` or `'agent'`. `'blocking'` uses curl to send requests immediately; `'agent'` writes a relay log to be consumed by [rollbar-agent](https://github.com/rollbar/rollbar-agent).
 
 Default: `'blocking'`
-  </dd>
+</dd>
 
-  <dt>host</dt>
-  <dd>Server hostname.
+<dt>host
+</dt>
+<dd>Server hostname.
 
 Default: `null`, which will result in a call to `gethostname()` (or `php_uname('n')` if that function does not exist)
-  </dd>
+</dd>
 
-  <dt>include_error_code_context</dt>
-  <dd>A boolean that indicates you wish to gather code context for instances of PHP Errors.
-    This can take a while because it requires reading the file from disk, so it's off by default.
+<dt>include_error_code_context
+</dt>
+<dd>A boolean that indicates you wish to gather code context for instances of PHP Errors.
+This can take a while because it requires reading the file from disk, so it's off by default.
 
-Default: false
-  </dd>
+Default: `false`
+</dd>
 
-  <dt>include_exception_code_context</dt>
-  <dd>A boolean that indicates you wish to gather code context for instances of PHP Exeptions.
-    This can take a while because it requires reading the file from disk, so it's off by default.
+<dt>include_exception_code_context
+</dt>
+<dd>A boolean that indicates you wish to gather code context for instances of PHP Exceptions.
+This can take a while because it requires reading the file from disk, so it's off by default.
 
-Default: false
-  </dd>
+Default: `false`
+</dd>
 
-  <dt>included_errno</dt>
-  <dd>A bitmask that includes all of the error levels to report. E.g. (E_ERROR | E_WARNING) to only report E_ERROR and E_WARNING errors. This will be used in combination with `error_reporting()` to prevent reporting of errors if `use_error_reporting` is set to `true`.
+<dt>included_errno
+</dt>
+<dd>A bitmask that includes all of the error levels to report. E.g. (E_ERROR \| E_WARNING) to only report E_ERROR and E_WARNING errors. This will be used in combination with `error_reporting()` to prevent reporting of errors if `use_error_reporting` is set to `true`.
 
-Default: (E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR)
-  </dd>
+Default: `(E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR)`
+</dd>
 
-  <dt>logger</dt>
-  <dd>An object that has a `log($level, $message)` method. If provided, will be used by RollbarNotifier to log messages.
-  </dd>
+<dt>logger
+</dt>
+<dd>An object that has a `log($level, $message)` method. If provided, will be used by RollbarNotifier to log messages.
+</dd>
 
-  <dt>person</dt>
-  <dd>An associative array containing data about the currently-logged in user. Required: `id`, optional: `username`, `email`. All values are strings.
-  </dd>
+<dt>person
+</dt>
+<dd>An associative array containing data about the currently-logged in user. Required: `id`, optional: `username`, `email`. All values are strings.
+</dd>
 
-  <dt>person_fn</dt>
-  <dd>A function reference (string, etc. - anything that [call_user_func()](http://php.net/call_user_func) can handle) returning an array like the one for 'person'.
-  </dd>
+<dt>person_fn
+</dt>
+<dd>A function reference (string, etc. - anything that [call_user_func()](http://php.net/call_user_func) can handle) returning an array like the one for 'person'.
+</dd>
 
-  <dt>root</dt>
-  <dd>Path to your project's root dir
-  </dd>
+<dt>root
+</dt>
+<dd>Path to your project's root dir
+</dd>
 
-  <dt>scrub_fields</dt>
-  <dd>Array of field names to scrub out of _POST and _SESSION. Values will be replaced with asterisks. If overriding, make sure to list all fields you want to scrub, not just fields you want to add to the default. Param names are converted to lowercase before comparing against the scrub list.
+<dt>scrub_fields
+</dt>
+<dd>Array of field names to scrub out of \_POST and \_SESSION. Values will be replaced with asterisks. If overriding, make sure to list all fields you want to scrub, not just fields you want to add to the default. Param names are converted to lowercase before comparing against the scrub list.
 
 Default: `('passwd', 'password', 'secret', 'confirm_password', 'password_confirmation', 'auth_token', 'csrf_token')`
-  </dd>
+</dd>
 
-  <dt>shift_function</dt>
-  <dd>Whether to shift function names in stack traces down one frame, so that the function name correctly reflects the context of each frame.
+<dt>shift_function
+</dt>
+<dd>Whether to shift function names in stack traces down one frame, so that the function name correctly reflects the context of each frame.
 
 Default: `true`
-  </dd>
+</dd>
 
-  <dt>timeout</dt>
-  <dd>Request timeout for posting to rollbar, in seconds.
+<dt>timeout
+</dt>
+<dd>Request timeout for posting to rollbar, in seconds.
 
 Default: `3`
-  </dd>
+</dd>
 
-  <dt>report_suppressed</dt>
-  <dd>Sets whether errors suppressed with '@' should be reported or not
-
-Default: `false`
-  </dd>
-
-  <dt>use_error_reporting</dt>
-  <dd>Sets whether to respect current `error_reporting()` level or not
+<dt>report_suppressed</dt>
+<dd>Sets whether errors suppressed with '@' should be reported or not
 
 Default: `false`
-  </dd>
+</dd>
 
-  <dt>proxy</dt>
-  <dd>Send data via a proxy server.
+<dt>use_error_reporting</dt>
+<dd>Sets whether to respect current `error_reporting()` level or not
+
+Default: `false`
+</dd>
+
+<dt>proxy</dt>
+<dd>Send data via a proxy server.
 
 E.g. Using a local proxy with no authentication
 
@@ -426,11 +445,12 @@ $config['proxy'] = array(
 ```
 
 Default: No proxy
-  </dd>
+</dd>
 
-  </dl>
+</dl>
 
 Example use of error_sample_rates:
+
 ```php
 <?php
 $config['error_sample_rates'] = array(
@@ -445,6 +465,7 @@ $config['error_sample_rates'] = array(
 ```
 
 Example use of person_fn:
+
 ```php
 <?php
 function get_current_user() {
