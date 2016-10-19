@@ -482,14 +482,20 @@ class DataBuilder implements DataBuilderInterface
         $scrubFields = $this->getScrubFields();
         $request = new Request();
         $request->setUrl($this->getUrl($scrubFields))
-            ->setMethod($this->tryGet($_SERVER, 'REQUEST_METHOD'))
             ->setHeaders($this->getScrubbedHeaders($scrubFields))
             ->setParams($this->getRequestParams())
-            ->setGet(self::scrub($_GET, $scrubFields))
-            ->setQueryString(self::scrubUrl($this->tryGet($_SERVER, "QUERY_STRING"), $scrubFields))
-            ->setPost(self::scrub($_POST, $scrubFields))
             ->setBody($this->getRequestBody())
             ->setUserIp($this->getUserIp());
+        if (isset($_SERVER)) {
+            $request->setMethod($this->tryGet($_SERVER, 'REQUEST_METHOD'))
+                ->setQueryString(self::scrubUrl($this->tryGet($_SERVER, "QUERY_STRING"), $scrubFields));
+        }
+        if (isset($_GET)) {
+            $request->setGet(self::scrub($_GET, $scrubFields));
+        }
+        if (isset($_POST)) {
+            $request->setPost(self::scrub($_POST, $scrubFields));
+        }
         $extras = $this->getRequestExtras();
         if (!$extras) {
             $extras = array();
@@ -501,7 +507,7 @@ class DataBuilder implements DataBuilderInterface
                 $request->$key = $val;
             }
         }
-        if (is_array($_SESSION) && count($_SESSION) > 0) {
+        if (isset($_SESSION) && is_array($_SESSION) && count($_SESSION) > 0) {
             $request->session = self::scrub($_SESSION, $scrubFields);
         }
         return $request;
@@ -538,13 +544,15 @@ class DataBuilder implements DataBuilderInterface
             $port = 80;
         }
 
-        $path = Utilities::coalesce($this->tryGet($_SERVER, 'REQUEST_URI'), '/');
         $url = $proto . '://' . $host;
         if (($proto == 'https' && $port != 443) || ($proto == 'http' && $port != 80)) {
             $url .= ':' . $port;
         }
 
-        $url .= $path;
+        if (isset($_SERVER)) {
+            $path = Utilities::coalesce($this->tryGet($_SERVER, 'REQUEST_URI'), '/');
+            $url .= $path;
+        }
 
         if ($host == 'unknown') {
             $url = null;
@@ -562,16 +570,18 @@ class DataBuilder implements DataBuilderInterface
     protected function getHeaders()
     {
         $headers = array();
-        foreach ($_SERVER as $key => $val) {
-            if (substr($key, 0, 5) == 'HTTP_') {
-                // convert HTTP_CONTENT_TYPE to Content-Type, HTTP_HOST to Host, etc.
-                $name = strtolower(substr($key, 5));
-                if (strpos($name, '_') != -1) {
-                    $name = preg_replace('/ /', '-', ucwords(preg_replace('/_/', ' ', $name)));
-                } else {
-                    $name = ucfirst($name);
+        if (isset($_SERVER)) {
+            foreach ($_SERVER as $key => $val) {
+                if (substr($key, 0, 5) == 'HTTP_') {
+                    // convert HTTP_CONTENT_TYPE to Content-Type, HTTP_HOST to Host, etc.
+                    $name = strtolower(substr($key, 5));
+                    if (strpos($name, '_') != -1) {
+                        $name = preg_replace('/ /', '-', ucwords(preg_replace('/_/', ' ', $name)));
+                    } else {
+                        $name = ucfirst($name);
+                    }
+                    $headers[$name] = $val;
                 }
-                $headers[$name] = $val;
             }
         }
         if (count($headers) > 0) {
@@ -593,6 +603,9 @@ class DataBuilder implements DataBuilderInterface
 
     protected function getUserIp()
     {
+        if (!isset($_SERVER)) {
+            return null;
+        }
         $forwardFor = $this->tryGet($_SERVER, 'HTTP_X_FORWARDED_FOR');
         if ($forwardFor) {
             // return everything until the first comma
@@ -660,7 +673,7 @@ class DataBuilder implements DataBuilderInterface
                 $server->$key = $val;
             }
         }
-        if (array_key_exists('argv', $_SERVER)) {
+        if (isset($_SERVER) && array_key_exists('argv', $_SERVER)) {
             $server->argv = $_SERVER['argv'];
         }
         return $server;
