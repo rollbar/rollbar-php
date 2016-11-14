@@ -54,7 +54,7 @@ class Rollbar
         if (is_null(self::$logger)) {
             return self::getNotInitializedResponse();
         }
-        return self::$logger->log($level, $exc, $extra);
+        return self::$logger->log($level, $exc, (array) $extra);
     }
 
     public static function setupErrorHandling()
