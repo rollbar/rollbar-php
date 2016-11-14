@@ -2,7 +2,7 @@
 
 use Rollbar\Utilities;
 
-class ExceptionInfo
+class ExceptionInfo implements \JsonSerializable
 {
     private $class;
     private $message;
@@ -49,5 +49,10 @@ class ExceptionInfo
         Utilities::validateString($description, "description");
         $this->description = $description;
         return $this;
+    }
+
+    public function jsonSerialize()
+    {
+        return Utilities::serializeForRollbar(get_object_vars($this));
     }
 }
