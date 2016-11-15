@@ -756,7 +756,7 @@ class DataBuilder implements DataBuilderInterface
 
         $scrubber = function (&$val, $key) use ($fields, $replacement, $arr) {
 
-            if (key_exists($key, $arr)) {
+            if (key_exists($key, $fields)) {
                 $val = str_repeat($replacement, 8);
             }
         };
