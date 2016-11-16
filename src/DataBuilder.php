@@ -754,13 +754,18 @@ class DataBuilder implements DataBuilderInterface
             return null;
         }
 
-        $scrubber = function (&$val, $key) use ($fields, $replacement, $arr) {
-
+        $scrubber = function (&$val, $key) use ($fields, $replacement, &$scrubber) {
             if (in_array($key, $fields)) {
                 $val = str_repeat($replacement, 8);
             }
+
+            if (is_array($val)) {
+                array_walk($val, $scrubber);
+            }
         };
-        array_walk_recursive($arr, $scrubber);
+
+        array_walk($arr, $scrubber);
+
         return $arr;
     }
 
