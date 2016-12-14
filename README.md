@@ -4,27 +4,7 @@
 
 This library detects errors and exceptions in your application and reports them to [Rollbar](https://rollbar.com) for alerts, reporting, and analysis.
 
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-##Table of Contents
-
-- [Quick start](#quick-start)
-- [Installation](#installation)
-  - [General](#general)
-  - [If Using Composer](#if-using-composer)
-- [Setup](#setup)
-  - [For Heroku Users](#for-heroku-users)
-- [Basic Usage](#basic-usage)
-- [Batching](#batching)
-- [Using Monolog](#using-monolog)
-- [Configuration](#configuration)
-  - [Asynchronous Reporting](#asynchronous-reporting)
-  - [Configuration reference](#configuration-reference)
-- [Related projects](#related-projects)
-- [Help / Support](#help--support)
-- [Contributing](#contributing)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+<!-- Sub:[TOC] -->
 
 ## Quick start
 
