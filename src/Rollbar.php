@@ -49,7 +49,7 @@ class Rollbar
         set_exception_handler('Rollbar\Rollbar::log');
     }
 
-    public static function log($exc, $extra = null, $level = null)
+    public static function log($exc, $extra = array(), $level = null)
     {
         if (is_null(self::$logger)) {
             return self::getNotInitializedResponse();
