@@ -181,6 +181,15 @@ class Config
                 );
             }
         }
+
+        if (isset($c['handler']) && 'errorlog' == $c['handler']) {
+            $default = "Rollbar\Senders\ErrorlogSender";
+
+            if (isset($c['message_type'])) {
+                $c['senderOptions'] = ['messageType' => $c['message_type']];
+            }
+        }
+
         $this->setupWithOptions($c, "sender", $expected, $default);
     }
 
