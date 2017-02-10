@@ -312,7 +312,8 @@ Default: empty array, meaning all errors are reported.
   </dd>
 
   <dt>handler</dt>
-  <dd>Either `'blocking'` or `'agent'`. `'blocking'` uses curl to send requests immediately; `'agent'` writes a relay log to be consumed by [rollbar-agent](https://github.com/rollbar/rollbar-agent).
+  <dd>Either `'blocking'`, `'agent'` or `'errorlog'`. `'blocking'` uses curl to send requests immediately; `'agent'` writes a relay log to be consumed by [rollbar-agent](https://github.com/rollbar/rollbar-agent)
+  and `'errorlog'` writes directly to the error log of PHP.
 
 Default: `'blocking'`
   </dd>

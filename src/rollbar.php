@@ -130,7 +130,7 @@ class RollbarNotifier {
     public $code_version = null;
     public $environment = 'production';
     public $error_sample_rates = array();
-    // available handlers: blocking, agent
+    // available handlers: blocking, agent, errorlog
     public $handler = 'blocking';
     public $agent_log_location = '/var/tmp';
     public $host = null;
@@ -187,7 +187,7 @@ class RollbarNotifier {
         }
         $this->_source_file_reader = new SourceFileReader();
 
-        if (!$this->access_token && $this->handler != 'agent') {
+        if (!$this->access_token && !in_array($this->handler,  ['agent', 'errorlog'])) {
             $this->log_error('Missing access token');
         }
 
@@ -553,7 +553,7 @@ class RollbarNotifier {
     }
 
     protected function check_config() {
-        return $this->handler == 'agent' || ($this->access_token && strlen($this->access_token) == 32);
+        return in_array($this->handler, ['agent', 'errorlog']) || ($this->access_token && strlen($this->access_token) == 32);
     }
 
     protected function build_request_data() {
@@ -959,10 +959,16 @@ class RollbarNotifier {
      * $payload - php array
      */
     protected function _send_payload($payload) {
-        if ($this->handler == 'agent') {
-            $this->_send_payload_agent($payload);
-        } else {
-            $this->_send_payload_blocking($payload);
+        switch ($this->handler){
+            case 'agent':
+                $this->_send_payload_agent($payload);
+                break;
+            case 'errorlog':
+                $this->_send_payload_errorlog($payload);
+                break;
+            default:
+                $this->_send_payload_blocking($payload);
+                break;
         }
     }
 
@@ -982,16 +988,26 @@ class RollbarNotifier {
         fwrite($this->_agent_log, json_encode($payload) . "\n");
     }
 
+    protected function _send_payload_errorlog($payload) {
+        error_log(json_encode($payload) . PHP_EOL);
+    }
+
     /**
      * Sends a batch of payloads to the /batch endpoint.
      * A batch is just an array of standalone payloads.
      * $batch - php array of payloads
      */
     protected function send_batch($batch) {
-        if ($this->handler == 'agent') {
-            $this->send_batch_agent($batch);
-        } else {
-            $this->send_batch_blocking($batch);
+        switch ($this->handler){
+            case 'agent':
+                $this->send_batch_agent($batch);
+                break;
+            case 'errorlog':
+                $this->send_batch_errorlog($batch);
+                break;
+            default:
+                $this->send_batch_blocking($batch);
+                break;
         }
     }
 
@@ -1013,6 +1029,14 @@ class RollbarNotifier {
         $access_token = $batch[0]['access_token'];
         $post_data = json_encode($batch);
         $this->make_api_call('item_batch', $access_token, $post_data);
+    }
+
+    protected function send_batch_errorlog($batch) {
+        $this->log_info("Writing batch to errorlog");
+
+        foreach ($batch as $item) {
+            error_log(json_encode($item) . PHP_EOL);
+        }
     }
 
     protected function get_php_context() {
