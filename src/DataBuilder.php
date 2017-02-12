@@ -501,7 +501,7 @@ class DataBuilder implements DataBuilderInterface
                 $request->$key = $val;
             }
         }
-        if (is_array($_SESSION) && count($_SESSION) > 0) {
+        if (isset($_SESSION) && is_array($_SESSION) && count($_SESSION) > 0) {
             $request->session = self::scrub($_SESSION, $scrubFields);
         }
         return $request;
