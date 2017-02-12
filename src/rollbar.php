@@ -1,4 +1,6 @@
 <?php
+use Fluent\Logger\FluentLogger;
+
 include 'Level.php';
 
 /**
@@ -130,9 +132,12 @@ class RollbarNotifier {
     public $code_version = null;
     public $environment = 'production';
     public $error_sample_rates = array();
-    // available handlers: blocking, agent, errorlog
+    // available handlers: blocking, agent, fluent, errorlog
     public $handler = 'blocking';
     public $agent_log_location = '/var/tmp';
+    public $fluent_host = FluentLogger::DEFAULT_ADDRESS;
+    public $fluent_port = FluentLogger::DEFAULT_LISTEN_PORT;
+    public $fluent_tag = 'rollbar';
     public $host = null;
     /** @var iRollbarLogger */
     public $logger = null;
@@ -170,6 +175,10 @@ class RollbarNotifier {
     // file handle for agent log
     private $_agent_log = null;
 
+    // fluent logger instance
+    /** @var FluentLogger */
+    private $_fluent_logger = null;
+
     private $_iconv_available = null;
 
     private $_mt_randmax;
@@ -187,7 +196,7 @@ class RollbarNotifier {
         }
         $this->_source_file_reader = new SourceFileReader();
 
-        if (!$this->access_token && !in_array($this->handler,  ['agent', 'errorlog'])) {
+        if (!$this->access_token && !in_array($this->handler,  ['agent', 'fluent', 'errorlog'])) {
             $this->log_error('Missing access token');
         }
 
@@ -553,7 +562,7 @@ class RollbarNotifier {
     }
 
     protected function check_config() {
-        return in_array($this->handler, ['agent', 'errorlog']) || ($this->access_token && strlen($this->access_token) == 32);
+        return in_array($this->handler, ['agent', 'fluent', 'errorlog']) || ($this->access_token && strlen($this->access_token) == 32);
     }
 
     protected function build_request_data() {
@@ -966,6 +975,9 @@ class RollbarNotifier {
             case 'errorlog':
                 $this->_send_payload_errorlog($payload);
                 break;
+            case 'fluent':
+                $this->_send_payload_fluent($payload);
+                break;
             default:
                 $this->_send_payload_blocking($payload);
                 break;
@@ -998,6 +1010,15 @@ class RollbarNotifier {
         file_put_contents('php://stderr', $payload);
     }
 
+    protected function _send_payload_fluent($payload) {
+        // Only instantiate the logger the first time
+        if (empty($this->_fluent_logger)) {
+            $this->load_fluent_logger();
+        }
+
+        $this->_fluent_logger->post($this->fluent_tag, $payload);
+    }
+
     /**
      * Sends a batch of payloads to the /batch endpoint.
      * A batch is just an array of standalone payloads.
@@ -1010,6 +1031,8 @@ class RollbarNotifier {
                 break;
             case 'errorlog':
                 $this->send_batch_errorlog($batch);
+            case 'fluent':
+                $this->send_batch_fluent($batch);
                 break;
             default:
                 $this->send_batch_blocking($batch);
@@ -1041,13 +1064,15 @@ class RollbarNotifier {
         $this->log_info("Writing batch to errorlog");
 
         foreach ($batch as $item) {
-            if (version_compare(PHP_VERSION, '5.4.0', '>=')) {
-                $item = json_encode($item, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-            } else {
-                $item = json_encode($item);
-            }
+            $this->_send_payload_errorlog($item);
+        }
+    }
 
-            file_put_contents('php://stderr', $item);
+    protected function send_batch_fluent($batch) {
+        $this->log_info("Writing batch to fluent");
+
+        foreach ($batch as $item) {
+            $this->_send_payload_fluent($item);
         }
     }
 
@@ -1144,6 +1169,10 @@ class RollbarNotifier {
 
     protected function load_agent_file() {
         $this->_agent_log = fopen($this->agent_log_location . '/rollbar-relay.' . getmypid() . '.' . microtime(true) . '.rollbar', 'a');
+    }
+
+    protected function load_fluent_logger() {
+        $this->_fluent_logger = new FluentLogger($this->fluent_host, $this->fluent_port);
     }
 
     protected function add_frame_code_context($file, $line, array &$framedata) {
