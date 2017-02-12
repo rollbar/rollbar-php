@@ -7,7 +7,7 @@ include 'Level.php';
  * Unless you need multiple RollbarNotifier instances in the same project, use this.
  */
 if ( !defined( 'BASE_EXCEPTION' ) ) {
-	define( 'BASE_EXCEPTION', version_compare( phpversion(), '7.0', '<' )? '\Exception': '\Throwable' );
+    define( 'BASE_EXCEPTION', version_compare( phpversion(), '7.0', '<' )? '\Exception': '\Throwable' );
 }
 
 class Rollbar {
@@ -436,7 +436,7 @@ class RollbarNotifier {
             case 4:
                 $level = Level::CRITICAL;
                 $constant = 'E_PARSE';
-		break;
+                break;
             case 8:
                 $level = Level::INFO;
                 $constant = 'E_NOTICE';
@@ -989,7 +989,13 @@ class RollbarNotifier {
     }
 
     protected function _send_payload_errorlog($payload) {
-        error_log(json_encode($payload) . PHP_EOL);
+        if (version_compare(PHP_VERSION, '5.4.0', '>=')) {
+            $payload = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        } else {
+            $payload = json_encode($payload);
+        }
+
+        file_put_contents('php://stderr', $payload);
     }
 
     /**
@@ -1035,7 +1041,13 @@ class RollbarNotifier {
         $this->log_info("Writing batch to errorlog");
 
         foreach ($batch as $item) {
-            error_log(json_encode($item) . PHP_EOL);
+            if (version_compare(PHP_VERSION, '5.4.0', '>=')) {
+                $item = json_encode($item, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            } else {
+                $item = json_encode($item);
+            }
+
+            file_put_contents('php://stderr', $item);
         }
     }
 
