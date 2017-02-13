@@ -161,7 +161,8 @@ class RollbarNotifier {
         'capture_error_backtraces', 'code_version', 'environment', 'error_sample_rates', 'handler',
         'agent_log_location', 'host', 'logger', 'included_errno', 'person', 'person_fn', 'root', 'checkIgnore',
         'scrub_fields', 'shift_function', 'timeout', 'report_suppressed', 'use_error_reporting', 'proxy',
-        'include_error_code_context', 'include_exception_code_context', 'enable_utf8_sanitization');
+        'include_error_code_context', 'include_exception_code_context', 'enable_utf8_sanitization',
+        'fluent_host', 'fluent_port', 'fluent_tag');
 
     // cached values for request/server/person data
     private $_php_context = null;
