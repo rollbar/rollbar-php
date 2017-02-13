@@ -131,6 +131,7 @@ class RollbarNotifier {
     public $capture_error_backtraces = true;
     public $code_version = null;
     public $environment = 'production';
+    public $framework = 'php';
     public $error_sample_rates = array();
     // available handlers: blocking, agent, fluent, errorlog
     public $handler = 'blocking';
@@ -158,7 +159,7 @@ class RollbarNotifier {
     public $enable_utf8_sanitization = true;
 
     private $config_keys = array('access_token', 'base_api_url', 'batch_size', 'batched', 'branch',
-        'capture_error_backtraces', 'code_version', 'environment', 'error_sample_rates', 'handler',
+        'capture_error_backtraces', 'code_version', 'environment', 'framework', 'error_sample_rates', 'handler',
         'agent_log_location', 'host', 'logger', 'included_errno', 'person', 'person_fn', 'root', 'checkIgnore',
         'scrub_fields', 'shift_function', 'timeout', 'report_suppressed', 'use_error_reporting', 'proxy',
         'include_error_code_context', 'include_exception_code_context', 'enable_utf8_sanitization',
@@ -924,7 +925,7 @@ class RollbarNotifier {
             'environment' => $this->environment,
             'level' => $level,
             'language' => 'php',
-            'framework' => 'php',
+            'framework' => $this->framework,
             'php_context' => $this->_php_context,
             'notifier' => array(
                 'name' => 'rollbar-php',
