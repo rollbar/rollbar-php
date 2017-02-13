@@ -1,4 +1,6 @@
 <?php
+use Fluent\Logger\FluentLogger;
+
 include 'Level.php';
 
 /**
@@ -7,7 +9,7 @@ include 'Level.php';
  * Unless you need multiple RollbarNotifier instances in the same project, use this.
  */
 if ( !defined( 'BASE_EXCEPTION' ) ) {
-	define( 'BASE_EXCEPTION', version_compare( phpversion(), '7.0', '<' )? '\Exception': '\Throwable' );
+    define( 'BASE_EXCEPTION', version_compare( phpversion(), '7.0', '<' )? '\Exception': '\Throwable' );
 }
 
 class Rollbar {
@@ -129,10 +131,14 @@ class RollbarNotifier {
     public $capture_error_backtraces = true;
     public $code_version = null;
     public $environment = 'production';
+    public $framework = 'php';
     public $error_sample_rates = array();
-    // available handlers: blocking, agent
+    // available handlers: blocking, agent, fluent, errorlog
     public $handler = 'blocking';
     public $agent_log_location = '/var/tmp';
+    public $fluent_host = FluentLogger::DEFAULT_ADDRESS;
+    public $fluent_port = FluentLogger::DEFAULT_LISTEN_PORT;
+    public $fluent_tag = 'rollbar';
     public $host = null;
     /** @var iRollbarLogger */
     public $logger = null;
@@ -153,10 +159,11 @@ class RollbarNotifier {
     public $enable_utf8_sanitization = true;
 
     private $config_keys = array('access_token', 'base_api_url', 'batch_size', 'batched', 'branch',
-        'capture_error_backtraces', 'code_version', 'environment', 'error_sample_rates', 'handler',
+        'capture_error_backtraces', 'code_version', 'environment', 'framework', 'error_sample_rates', 'handler',
         'agent_log_location', 'host', 'logger', 'included_errno', 'person', 'person_fn', 'root', 'checkIgnore',
         'scrub_fields', 'shift_function', 'timeout', 'report_suppressed', 'use_error_reporting', 'proxy',
-        'include_error_code_context', 'include_exception_code_context', 'enable_utf8_sanitization');
+        'include_error_code_context', 'include_exception_code_context', 'enable_utf8_sanitization',
+        'fluent_host', 'fluent_port', 'fluent_tag');
 
     // cached values for request/server/person data
     private $_php_context = null;
@@ -169,6 +176,10 @@ class RollbarNotifier {
 
     // file handle for agent log
     private $_agent_log = null;
+
+    // fluent logger instance
+    /** @var FluentLogger */
+    private $_fluent_logger = null;
 
     private $_iconv_available = null;
 
@@ -187,7 +198,7 @@ class RollbarNotifier {
         }
         $this->_source_file_reader = new SourceFileReader();
 
-        if (!$this->access_token && $this->handler != 'agent') {
+        if (!$this->access_token && !in_array($this->handler,  ['agent', 'fluent', 'errorlog'])) {
             $this->log_error('Missing access token');
         }
 
@@ -436,7 +447,7 @@ class RollbarNotifier {
             case 4:
                 $level = Level::CRITICAL;
                 $constant = 'E_PARSE';
-		break;
+                break;
             case 8:
                 $level = Level::INFO;
                 $constant = 'E_NOTICE';
@@ -553,7 +564,7 @@ class RollbarNotifier {
     }
 
     protected function check_config() {
-        return $this->handler == 'agent' || ($this->access_token && strlen($this->access_token) == 32);
+        return in_array($this->handler, ['agent', 'fluent', 'errorlog']) || ($this->access_token && strlen($this->access_token) == 32);
     }
 
     protected function build_request_data() {
@@ -914,7 +925,7 @@ class RollbarNotifier {
             'environment' => $this->environment,
             'level' => $level,
             'language' => 'php',
-            'framework' => 'php',
+            'framework' => $this->framework,
             'php_context' => $this->_php_context,
             'notifier' => array(
                 'name' => 'rollbar-php',
@@ -959,10 +970,19 @@ class RollbarNotifier {
      * $payload - php array
      */
     protected function _send_payload($payload) {
-        if ($this->handler == 'agent') {
-            $this->_send_payload_agent($payload);
-        } else {
-            $this->_send_payload_blocking($payload);
+        switch ($this->handler){
+            case 'agent':
+                $this->_send_payload_agent($payload);
+                break;
+            case 'errorlog':
+                $this->_send_payload_errorlog($payload);
+                break;
+            case 'fluent':
+                $this->_send_payload_fluent($payload);
+                break;
+            default:
+                $this->_send_payload_blocking($payload);
+                break;
         }
     }
 
@@ -982,16 +1002,43 @@ class RollbarNotifier {
         fwrite($this->_agent_log, json_encode($payload) . "\n");
     }
 
+    protected function _send_payload_errorlog($payload) {
+        if (version_compare(PHP_VERSION, '5.4.0', '>=')) {
+            $payload = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        } else {
+            $payload = json_encode($payload);
+        }
+
+        file_put_contents('php://stderr', $payload);
+    }
+
+    protected function _send_payload_fluent($payload) {
+        // Only instantiate the logger the first time
+        if (empty($this->_fluent_logger)) {
+            $this->load_fluent_logger();
+        }
+
+        $this->_fluent_logger->post($this->fluent_tag, $payload);
+    }
+
     /**
      * Sends a batch of payloads to the /batch endpoint.
      * A batch is just an array of standalone payloads.
      * $batch - php array of payloads
      */
     protected function send_batch($batch) {
-        if ($this->handler == 'agent') {
-            $this->send_batch_agent($batch);
-        } else {
-            $this->send_batch_blocking($batch);
+        switch ($this->handler){
+            case 'agent':
+                $this->send_batch_agent($batch);
+                break;
+            case 'errorlog':
+                $this->send_batch_errorlog($batch);
+            case 'fluent':
+                $this->send_batch_fluent($batch);
+                break;
+            default:
+                $this->send_batch_blocking($batch);
+                break;
         }
     }
 
@@ -1013,6 +1060,22 @@ class RollbarNotifier {
         $access_token = $batch[0]['access_token'];
         $post_data = json_encode($batch);
         $this->make_api_call('item_batch', $access_token, $post_data);
+    }
+
+    protected function send_batch_errorlog($batch) {
+        $this->log_info("Writing batch to errorlog");
+
+        foreach ($batch as $item) {
+            $this->_send_payload_errorlog($item);
+        }
+    }
+
+    protected function send_batch_fluent($batch) {
+        $this->log_info("Writing batch to fluent");
+
+        foreach ($batch as $item) {
+            $this->_send_payload_fluent($item);
+        }
     }
 
     protected function get_php_context() {
@@ -1108,6 +1171,10 @@ class RollbarNotifier {
 
     protected function load_agent_file() {
         $this->_agent_log = fopen($this->agent_log_location . '/rollbar-relay.' . getmypid() . '.' . microtime(true) . '.rollbar', 'a');
+    }
+
+    protected function load_fluent_logger() {
+        $this->_fluent_logger = new FluentLogger($this->fluent_host, $this->fluent_port);
     }
 
     protected function add_frame_code_context($file, $line, array &$framedata) {
