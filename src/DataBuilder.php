@@ -307,7 +307,7 @@ class DataBuilder implements DataBuilderInterface
         if ($toLog instanceof ErrorWrapper) {
             $content = $this->getErrorTrace($toLog);
         } elseif ($toLog instanceof $baseException) {
-            $content = $this->getExceptionTrace($baseException);
+            $content = $this->getExceptionTrace($toLog);
         } else {
             $scrubFields = $this->getScrubFields();
             $content = $this->getMessage($toLog, self::scrub($context, $scrubFields));
@@ -340,7 +340,8 @@ class DataBuilder implements DataBuilderInterface
         if (count($chain) > 1) {
             return new TraceChain($chain);
         }
-        return new Trace($chain[0], $chain[0]->getException());
+
+        return $chain[0];
     }
 
     /**
@@ -501,7 +502,7 @@ class DataBuilder implements DataBuilderInterface
                 $request->$key = $val;
             }
         }
-        if (is_array($_SESSION) && count($_SESSION) > 0) {
+        if (isset($_SESSION) && is_array($_SESSION) && count($_SESSION) > 0) {
             $request->session = self::scrub($_SESSION, $scrubFields);
         }
         return $request;
