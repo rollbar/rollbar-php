@@ -496,7 +496,7 @@ class DataBuilder implements DataBuilderInterface
             $extras = array();
         }
         foreach ($extras as $key => $val) {
-            if (in_array($key, $scrubFields)) {
+            if (in_array($key, $scrubFields, true)) {
                 $request->$key = str_repeat("*", 8);
             } else {
                 $request->$key = $val;
@@ -655,7 +655,7 @@ class DataBuilder implements DataBuilderInterface
             $extras = array();
         }
         foreach ($extras as $key => $val) {
-            if (in_array($key, $scrubFields)) {
+            if (in_array($key, $scrubFields, true)) {
                 $server->$key = str_repeat("*", 8);
             } {
                 $server->$key = $val;
@@ -755,7 +755,7 @@ class DataBuilder implements DataBuilderInterface
         }
 
         $scrubber = function (&$val, $key) use ($fields, $replacement, &$scrubber) {
-            if (in_array($key, $fields)) {
+            if (in_array($key, $fields, true)) {
                 $val = str_repeat($replacement, 8);
             }
 
