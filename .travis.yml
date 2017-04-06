@@ -13,3 +13,10 @@ sudo: false
 install: composer install --no-interaction
 
 script: composer test
+
+addons:
+  code_climate:
+    repo_token: 78d27c9cf1bb57964da0d98f1e40b6aa92c9c7d06a7a4268a0b87d7d921c4123
+
+after_success:
+  - vendor/bin/test-reporter
