@@ -20,3 +20,5 @@ addons:
 
 after_success:
   - vendor/bin/test-reporter
+
+  
