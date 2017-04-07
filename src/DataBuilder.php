@@ -748,7 +748,7 @@ class DataBuilder implements DataBuilderInterface
         return $this->scrubFields;
     }
 
-    protected function scrub($arr, $fields, $replacement = '*')
+    public static function scrub($arr, $fields, $replacement = '*')
     {
         if (!$fields || !$arr) {
             return null;

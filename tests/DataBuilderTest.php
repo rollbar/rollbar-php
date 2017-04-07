@@ -6,11 +6,6 @@ use Rollbar\Payload\Level;
 
 class DataBuilderTest extends \PHPUnit_Framework_TestCase
 {
-    public function __construct()
-    {
-        parent::__construct();
-        $_SESSION = array();
-    }
 
     /**
      * @var DataBuilder
@@ -19,6 +14,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
+        $_SESSION = array();
         $this->dataBuilder = new DataBuilder(array(
             'accessToken' => 'abcd1234efef5678abcd1234567890be',
             'environment' => 'tests'
@@ -28,6 +24,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     public function testMakeData()
     {
         $output = $this->dataBuilder->makeData(Level::fromName('error'), "testing", array());
+        // TODO: test for scrubbing data in makeData()
         $this->assertEquals('tests', $output->getEnvironment());
     }
 
@@ -76,6 +73,10 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($output[0]->getContext());
     }
 
+    // TODO: changing DataBuilderTest.php code breaks this test.
+    // This is not ideal. Should be done in a different way so
+    // development of DataBuilderTest.php doesn't break the
+    // this test.
     public function testFramesWithContext()
     {
         $dataBuilder = new DataBuilder(array(
@@ -149,7 +150,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/var/www/app', $output->getServer()->getRoot());
     }
 
-    public function testScrubFields()
+    public function testMakeDataScrubbing()
     {
         $dataBuilder = new DataBuilder(array(
             'accessToken' => 'abcd1234efef5678abcd1234567890be',
@@ -160,5 +161,67 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
         $post = $output->getRequest()->getPost();
         $this->assertEquals('********', $post['test']);
+    }
+
+    // TODO: Make a test for replacement parameter for DataBuilder::scrub
+
+    /**
+     * @dataProvider scrubData
+     */
+    public function testScrub($testData, $scrubFields, $expected)
+    {
+        $result = DataBuilder::scrub($testData, $scrubFields);
+        $this->assertEquals($result, $expected, "Looks like some fields did not get scrubbed correctly.");
+    }
+
+    public function scrubData()
+    {
+        return array(
+            'flat data array' => array(
+                array( // $testData
+                    'non sensitive data' => '123',
+                    'sensitive data' => '456'
+                ),
+                array( // $scrubFields
+                    'sensitive data'
+                ),
+                array( // $expected
+                    'non sensitive data' => '123',
+                    'sensitive data' => '********'
+                )
+            ),
+            'recursive data array' => array(
+                array( // $testData
+                    'non sensitive data 1' => '123',
+                    'non sensitive data 2' => '456',
+                    'sensitive data' => '456',
+                    array(
+                        'non sensitive data 3' => '789',
+                        'recursive sensitive data' => 'qwe',
+                        'non sensitive data 3' => 'rty',
+                        array(
+                            'recursive sensitive data' => array(),
+                        )
+                    ),
+                ),
+                array( // $scrubFields
+                    'sensitive data',
+                    'recursive sensitive data'
+                ),
+                array( // $expected
+                    'non sensitive data 1' => '123',
+                    'non sensitive data 2' => '456',
+                    'sensitive data' => '********',
+                    array(
+                        'non sensitive data 3' => '789',
+                        'recursive sensitive data' => '********',
+                        'non sensitive data 3' => 'rty',
+                        array(
+                            'recursive sensitive data' => '********',
+                        )
+                    ),
+                ),
+            )
+        );
     }
 }
