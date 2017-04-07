@@ -16,7 +16,8 @@ script: composer test
 
 addons:
   code_climate:
-    repo_token: b10dfa69b04844a8ca9696a5092370008dcc4ac5ca723adcb14d815fbeaebbc7
+    repo_token:
+      secure: "Zh3sCkr1LizGn7cB3DVAVDeYCS4XQJ7sEgqbLyZFA+0YTKbT7kP0tIWx0juXF3Twps/wEIAz4Q7snK1aGzqkg53wcedbx27TSViSnmCMr7ViVrGPj9QMNzoB6xS5sG3LPbQ1Qa6osGL4IbFSiCkEuNYj9NGFYCAlT6qej1fnZ/c="
 
 after_success:
   - vendor/bin/test-reporter
