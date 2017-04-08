@@ -771,7 +771,7 @@ class DataBuilder implements DataBuilderInterface
         return $arr;
     }
 
-    public function scrubUrl($url, $fields)
+    public static function scrubUrl($url, $fields)
     {
         $urlQuery = parse_url($url, PHP_URL_QUERY);
         if (!$urlQuery) {
