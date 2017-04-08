@@ -478,7 +478,7 @@ class DataBuilder implements DataBuilderInterface
         return $this->context;
     }
 
-    public function getRequest()
+    protected function getRequest()
     {
         $scrubFields = $this->getScrubFields();
         $request = new Request();
@@ -510,7 +510,7 @@ class DataBuilder implements DataBuilderInterface
         return $request;
     }
 
-    public function getUrl($scrubFields)
+    protected function getUrl($scrubFields)
     {
         if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
             $proto = strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']);
