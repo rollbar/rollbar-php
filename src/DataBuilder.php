@@ -510,7 +510,7 @@ class DataBuilder implements DataBuilderInterface
         return $request;
     }
 
-    protected function getUrl($scrubFields)
+    public function getUrl($scrubFields)
     {
         if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
             $proto = strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']);
