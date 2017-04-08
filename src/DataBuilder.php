@@ -478,7 +478,7 @@ class DataBuilder implements DataBuilderInterface
         return $this->context;
     }
 
-    protected function getRequest()
+    public function getRequest()
     {
         $scrubFields = $this->getScrubFields();
         $request = new Request();
@@ -495,6 +495,8 @@ class DataBuilder implements DataBuilderInterface
         if (!$extras) {
             $extras = array();
         }
+        // TODO: this is not recursive, and ideally needs
+        // to be switched to use self::scrub()
         foreach ($extras as $key => $val) {
             if (in_array($key, $scrubFields, true)) {
                 $request->$key = str_repeat("*", 8);
@@ -769,7 +771,7 @@ class DataBuilder implements DataBuilderInterface
         return $arr;
     }
 
-    protected function scrubUrl($url, $fields)
+    public function scrubUrl($url, $fields)
     {
         $urlQuery = parse_url($url, PHP_URL_QUERY);
         if (!$urlQuery) {
@@ -777,7 +779,7 @@ class DataBuilder implements DataBuilderInterface
         }
 
         parse_str($urlQuery, $parsedOutput);
-        $scrubbedOutput = $this->scrub($parsedOutput, $fields, 'x');
+        $scrubbedOutput = self::scrub($parsedOutput, $fields, 'x');
 
         return str_replace($urlQuery, http_build_query($scrubbedOutput), $url);
     }
