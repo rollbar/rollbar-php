@@ -163,15 +163,13 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('********', $post['test']);
     }
 
-    // TODO: Make a test for replacement parameter for DataBuilder::scrub
-
     /**
      * @dataProvider scrubData
      */
     public function testScrub($testData, $scrubFields, $expected)
     {
         $result = DataBuilder::scrub($testData, $scrubFields);
-        $this->assertEquals($result, $expected, "Looks like some fields did not get scrubbed correctly.");
+        $this->assertEquals($expected, $result, "Looks like some fields did not get scrubbed correctly.");
     }
 
     public function scrubData()
@@ -223,5 +221,16 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
                 ),
             )
         );
+    }
+
+    public function testScrubReplacement()
+    {
+        $result = DataBuilder::scrub(
+            array('scrubit' => '123'),
+            array('scrubit'),
+            "@"
+        );
+
+        $this->assertEquals("@@@@@@@@", $result['scrubit']);
     }
 }
