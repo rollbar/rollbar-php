@@ -24,7 +24,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     public function testMakeData()
     {
         $output = $this->dataBuilder->makeData(Level::fromName('error'), "testing", array());
-        // TODO: test for scrubbing data in makeData()
+        // TODO: test for scrub data in makeData()
         $this->assertEquals('tests', $output->getEnvironment());
     }
 
@@ -150,7 +150,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/var/www/app', $output->getServer()->getRoot());
     }
 
-    public function testMakeDataScrubbing()
+    public function testMakeDataScrub()
     {
         $dataBuilder = new DataBuilder(array(
             'accessToken' => 'abcd1234efef5678abcd1234567890be',
@@ -164,7 +164,73 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider scrubData
+     * TODO: implement this test
+     * Test url, headers, get, query string, post, extras,
+     * $_SESSION, $_COOKIE
+     * 
+     * @dataProvider getRequestScrubDataProvider
+     */
+    public function testGetRequestScrub()
+    {
+        
+    }
+
+    public function getRequestScrubDataProvider()
+    {
+        return array(
+
+        );
+    }
+    
+    public function testGetUrlScrub()
+    {
+        $_SERVER['SERVER_NAME'] = 'localhost';
+        $_SERVER['REQUEST_URI'] = '/index.php?arg1=val1&arg2=val2&arg3=val3';
+
+        $scrubFields = array('arg2');
+
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'scrub_fields' => $scrubFields
+        ));
+
+        $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
+
+        $result = $output->getRequest()->getUrl();
+
+        $this->assertEquals(
+            'http://localhost/index.php?arg1=val1&arg2=xxxxxxxx&arg3=val3',
+            $result);
+    }
+
+    /**
+     * @dataProvider scrubUrlDataProvider
+     */
+    public function testScrubUrl($testData, $scrubFields, $expected)
+    {
+        $result = DataBuilder::scrubUrl($testData, $scrubFields);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function scrubUrlDataProvider()
+    {
+        return array(
+            'nothing to scrub' => array(
+                'https://rollbar.com', // $testData
+                array(), // $scrubfields
+                'https://rollbar.com' // $expected
+            ),
+            'mix of scrub and no scrub' => array(
+                'https://rollbar.com?arg1=val1&arg2=val2&arg3=val3', // $testData
+                array('arg2'),
+                'https://rollbar.com?arg1=val1&arg2=xxxxxxxx&arg3=val3'
+            ),
+        );
+    }
+
+    /**
+     * @dataProvider scrubDataProvider
      */
     public function testScrub($testData, $scrubFields, $expected)
     {
@@ -172,7 +238,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $result, "Looks like some fields did not get scrubbed correctly.");
     }
 
-    public function scrubData()
+    public function scrubDataProvider()
     {
         return array(
             'flat data array' => array(
