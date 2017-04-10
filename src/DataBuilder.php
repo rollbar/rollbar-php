@@ -654,12 +654,11 @@ class DataBuilder implements DataBuilderInterface
         if (!$extras) {
             $extras = array();
         }
+
+        $extras = self::scrub($extras, $scrubFields);
+
         foreach ($extras as $key => $val) {
-            if (in_array($key, $scrubFields, true)) {
-                $server->$key = str_repeat("*", 8);
-            } {
-                $server->$key = $val;
-            }
+            $server->$key = $val;
         }
         if (array_key_exists('argv', $_SERVER)) {
             $server->argv = $_SERVER['argv'];
