@@ -13,7 +13,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     private $dataBuilder;
 
 
-    
+
 
     public function setUp()
     {
@@ -76,40 +76,60 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($output[0]->getContext());
     }
 
-    // TODO: changing DataBuilderTest.php code breaks this test.
-    // This is not ideal. Should be done in a different way so
-    // development of DataBuilderTest.php doesn't break the
-    // this test.
     public function testFramesWithContext()
     {
+
+        $testFilePath = __DIR__ . '/DataBuilderTest.php';
+
         $dataBuilder = new DataBuilder(array(
             'accessToken' => 'abcd1234efef5678abcd1234567890be',
             'environment' => 'tests',
             'include_error_code_context' => true
         ));
+
         $backTrace = array(
             array(
-                'file' => __DIR__ . '/DataBuilderTest.php',
-                'line' => 68,
+                'file' => $testFilePath,
                 'function' => 'testFramesWithoutContext'
             ),
             array(
-                'file' => __DIR__ . '/DataBuilderTest.php',
-                'line' => 79,
+                'file' => $testFilePath,
                 'function' => 'testFramesWithContext'
             ),
         );
+
+        $fh = fopen($testFilePath, 'r');
+        $lineNumber = 0;
+        while(!feof($fh)) {
+
+            $lineNumber++;
+            $line = fgets($fh);
+
+            if ($line == '    public function testFramesWithoutContext()
+') {
+                $backTrace[0]['line'] = $lineNumber;
+            } else if ($line == '    public function testFramesWithContext()
+') {
+                $backTrace[1]['line'] = $lineNumber;
+            }
+
+        }
+        fclose($fh);
+
         $output = $dataBuilder->makeFrames(new ErrorWrapper(null, null, null, null, $backTrace));
         $pre = $output[0]->getContext()->getPre();
-        $expected = array(
-            '            \'host\' => \'my host\'',
-            '        ));',
-            '        $output = $dataBuilder->makeData(Level::fromName(\'error\'), "testing", array());',
-            '        $this->assertEquals(\'my host\', $output->getServer()->getHost());',
-            '    }',
-            ''
+
+        $expected = array();
+        $fileContent = file($backTrace[0]['file']);
+        for ($i = 7; $i > 1; $i--) {
+            $expectedLine = $fileContent[$backTrace[0]['line']-$i];
+            $expected[] = $expectedLine;
+        }
+
+        $this->assertEquals(
+            str_replace(array("\r", "\n"), '', $expected), 
+            str_replace(array("\r", "\n"), '', $pre)
         );
-        $this->assertEquals($expected, $pre);
     }
 
     public function testPerson()
