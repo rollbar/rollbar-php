@@ -163,25 +163,133 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('********', $post['test']);
     }
 
-    /**
-     * TODO: implement this test
-     * Test url, headers, get, query string, post, extras,
-     * $_SESSION, $_COOKIE
-     * 
-     * @dataProvider getRequestScrubDataProvider
-     */
-    public function testGetRequestScrub()
+    public function testGetRequestScrubGET()
     {
-        
+        $_GET['Secret data'] = 'Secret value';
+
+        $scrubFields = array('Secret data');
+
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'scrub_fields' => $scrubFields
+        ));
+
+        $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
+
+        $result = $output->getRequest()->getGet();
+        $this->assertEquals('********', $result['Secret data'], "GET arguments of the request did not get scrubbed.");
     }
 
-    public function getRequestScrubDataProvider()
+    public function testGetRequestScrubQueryString()
     {
-        return array(
+        $_SERVER['QUERY_STRING'] = '?arg1=val1&arg2=val2&arg3=val3';
 
+        $scrubFields = array('arg2');
+
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'scrub_fields' => $scrubFields
+        ));
+
+        $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
+
+        // Test scrubbing query string
+        $result = $output->getRequest()->getQueryString();
+        $this->assertEquals(
+            '?arg1=val1&arg2=xxxxxxxx&arg3=val3', 
+            $result, '$_SERVER[\'QUERY_STRING\'] did not get scrubbed.');
+    }
+
+    public function testGetRequestScrubPOST()
+    {
+        $_POST = array(
+            'non-sensitive' => 'value 1',
+            'sensitive' => 'value 2',
+            'recursive' => array(
+                'sensitive' => 'value 1',
+                'non-sensitive' => 'value 2'
+            )
         );
+
+        $scrubFields = array('sensitive');
+
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'scrub_fields' => $scrubFields
+        ));
+
+        $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
+
+        $result = $output->getRequest()->getPost();
+
+        $this->assertEquals(
+            '********', 
+            $result['sensitive'], 
+            '$_POST did not get scrubbed.');
+
+        $this->assertEquals(
+            '********', 
+            $result['recursive']['sensitive'], 
+            '$_POST did not get scrubbed recursively.');
     }
-    
+
+    /**
+     * TODO: finish this test
+     */
+    public function testGetRequestScrubExtras()
+    {
+        $extras = array(
+            'non-sensitive' => 'value 1',
+            'sensitive' => 'value 2',
+            'recursive' => array(
+                'sensitive' => 'value 1',
+                'non-sensitive' => 'value 2'
+            )
+        );
+
+        $scrubFields = array('sensitive');
+
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'scrub_fields' => $scrubFields
+        ));
+
+        $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
+
+        // TODO: Test scrubbing extras
+        // as of right now I'm not sure how to set up
+        // request extras
+    }
+
+    /**
+     * TODO: Scrubbing and testing of $_SESSION, $_COOKIE 
+     *
+     */
+
+    public function testGetScrubbedHeaders()
+    {
+        $_SERVER['HTTP_CONTENT_TYPE'] = 'text/html; charset=utf-8';
+        $_SERVER['HTTP_SECRET_DATA'] = 'Secret value';
+
+        $scrubFields = array('Secret-Data');
+
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'scrub_fields' => $scrubFields
+        ));
+
+        $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
+
+        $result = $output->getRequest()->getHeaders($scrubFields);
+
+        $this->assertEquals('********', $result['Secret-Data']);        
+    }
+
     public function testGetUrlScrub()
     {
         $_SERVER['SERVER_NAME'] = 'localhost';
