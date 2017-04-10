@@ -174,7 +174,6 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @todo cover scrubbing data in:
-     * - server extras ( getServer() )
      * - get custom
      * - what about $_COOKIE? is it just not used in rollbar-php?
      */
