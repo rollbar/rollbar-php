@@ -750,6 +750,10 @@ class DataBuilder implements DataBuilderInterface
 
     public static function scrub($arr, $fields, $replacement = '*')
     {
+        if (!$fields || !$arr) {
+            return $arr;
+        }
+
         $scrubber = function (&$val, $key) use ($fields, $replacement, &$scrubber) {
             if (in_array($key, $fields, true)) {
                 $val = str_repeat($replacement, 8);
