@@ -235,38 +235,49 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             $result['recursive']['sensitive'], 
             '$_POST did not get scrubbed recursively.');
     }
-
-    /**
-     * TODO: finish this test
-     */
+    
     public function testGetRequestScrubExtras()
     {
         $extras = array(
-            'non-sensitive' => 'value 1',
-            'sensitive' => 'value 2',
-            'recursive' => array(
-                'sensitive' => 'value 1',
-                'non-sensitive' => 'value 2'
+            'extraField1' => array(
+                'non-sensitive' => 'value 1',
+                'sensitive' => 'value 2',
+                'recursive' => array(
+                    'sensitive' => 'value 1',
+                    'non-sensitive' => 'value 2'
+                )
             )
         );
 
         $scrubFields = array('sensitive');
 
+        // TODO: need to check with Andrew if this
+        // is a reliable way of passing the extras
+
         $dataBuilder = new DataBuilder(array(
             'accessToken' => 'abcd1234efef5678abcd1234567890be',
             'environment' => 'tests',
-            'scrub_fields' => $scrubFields
+            'scrub_fields' => $scrubFields,
+            'requestExtras' => $extras
         ));
 
         $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
 
-        // TODO: Test scrubbing extras
-        // as of right now I'm not sure how to set up
-        // request extras
+        $result = $output->getRequest()->extraField1;
+
+        $this->assertEquals(
+            '********', 
+            $result['sensitive'], 
+            '$_POST did not get scrubbed.');
+
+        $this->assertEquals(
+            '********', 
+            $result['recursive']['sensitive'], 
+            '$_POST did not get scrubbed recursively.');
     }
 
     /**
-     * TODO: Scrubbing and testing of $_SESSION, $_COOKIE 
+     * TODO: Scrubbing and testing of $_SESSION, $_COOKIE, getBody
      *
      */
 
