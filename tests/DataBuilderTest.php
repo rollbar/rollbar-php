@@ -12,6 +12,9 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
      */
     private $dataBuilder;
 
+
+    
+
     public function setUp()
     {
         $_SESSION = array();
@@ -345,10 +348,6 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             $result['recursive']['sensitive'], 
             '$_POST did not get scrubbed recursively.');
     }
-
-    /**
-     * TODO: Scrubbing and testing of $_COOKIE
-     */
 
     public function testGetScrubbedHeaders()
     {
