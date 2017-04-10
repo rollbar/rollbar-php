@@ -12,9 +12,6 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
      */
     private $dataBuilder;
 
-
-
-
     public function setUp()
     {
         $_SESSION = array();
@@ -27,7 +24,9 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     public function testMakeData()
     {
         $output = $this->dataBuilder->makeData(Level::fromName('error'), "testing", array());
-        // TODO: test for scrub data in makeData()
+        /**
+         * @todo test for scrub data in makeData()
+         */
         $this->assertEquals('tests', $output->getEnvironment());
     }
 
@@ -173,6 +172,56 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/var/www/app', $output->getServer()->getRoot());
     }
 
+    /**
+     * @todo some asserts in this test file might have incorrect message saying
+     * $_POST did not get scrubbed when something else was actually under
+     * test
+     */
+
+    /**
+     * @todo cover scrubbing data in:
+     * - server extras ( getServer() )
+     * - get custom
+     * - what about $_COOKIE? is it just not used in rollbar-php?
+     */
+
+    public function testMakeDataScrubServerExtras()
+    {
+        $extras = array(
+            'extraField1' => array(
+                'non-sensitive' => 'value 1',
+                'sensitive' => 'value 2',
+                'recursive' => array(
+                    'sensitive' => 'value 1',
+                    'non-sensitive' => 'value 2'
+                )
+            )
+        );
+
+        $scrubFields = array('sensitive');
+
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'scrub_fields' => $scrubFields,
+            'serverExtras' => $extras
+        ));
+
+        $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
+
+        $result = $output->getServer()->extraField1;
+
+        $this->assertEquals(
+            '********', 
+            $result['sensitive'], 
+            '$_POST did not get scrubbed.');
+
+        $this->assertEquals(
+            '********', 
+            $result['recursive']['sensitive'], 
+            '$_POST did not get scrubbed recursively.');
+    }
+
     public function testGetRequestScrubGET()
     {
         $_GET['Secret data'] = 'Secret value';
@@ -261,8 +310,10 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
 
         $scrubFields = array('sensitive');
 
-        // TODO: need to check with Andrew if this
-        // is a reliable way of passing the extras
+        /**
+         * @todo need to check with Andrew if this
+         * is a reliable way of passing the extras
+         */
 
         $dataBuilder = new DataBuilder(array(
             'accessToken' => 'abcd1234efef5678abcd1234567890be',
