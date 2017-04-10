@@ -235,7 +235,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             $result['recursive']['sensitive'], 
             '$_POST did not get scrubbed recursively.');
     }
-    
+
     public function testGetRequestScrubExtras()
     {
         $extras = array(
@@ -276,9 +276,78 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             '$_POST did not get scrubbed recursively.');
     }
 
+    public function testGetRequestScrubBodyContext()
+    {
+        $bodyContext = array(
+            'context1' => array(
+                'non-sensitive' => 'value 1',
+                'sensitive' => 'value 2',
+                'recursive' => array(
+                    'sensitive' => 'value 1',
+                    'non-sensitive' => 'value 2'
+                )
+            )
+        );
+
+        $scrubFields = array('sensitive');
+
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'scrub_fields' => $scrubFields
+        ));
+
+        $output = $dataBuilder->makeData(Level::fromName('error'), "testing", $bodyContext);
+
+        $result = $output->getBody()->getValue()->context1;
+
+        $this->assertEquals(
+            '********', 
+            $result['sensitive'], 
+            '$_POST did not get scrubbed.');
+
+        $this->assertEquals(
+            '********', 
+            $result['recursive']['sensitive'], 
+            '$_POST did not get scrubbed recursively.');
+    }
+
+    public function testGetRequestScrubSession()
+    {
+        $_SESSION = array(
+            'non-sensitive' => 'value 1',
+            'sensitive' => 'value 2',
+            'recursive' => array(
+                'sensitive' => 'value 1',
+                'non-sensitive' => 'value 2'
+            )
+        );
+
+        $scrubFields = array('sensitive');
+
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'scrub_fields' => $scrubFields
+        ));
+
+        $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
+
+        $result = $output->getRequest()->session;
+
+        $this->assertEquals(
+            '********', 
+            $result['sensitive'], 
+            '$_POST did not get scrubbed.');
+
+        $this->assertEquals(
+            '********', 
+            $result['recursive']['sensitive'], 
+            '$_POST did not get scrubbed recursively.');
+    }
+
     /**
-     * TODO: Scrubbing and testing of $_SESSION, $_COOKIE, getBody
-     *
+     * TODO: Scrubbing and testing of $_COOKIE
      */
 
     public function testGetScrubbedHeaders()
