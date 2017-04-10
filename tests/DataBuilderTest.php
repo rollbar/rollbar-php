@@ -173,19 +173,6 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/var/www/app', $output->getServer()->getRoot());
     }
 
-    public function testMakeDataScrub()
-    {
-        $dataBuilder = new DataBuilder(array(
-            'accessToken' => 'abcd1234efef5678abcd1234567890be',
-            'environment' => 'tests',
-            'scrub_fields' => array('test')
-        ));
-        $_POST['test'] = 'blah';
-        $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
-        $post = $output->getRequest()->getPost();
-        $this->assertEquals('********', $post['test']);
-    }
-
     public function testGetRequestScrubGET()
     {
         $_GET['Secret data'] = 'Secret value';
