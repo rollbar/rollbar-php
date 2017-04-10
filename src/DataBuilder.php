@@ -495,15 +495,13 @@ class DataBuilder implements DataBuilderInterface
         if (!$extras) {
             $extras = array();
         }
-        // TODO: this is not recursive, and ideally needs
-        // to be switched to use self::scrub()
+
+        $extras = self::scrub($extras, $scrubFields);
+
         foreach ($extras as $key => $val) {
-            if (in_array($key, $scrubFields, true)) {
-                $request->$key = str_repeat("*", 8);
-            } else {
-                $request->$key = $val;
-            }
+            $request->$key = $val;
         }
+        
         if (isset($_SESSION) && is_array($_SESSION) && count($_SESSION) > 0) {
             $request->session = self::scrub($_SESSION, $scrubFields);
         }
