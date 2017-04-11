@@ -174,9 +174,43 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @todo cover scrubbing data in:
-     * - get custom
      * - what about $_COOKIE? is it just not used in rollbar-php?
      */
+
+    public function testMakeDataScrubCustom()
+    {
+        $custom = array(
+            'non-sensitive' => 'value 1',
+            'sensitive' => 'value 2',
+            'recursive' => array(
+                'sensitive' => 'value 1',
+                'non-sensitive' => 'value 2'
+            )
+        );
+
+        $scrubFields = array('sensitive');
+
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'scrub_fields' => $scrubFields,
+            'custom' => $custom
+        ));
+
+        $output = $dataBuilder->makeData(Level::fromName('error'), new \Exception(), array());
+
+        $result = $output->getCustom();
+
+        $this->assertEquals(
+            '********', 
+            $result['sensitive'], 
+            'Custom did not get scrubbed.');
+
+        $this->assertEquals(
+            '********', 
+            $result['recursive']['sensitive'], 
+            'Custom did not get scrubbed recursively.');
+    }
 
     public function testMakeDataScrubServerExtras()
     {
