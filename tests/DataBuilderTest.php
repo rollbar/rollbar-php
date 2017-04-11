@@ -99,19 +99,17 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
 
         $fh = fopen($testFilePath, 'r');
         $lineNumber = 0;
-        while(!feof($fh)) {
-
+        while (!feof($fh)) {
             $lineNumber++;
             $line = fgets($fh);
 
             if ($line == '    public function testFramesWithoutContext()
 ') {
                 $backTrace[0]['line'] = $lineNumber;
-            } else if ($line == '    public function testFramesWithContext()
+            } elseif ($line == '    public function testFramesWithContext()
 ') {
                 $backTrace[1]['line'] = $lineNumber;
             }
-
         }
         fclose($fh);
 
@@ -126,7 +124,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->assertEquals(
-            str_replace(array("\r", "\n"), '', $expected), 
+            str_replace(array("\r", "\n"), '', $expected),
             str_replace(array("\r", "\n"), '', $pre)
         );
     }
@@ -202,14 +200,16 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $result = $output->getCustom();
 
         $this->assertEquals(
-            '********', 
-            $result['sensitive'], 
-            'Custom did not get scrubbed.');
+            '********',
+            $result['sensitive'],
+            'Custom did not get scrubbed.'
+        );
 
         $this->assertEquals(
-            '********', 
-            $result['recursive']['sensitive'], 
-            'Custom did not get scrubbed recursively.');
+            '********',
+            $result['recursive']['sensitive'],
+            'Custom did not get scrubbed recursively.'
+        );
     }
 
     public function testMakeDataScrubServerExtras()
@@ -239,14 +239,16 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $result = $output->getServer()->extraField1;
 
         $this->assertEquals(
-            '********', 
-            $result['sensitive'], 
-            'Server exras did not get scrubbed.');
+            '********',
+            $result['sensitive'],
+            'Server exras did not get scrubbed.'
+        );
 
         $this->assertEquals(
-            '********', 
-            $result['recursive']['sensitive'], 
-            'Server extras did not get scrubbed recursively.');
+            '********',
+            $result['recursive']['sensitive'],
+            'Server extras did not get scrubbed recursively.'
+        );
     }
 
     public function testGetRequestScrubGET()
@@ -284,8 +286,10 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         // Test scrubbing query string
         $result = $output->getRequest()->getQueryString();
         $this->assertEquals(
-            '?arg1=val1&arg2=xxxxxxxx&arg3=val3', 
-            $result, '$_SERVER[\'QUERY_STRING\'] did not get scrubbed.');
+            '?arg1=val1&arg2=xxxxxxxx&arg3=val3',
+            $result,
+            '$_SERVER[\'QUERY_STRING\'] did not get scrubbed.'
+        );
     }
 
     public function testGetRequestScrubPOST()
@@ -312,14 +316,16 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $result = $output->getRequest()->getPost();
 
         $this->assertEquals(
-            '********', 
-            $result['sensitive'], 
-            '$_POST did not get scrubbed.');
+            '********',
+            $result['sensitive'],
+            '$_POST did not get scrubbed.'
+        );
 
         $this->assertEquals(
-            '********', 
-            $result['recursive']['sensitive'], 
-            '$_POST did not get scrubbed recursively.');
+            '********',
+            $result['recursive']['sensitive'],
+            '$_POST did not get scrubbed recursively.'
+        );
     }
 
     public function testGetRequestScrubExtras()
@@ -354,14 +360,16 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $result = $output->getRequest()->extraField1;
 
         $this->assertEquals(
-            '********', 
-            $result['sensitive'], 
-            'Request extras did not get scrubbed.');
+            '********',
+            $result['sensitive'],
+            'Request extras did not get scrubbed.'
+        );
 
         $this->assertEquals(
-            '********', 
-            $result['recursive']['sensitive'], 
-            'Request extras did not get scrubbed recursively.');
+            '********',
+            $result['recursive']['sensitive'],
+            'Request extras did not get scrubbed recursively.'
+        );
     }
 
     public function testGetRequestScrubBodyContext()
@@ -390,14 +398,16 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $result = $output->getBody()->getValue()->context1;
 
         $this->assertEquals(
-            '********', 
-            $result['sensitive'], 
-            'Request body context did not get scrubbed.');
+            '********',
+            $result['sensitive'],
+            'Request body context did not get scrubbed.'
+        );
 
         $this->assertEquals(
-            '********', 
-            $result['recursive']['sensitive'], 
-            'Request body context did not get scrubbed recursively.');
+            '********',
+            $result['recursive']['sensitive'],
+            'Request body context did not get scrubbed recursively.'
+        );
     }
 
     public function testGetRequestScrubSession()
@@ -424,14 +434,16 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $result = $output->getRequest()->session;
 
         $this->assertEquals(
-            '********', 
-            $result['sensitive'], 
-            '$_SESSION did not get scrubbed.');
+            '********',
+            $result['sensitive'],
+            '$_SESSION did not get scrubbed.'
+        );
 
         $this->assertEquals(
-            '********', 
-            $result['recursive']['sensitive'], 
-            '$_SESSION did not get scrubbed recursively.');
+            '********',
+            $result['recursive']['sensitive'],
+            '$_SESSION did not get scrubbed recursively.'
+        );
     }
 
     public function testGetScrubbedHeaders()
@@ -451,7 +463,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
 
         $result = $output->getRequest()->getHeaders($scrubFields);
 
-        $this->assertEquals('********', $result['Secret-Data']);        
+        $this->assertEquals('********', $result['Secret-Data']);
     }
 
     public function testGetUrlScrub()
@@ -473,7 +485,8 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             'http://localhost/index.php?arg1=val1&arg2=xxxxxxxx&arg3=val3',
-            $result);
+            $result
+        );
     }
 
     /**
