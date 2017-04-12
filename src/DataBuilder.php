@@ -310,7 +310,7 @@ class DataBuilder implements DataBuilderInterface
             $content = $this->getExceptionTrace($toLog);
         } else {
             $scrubFields = $this->getScrubFields();
-            $content = $this->getMessage($toLog, self::scrub($context, $scrubFields));
+            $content = $this->getMessage($toLog, self::scrubArray($context, $scrubFields));
         }
         return new Body($content);
     }
@@ -486,9 +486,9 @@ class DataBuilder implements DataBuilderInterface
             ->setMethod($this->tryGet($_SERVER, 'REQUEST_METHOD'))
             ->setHeaders($this->getScrubbedHeaders($scrubFields))
             ->setParams($this->getRequestParams())
-            ->setGet(self::scrub($_GET, $scrubFields))
+            ->setGet(self::scrubArray($_GET, $scrubFields))
             ->setQueryString(self::scrubUrl($this->tryGet($_SERVER, "QUERY_STRING"), $scrubFields))
-            ->setPost(self::scrub($_POST, $scrubFields))
+            ->setPost(self::scrubArray($_POST, $scrubFields))
             ->setBody($this->getRequestBody())
             ->setUserIp($this->getUserIp());
         $extras = $this->getRequestExtras();
@@ -496,14 +496,14 @@ class DataBuilder implements DataBuilderInterface
             $extras = array();
         }
 
-        $extras = self::scrub($extras, $scrubFields);
+        $extras = self::scrubArray($extras, $scrubFields);
 
         foreach ($extras as $key => $val) {
             $request->$key = $val;
         }
         
         if (isset($_SESSION) && is_array($_SESSION) && count($_SESSION) > 0) {
-            $request->session = self::scrub($_SESSION, $scrubFields);
+            $request->session = self::scrubArray($_SESSION, $scrubFields);
         }
         return $request;
     }
@@ -557,7 +557,7 @@ class DataBuilder implements DataBuilderInterface
     protected function getScrubbedHeaders($scrubFields)
     {
         $headers = $this->getHeaders();
-        return self::scrub($headers, $scrubFields);
+        return self::scrubArray($headers, $scrubFields);
     }
 
     protected function getHeaders()
@@ -655,7 +655,7 @@ class DataBuilder implements DataBuilderInterface
             $extras = array();
         }
 
-        $extras = self::scrub($extras, $scrubFields);
+        $extras = self::scrubArray($extras, $scrubFields);
 
         foreach ($extras as $key => $val) {
             $server->$key = $val;
@@ -713,7 +713,7 @@ class DataBuilder implements DataBuilderInterface
         }
 
         $scrubFields = $this->getScrubFields();
-        $custom = self::scrub($custom, $scrubFields);
+        $custom = self::scrubArray($custom, $scrubFields);
         return array_replace_recursive(array(), $context, $custom);
     }
 
@@ -747,7 +747,7 @@ class DataBuilder implements DataBuilderInterface
         return $this->scrubFields;
     }
 
-    public static function scrub($arr, $fields, $replacement = '*')
+    public static function scrubArray($arr, $fields, $replacement = '*')
     {
         if (!$fields || !$arr) {
             return $arr;
@@ -776,7 +776,7 @@ class DataBuilder implements DataBuilderInterface
         }
 
         parse_str($urlQuery, $parsedOutput);
-        $scrubbedOutput = self::scrub($parsedOutput, $fields, 'x');
+        $scrubbedOutput = self::scrubArray($parsedOutput, $fields, 'x');
 
         return str_replace($urlQuery, http_build_query($scrubbedOutput), $url);
     }

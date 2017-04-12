@@ -519,7 +519,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testScrub($testData, $scrubFields, $expected)
     {
-        $result = DataBuilder::scrub($testData, $scrubFields);
+        $result = DataBuilder::scrubArray($testData, $scrubFields);
         $this->assertEquals($expected, $result, "Looks like some fields did not get scrubbed correctly.");
     }
 
@@ -576,7 +576,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testScrubReplacement()
     {
-        $result = DataBuilder::scrub(
+        $result = DataBuilder::scrubArray(
             array('scrubit' => '123'),
             array('scrubit'),
             "@"
