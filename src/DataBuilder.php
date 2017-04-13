@@ -742,7 +742,7 @@ class DataBuilder implements DataBuilderInterface
         return $this->baseException;
     }
 
-    protected function getScrubFields()
+    public function getScrubFields()
     {
         return $this->scrubFields;
     }

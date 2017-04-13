@@ -1,16 +1,20 @@
 <?php namespace Rollbar\Payload;
 
 use Rollbar\Utilities;
+use Rollbar\DataBuilder;
+use Rollbar\Config;
 
 class Payload implements \JsonSerializable
 {
     private $data;
     private $accessToken;
+    private $config;
 
-    public function __construct(Data $data, $accessToken)
+    public function __construct(Data $data, $accessToken, Config $config)
     {
         $this->setData($data);
         $this->setAccessToken($accessToken);
+        $this->config = $config;
     }
 
     /**
@@ -41,6 +45,13 @@ class Payload implements \JsonSerializable
 
     public function jsonSerialize()
     {
-        return Utilities::serializeForRollbar(get_object_vars($this));
+        $serialized = Utilities::serializeForRollbar(array(
+            'data' => $this->data,
+            'accessToken' => $this->accessToken
+        ));
+        
+        $scrubbed = DataBuilder::scrubArray($serialized, $this->config->getDataBuilder()->getScrubFields());
+        
+        return $scrubbed;
     }
 }

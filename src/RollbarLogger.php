@@ -39,7 +39,7 @@ class RollbarLogger extends AbstractLogger
     protected function getPayload($accessToken, $level, $toLog, $context)
     {
         $data = $this->config->getRollbarData($level, $toLog, $context);
-        $payload = new Payload($data, $accessToken);
+        $payload = new Payload($data, $accessToken, $this->config);
         return $this->config->transform($payload, $level, $toLog, $context);
     }
 

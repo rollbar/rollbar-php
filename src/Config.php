@@ -258,6 +258,11 @@ class Config
     {
         return $this->dataBuilder->makeData($level, $toLog, $context);
     }
+    
+    public function getDataBuilder()
+    {
+        return $this->dataBuilder;
+    }
 
     /**
      * @param Payload $payload
