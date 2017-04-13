@@ -4,3 +4,10 @@
    * You can get argument names like so: http://stackoverflow.com/a/2692514/456188
    * You can use `array_combine` to get a kwargs version of the arguments
    * You can then sanitize based on argument name
+
+## github-122-scrubbing TO DO
+1. Move scrubbing test coverage from DataBuilderTest to PayloadTest
+2. Remove duplication of arguments from Payload::__construct
+3. Check if any other places require scrubbing test coverage (e.g. args and kwargs
+as per POST_FORMAT.md)
+4. Is scrubbing of the $extra_data argument for old report_* methods covered?
