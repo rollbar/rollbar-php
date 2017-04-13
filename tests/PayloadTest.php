@@ -9,9 +9,12 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
     public function testPayloadData()
     {
         $data = m::mock("Rollbar\Payload\Data");
-        $config = m::mock("Rollbar\Config");
+        $config = m::mock("Rollbar\Config")
+                    ->shouldReceive('getAccessToken')
+                    ->andReturn('012345678901234567890123456789ab')
+                    ->mock();
         
-        $payload = new Payload($data, "012345678901234567890123456789ab", $config);
+        $payload = new Payload($data, $config);
 
         $this->assertEquals($data, $payload->getData());
 
@@ -21,31 +24,46 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
 
     public function testPayloadAccessToken()
     {
-        $data = m::mock("Rollbar\Payload\Data");
-        $config = m::mock("Rollbar\Config");
         $accessToken = "012345678901234567890123456789ab";
+        $data = m::mock("Rollbar\Payload\Data");
+        $config = m::mock("Rollbar\Config")
+                    ->shouldReceive('getAccessToken')
+                    ->andReturn($accessToken)
+                    ->mock();
 
-        $payload = new Payload($data, $accessToken, $config);
+        $payload = new Payload($data, $config);
         $this->assertEquals($accessToken, $payload->getAccessToken());
 
         $accessToken = "too_short";
+        $config = m::mock("Rollbar\Config")
+                    ->shouldReceive('getAccessToken')
+                    ->andReturn($accessToken)
+                    ->mock();
         try {
-            new Payload($data, $accessToken, $config);
+            new Payload($data, $config);
             $this->fail("Above should throw");
         } catch (\InvalidArgumentException $e) {
             $this->assertContains("32", $e->getMessage());
         }
 
         $accessToken = "too_longtoo_longtoo_longtoo_longtoo_longtoo_long";
+        $config = m::mock("Rollbar\Config")
+                    ->shouldReceive('getAccessToken')
+                    ->andReturn($accessToken)
+                    ->mock();
         try {
-            new Payload($data, $accessToken, $config);
+            new Payload($data, $config);
             $this->fail("Above should throw");
         } catch (\InvalidArgumentException $e) {
             $this->assertContains("32", $e->getMessage());
         }
 
         $accessToken = "012345678901234567890123456789ab";
-        $payload = new Payload($data, $accessToken, $config);
+        $config = m::mock("Rollbar\Config")
+                    ->shouldReceive('getAccessToken')
+                    ->andReturn($accessToken)
+                    ->mock();
+        $payload = new Payload($data, $config);
         $this->assertEquals($accessToken, $payload->getAccessToken());
 
         $at2 = "ab012345678901234567890123456789";
@@ -54,6 +72,7 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
 
     public function testEncode()
     {
+        $accessToken = '012345678901234567890123456789ab';
         $data = m::mock('Rollbar\Payload\Data, \JsonSerializable')
             ->shouldReceive('jsonSerialize')
             ->andReturn(new \ArrayObject())
@@ -65,11 +84,13 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
         $config = m::mock("Rollbar\Config")
             ->shouldReceive('getDataBuilder')
             ->andReturn($dataBuilder)
+            ->shouldReceive('getAccessToken')
+            ->andReturn($accessToken)
             ->mock();
         
-        $payload = new Payload($data, "012345678901234567890123456789ab", $config);
+        $payload = new Payload($data, $config);
         $encoded = json_encode($payload->jsonSerialize());
-        $json = '{"data":{},"access_token":"012345678901234567890123456789ab"}';
+        $json = '{"data":{},"access_token":"'.$accessToken.'"}';
         $this->assertEquals($json, $encoded);
     }
     
@@ -89,7 +110,7 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
 
         $data = $dataBuilder->makeData(Level::fromName('error'), "testing", $context);
         
-        $payload = new Payload($data, $config->getAccessToken(), $config);
+        $payload = new Payload($data, $config);
 
         $result = $payload->jsonSerialize();
         

@@ -10,10 +10,10 @@ class Payload implements \JsonSerializable
     private $accessToken;
     private $config;
 
-    public function __construct(Data $data, $accessToken, Config $config)
+    public function __construct(Data $data, Config $config)
     {
         $this->setData($data);
-        $this->setAccessToken($accessToken);
+        $this->setAccessToken($config->getAccessToken());
         $this->config = $config;
     }
 
