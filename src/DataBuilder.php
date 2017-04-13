@@ -309,8 +309,7 @@ class DataBuilder implements DataBuilderInterface
         } elseif ($toLog instanceof $baseException) {
             $content = $this->getExceptionTrace($toLog);
         } else {
-            $scrubFields = $this->getScrubFields();
-            $content = $this->getMessage($toLog, self::scrubArray($context, $scrubFields));
+            $content = $this->getMessage($toLog, $context);
         }
         return new Body($content);
     }
@@ -480,15 +479,14 @@ class DataBuilder implements DataBuilderInterface
 
     protected function getRequest()
     {
-        $scrubFields = $this->getScrubFields();
         $request = new Request();
-        $request->setUrl($this->getUrl($scrubFields))
+        $request->setUrl($this->getUrl())
             ->setMethod($this->tryGet($_SERVER, 'REQUEST_METHOD'))
-            ->setHeaders($this->getScrubbedHeaders($scrubFields))
+            ->setHeaders($this->getHeaders())
             ->setParams($this->getRequestParams())
-            ->setGet(self::scrubArray($_GET, $scrubFields))
-            ->setQueryString(self::scrub($this->tryGet($_SERVER, "QUERY_STRING"), $scrubFields))
-            ->setPost(self::scrubArray($_POST, $scrubFields))
+            ->setGet($_GET)
+            ->setQueryString($this->tryGet($_SERVER, "QUERY_STRING"))
+            ->setPost($_POST)
             ->setBody($this->getRequestBody())
             ->setUserIp($this->getUserIp());
         $extras = $this->getRequestExtras();
@@ -496,19 +494,17 @@ class DataBuilder implements DataBuilderInterface
             $extras = array();
         }
 
-        $extras = self::scrubArray($extras, $scrubFields);
-
         foreach ($extras as $key => $val) {
             $request->$key = $val;
         }
         
         if (isset($_SESSION) && is_array($_SESSION) && count($_SESSION) > 0) {
-            $request->session = self::scrubArray($_SESSION, $scrubFields);
+            $request->session = $_SESSION;
         }
         return $request;
     }
 
-    protected function getUrl($scrubFields)
+    protected function getUrl()
     {
         if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
             $proto = strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']);
@@ -551,13 +547,7 @@ class DataBuilder implements DataBuilderInterface
             $url = null;
         }
 
-        return self::scrub($url, $scrubFields);
-    }
-
-    protected function getScrubbedHeaders($scrubFields)
-    {
-        $headers = $this->getHeaders();
-        return self::scrubArray($headers, $scrubFields);
+        return $url;
     }
 
     protected function getHeaders()
@@ -649,13 +639,10 @@ class DataBuilder implements DataBuilderInterface
             ->setRoot($this->getServerRoot())
             ->setBranch($this->getServerBranch())
             ->setCodeVersion($this->getServerCodeVersion());
-        $scrubFields = $this->getScrubFields();
         $extras = $this->getServerExtras();
         if (!$extras) {
             $extras = array();
         }
-
-        $extras = self::scrubArray($extras, $scrubFields);
 
         foreach ($extras as $key => $val) {
             $server->$key = $val;
@@ -712,8 +699,6 @@ class DataBuilder implements DataBuilderInterface
             return array_replace_recursive(array(), $custom);
         }
 
-        $scrubFields = $this->getScrubFields();
-        $custom = self::scrubArray($custom, $scrubFields);
         return array_replace_recursive(array(), $context, $custom);
     }
 
@@ -813,7 +798,7 @@ class DataBuilder implements DataBuilderInterface
                 $val = str_repeat($replacement, 8);
             }
 
-            self::scrub($val, $fields, $replacement);
+            $val = self::scrub($val, $fields, $replacement);
         };
 
         array_walk($arr, $scrubber);
