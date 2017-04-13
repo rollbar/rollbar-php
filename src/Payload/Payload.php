@@ -50,10 +50,8 @@ class Payload implements \JsonSerializable
             'accessToken' => $this->accessToken
         ));
         
-        $serialized['data'] = DataBuilder::scrub(
-            $serialized['data'],
-            $this->config->getDataBuilder()->getScrubFields()
-        );
+        $dataBuilder = $this->config->getDataBuilder();
+        $serialized['data'] = $dataBuilder->scrub($serialized['data']);
         
         return $serialized;
     }

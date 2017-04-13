@@ -7,7 +7,6 @@
 
 ## github-122-scrubbing TO DO
 1. Decide if the scrubbing code should be taken out of DataBuilder completely
-2. Remove duplication of arguments from Payload::__construct
 3. Check if any other places require scrubbing test coverage (e.g. args and kwargs
 as per POST_FORMAT.md)
 4. Is scrubbing of the $extra_data argument for old report_* methods covered?

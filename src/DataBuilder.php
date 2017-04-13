@@ -739,15 +739,17 @@ class DataBuilder implements DataBuilderInterface
      * @param array $fields Sequence of field names to scrub.
      * @param string $replacement Character used for scrubbing.
      */
-    public static function scrub(&$data, $fields, $replacement = '*')
+    public function scrub(&$data, $replacement = '*')
     {
+        $fields = $this->getScrubFields();
+        
         if (!$fields || !$data) {
             return $data;
         }
         
         if (is_array($data)) { // scrub arrays
         
-            $data = self::scrubArray($data, $fields, $replacement);
+            $data = $this->scrubArray($data, $replacement);
         } elseif (is_string($data)) { // scrub URLs and query strings
             
             $query = parse_url($data, PHP_URL_QUERY);
@@ -776,7 +778,7 @@ class DataBuilder implements DataBuilderInterface
             if ($query) {
                 $data = str_replace(
                     $query,
-                    self::scrubQueryString($query, $fields),
+                    $this->scrubQueryString($query),
                     $data
                 );
             }
@@ -785,8 +787,10 @@ class DataBuilder implements DataBuilderInterface
         return $data;
     }
 
-    public static function scrubArray(&$arr, $fields, $replacement = '*')
+    public function scrubArray(&$arr, $replacement = '*')
     {
+        $fields = $this->getScrubFields();
+        
         if (!$fields || !$arr) {
             return $arr;
         }
@@ -796,7 +800,7 @@ class DataBuilder implements DataBuilderInterface
                 $val = str_repeat($replacement, 8);
             }
 
-            $val = DataBuilder::scrub($val, $fields, $replacement);
+            $val = $this->scrub($val, $replacement);
         };
 
         array_walk($arr, $scrubber);
@@ -804,10 +808,10 @@ class DataBuilder implements DataBuilderInterface
         return $arr;
     }
 
-    public static function scrubQueryString($query, $fields, $replacement = 'x')
+    public function scrubQueryString($query, $replacement = 'x')
     {
         parse_str($query, $parsed);
-        $scrubbed = self::scrub($parsed, $fields, $replacement);
+        $scrubbed = $this->scrub($parsed, $replacement);
         return http_build_query($scrubbed);
     }
 

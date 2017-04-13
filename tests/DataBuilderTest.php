@@ -175,7 +175,12 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testScrubUrl($testData, $scrubFields, $expected)
     {
-        $result = DataBuilder::scrub($testData, $scrubFields);
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'scrubFields' => $scrubFields
+        ));
+        $result = $dataBuilder->scrub($testData);
         $this->assertEquals($expected, $result);
     }
 
@@ -200,7 +205,12 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testScrub($testData, $scrubFields, $expected)
     {
-        $result = DataBuilder::scrub($testData, $scrubFields);
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'scrubFields' => $scrubFields
+        ));
+        $result = $dataBuilder->scrub($testData);
         $this->assertEquals($expected, $result, "Looks like some fields did not get scrubbed correctly.");
     }
     
@@ -359,7 +369,12 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testScrubArray($testData, $scrubFields, $expected)
     {
-        $result = DataBuilder::scrubArray($testData, $scrubFields);
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'scrubFields' => $scrubFields
+        ));
+        $result = $dataBuilder->scrubArray($testData);
         $this->assertEquals($expected, $result, "Looks like some fields did not get scrubbed correctly.");
     }
 
@@ -417,11 +432,14 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     public function testScrubReplacement()
     {
         $testData = array('scrubit' => '123');
-        $result = DataBuilder::scrubArray(
-            $testData,
-            array('scrubit'),
-            "@"
-        );
+        
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'scrubFields' => array('scrubit')
+        ));
+        
+        $result = $dataBuilder->scrubArray($testData, "@");
 
         $this->assertEquals("@@@@@@@@", $result['scrubit']);
     }

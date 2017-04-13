@@ -80,6 +80,8 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
         $dataBuilder = m::mock('Rollbar\DataBuilder')
             ->shouldReceive('getScrubFields')
             ->andReturn(array())
+            ->shouldReceive('scrub')
+            ->andReturn(new \ArrayObject())
             ->mock();
         $config = m::mock("Rollbar\Config")
             ->shouldReceive('getDataBuilder')
