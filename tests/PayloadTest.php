@@ -132,11 +132,11 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
         return array(
             array( // test 1
                 array( // $testData
-                    'non-sensitive' => 'value 1',
+                    'nonsensitive' => 'value 1',
                     'sensitive' => 'value 2',
                     'recursive' => array(
                         'sensitive' => 'value 1',
-                        'non-sensitive' => 'value 2'
+                        'nonsensitive' => 'value 2'
                     )
                 )
             )
@@ -275,7 +275,7 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
     public function testGetUrlScrub($testData)
     {
         $_SERVER['SERVER_NAME'] = 'localhost';
-        $_SERVER['REQUEST_URI'] = "index.php?$testData";
+        $_SERVER['REQUEST_URI'] = "/index.php?$testData";
         
         $result = $this->scrubTestHelper();
         $parsed = array();
