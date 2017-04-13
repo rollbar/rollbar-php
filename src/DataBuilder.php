@@ -784,7 +784,7 @@ class DataBuilder implements DataBuilderInterface
                  * Also, if it results in first key having an assigned value
                  * it's also a valid query string (values recognition).
                  */
-                if (count($parsed) > 0 || $parsedValues[0]) {
+                if (count($parsed) > 1 || $parsedValues[0]) {
                     $query = $data;
                 }
             }
@@ -813,9 +813,7 @@ class DataBuilder implements DataBuilderInterface
                 $val = str_repeat($replacement, 8);
             }
 
-            if (is_array($val)) {
-                self::scrub($val, $fields, $replacement);
-            }
+            self::scrub($val, $fields, $replacement);
         };
 
         array_walk($arr, $scrubber);
