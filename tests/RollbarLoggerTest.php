@@ -28,7 +28,8 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
             "environment" => "testing-php"
         ));
         $response = $l->log(LogLevel::WARNING, "Testing PHP Notifier", array());
-        $this->assertEquals(200, $response->getStatus(), "Got RC 422: ".$response->getInfo()['message']);
+        $responesInfo = $response->getInfo();
+        $this->assertEquals(200, $response->getStatus(), "Got RC 422: ".$responesInfo['message']);
     }
 
     public function testErrorSampleRates()
