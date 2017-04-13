@@ -734,7 +734,7 @@ class DataBuilder implements DataBuilderInterface
     
     /**
      * Scrub a data structure including arrays and query strings.
-     * 
+     *
      * @param mixed $data Data to be scrubbed.
      * @param array $fields Sequence of field names to scrub.
      * @param string $replacement Character used for scrubbing.
@@ -748,8 +748,7 @@ class DataBuilder implements DataBuilderInterface
         if (is_array($data)) { // scrub arrays
         
             $data = self::scrubArray($data, $fields, $replacement);
-            
-        } else if (is_string($data)) { // scrub URLs and query strings
+        } elseif (is_string($data)) { // scrub URLs and query strings
             
             $query = parse_url($data, PHP_URL_QUERY);
             
@@ -763,9 +762,9 @@ class DataBuilder implements DataBuilderInterface
                 
                 /**
                  * If parsing a string results in an associative array
-                 * with multiple elements it's valid query string (key 
+                 * with multiple elements it's valid query string (key
                  * recognition).
-                 * 
+                 *
                  * Also, if it results in first key having an assigned value
                  * it's also a valid query string (values recognition).
                  */
@@ -781,7 +780,6 @@ class DataBuilder implements DataBuilderInterface
                     $data
                 );
             }
-            
         }
         
         return $data;

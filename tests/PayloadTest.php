@@ -104,12 +104,13 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
      * @param string $replacement Character used for scrubbing
      */
     private function scrubTestAssert(
-        $dataName, 
-        $result, 
-        $scrubField = 'sensitive', 
+        $dataName,
+        $result,
+        $scrubField = 'sensitive',
         $recursive = true,
-        $replacement = '*')
-    {
+        $replacement = '*'
+    ) {
+    
         
         $this->assertEquals(
             str_repeat($replacement, 8),
@@ -124,7 +125,6 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
                 "$dataName did not get scrubbed recursively."
             );
         }
-        
     }
     
     public function scrubDataProvider()
@@ -183,8 +183,8 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
         
         $result = $this->scrubTestHelper(array('scrub_fields' => array($scrubField)));
         $this->scrubTestAssert(
-            'Headers', 
-            $result['data']['request']['headers'], 
+            'Headers',
+            $result['data']['request']['headers'],
             $scrubField, // field names in headers are slight different convenstion
             false // non-recursive
         );
@@ -202,7 +202,7 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
         $result = $this->scrubTestHelper(array('requestExtras' => $extras));
         
         $this->scrubTestAssert(
-            "Request extras", 
+            "Request extras",
             $result['data']['request']['extraField1']
         );
     }
@@ -219,7 +219,7 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
         $result = $this->scrubTestHelper(array('serverExtras' => $extras));
         
         $this->scrubTestAssert(
-            "Server extras", 
+            "Server extras",
             $result['data']['server']['extraField1']
         );
     }
@@ -233,7 +233,7 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
         $result = $this->scrubTestHelper(array('custom' => $custom));
 
         $this->scrubTestAssert(
-            "Custom", 
+            "Custom",
             $result['data']['custom']
         );
     }
@@ -253,7 +253,7 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->scrubTestAssert(
-            "Request body context", 
+            "Request body context",
             $result['data']['body']['message']['context1']
         );
     }
@@ -282,9 +282,9 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
         parse_str(parse_url($result['data']['request']['url'], PHP_URL_QUERY), $parsed);
 
         $this->scrubTestAssert(
-            "Url", 
-            $parsed, 
-            'sensitive', 
+            "Url",
+            $parsed,
+            'sensitive',
             true,
             'x' // query string is scrubbed with "x" rather than "*"
         );
@@ -302,7 +302,7 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
         parse_str($result['data']['request']['query_string'], $parsed);
         
         $this->scrubTestAssert(
-            "Query string", 
+            "Query string",
             $parsed,
             'sensitive',
             true,
