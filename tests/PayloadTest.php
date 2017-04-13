@@ -248,7 +248,7 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
         );
         
         $result = $this->scrubTestHelper(
-            array('custom' => $custom),
+            array('custom' => $bodyContext),
             $bodyContext
         );
 
