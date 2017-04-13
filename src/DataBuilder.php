@@ -798,7 +798,7 @@ class DataBuilder implements DataBuilderInterface
                 $val = str_repeat($replacement, 8);
             }
 
-            $val = self::scrub($val, $fields, $replacement);
+            $val = DataBuilder::scrub($val, $fields, $replacement);
         };
 
         array_walk($arr, $scrubber);
