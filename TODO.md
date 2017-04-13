@@ -6,7 +6,7 @@
    * You can then sanitize based on argument name
 
 ## github-122-scrubbing TO DO
-1. Move scrubbing test coverage from DataBuilderTest to PayloadTest
+1. Decide if the scrubbing code should be taken out of DataBuilder completely
 2. Remove duplication of arguments from Payload::__construct
 3. Check if any other places require scrubbing test coverage (e.g. args and kwargs
 as per POST_FORMAT.md)
