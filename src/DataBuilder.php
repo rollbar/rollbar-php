@@ -487,7 +487,7 @@ class DataBuilder implements DataBuilderInterface
             ->setHeaders($this->getScrubbedHeaders($scrubFields))
             ->setParams($this->getRequestParams())
             ->setGet(self::scrubArray($_GET, $scrubFields))
-            ->setQueryString(self::scrubUrl($this->tryGet($_SERVER, "QUERY_STRING"), $scrubFields))
+            ->setQueryString(self::scrub($this->tryGet($_SERVER, "QUERY_STRING"), $scrubFields))
             ->setPost(self::scrubArray($_POST, $scrubFields))
             ->setBody($this->getRequestBody())
             ->setUserIp($this->getUserIp());
@@ -551,7 +551,7 @@ class DataBuilder implements DataBuilderInterface
             $url = null;
         }
 
-        return self::scrubUrl($url, $scrubFields);
+        return self::scrub($url, $scrubFields);
     }
 
     protected function getScrubbedHeaders($scrubFields)
@@ -746,8 +746,63 @@ class DataBuilder implements DataBuilderInterface
     {
         return $this->scrubFields;
     }
+    
+    /**
+     * Scrub a data structure including arrays and query strings.
+     * 
+     * @param mixed $data Data to be scrubbed.
+     * @param array $fields Sequence of field names to scrub.
+     * @param string $replacement Character used for scrubbing.
+     */
+    public static function scrub(&$data, $fields, $replacement = '*')
+    {
+        if (!$fields || !$data) {
+            return $data;
+        }
+        
+        if (is_array($data)) { // scrub arrays
+        
+            $data = self::scrubArray($data, $fields, $replacement);
+            
+        } else if (is_string($data)) { // scrub URLs and query strings
+            
+            $query = parse_url($data, PHP_URL_QUERY);
+            
+            /**
+             * String is not a URL but it still might be just a plain
+             * query string in format arg1=val1&arg2=val2
+             */
+            if (!$query) {
+                parse_str($data, $parsed);
+                $parsedValues = array_values($parsed);
+                
+                /**
+                 * If parsing a string results in an associative array
+                 * with multiple elements it's valid query string (key 
+                 * recognition).
+                 * 
+                 * Also, if it results in first key having an assigned value
+                 * it's also a valid query string (values recognition).
+                 */
+                if (count($parsed) > 0 || $parsedValues[0]) {
+                    $query = $data;
+                }
+            }
+                
+            if ($query) {
+                $data = str_replace(
+                    $query,
+                    self::scrubQueryString($query, $fields),
+                    $data
+                );
+            }
+            
+        }
+        
+        return $data;
+    }
 
-    public static function scrubArray($arr, $fields, $replacement = '*')
+    public static function scrubArray(&$arr, $fields, $replacement = '*')
     {
         if (!$fields || !$arr) {
             return $arr;
@@ -759,7 +814,7 @@ class DataBuilder implements DataBuilderInterface
             }
 
             if (is_array($val)) {
-                array_walk($val, $scrubber);
+                self::scrub($val, $fields, $replacement);
             }
         };
 
@@ -768,17 +823,11 @@ class DataBuilder implements DataBuilderInterface
         return $arr;
     }
 
-    public static function scrubUrl($url, $fields)
+    public static function scrubQueryString($query, $fields, $replacement = 'x')
     {
-        $urlQuery = parse_url($url, PHP_URL_QUERY);
-        if (!$urlQuery) {
-            return $url;
-        }
-
-        parse_str($urlQuery, $parsedOutput);
-        $scrubbedOutput = self::scrubArray($parsedOutput, $fields, 'x');
-
-        return str_replace($urlQuery, http_build_query($scrubbedOutput), $url);
+        parse_str($query, $parsed);
+        $scrubbed = self::scrub($parsed, $fields, $replacement);
+        return http_build_query($scrubbed);
     }
 
     // from http://www.php.net/manual/en/function.uniqid.php#94959
