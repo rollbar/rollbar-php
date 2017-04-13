@@ -794,13 +794,15 @@ class DataBuilder implements DataBuilderInterface
         if (!$fields || !$arr) {
             return $arr;
         }
+        
+        $dataBuilder = $this;
 
-        $scrubber = function (&$val, $key) use ($fields, $replacement, &$scrubber) {
+        $scrubber = function (&$val, $key) use ($fields, $replacement, &$scrubber, $dataBuilder) {
             if (in_array($key, $fields, true)) {
                 $val = str_repeat($replacement, 8);
             }
 
-            $val = $this->scrub($val, $replacement);
+            $val = $dataBuilder->scrub($val, $replacement);
         };
 
         array_walk($arr, $scrubber);
