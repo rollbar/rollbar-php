@@ -404,7 +404,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             'environment' => 'tests',
             'scrubFields' => $scrubFields
         ));
-        $result = $dataBuilder->scrubArray($testData);
+        $result = $dataBuilder->scrub($testData);
         $this->assertEquals($expected, $result, "Looks like some fields did not get scrubbed correctly.");
     }
 
@@ -469,7 +469,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             'scrubFields' => array('scrubit')
         ));
         
-        $result = $dataBuilder->scrubArray($testData, "@");
+        $result = $dataBuilder->scrub($testData, "@");
 
         $this->assertEquals("@@@@@@@@", $result['scrubit']);
     }

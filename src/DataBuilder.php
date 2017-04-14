@@ -787,7 +787,7 @@ class DataBuilder implements DataBuilderInterface
         return $data;
     }
 
-    public function scrubArray(&$arr, $replacement = '*')
+    protected function scrubArray(&$arr, $replacement = '*')
     {
         $fields = $this->getScrubFields();
         
@@ -810,7 +810,7 @@ class DataBuilder implements DataBuilderInterface
         return $arr;
     }
 
-    public function scrubQueryString($query, $replacement = 'x')
+    protected function scrubQueryString($query, $replacement = 'x')
     {
         parse_str($query, $parsed);
         $scrubbed = $this->scrub($parsed, $replacement);
