@@ -1,6 +1,6 @@
 <?php namespace Rollbar;
 
-use Psr\Log\LogLevel;
+use Rollbar\Payload\Level;
 
 class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
 {
@@ -27,7 +27,7 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
             "access_token" => "ad865e76e7fb496fab096ac07b1dbabb",
             "environment" => "testing-php"
         ));
-        $response = $l->log(LogLevel::WARNING, "Testing PHP Notifier", array());
+        $response = $l->log(Level::warning(), "Testing PHP Notifier", array());
         $this->assertEquals(200, $response->getStatus());
     }
 
@@ -40,7 +40,7 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
                 E_ERROR => 0
             )
         ));
-        $response = $l->log(null, new ErrorWrapper(E_ERROR, '', null, null, array()), array());
+        $response = $l->log(Level::error(), new ErrorWrapper(E_ERROR, '', null, null, array()), array());
         $this->assertEquals(0, $response->getStatus());
     }
 
@@ -51,7 +51,7 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
             "environment" => "testing-php",
             "included_errno" => E_ERROR | E_WARNING
         ));
-        $response = $l->log(null, new ErrorWrapper(E_USER_ERROR, '', null, null, array()), array());
+        $response = $l->log(Level::error(), new ErrorWrapper(E_USER_ERROR, '', null, null, array()), array());
         $this->assertEquals(0, $response->getStatus());
     }
 }
