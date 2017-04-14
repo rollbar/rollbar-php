@@ -167,7 +167,6 @@ Here is an example of how to use Rollbar as a handler for Monolog:
 
 ```
 use Monolog\Logger;
-use Monolog\Handler\RollbarHandler;
 
 $config = array('access_token' => 'POST_SERVER_ITEM_ACCESS_TOKEN');
 
@@ -175,7 +174,7 @@ $config = array('access_token' => 'POST_SERVER_ITEM_ACCESS_TOKEN');
 Rollbar::init($config);
 
 $log = new Logger('test');
-$log->pushHandler(new RollbarHandler(Rollbar::$instance));
+$log->pushHandler(new \Monolog\Handler\PsrHandler(Rollbar::logger()));
 
 try {
     throw new Exception('exception for monolog');
