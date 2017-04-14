@@ -222,11 +222,11 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             'recursive data array' =>
                 $this->scrubRecursiveDataProvider(),
             'string encoded values' =>
-                $this->scrubFlatStringEncodedDataProvider(),
+                $this->scrubFlatStringDataProvider(),
             'string encoded recursive values' =>
-                $this->scrubRecursiveStringEncodedDataProvider(),
+                $this->scrubRecursiveStringDataProvider(),
             'string encoded recursive values in recursive array' =>
-                $this->scrubRecursiveStringEncodedRecursiveArrayDataProvider()
+                $this->scrubRecursiveStringRecursiveDataProvider()
         );
     }
     
@@ -283,7 +283,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         );
     }
     
-    private function scrubFlatStringEncodedDataProvider()
+    private function scrubFlatStringDataProvider()
     {
         return array(
             // $testData
@@ -308,7 +308,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         );
     }
     
-    private function scrubRecursiveStringEncodedDataProvider()
+    private function scrubRecursiveStringDataProvider()
     {
         return array(
             // $testData
@@ -339,7 +339,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         );
     }
     
-    private function scrubRecursiveStringEncodedRecursiveArrayDataProvider()
+    private function scrubRecursiveStringRecursiveDataProvider()
     {
         return array(
             array( // $testData
