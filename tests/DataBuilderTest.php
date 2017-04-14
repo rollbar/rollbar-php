@@ -170,20 +170,6 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/var/www/app', $output->getServer()->getRoot());
     }
 
-    /**
-     * @dataProvider scrubUrlDataProvider
-     */
-    public function testScrubUrl($testData, $scrubFields, $expected)
-    {
-        $dataBuilder = new DataBuilder(array(
-            'accessToken' => 'abcd1234efef5678abcd1234567890be',
-            'environment' => 'tests',
-            'scrubFields' => $scrubFields
-        ));
-        $result = $dataBuilder->scrub($testData);
-        $this->assertEquals($expected, $result);
-    }
-
     public function scrubUrlDataProvider()
     {
         return array(
@@ -194,8 +180,8 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             ),
             'mix of scrub and no scrub' => array(
                 'https://rollbar.com?arg1=val1&arg2=val2&arg3=val3', // $testData
-                array('arg2'),
-                'https://rollbar.com?arg1=val1&arg2=xxxxxxxx&arg3=val3'
+                array('arg2'), // $scrubFields
+                'https://rollbar.com?arg1=val1&arg2=xxxxxxxx&arg3=val3' // $expected
             ),
         );
     }
@@ -216,7 +202,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     
     public function scrubDataProvider()
     {
-        return array(
+        return array_merge(array(
             'flat data array' =>
                 $this->scrubFlatDataProvider(),
             'recursive data array' =>
@@ -227,7 +213,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
                 $this->scrubRecursiveStringDataProvider(),
             'string encoded recursive values in recursive array' =>
                 $this->scrubRecursiveStringRecursiveDataProvider()
-        );
+        ), $this->scrubUrlDataProvider());
     }
     
     private function scrubFlatDataProvider()
