@@ -217,87 +217,16 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     public function scrubDataProvider()
     {
         return array(
-            'flat data array' => $this->scrubFlatDataProvider(),
-            'recursive data array' => $this->scrubRecursiveDataProvider(),
-            'string encoded values' => $this->scrubFlatStringEncodedDataProvider(),
-            'string encoded recursive values' => array(
-                // $testData
-                http_build_query(
-                    array(
-                        'arg1' => 'val 1',
-                        'sensitive' => 'scrubit',
-                        'arg2' => array(
-                            'arg3' => 'val 3',
-                            'sensitive' => 'scrubit'
-                        )
-                    )
-                ),
-                array( // $scrubFields
-                    'sensitive'
-                ),
-                // $expected
-                http_build_query(
-                    array(
-                        'arg1' => 'val 1',
-                        'sensitive' => 'xxxxxxxx',
-                        'arg2' => array(
-                            'arg3' => 'val 3',
-                            'sensitive' => 'xxxxxxxx'
-                        )
-                    )
-                ),
-            ),
-            'string encoded recursive values in recursive array' => array(
-                array( // $testData
-                    'non sensitive data 1' => '123',
-                    'non sensitive data 2' => '456',
-                    'sensitive data' => '456',
-                    array(
-                        'non sensitive data 3' => '789',
-                        'recursive sensitive data' => 'qwe',
-                        'non sensitive data 3' => http_build_query(
-                            array(
-                                'arg1' => 'val 1',
-                                'sensitive' => 'scrubit',
-                                'arg2' => array(
-                                    'arg3' => 'val 3',
-                                    'sensitive' => 'scrubit'
-                                )
-                            )
-                        ),
-                        array(
-                            'recursive sensitive data' => array(),
-                        )
-                    ),
-                ),
-                array( // $scrubFields
-                    'sensitive data',
-                    'recursive sensitive data',
-                    'sensitive'
-                ),
-                array( // $expected
-                    'non sensitive data 1' => '123',
-                    'non sensitive data 2' => '456',
-                    'sensitive data' => '********',
-                    array(
-                        'non sensitive data 3' => '789',
-                        'recursive sensitive data' => '********',
-                        'non sensitive data 3' => http_build_query(
-                            array(
-                                'arg1' => 'val 1',
-                                'sensitive' => 'xxxxxxxx',
-                                'arg2' => array(
-                                    'arg3' => 'val 3',
-                                    'sensitive' => 'xxxxxxxx'
-                                )
-                            )
-                        ),
-                        array(
-                            'recursive sensitive data' => '********',
-                        )
-                    ),
-                )
-            )
+            'flat data array' => 
+                $this->scrubFlatDataProvider(),
+            'recursive data array' => 
+                $this->scrubRecursiveDataProvider(),
+            'string encoded values' => 
+                $this->scrubFlatStringEncodedDataProvider(),
+            'string encoded recursive values' => 
+                $this->scrubRecursiveStringEncodedDataProvider(),
+            'string encoded recursive values in recursive array' => 
+                $this->scrubRecursiveStringEncodedRecursiveArrayDataProvider()
         );
     }
     
@@ -376,6 +305,92 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
                     'arg2' => 'val 3'
                 )
             ),
+        );
+    }
+    
+    private function scrubRecursiveStringEncodedDataProvider()
+    {
+        return array(
+            // $testData
+            http_build_query(
+                array(
+                    'arg1' => 'val 1',
+                    'sensitive' => 'scrubit',
+                    'arg2' => array(
+                        'arg3' => 'val 3',
+                        'sensitive' => 'scrubit'
+                    )
+                )
+            ),
+            array( // $scrubFields
+                'sensitive'
+            ),
+            // $expected
+            http_build_query(
+                array(
+                    'arg1' => 'val 1',
+                    'sensitive' => 'xxxxxxxx',
+                    'arg2' => array(
+                        'arg3' => 'val 3',
+                        'sensitive' => 'xxxxxxxx'
+                    )
+                )
+            ),
+        );
+    }
+    
+    private function scrubRecursiveStringEncodedRecursiveArrayDataProvider()
+    {
+        return array(
+            array( // $testData
+                'non sensitive data 1' => '123',
+                'non sensitive data 2' => '456',
+                'sensitive data' => '456',
+                array(
+                    'non sensitive data 3' => '789',
+                    'recursive sensitive data' => 'qwe',
+                    'non sensitive data 3' => http_build_query(
+                        array(
+                            'arg1' => 'val 1',
+                            'sensitive' => 'scrubit',
+                            'arg2' => array(
+                                'arg3' => 'val 3',
+                                'sensitive' => 'scrubit'
+                            )
+                        )
+                    ),
+                    array(
+                        'recursive sensitive data' => array(),
+                    )
+                ),
+            ),
+            array( // $scrubFields
+                'sensitive data',
+                'recursive sensitive data',
+                'sensitive'
+            ),
+            array( // $expected
+                'non sensitive data 1' => '123',
+                'non sensitive data 2' => '456',
+                'sensitive data' => '********',
+                array(
+                    'non sensitive data 3' => '789',
+                    'recursive sensitive data' => '********',
+                    'non sensitive data 3' => http_build_query(
+                        array(
+                            'arg1' => 'val 1',
+                            'sensitive' => 'xxxxxxxx',
+                            'arg2' => array(
+                                'arg3' => 'val 3',
+                                'sensitive' => 'xxxxxxxx'
+                            )
+                        )
+                    ),
+                    array(
+                        'recursive sensitive data' => '********',
+                    )
+                ),
+            )
         );
     }
 
