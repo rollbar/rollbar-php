@@ -217,15 +217,15 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     public function scrubDataProvider()
     {
         return array(
-            'flat data array' => 
+            'flat data array' =>
                 $this->scrubFlatDataProvider(),
-            'recursive data array' => 
+            'recursive data array' =>
                 $this->scrubRecursiveDataProvider(),
-            'string encoded values' => 
+            'string encoded values' =>
                 $this->scrubFlatStringEncodedDataProvider(),
-            'string encoded recursive values' => 
+            'string encoded recursive values' =>
                 $this->scrubRecursiveStringEncodedDataProvider(),
-            'string encoded recursive values in recursive array' => 
+            'string encoded recursive values in recursive array' =>
                 $this->scrubRecursiveStringEncodedRecursiveArrayDataProvider()
         );
     }
