@@ -83,12 +83,6 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
             ->shouldReceive('scrub')
             ->andReturn(new \ArrayObject())
             ->mock();
-        $config = m::mock("Rollbar\Config")
-            ->shouldReceive('getDataBuilder')
-            ->andReturn($dataBuilder)
-            ->shouldReceive('getAccessToken')
-            ->andReturn($accessToken)
-            ->mock();
         
         $payload = new Payload($data, $accessToken);
         $encoded = json_encode($payload->jsonSerialize());
