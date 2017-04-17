@@ -8,13 +8,11 @@ class Payload implements \JsonSerializable
 {
     private $data;
     private $accessToken;
-    private $config;
 
-    public function __construct(Data $data, Config $config)
+    public function __construct(Data $data, $accessToken)
     {
         $this->setData($data);
-        $this->setAccessToken($config->getAccessToken());
-        $this->config = $config;
+        $this->setAccessToken($accessToken);
     }
 
     /**
@@ -45,14 +43,6 @@ class Payload implements \JsonSerializable
 
     public function jsonSerialize()
     {
-        $serialized = Utilities::serializeForRollbar(array(
-            'data' => $this->data,
-            'accessToken' => $this->accessToken
-        ));
-        
-        $dataBuilder = $this->config->getDataBuilder();
-        $serialized['data'] = $dataBuilder->scrub($serialized['data']);
-        
-        return $serialized;
+        return Utilities::serializeForRollbar(get_object_vars($this));
     }
 }

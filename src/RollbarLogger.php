@@ -30,16 +30,23 @@ class RollbarLogger extends AbstractLogger
     public function log($level, $toLog, array $context = array())
     {
         $accessToken = $this->getAccessToken();
-        $payload = $this->getPayload($level, $toLog, $context);
-        $response = $this->sendOrIgnore($payload, $accessToken, $toLog);
+        $payload = $this->getPayload($accessToken, $level, $toLog, $context);
+        
+        if ($this->config->checkIgnored($payload, $accessToken, $toLog)) {
+            $response = new Response(0, "Ignored");
+        } else {
+            $scrubbed = $this->scrubPayload($payload);
+            $response = $this->config->send($scrubbed, $accessToken);
+        }
+        
         $this->handleResponse($payload, $response);
         return $response;
     }
 
-    protected function getPayload($level, $toLog, $context)
+    protected function getPayload($accessToken, $level, $toLog, $context)
     {
         $data = $this->config->getRollbarData($level, $toLog, $context);
-        $payload = new Payload($data, $this->config);
+        $payload = new Payload($data, $accessToken);
         return $this->config->transform($payload, $level, $toLog, $context);
     }
 
@@ -48,23 +55,19 @@ class RollbarLogger extends AbstractLogger
         return $this->config->getAccessToken();
     }
 
-    /**
-     * @param Payload $payload
-     * @param string $accessToken
-     * @param mixed $toLog
-     * @return Response
-     */
-    protected function sendOrIgnore($payload, $accessToken, $toLog)
-    {
-        if ($this->config->checkIgnored($payload, $accessToken, $toLog)) {
-            return new Response(0, "Ignored");
-        }
-
-        return $this->config->send($payload, $accessToken);
-    }
-
     protected function handleResponse($payload, $response)
     {
         $this->config->handleResponse($payload, $response);
+    }
+    
+    /**
+     * @param Payload $payload
+     * @return array
+     */
+    protected function scrubPayload(Payload $payload)
+    {
+        $serialized = $payload->jsonSerialize();
+        $serialized['data'] = $this->config->getDataBuilder()->scrub($serialized['data']);
+        return $serialized;
     }
 }
