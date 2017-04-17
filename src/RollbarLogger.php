@@ -35,7 +35,7 @@ class RollbarLogger extends AbstractLogger
         if ($this->config->checkIgnored($payload, $accessToken, $toLog)) {
             $response = new Response(0, "Ignored");
         } else {
-            $scrubbed = $this->scrubPayload($payload);
+            $scrubbed = $this->scrub($payload);
             $response = $this->config->send($scrubbed, $accessToken);
         }
         
@@ -64,7 +64,7 @@ class RollbarLogger extends AbstractLogger
      * @param Payload $payload
      * @return array
      */
-    protected function scrubPayload(Payload $payload)
+    protected function scrub(Payload $payload)
     {
         $serialized = $payload->jsonSerialize();
         $serialized['data'] = $this->config->getDataBuilder()->scrub($serialized['data']);
