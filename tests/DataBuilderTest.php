@@ -24,9 +24,6 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     public function testMakeData()
     {
         $output = $this->dataBuilder->makeData(Level::fromName('error'), "testing", array());
-        /**
-         * @todo test for scrub data in makeData()
-         */
         $this->assertEquals('tests', $output->getEnvironment());
     }
 
