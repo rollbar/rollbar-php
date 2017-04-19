@@ -800,9 +800,9 @@ class DataBuilder implements DataBuilderInterface
         $scrubber = function (&$val, $key) use ($fields, $replacement, &$scrubber, $dataBuilder) {
             if (in_array($key, $fields, true)) {
                 $val = str_repeat($replacement, 8);
+            } else {
+                $val = $dataBuilder->scrub($val, $replacement);
             }
-
-            $val = $dataBuilder->scrub($val, $replacement);
         };
 
         array_walk($arr, $scrubber);
