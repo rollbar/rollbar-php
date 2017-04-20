@@ -41,7 +41,6 @@ class Payload implements \JsonSerializable
 
     public function jsonSerialize()
     {
-        var_dump(Utilities::serializeForRollbar(get_object_vars($this))['data']['request']);
         return Utilities::serializeForRollbar(get_object_vars($this));
     }
 }
