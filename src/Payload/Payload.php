@@ -1,6 +1,8 @@
 <?php namespace Rollbar\Payload;
 
 use Rollbar\Utilities;
+use Rollbar\DataBuilder;
+use Rollbar\Config;
 
 class Payload implements \JsonSerializable
 {
