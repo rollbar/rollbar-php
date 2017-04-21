@@ -137,6 +137,29 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
         $this->assertEquals('test@test.com', $output->getPerson()->getEmail());
     }
+    
+    public function testPersonFuncException()
+    {
+        \Rollbar\Rollbar::init(array(
+            'access_token' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'person_fn' => function () {
+                throw new \Exception("Exception from person_fn");
+            }
+        ));
+        
+        try {
+            
+            \Rollbar\Rollbar::log("testing exceptions in person_fn", array(), Level::fromName('error'));
+            
+            /**
+             * @todo check if the exception from person_fn was logged
+             */
+            
+        } catch (\Exception $exception) {
+            $this->fail("Exception in person_fn was not caught.");
+        }
+    }
 
     public function testRoot()
     {
