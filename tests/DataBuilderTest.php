@@ -152,10 +152,6 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             
             \Rollbar\Rollbar::log("testing exceptions in person_fn", array(), Level::fromName('error'));
             
-            /**
-             * @todo check if the exception from person_fn was logged
-             */
-            
         } catch (\Exception $exception) {
             $this->fail("Exception in person_fn was not caught.");
         }
