@@ -4,5 +4,5 @@ use Rollbar\Payload\Payload;
 
 interface SenderInterface
 {
-    public function send(Payload $payload, $accessToken);
+    public function send($scrubbedPayload, $accessToken);
 }
