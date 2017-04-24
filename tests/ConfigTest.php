@@ -140,25 +140,26 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
     private function runConfigTest($config)
     {
+        $accessToken = $config->getAccessToken();
         $debugData = m::mock("Rollbar\Payload\Data")
             ->shouldReceive('getLevel')
             ->andReturn(Level::DEBUG())
             ->mock();
-        $debug = new Payload($debugData, $this->token);
+        $debug = new Payload($debugData, $accessToken);
         $this->assertTrue($config->checkIgnored($debug, null, $this->error));
 
         $criticalData = m::mock("Rollbar\Payload\Data")
             ->shouldReceive('getLevel')
             ->andReturn(Level::CRITICAL())
             ->mock();
-        $critical = new Payload($criticalData, $this->token);
+        $critical = new Payload($criticalData, $accessToken);
         $this->assertFalse($config->checkIgnored($critical, null, $this->error));
 
         $warningData = m::mock("Rollbar\Payload\Data")
             ->shouldReceive('getLevel')
             ->andReturn(Level::warning())
             ->mock();
-        $warning = new Payload($warningData, $this->token);
+        $warning = new Payload($warningData, $accessToken);
         $this->assertFalse($config->checkIgnored($warning, null, $this->error));
     }
 
@@ -219,7 +220,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         ));
         $data = new Data($this->env, new Body(new Message("test")));
         $data->setLevel(Level::fromName('error'));
-        $c->checkIgnored(new Payload($data, $this->token), $this->token, $this->error);
+        $c->checkIgnored(new Payload($data, $c->getAccessToken()), $this->token, $this->error);
 
         $this->assertTrue($called);
     }
