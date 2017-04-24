@@ -26,7 +26,7 @@ class MockPhpStream
     
     public function stream_read($count)
     {
-        if(is_null($this->length) === true){
+        if (is_null($this->length) === true) {
             $this->length = strlen(self::$data);
         }
         $length = min($count, $this->length - $this->index);
