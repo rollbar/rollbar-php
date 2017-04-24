@@ -170,6 +170,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         try {
             
             \Rollbar\Rollbar::log("testing exceptions in person_fn", array(), Level::fromName('error'));
+            $this->assertTrue(true); // assert that exception was not thrown
             
         } catch (\PersonFuncException $exception) {
             $this->fail("Exception in person_fn was not caught.");
