@@ -636,6 +636,7 @@ class DataBuilder implements DataBuilderInterface
         }
 
         unset($personData['id'], $personData['email'], $personData['username']);
+        var_dump($id);
         return new Person($id, $username, $email, $personData);
     }
 
