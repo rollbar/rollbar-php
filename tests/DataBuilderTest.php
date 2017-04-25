@@ -3,7 +3,6 @@
 namespace Rollbar;
 
 use Rollbar\Payload\Level;
-use Rollbar\Exceptions\PersonFuncException;
 
 class DataBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -163,14 +162,14 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             'access_token' => 'abcd1234efef5678abcd1234567890be',
             'environment' => 'tests',
             'person_fn' => function () {
-                throw new PersonFuncException("Exception from person_fn");
+                throw new \Exception("Exception from person_fn");
             }
         ));
         
         try {
             $logger->log(Level::fromName('error'), "testing exceptions in person_fn", array());
             $this->assertTrue(true); // assert that exception was not thrown
-        } catch (\PersonFuncException $exception) {
+        } catch (\Exception $exception) {
             $this->fail("Exception in person_fn was not caught.");
         }
     }

@@ -613,7 +613,7 @@ class DataBuilder implements DataBuilderInterface
         if (!isset($personData) && is_callable($this->personFunc)) {
             try {
                 $personData = call_user_func($this->personFunc);
-            } catch (PersonFuncException $exception) {
+            } catch (\Exception $exception) {
                 Rollbar::scope(array('person_fn' => null))->
                     log(Level::fromName("error"), $exception);
             }
