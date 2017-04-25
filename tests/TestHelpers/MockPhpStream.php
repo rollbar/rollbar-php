@@ -14,6 +14,8 @@ class MockPhpStream
      */
     protected static $data = '';
     
+    // @codingStandardsIgnoreStart
+    
     public function stream_open($path, $mode, $options, &$opened_path)
     {
         return true;
@@ -46,4 +48,6 @@ class MockPhpStream
         $this->length = strlen(self::$data);
         return $this->length;
     }
+    
+    // @codingStandardsIgnoreEnd
 }
