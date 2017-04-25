@@ -12,6 +12,8 @@ use Rollbar\Payload\Trace;
 use Rollbar\Payload\Frame;
 use Rollbar\Payload\TraceChain;
 use Rollbar\Payload\ExceptionInfo;
+use Rollbar\Rollbar;
+use Rollbar\Exceptions\PersonFuncException;
 
 class DataBuilder implements DataBuilderInterface
 {
@@ -609,7 +611,12 @@ class DataBuilder implements DataBuilderInterface
     {
         $personData = $this->person;
         if (!isset($personData) && is_callable($this->personFunc)) {
-            $personData = call_user_func($this->personFunc);
+            try {
+                $personData = call_user_func($this->personFunc);
+            } catch (\Exception $exception) {
+                Rollbar::scope(array('person_fn' => null))->
+                    log(Level::fromName("error"), $exception);
+            }
         }
 
         if (!isset($personData['id'])) {
