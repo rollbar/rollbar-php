@@ -2,6 +2,7 @@
 
 use Psr\Log\AbstractLogger;
 use Rollbar\Payload\Payload;
+use Rollbar\Payload\Level;
 
 class RollbarLogger extends AbstractLogger
 {
@@ -29,6 +30,9 @@ class RollbarLogger extends AbstractLogger
 
     public function log($level, $toLog, array $context = array())
     {
+        if (Level::fromName($level) === null) {
+            throw new \Psr\Log\InvalidArgumentException("Invalid log level '$level'.");
+        }
         $accessToken = $this->getAccessToken();
         $payload = $this->getPayload($accessToken, $level, $toLog, $context);
         
