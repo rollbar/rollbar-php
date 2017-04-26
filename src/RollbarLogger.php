@@ -35,7 +35,14 @@ class RollbarLogger extends AbstractLogger
         }
         $accessToken = $this->getAccessToken();
         $payload = $this->getPayload($accessToken, $level, $toLog, $context);
-        $response = $this->sendOrIgnore($payload, $accessToken, $toLog);
+        
+        if ($this->config->checkIgnored($payload, $accessToken, $toLog)) {
+            $response = new Response(0, "Ignored");
+        } else {
+            $scrubbed = $this->scrub($payload);
+            $response = $this->config->send($scrubbed, $accessToken);
+        }
+        
         $this->handleResponse($payload, $response);
         return $response;
     }
@@ -52,23 +59,19 @@ class RollbarLogger extends AbstractLogger
         return $this->config->getAccessToken();
     }
 
-    /**
-     * @param Payload $payload
-     * @param string $accessToken
-     * @param mixed $toLog
-     * @return Response
-     */
-    protected function sendOrIgnore($payload, $accessToken, $toLog)
-    {
-        if ($this->config->checkIgnored($payload, $accessToken, $toLog)) {
-            return new Response(0, "Ignored");
-        }
-
-        return $this->config->send($payload, $accessToken);
-    }
-
     protected function handleResponse($payload, $response)
     {
         $this->config->handleResponse($payload, $response);
+    }
+    
+    /**
+     * @param Payload $payload
+     * @return array
+     */
+    protected function scrub(Payload $payload)
+    {
+        $serialized = $payload->jsonSerialize();
+        $serialized['data'] = $this->config->getDataBuilder()->scrub($serialized['data']);
+        return $serialized;
     }
 }

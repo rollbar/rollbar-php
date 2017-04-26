@@ -39,26 +39,26 @@ class CurlSender implements SenderInterface
         }
     }
 
-    public function send(Payload $payload, $accessToken)
+    public function send($scrubbedPayload, $accessToken)
     {
 
         $ch = curl_init();
 
-        $this->setCurlOptions($ch, $payload, $accessToken);
+        $this->setCurlOptions($ch, $scrubbedPayload, $accessToken);
         $result = curl_exec($ch);
         $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
         curl_close($ch);
 
-        $uuid = $payload->getData()->getUuid();
+        $uuid = $scrubbedPayload['data']['uuid'];
         return new Response($statusCode, json_decode($result, true), $uuid);
     }
 
-    public function setCurlOptions($ch, Payload $payload, $accessToken)
+    public function setCurlOptions($ch, $scrubbedPayload, $accessToken)
     {
         curl_setopt($ch, CURLOPT_URL, $this->endpoint);
         curl_setopt($ch, CURLOPT_POST, true);
-        $encoded = json_encode($payload->jsonSerialize());
+        $encoded = json_encode($scrubbedPayload);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $encoded);
         curl_setopt($ch, CURLOPT_VERBOSE, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);

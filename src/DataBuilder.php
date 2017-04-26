@@ -12,6 +12,8 @@ use Rollbar\Payload\Trace;
 use Rollbar\Payload\Frame;
 use Rollbar\Payload\TraceChain;
 use Rollbar\Payload\ExceptionInfo;
+use Rollbar\Rollbar;
+use Rollbar\Exceptions\PersonFuncException;
 
 class DataBuilder implements DataBuilderInterface
 {
@@ -309,8 +311,7 @@ class DataBuilder implements DataBuilderInterface
         } elseif ($toLog instanceof $baseException) {
             $content = $this->getExceptionTrace($toLog);
         } else {
-            $scrubFields = $this->getScrubFields();
-            $content = $this->getMessage($toLog, self::scrub($context, $scrubFields));
+            $content = $this->getMessage($toLog, $context);
         }
         return new Body($content);
     }
@@ -480,35 +481,32 @@ class DataBuilder implements DataBuilderInterface
 
     protected function getRequest()
     {
-        $scrubFields = $this->getScrubFields();
         $request = new Request();
-        $request->setUrl($this->getUrl($scrubFields))
+        $request->setUrl($this->getUrl())
             ->setMethod($this->tryGet($_SERVER, 'REQUEST_METHOD'))
-            ->setHeaders($this->getScrubbedHeaders($scrubFields))
+            ->setHeaders($this->getHeaders())
             ->setParams($this->getRequestParams())
-            ->setGet(self::scrub($_GET, $scrubFields))
-            ->setQueryString(self::scrubUrl($this->tryGet($_SERVER, "QUERY_STRING"), $scrubFields))
-            ->setPost(self::scrub($_POST, $scrubFields))
+            ->setGet($_GET)
+            ->setQueryString($this->tryGet($_SERVER, "QUERY_STRING"))
+            ->setPost($_POST)
             ->setBody($this->getRequestBody())
             ->setUserIp($this->getUserIp());
         $extras = $this->getRequestExtras();
         if (!$extras) {
             $extras = array();
         }
+
         foreach ($extras as $key => $val) {
-            if (in_array($scrubFields, $key)) {
-                $request->$key = str_repeat("*", 8);
-            } else {
-                $request->$key = $val;
-            }
+            $request->$key = $val;
         }
+        
         if (isset($_SESSION) && is_array($_SESSION) && count($_SESSION) > 0) {
-            $request->session = self::scrub($_SESSION, $scrubFields);
+            $request->session = $_SESSION;
         }
         return $request;
     }
 
-    protected function getUrl($scrubFields)
+    protected function getUrl()
     {
         if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
             $proto = strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']);
@@ -551,13 +549,7 @@ class DataBuilder implements DataBuilderInterface
             $url = null;
         }
 
-        return self::scrubUrl($url, $scrubFields);
-    }
-
-    protected function getScrubbedHeaders($scrubFields)
-    {
-        $headers = $this->getHeaders();
-        return self::scrub($headers, $scrubFields);
+        return $url;
     }
 
     protected function getHeaders()
@@ -619,7 +611,12 @@ class DataBuilder implements DataBuilderInterface
     {
         $personData = $this->person;
         if (!isset($personData) && is_callable($this->personFunc)) {
-            $personData = call_user_func($this->personFunc);
+            try {
+                $personData = call_user_func($this->personFunc);
+            } catch (\Exception $exception) {
+                Rollbar::scope(array('person_fn' => null))->
+                    log(Level::fromName("error"), $exception);
+            }
         }
 
         if (!isset($personData['id'])) {
@@ -649,17 +646,13 @@ class DataBuilder implements DataBuilderInterface
             ->setRoot($this->getServerRoot())
             ->setBranch($this->getServerBranch())
             ->setCodeVersion($this->getServerCodeVersion());
-        $scrubFields = $this->getScrubFields();
         $extras = $this->getServerExtras();
         if (!$extras) {
             $extras = array();
         }
+
         foreach ($extras as $key => $val) {
-            if (in_array($scrubFields, $key)) {
-                $server->$key = str_repeat("*", 8);
-            } {
-                $server->$key = $val;
-            }
+            $server->$key = $val;
         }
         if (array_key_exists('argv', $_SERVER)) {
             $server->argv = $_SERVER['argv'];
@@ -713,8 +706,6 @@ class DataBuilder implements DataBuilderInterface
             return array_replace_recursive(array(), $custom);
         }
 
-        $scrubFields = $this->getScrubFields();
-        $custom = self::scrub($custom, $scrubFields);
         return array_replace_recursive(array(), $context, $custom);
     }
 
@@ -743,38 +734,94 @@ class DataBuilder implements DataBuilderInterface
         return $this->baseException;
     }
 
-    protected function getScrubFields()
+    public function getScrubFields()
     {
         return $this->scrubFields;
     }
-
-    protected function scrub($arr, $fields, $replacement = '*')
+    
+    /**
+     * Scrub a data structure including arrays and query strings.
+     *
+     * @param mixed $data Data to be scrubbed.
+     * @param array $fields Sequence of field names to scrub.
+     * @param string $replacement Character used for scrubbing.
+     */
+    public function scrub(&$data, $replacement = '*')
     {
-        if (!$fields || !$arr) {
-            return null;
+        $fields = $this->getScrubFields();
+        
+        if (!$fields || !$data) {
+            return $data;
         }
+        
+        if (is_array($data)) { // scrub arrays
+        
+            $data = $this->scrubArray($data, $replacement);
+        } elseif (is_string($data)) { // scrub URLs and query strings
+            
+            $query = parse_url($data, PHP_URL_QUERY);
+            
+            /**
+             * String is not a URL but it still might be just a plain
+             * query string in format arg1=val1&arg2=val2
+             */
+            if (!$query) {
+                parse_str($data, $parsed);
+                $parsedValues = array_values($parsed);
+                
+                /**
+                 * If parsing a string results in an associative array
+                 * with multiple elements it's valid query string (key
+                 * recognition).
+                 *
+                 * Also, if it results in first key having an assigned value
+                 * it's also a valid query string (values recognition).
+                 */
+                if (count($parsed) > 1 || $parsedValues[0]) {
+                    $query = $data;
+                }
+            }
+                
+            if ($query) {
+                $data = str_replace(
+                    $query,
+                    $this->scrubQueryString($query),
+                    $data
+                );
+            }
+        }
+        
+        return $data;
+    }
 
-        $scrubber = function (&$val, $key) use ($fields, $replacement, $arr) {
+    protected function scrubArray(&$arr, $replacement = '*')
+    {
+        $fields = $this->getScrubFields();
+        
+        if (!$fields || !$arr) {
+            return $arr;
+        }
+        
+        $dataBuilder = $this;
 
-            if (key_exists($key, $arr)) {
+        $scrubber = function (&$val, $key) use ($fields, $replacement, &$scrubber, $dataBuilder) {
+            if (in_array($key, $fields, true)) {
                 $val = str_repeat($replacement, 8);
+            } else {
+                $val = $dataBuilder->scrub($val, $replacement);
             }
         };
-        array_walk_recursive($arr, $scrubber);
+
+        array_walk($arr, $scrubber);
+
         return $arr;
     }
 
-    protected function scrubUrl($url, $fields)
+    protected function scrubQueryString($query, $replacement = 'x')
     {
-        $urlQuery = parse_url($url, PHP_URL_QUERY);
-        if (!$urlQuery) {
-            return $url;
-        }
-
-        parse_str($urlQuery, $parsedOutput);
-        $scrubbedOutput = $this->scrub($parsedOutput, $fields, 'x');
-
-        return str_replace($urlQuery, http_build_query($scrubbedOutput), $url);
+        parse_str($query, $parsed);
+        $scrubbed = $this->scrub($parsed, $replacement);
+        return http_build_query($scrubbed);
     }
 
     // from http://www.php.net/manual/en/function.uniqid.php#94959
