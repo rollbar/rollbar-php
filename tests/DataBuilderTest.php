@@ -466,6 +466,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         
         stream_wrapper_unregister("php");
         stream_wrapper_register("php", "\Rollbar\TestHelpers\MockPhpStream");
+
         file_put_contents('php://input', $streamInput);
         
         $dataBuilder = new DataBuilder(array(
