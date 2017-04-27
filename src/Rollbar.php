@@ -101,4 +101,74 @@ class Rollbar
     {
         return new Response(0, "Rollbar Not Initialized");
     }
+    
+    /**
+     * Below methods are deprecated and still available only for backwards
+     * compatibility. If you're still using them in your application, please
+     * transition to using the ::log method as soon as possible.
+     */
+    
+    /**
+     * @param \Exception $exc Exception to be logged
+     * @param array $extra_data Additional data to be logged with the exception
+     * @param array $payload_data This is deprecated as of v1.0.0 and remains for
+     * backwards compatibility. The content fo this array will be merged with
+     * $extra_data.
+     * 
+     * @deprecated 1.0.0 This method has been replaced by ::log
+     */
+    public static function report_exception($exc, $extra_data = null, $payload_data = null) {
+        
+        $extra_data = array_merge($extra_data, $payload_data);
+        self::log($exc, $extra_data, Level::error());
+        
+    }
+
+    /**
+     * @param string $message Message to be logged
+     * @param string|Level::error() $level One of the values in \Rollbar\Payload\Level::$values 
+     * @param array $extra_data Additional data to be logged with the exception
+     * @param array $payload_data This is deprecated as of v1.0.0 and remains for
+     * backwards compatibility. The content fo this array will be merged with
+     * $extra_data.
+     * 
+     * @deprecated 1.0.0 This method has been replaced by ::log
+     */
+    public static function report_message($message, $level = null, $extra_data = null, $payload_data = null) {
+        
+        $level = $level ? Level::fromName($level) : Level::error();
+        $extra_data = array_merge($extra_data, $payload_data);
+        self::log($message, $extra_data, $level);
+        
+    }
+
+
+    /**
+     * Catch any fatal errors that are causing the shutdown
+     * 
+     * @deprecated 1.0.0 This method has been replaced by ::fatalHandler
+     */
+    public static function report_fatal_error() {
+        self::fatalHandler();
+    }
+
+
+    /**
+     * This function must return false so that the default php error handler runs
+     * 
+     * @deprecated 1.0.0 This method has been replaced by ::log
+     */
+    public static function report_php_error($errno, $errstr, $errfile, $errline) {
+        self::errorHandler($errno, $errstr, $errfile, $errline);
+        return false;
+    }
+
+    /**
+     * Do nothing silently to not cause backwards compatibility issues.
+     * 
+     * @deprecated 1.0.0
+     */
+    public static function flush() {
+        return;
+    }
 }
