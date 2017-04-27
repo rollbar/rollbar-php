@@ -175,6 +175,10 @@ class DataBuilder implements DataBuilderInterface
     protected function setRequestBody($c)
     {
         $this->requestBody = $this->tryGet($c, 'requestBody');
+        
+        if (!$this->requestBody) {
+            $this->requestBody = file_get_contents("php://input");
+        }
     }
 
     protected function setRequestExtras($c)
@@ -574,6 +578,7 @@ class DataBuilder implements DataBuilderInterface
         }
     }
 
+    
     protected function getRequestParams()
     {
         return $this->requestParams;

@@ -3,6 +3,7 @@
 namespace Rollbar;
 
 use Rollbar\Payload\Level;
+use Rollbar\TestHelpers\MockPhpStream;
 
 class DataBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -473,5 +474,28 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $result = $dataBuilder->scrub($testData, "@");
 
         $this->assertEquals("@@@@@@@@", $result['scrubit']);
+    }
+    
+    public function testSetRequestBody()
+    {
+        $_POST['arg1'] = "val1";
+        $_POST['arg2'] = "val2";
+        $streamInput = http_build_query($_POST);
+        
+        stream_wrapper_unregister("php");
+        stream_wrapper_register("php", "\Rollbar\TestHelpers\MockPhpStream");
+
+        file_put_contents('php://input', $streamInput);
+        
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests'
+        ));
+        $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
+        $requestBody = $output->getRequest()->getBody();
+        
+        $this->assertEquals($streamInput, $requestBody);
+        
+        stream_wrapper_restore("php");
     }
 }
