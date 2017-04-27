@@ -115,12 +115,14 @@ class Rollbar
      * backwards compatibility. The content fo this array will be merged with
      * $extra_data.
      * 
+     * @return string uuid
+     * 
      * @deprecated 1.0.0 This method has been replaced by ::log
      */
     public static function report_exception($exc, $extra_data = null, $payload_data = null) {
         
         $extra_data = array_merge($extra_data, $payload_data);
-        self::log($exc, $extra_data, Level::error());
+        return self::log($exc, $extra_data, Level::error())->getUuid();
         
     }
 
@@ -132,13 +134,15 @@ class Rollbar
      * backwards compatibility. The content fo this array will be merged with
      * $extra_data.
      * 
+     * @return string uuid
+     * 
      * @deprecated 1.0.0 This method has been replaced by ::log
      */
     public static function report_message($message, $level = null, $extra_data = null, $payload_data = null) {
         
         $level = $level ? Level::fromName($level) : Level::error();
         $extra_data = array_merge($extra_data, $payload_data);
-        self::log($message, $extra_data, $level);
+        return self::log($message, $extra_data, $level)->getUuid();
         
     }
 
