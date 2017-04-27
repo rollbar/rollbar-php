@@ -1,5 +1,7 @@
 <?php namespace Rollbar;
 
+use \Rollbar\Payload\Level;
+
 class Rollbar
 {
     /**
@@ -68,7 +70,7 @@ class Rollbar
             return;
         }
         $exception = self::generateErrorWrapper($errno, $errstr, $errfile, $errline);
-        self::$logger->log(null, $exception);
+        self::$logger->log(Level::error(), $exception);
     }
 
     public static function setupFatalHandling()
@@ -85,7 +87,7 @@ class Rollbar
             $errfile = $last_error['file'];
             $errline = $last_error['line'];
             $exception = self::generateErrorWrapper($errno, $errstr, $errfile, $errline);
-            self::$logger->log(null, $exception);
+            self::$logger->log(Level::critical(), $exception);
         }
     }
 
@@ -101,4 +103,89 @@ class Rollbar
     {
         return new Response(0, "Rollbar Not Initialized");
     }
+    
+    // @codingStandardsIgnoreStart
+    
+    /**
+     * Below methods are deprecated and still available only for backwards
+     * compatibility. If you're still using them in your application, please
+     * transition to using the ::log method as soon as possible.
+     */
+    
+    /**
+     * @param \Exception $exc Exception to be logged
+     * @param array $extra_data Additional data to be logged with the exception
+     * @param array $payload_data This is deprecated as of v1.0.0 and remains for
+     * backwards compatibility. The content fo this array will be merged with
+     * $extra_data.
+     *
+     * @return string uuid
+     *
+     * @deprecated 1.0.0 This method has been replaced by ::log
+     */
+    public static function report_exception($exc, $extra_data = null, $payload_data = null)
+    {
+        
+        if ($payload_data) {
+            $extra_data = array_merge($extra_data, $payload_data);
+        }
+        return self::log($exc, $extra_data, Level::error())->getUuid();
+    }
+
+    /**
+     * @param string $message Message to be logged
+     * @param string|Level::error() $level One of the values in \Rollbar\Payload\Level::$values
+     * @param array $extra_data Additional data to be logged with the exception
+     * @param array $payload_data This is deprecated as of v1.0.0 and remains for
+     * backwards compatibility. The content fo this array will be merged with
+     * $extra_data.
+     *
+     * @return string uuid
+     *
+     * @deprecated 1.0.0 This method has been replaced by ::log
+     */
+    public static function report_message($message, $level = null, $extra_data = null, $payload_data = null)
+    {
+        
+        $level = $level ? Level::fromName($level) : Level::error();
+        if ($payload_data) {
+            $extra_data = array_merge($extra_data, $payload_data);
+        }
+        return self::log($message, $extra_data, $level)->getUuid();
+    }
+
+
+    /**
+     * Catch any fatal errors that are causing the shutdown
+     *
+     * @deprecated 1.0.0 This method has been replaced by ::fatalHandler
+     */
+    public static function report_fatal_error()
+    {
+        self::fatalHandler();
+    }
+
+
+    /**
+     * This function must return false so that the default php error handler runs
+     *
+     * @deprecated 1.0.0 This method has been replaced by ::log
+     */
+    public static function report_php_error($errno, $errstr, $errfile, $errline)
+    {
+        self::errorHandler($errno, $errstr, $errfile, $errline);
+        return false;
+    }
+
+    /**
+     * Do nothing silently to not cause backwards compatibility issues.
+     *
+     * @deprecated 1.0.0
+     */
+    public static function flush()
+    {
+        return;
+    }
+    
+    // @codingStandardsIgnoreEnd
 }
