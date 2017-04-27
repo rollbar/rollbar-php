@@ -1,5 +1,7 @@
 <?php namespace Rollbar;
 
+use \Rollbar\Payload\Level;
+
 class Rollbar
 {
     /**
@@ -68,7 +70,7 @@ class Rollbar
             return;
         }
         $exception = self::generateErrorWrapper($errno, $errstr, $errfile, $errline);
-        self::$logger->log(null, $exception);
+        self::$logger->log(Level::error(), $exception);
     }
 
     public static function setupFatalHandling()
@@ -85,7 +87,7 @@ class Rollbar
             $errfile = $last_error['file'];
             $errline = $last_error['line'];
             $exception = self::generateErrorWrapper($errno, $errstr, $errfile, $errline);
-            self::$logger->log(null, $exception);
+            self::$logger->log(Level::critical(), $exception);
         }
     }
 
@@ -121,7 +123,9 @@ class Rollbar
      */
     public static function report_exception($exc, $extra_data = null, $payload_data = null) {
         
-        $extra_data = array_merge($extra_data, $payload_data);
+        if ($payload_data) {
+            $extra_data = array_merge($extra_data, $payload_data);
+        }
         return self::log($exc, $extra_data, Level::error())->getUuid();
         
     }
@@ -141,7 +145,9 @@ class Rollbar
     public static function report_message($message, $level = null, $extra_data = null, $payload_data = null) {
         
         $level = $level ? Level::fromName($level) : Level::error();
-        $extra_data = array_merge($extra_data, $payload_data);
+        if ($payload_data) {
+            $extra_data = array_merge($extra_data, $payload_data);
+        }
         return self::log($message, $extra_data, $level)->getUuid();
         
     }
