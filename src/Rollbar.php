@@ -104,6 +104,8 @@ class Rollbar
         return new Response(0, "Rollbar Not Initialized");
     }
     
+    // @codingStandardsIgnoreStart
+    
     /**
      * Below methods are deprecated and still available only for backwards
      * compatibility. If you're still using them in your application, please
@@ -184,4 +186,6 @@ class Rollbar
     {
         return;
     }
+    
+    // @codingStandardsIgnoreEnd
 }
