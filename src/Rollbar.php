@@ -116,69 +116,72 @@ class Rollbar
      * @param array $payload_data This is deprecated as of v1.0.0 and remains for
      * backwards compatibility. The content fo this array will be merged with
      * $extra_data.
-     * 
+     *
      * @return string uuid
-     * 
+     *
      * @deprecated 1.0.0 This method has been replaced by ::log
      */
-    public static function report_exception($exc, $extra_data = null, $payload_data = null) {
+    public static function report_exception($exc, $extra_data = null, $payload_data = null)
+    {
         
         if ($payload_data) {
             $extra_data = array_merge($extra_data, $payload_data);
         }
         return self::log($exc, $extra_data, Level::error())->getUuid();
-        
     }
 
     /**
      * @param string $message Message to be logged
-     * @param string|Level::error() $level One of the values in \Rollbar\Payload\Level::$values 
+     * @param string|Level::error() $level One of the values in \Rollbar\Payload\Level::$values
      * @param array $extra_data Additional data to be logged with the exception
      * @param array $payload_data This is deprecated as of v1.0.0 and remains for
      * backwards compatibility. The content fo this array will be merged with
      * $extra_data.
-     * 
+     *
      * @return string uuid
-     * 
+     *
      * @deprecated 1.0.0 This method has been replaced by ::log
      */
-    public static function report_message($message, $level = null, $extra_data = null, $payload_data = null) {
+    public static function report_message($message, $level = null, $extra_data = null, $payload_data = null)
+    {
         
         $level = $level ? Level::fromName($level) : Level::error();
         if ($payload_data) {
             $extra_data = array_merge($extra_data, $payload_data);
         }
         return self::log($message, $extra_data, $level)->getUuid();
-        
     }
 
 
     /**
      * Catch any fatal errors that are causing the shutdown
-     * 
+     *
      * @deprecated 1.0.0 This method has been replaced by ::fatalHandler
      */
-    public static function report_fatal_error() {
+    public static function report_fatal_error()
+    {
         self::fatalHandler();
     }
 
 
     /**
      * This function must return false so that the default php error handler runs
-     * 
+     *
      * @deprecated 1.0.0 This method has been replaced by ::log
      */
-    public static function report_php_error($errno, $errstr, $errfile, $errline) {
+    public static function report_php_error($errno, $errstr, $errfile, $errline)
+    {
         self::errorHandler($errno, $errstr, $errfile, $errline);
         return false;
     }
 
     /**
      * Do nothing silently to not cause backwards compatibility issues.
-     * 
+     *
      * @deprecated 1.0.0
      */
-    public static function flush() {
+    public static function flush()
+    {
         return;
     }
 }
