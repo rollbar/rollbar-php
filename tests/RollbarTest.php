@@ -4,7 +4,6 @@ if (!defined('ROLLBAR_TEST_TOKEN')) {
     define('ROLLBAR_TEST_TOKEN', 'ad865e76e7fb496fab096ac07b1dbabb');
 }
 
-
 use Rollbar\Rollbar;
 use Rollbar\Payload\Level;
 
@@ -47,42 +46,6 @@ class RollbarTest extends \PHPUnit_Framework_TestCase
         );
         
         $this->assertTrue(true);
-    }
-    
-    /**
-     * @expectedException \Exception
-     */
-    public function testQuickStart()
-    {
-        // installs global error and exception handlers
-        Rollbar::init(
-            array(
-                'access_token' => ROLLBAR_TEST_TOKEN,
-                'environment' => 'production'
-            )
-        );
-        
-        try {
-            throw new \Exception('test exception');
-        } catch (\Exception $e) {
-            Rollbar::log(Level::error(), $e);
-        }
-        
-        // Message at level 'info'
-        Rollbar::log(Level::info(), 'testing info level');
-        
-        // With extra data (3rd arg) and custom payload options (4th arg)
-        Rollbar::log(
-            Level::info(),
-            'testing extra data',
-            array("some_key" => "some value") // key-value additional data
-        );
-        
-        // raises an E_NOTICE which will *not* be reported by the error handler
-        $foo = $bar;
-        
-        // will be reported by the exception handler
-        throw new \Exception('testing exception handler');
     }
 
     /**
