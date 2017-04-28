@@ -258,6 +258,11 @@ class Config
     {
         return $this->dataBuilder->makeData($level, $toLog, $context);
     }
+    
+    public function getDataBuilder()
+    {
+        return $this->dataBuilder;
+    }
 
     /**
      * @param Payload $payload
@@ -329,9 +334,9 @@ class Config
         return error_reporting() === 0 && !$this->reportSuppressed;
     }
 
-    public function send($payload, $accessToken)
+    public function send(&$scrubbedPayload, $accessToken)
     {
-        return $this->sender->send($payload, $accessToken);
+        return $this->sender->send($scrubbedPayload, $accessToken);
     }
 
     public function handleResponse($payload, $response)
