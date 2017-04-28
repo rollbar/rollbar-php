@@ -1,5 +1,7 @@
 <?php namespace Rollbar;
 
+use Rollbar\Payload\Level;
+
 class Rollbar
 {
     /**
