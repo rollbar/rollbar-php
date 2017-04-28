@@ -10,12 +10,14 @@ use Rollbar\Payload\Level;
 use Monolog\Logger;
 
 // used in testBasicUsage()
-function do_something() {
-    throw new \Exception();    
+function do_something()
+{
+    throw new \Exception();
 }
 
 class ReadmeTest extends \PHPUnit_Framework_TestCase
-{   
+{
+
     /**
      * @expectedException \Exception
      */
@@ -100,7 +102,7 @@ class ReadmeTest extends \PHPUnit_Framework_TestCase
     {
         Rollbar::log(Level::warning(), 'could not connect to mysql server');
         Rollbar::log(
-            Level::info(), 
+            Level::info(),
             'Here is a message with some additional data',
             array('x' => 10, 'code' => 'blue')
         );

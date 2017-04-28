@@ -17,7 +17,7 @@ class RollbarTest extends \PHPUnit_Framework_TestCase
     
     public function setUp()
     {
-        Rollbar::init(self::$simpleConfig);   
+        Rollbar::init(self::$simpleConfig);
     }
     
     public function testLogException()
