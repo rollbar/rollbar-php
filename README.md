@@ -161,7 +161,7 @@ Rollbar::log(
 
 Here is an example of how to use Rollbar as a handler for Monolog:
 
-```
+```php
 use Monolog\Logger;
 use Rollbar\Rollbar;
 use Rollbar\Payload\Level;
