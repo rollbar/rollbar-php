@@ -16,32 +16,32 @@ use \Rollbar\Payload\Level;
 // installs global error and exception handlers
 Rollbar::init(
     array(
-        'access_token' => 'POST_SERVER_ITEM_ACCESS_TOKEN',
+        'access_token' => ROLLBAR_TEST_TOKEN,
         'environment' => 'production'
     )
 );
 
 try {
-    throw new Exception('test exception');
-} catch (Exception $e) {
-    Rollbar::log($e);
+    throw new \Exception('test exception');
+} catch (\Exception $e) {
+    Rollbar::log(Level::error(), $e);
 }
 
 // Message at level 'info'
-Rollbar::log('testing 123', null, Level::info());
+Rollbar::log(Level::info(), 'testing info level');
 
 // With extra data (3rd arg) and custom payload options (4th arg)
 Rollbar::log(
-    'testing 123',
-    array("some_key" => "some value"), // key-value additional data
-    Level::info()
+    Level::info(),
+    'testing extra data',
+    array("some_key" => "some value") // key-value additional data
 );
 
 // raises an E_NOTICE which will *not* be reported by the error handler
 $foo = $bar;
 
 // will be reported by the exception handler
-throw new Exception('test 2');
+throw new \Exception('testing exception handler');
 ?>
 ```
 
