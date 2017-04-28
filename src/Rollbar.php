@@ -46,15 +46,20 @@ class Rollbar
 
     public static function setupExceptionHandling()
     {
-        set_exception_handler('Rollbar\Rollbar::log');
+        set_exception_handler('Rollbar\Rollbar::exceptionHandler');
+    }
+    
+    public static function exceptionHandler($exception)
+    {
+        return self::log(Level::error(), $exception);
     }
 
-    public static function log($exc, $extra = null, $level = null)
+    public static function log($level, $toLog, $extra = array())
     {
         if (is_null(self::$logger)) {
             return self::getNotInitializedResponse();
         }
-        return self::$logger->log($level, $exc, (array) $extra);
+        return self::$logger->log($level, $toLog, $extra);
     }
 
     public static function setupErrorHandling()
