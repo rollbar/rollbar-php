@@ -61,7 +61,7 @@ class Rollbar
         if (is_null(self::$logger)) {
             return self::getNotInitializedResponse();
         }
-        return self::$logger->log($level, $toLog, $extra);
+        return self::$logger->log($level, $toLog, (array)$extra);
     }
 
     public static function setupErrorHandling()
@@ -134,7 +134,7 @@ class Rollbar
         if ($payload_data) {
             $extra_data = array_merge($extra_data, $payload_data);
         }
-        return self::log($exc, $extra_data, Level::error())->getUuid();
+        return self::log(Level::error(), $exc, $extra_data)->getUuid();
     }
 
     /**
@@ -156,7 +156,7 @@ class Rollbar
         if ($payload_data) {
             $extra_data = array_merge($extra_data, $payload_data);
         }
-        return self::log($message, $extra_data, $level)->getUuid();
+        return self::log($level, $message, $extra_data)->getUuid();
     }
 
 

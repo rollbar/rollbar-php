@@ -4,6 +4,10 @@ if (!defined('ROLLBAR_TEST_TOKEN')) {
     define('ROLLBAR_TEST_TOKEN', 'ad865e76e7fb496fab096ac07b1dbabb');
 }
 
+
+use Rollbar\Rollbar;
+use Rollbar\Payload\Level;
+
 class RollbarTest extends \PHPUnit_Framework_TestCase
 {
 
@@ -11,18 +15,80 @@ class RollbarTest extends \PHPUnit_Framework_TestCase
         'access_token' => ROLLBAR_TEST_TOKEN,
         'environment' => 'test'
     );
-
-    public function testInit()
+    
+    public function setUp()
     {
-        Rollbar::init(self::$simpleConfig);
-
-        $this->assertNotNull(Rollbar::logger());
+        Rollbar::init(self::$simpleConfig);   
+    }
+    
+    public function testLogException()
+    {
+        try {
+            throw new \Exception('test exception');
+        } catch (\Exception $e) {
+            Rollbar::log(Level::error(), $e);
+        }
+        
+        $this->assertTrue(true);
+    }
+    
+    public function testLogMessage()
+    {
+        Rollbar::log(Level::info(), 'testing info level');
+        $this->assertTrue(true);
+    }
+    
+    public function testLogExtraData()
+    {
+        Rollbar::log(
+            Level::info(),
+            'testing extra data',
+            array("some_key" => "some value") // key-value additional data
+        );
+        
+        $this->assertTrue(true);
+    }
+    
+    /**
+     * @expectedException \Exception
+     */
+    public function testQuickStart()
+    {
+        // installs global error and exception handlers
+        Rollbar::init(
+            array(
+                'access_token' => ROLLBAR_TEST_TOKEN,
+                'environment' => 'production'
+            )
+        );
+        
+        try {
+            throw new \Exception('test exception');
+        } catch (\Exception $e) {
+            Rollbar::log(Level::error(), $e);
+        }
+        
+        // Message at level 'info'
+        Rollbar::log(Level::info(), 'testing info level');
+        
+        // With extra data (3rd arg) and custom payload options (4th arg)
+        Rollbar::log(
+            Level::info(),
+            'testing extra data',
+            array("some_key" => "some value") // key-value additional data
+        );
+        
+        // raises an E_NOTICE which will *not* be reported by the error handler
+        $foo = $bar;
+        
+        // will be reported by the exception handler
+        throw new \Exception('testing exception handler');
     }
 
     /**
      * Below are backwards compatibility tests with v0.18.2
      */
-    public function testSimpleMessage()
+    public function testBackwardsSimpleMessageVer()
     {
         Rollbar::init(self::$simpleConfig);
 
@@ -30,7 +96,7 @@ class RollbarTest extends \PHPUnit_Framework_TestCase
         $this->assertStringMatchesFormat('%x-%x-%x-%x-%x', $uuid);
     }
     
-    public function testSimpleError()
+    public function testBackwardsSimpleError()
     {
         Rollbar::init(self::$simpleConfig);
         
@@ -39,7 +105,7 @@ class RollbarTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($result);
     }
     
-    public function testSimpleException()
+    public function testBackwardsSimpleException()
     {
         Rollbar::init(self::$simpleConfig);
         
@@ -53,7 +119,7 @@ class RollbarTest extends \PHPUnit_Framework_TestCase
         $this->assertStringMatchesFormat('%x-%x-%x-%x-%x', $uuid);
     }
 
-    public function testFlush()
+    public function testBackwardsFlush()
     {
         Rollbar::flush();
         $this->assertTrue(true);
