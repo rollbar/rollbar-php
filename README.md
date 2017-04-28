@@ -1,4 +1,4 @@
-# Rollbar notifier for PHP [![Build Status](https://travis-ci.org/rollbar/rollbar-php.png?branch=v0.15.0)](https://travis-ci.org/rollbar/rollbar-php)
+# Rollbar notifier for PHP [![Build Status](https://api.travis-ci.org/rollbar/rollbar-php.png)](https://travis-ci.org/rollbar/rollbar-php)
 
 <!-- RemoveNext -->
 
@@ -10,24 +10,32 @@ This library detects errors and exceptions in your application and reports them 
 
 ```php
 <?php
+use \Rollbar\Rollbar;
+use \Rollbar\Payload\Level;
+
 // installs global error and exception handlers
-Rollbar::init(array('access_token' => 'POST_SERVER_ITEM_ACCESS_TOKEN'));
+Rollbar::init(
+    array(
+        'access_token' => 'POST_SERVER_ITEM_ACCESS_TOKEN',
+        'environment' => 'production'
+    )
+);
 
 try {
     throw new Exception('test exception');
 } catch (Exception $e) {
-    Rollbar::report_exception($e);
+    Rollbar::log($e);
 }
 
 // Message at level 'info'
-Rollbar::report_message('testing 123', Level::INFO);
+Rollbar::log('testing 123', null, Level::info());
 
 // With extra data (3rd arg) and custom payload options (4th arg)
-Rollbar::report_message('testing 123', Level::INFO,
-                        // key-value additional data
-                        array("some_key" => "some value"),  
-                        // payload options (overrides defaults) - see api docs
-                        array("fingerprint" => "custom-fingerprint-here"));
+Rollbar::log(
+    'testing 123',
+    array("some_key" => "some value"), // key-value additional data
+    Level::info()
+);
 
 // raises an E_NOTICE which will *not* be reported by the error handler
 $foo = $bar;
