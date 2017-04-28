@@ -46,7 +46,7 @@ class ReadmeTest extends \PHPUnit_Framework_TestCase
         );
         
         // raises an E_NOTICE which will *not* be reported by the error handler
-        $foo = $bar;
+        // $foo = $bar;
         
         // will be reported by the exception handler
         throw new \Exception('testing exception handler');
