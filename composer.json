@@ -40,7 +40,8 @@
     "phpunit/phpunit": "4.8.*",
     "mockery/mockery": "0.9.*",
     "squizlabs/php_codesniffer": "2.*",
-    "codeclimate/php-test-reporter": "dev-master"
+    "codeclimate/php-test-reporter": "dev-master",
+    "monolog/monolog": "*"
   },
 
   "scripts": {
