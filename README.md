@@ -471,4 +471,8 @@ For bug reports, please [open an issue on GitHub](https://github.com/rollbar/rol
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
 
-Tests are in `tests`. To run the tests: `phpunit`
+
+### Testing
+Tests are in `tests`.
+To run the tests: `composer test`
+To fix code style issues: `composer fix`
