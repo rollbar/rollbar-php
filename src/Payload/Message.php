@@ -9,8 +9,8 @@ class Message extends ContentInterface
     private $backtrace;
 
     public function __construct(
-        $body, 
-        array $extra = null, 
+        $body,
+        array $extra = null,
         $backtrace = null
     ) {
         $this->setBody($body);
