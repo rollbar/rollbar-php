@@ -60,7 +60,7 @@ class Rollbar
             throw $exception;
         } else {
             header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
-            exit(1);    
+            exit(1);
         }
     }
 
