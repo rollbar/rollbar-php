@@ -36,6 +36,12 @@ Rollbar::log(
     'testing extra data',
     array("some_key" => "some value") // key-value additional data
 );
+        
+// If you want to check if logging with Rollbar was successful
+$response = Rollbar::log(Level::info(), 'testing wasSuccessful()');
+if (!$response->wasSuccessful()) {
+    throw new \Exception('logging with Rollbar failed');
+}
 
 // raises an E_NOTICE which will *not* be reported by the error handler
 $foo = $bar;
