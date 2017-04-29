@@ -55,13 +55,8 @@ class Rollbar
     {
         self::log(Level::error(), $exception);
         
-        if (ini_get('display_errors')) {
-            restore_exception_handler();
-            throw $exception;
-        } else {
-            header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
-            exit(1);
-        }
+        restore_exception_handler();
+        throw $exception;
     }
 
     public static function log($level, $toLog, $extra = array())
