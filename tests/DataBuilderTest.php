@@ -61,6 +61,12 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
         $this->assertEquals('my host', $output->getServer()->getHost());
     }
+    
+    public function testGetMessage()
+    {
+        $result = $this->dataBuilder->makeData(Level::fromName('error'), "testing", array());
+        $this->assertNotEmpty($result->getBody()->getValue()->getBacktrace());
+    }
 
     public function testFramesWithoutContext()
     {

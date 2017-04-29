@@ -435,7 +435,7 @@ class DataBuilder implements DataBuilderInterface
 
     protected function getMessage($toLog, $context)
     {
-        return new Message((string)$toLog, $context);
+        return new Message((string)$toLog, $context, debug_backtrace());
     }
 
     protected function getLevel($level, $toLog)
