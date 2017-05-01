@@ -775,14 +775,10 @@ class DataBuilder implements DataBuilderInterface
                 $parsedValues = array_values($parsed);
                 
                 /**
-                 * If parsing a string results in an associative array
-                 * with multiple elements it's valid query string (key
-                 * recognition).
-                 *
-                 * Also, if it results in first key having an assigned value
-                 * it's also a valid query string (values recognition).
+                 * If we have at least one key/value pair (i.e. a=b) then
+                 * we treat the whole string as a query string.
                  */
-                if (count($parsed) > 1 || $parsedValues[0]) {
+                if (count(array_filter($parsedValues)) > 0) {
                     $query = $data;
                 }
             }
