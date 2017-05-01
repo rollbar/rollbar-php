@@ -221,8 +221,6 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         return array_merge(array(
             'flat data array' =>
                 $this->scrubFlatDataProvider(),
-            'plain numbers in an array' =>
-                $this->scrubJSONNumbersProvider(),
             'recursive data array' =>
                 $this->scrubRecursiveDataProvider(),
             'string encoded values' =>
@@ -231,17 +229,26 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
                 $this->scrubRecursiveStringDataProvider(),
             'string encoded recursive values in recursive array' =>
                 $this->scrubRecursiveStringRecursiveDataProvider()
-        ), $this->scrubUrlDataProvider());
+        ), $this->scrubUrlDataProvider(), $this->scrubJSONNumbersProvider());
     }
 
     private function scrubJSONNumbersProvider()
     {
         return array(
-            '[1023,1924]',
-            array(
-                'sensitive'
+            'plain array' => array(
+                  '[1023,1924]',
+                  array(
+                      'sensitive'
+                  ),
+                  '[1023,1924]'
             ),
-            '[1023,1924]'
+            'param equals array' => array(
+                'b=[1023,1924]',
+                array(
+                    'sensitive'
+                ),
+                'b=%5B1023%2C1924%5D'
+            )
         );
     }
 
