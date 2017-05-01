@@ -221,6 +221,8 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         return array_merge(array(
             'flat data array' =>
                 $this->scrubFlatDataProvider(),
+            'plain numbers in an array' =>
+                $this->scrubJSONNumbersProvider(),
             'recursive data array' =>
                 $this->scrubRecursiveDataProvider(),
             'string encoded values' =>
@@ -231,7 +233,18 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
                 $this->scrubRecursiveStringRecursiveDataProvider()
         ), $this->scrubUrlDataProvider());
     }
-    
+
+    private function scrubJSONNumbersProvider()
+    {
+        return array(
+            '[1023,1924]',
+            array(
+                'sensitive'
+            ),
+            '[1023,1924]'
+        );
+    }
+
     private function scrubFlatDataProvider()
     {
         return array(
@@ -255,9 +268,13 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             array( // $testData
                 'non sensitive data 1' => '123',
                 'non sensitive data 2' => '456',
+                'non sensitive data 3' => '4&56',
+                'non sensitive data 4' => 'a=4&56',
+                'non sensitive data 6' => 'baz&foo=bar',
                 'sensitive data' => '456',
                 array(
                     'non sensitive data 3' => '789',
+                    'non sensitive data 5' => '789&5=',
                     'recursive sensitive data' => 'qwe',
                     'non sensitive data 3' => 'rty',
                     array(
@@ -267,14 +284,19 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             ),
             array( // $scrubFields
                 'sensitive data',
-                'recursive sensitive data'
+                'recursive sensitive data',
+                'foo'
             ),
             array( // $expected
                 'non sensitive data 1' => '123',
                 'non sensitive data 2' => '456',
+                'non sensitive data 3' => '4&56',
+                'non sensitive data 4' => 'a=4&56=', // this is a weird edge case
+                'non sensitive data 6' => 'baz=&foo=xxxxxxxx',
                 'sensitive data' => '********',
                 array(
                     'non sensitive data 3' => '789',
+                    'non sensitive data 5' => '789&5=',
                     'recursive sensitive data' => '********',
                     'non sensitive data 3' => 'rty',
                     array(
