@@ -27,6 +27,28 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $output = $this->dataBuilder->makeData(Level::fromName('error'), "testing", array());
         $this->assertEquals('tests', $output->getEnvironment());
     }
+    
+    /**
+     * @dataProvider forwardHeaderProvider
+     */
+    public function testForwardedHeader($forwaded, $expected)
+    {
+        
+    }
+    
+    public function forwardedHeaderProvider()
+    {
+        return array(
+            array( // test 1
+                'forwarded header 1',
+                'expected value 1'
+            ),
+            array( // test 2
+                'forwarded header 2',
+                'expected value 2'
+            ),
+        );
+    }
 
     public function testBranchKey()
     {
