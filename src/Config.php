@@ -284,12 +284,12 @@ class Config
         return $this->accessToken;
     }
 
-    public function checkIgnored($payload, $accessToken, $toLog)
+    public function checkIgnored($payload, $accessToken, $toLog, $isUncaught)
     {
         if ($this->shouldSuppress()) {
             return true;
         }
-        if (isset($this->checkIgnore) && call_user_func($this->checkIgnore)) {
+        if (isset($this->checkIgnore) && call_user_func($this->checkIgnore, $isUncaught, $toLog, $payload)) {
             return true;
         }
         if ($this->levelTooLow($payload)) {

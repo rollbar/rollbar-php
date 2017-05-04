@@ -146,21 +146,21 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             ->andReturn(Level::DEBUG())
             ->mock();
         $debug = new Payload($debugData, $accessToken);
-        $this->assertTrue($config->checkIgnored($debug, null, $this->error));
+        $this->assertTrue($config->checkIgnored($debug, null, $this->error, false));
 
         $criticalData = m::mock("Rollbar\Payload\Data")
             ->shouldReceive('getLevel')
             ->andReturn(Level::CRITICAL())
             ->mock();
         $critical = new Payload($criticalData, $accessToken);
-        $this->assertFalse($config->checkIgnored($critical, null, $this->error));
+        $this->assertFalse($config->checkIgnored($critical, null, $this->error, false));
 
         $warningData = m::mock("Rollbar\Payload\Data")
             ->shouldReceive('getLevel')
             ->andReturn(Level::warning())
             ->mock();
         $warning = new Payload($warningData, $accessToken);
-        $this->assertFalse($config->checkIgnored($warning, null, $this->error));
+        $this->assertFalse($config->checkIgnored($warning, null, $this->error, false));
     }
 
     public function testReportSuppressed()
@@ -188,8 +188,8 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             "environment" => $this->env,
             "filter" => $filter
         ));
-        $this->assertTrue($c->checkIgnored($p, "fake_access_token", $this->error));
-        $this->assertFalse($c->checkIgnored($p, "fake_access_token", $this->error));
+        $this->assertTrue($c->checkIgnored($p, "fake_access_token", $this->error, false));
+        $this->assertFalse($c->checkIgnored($p, "fake_access_token", $this->error, false));
     }
 
     public function testSender()
@@ -214,13 +214,32 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $c = new Config(array(
             "access_token" => $this->token,
             "environment" => $this->env,
-            "checkIgnore" => function () use (&$called) {
+            "checkIgnore" => function ($isIgnored, $exc, $payload) use (&$called) {
                 $called = true;
             }
         ));
         $data = new Data($this->env, new Body(new Message("test")));
         $data->setLevel(Level::fromName('error'));
-        $c->checkIgnored(new Payload($data, $c->getAccessToken()), $this->token, $this->error);
+        $c->checkIgnored(new Payload($data, $c->getAccessToken()), $this->token, $this->error, false);
+
+        $this->assertTrue($called);
+    }
+
+    public function testCheckIgnoreParameters()
+    {
+        $called = false;
+        $c = new Config(array(
+            "access_token" => $this->token,
+            "environment" => $this->env,
+            "checkIgnore" => function ($isIgnored, $exc, $payload) use (&$called) {
+                $this->assertTrue($isIgnored);
+                $this->assertEquals($exc, $this->error);
+                $called = true;
+            }
+        ));
+        $data = new Data($this->env, new Body(new Message("test")));
+        $data->setLevel(Level::fromName('error'));
+        $c->checkIgnored(new Payload($data, $c->getAccessToken()), $this->token, $this->error, true);
 
         $this->assertTrue($called);
     }

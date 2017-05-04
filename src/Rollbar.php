@@ -1,6 +1,7 @@
 <?php namespace Rollbar;
 
 use Rollbar\Payload\Level;
+use Rollbar\Utilities;
 
 class Rollbar
 {
@@ -53,7 +54,7 @@ class Rollbar
     
     public static function exceptionHandler($exception)
     {
-        return self::log(Level::error(), $exception);
+        return self::log(Level::error(), $exception, array(Utilities::IS_UNCAUGHT_KEY => true));
     }
 
     public static function log($level, $toLog, $extra = array())
@@ -75,7 +76,7 @@ class Rollbar
             return;
         }
         $exception = self::generateErrorWrapper($errno, $errstr, $errfile, $errline);
-        self::$logger->log(Level::error(), $exception);
+        self::$logger->log(Level::error(), $exception, array(Utilities::IS_UNCAUGHT_KEY => true));
     }
 
     public static function setupFatalHandling()
@@ -95,7 +96,8 @@ class Rollbar
             $errfile = $last_error['file'];
             $errline = $last_error['line'];
             $exception = self::generateErrorWrapper($errno, $errstr, $errfile, $errline);
-            self::$logger->log(Level::critical(), $exception);
+            $extra = array(Utilities::IS_UNCAUGHT_KEY => true);
+            self::$logger->log(Level::critical(), $exception, $extra);
         }
     }
 
