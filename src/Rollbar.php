@@ -53,7 +53,10 @@ class Rollbar
     
     public static function exceptionHandler($exception)
     {
-        return self::log(Level::error(), $exception);
+        self::log(Level::error(), $exception);
+        
+        restore_exception_handler();
+        throw $exception;
     }
 
     public static function log($level, $toLog, $extra = array())
