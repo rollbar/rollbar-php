@@ -289,8 +289,15 @@ class Config
         if ($this->shouldSuppress()) {
             return true;
         }
-        if (isset($this->checkIgnore) && call_user_func($this->checkIgnore, $isUncaught, $toLog, $payload)) {
-            return true;
+        if (isset($this->checkIgnore)) {
+            try {
+                if (call_user_func($this->checkIgnore, $isUncaught, $toLog, $payload)) {
+                    return true;
+                }
+            } catch (Exception $e) {
+                // We should log that we are removing the custom checkIgnore
+                $this->checkIgnore = null;
+            }
         }
         if ($this->levelTooLow($payload)) {
             return true;
