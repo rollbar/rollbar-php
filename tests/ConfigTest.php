@@ -214,7 +214,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $c = new Config(array(
             "access_token" => $this->token,
             "environment" => $this->env,
-            "checkIgnore" => function ($isIgnored, $exc, $payload) use (&$called) {
+            "checkIgnore" => function ($isUncaught, $exc, $payload) use (&$called) {
                 $called = true;
             }
         ));
@@ -228,14 +228,15 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function testCheckIgnoreParameters()
     {
         $called = false;
-        $that = $this;
+        $isUncaughtPassed = null;
+        $errorPassed = null;
         $c = new Config(array(
             "access_token" => $this->token,
             "environment" => $this->env,
-            "checkIgnore" => function ($isIgnored, $exc, $payload) use (&$called, &$that) {
-                $that->assertTrue($isIgnored);
-                $that->assertEquals($exc, $that->error);
+            "checkIgnore" => function ($isUncaught, $exc, $payload) use (&$called, &$isUncaughtPassed, &$errorPassed) {
                 $called = true;
+                $isUncaughtPassed = $isUncaught;
+                $errorPassed = $exc;
             }
         ));
         $data = new Data($this->env, new Body(new Message("test")));
@@ -243,5 +244,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $c->checkIgnored(new Payload($data, $c->getAccessToken()), $this->token, $this->error, true);
 
         $this->assertTrue($called);
+        $this->assertTrue($isUncaughtPassed);
+        $this->assertEquals($this->error, $errorPassed);
     }
 }
