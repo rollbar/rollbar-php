@@ -35,7 +35,7 @@ class RollbarLogger extends AbstractLogger
             throw new \Psr\Log\InvalidArgumentException("Invalid log level '$level'.");
         }
         $isUncaught = false;
-        if ($context[Utilities::IS_UNCAUGHT_KEY]) {
+        if (array_key_exists(Utilities::IS_UNCAUGHT_KEY, $context) && $context[Utilities::IS_UNCAUGHT_KEY]) {
             $isUncaught = true;
             unset($context[Utilities::IS_UNCAUGHT_KEY]);
         }
