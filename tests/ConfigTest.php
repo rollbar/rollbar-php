@@ -228,12 +228,13 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function testCheckIgnoreParameters()
     {
         $called = false;
+        $that = $this;
         $c = new Config(array(
             "access_token" => $this->token,
             "environment" => $this->env,
-            "checkIgnore" => function ($isIgnored, $exc, $payload) use (&$called) {
-                $this->assertTrue($isIgnored);
-                $this->assertEquals($exc, $this->error);
+            "checkIgnore" => function ($isIgnored, $exc, $payload) use (&$called, &$that) {
+                $that->assertTrue($isIgnored);
+                $that->assertEquals($exc, $that->error);
                 $called = true;
             }
         ));
