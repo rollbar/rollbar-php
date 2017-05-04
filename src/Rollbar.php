@@ -85,6 +85,9 @@ class Rollbar
 
     public static function fatalHandler()
     {
+        if (is_null(self::$logger)) {
+            return;
+        }
         $last_error = error_get_last();
         if (!is_null($last_error)) {
             $errno = $last_error['type'];
