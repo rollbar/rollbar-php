@@ -509,18 +509,91 @@ class DataBuilder implements DataBuilderInterface
         }
         return $request;
     }
-
-    protected function getUrl()
+    
+    public function parseForwardedString($forwarded)
     {
-        if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+        $result = array();
+        
+        // Remove Forwarded   = 1#forwarded-element header prefix
+        $parts = trim(str_replace('Forwarded:', '', $forwarded));
+        
+        /**
+         * Break up the forwarded-element =
+         *  [ forwarded-pair ] *( ";" [ forwarded-pair ] )
+         */
+        $parts = explode(';', $parts);
+        
+        /**
+         * Parse forwarded pairs
+         */
+        foreach ($parts as $forwardedPair) {
+            $forwardedPair = trim($forwardedPair);
+            
+            
+            if (stripos($forwardedPair, 'host=') !== false) {
+                
+                // Parse 'host' forwarded pair    
+                $result['host'] = substr($forwardedPair, strlen('host='));
+                
+            } elseif (stripos($forwardedPair, 'proto=') !== false) {
+                
+                // Parse 'proto' forwarded pair
+                $result['proto'] = substr($forwardedPair, strlen('proto='));
+                
+            } else {
+                
+                // Parse 'for' and 'by' forwarded pairs which are comma separated
+                $fpParts = explode(',' ,$forwardedPair);
+                foreach ($fpParts as $fpPart) {
+                    
+                    $fpPart = trim($fpPart);
+                    
+                    if (stripos($fpPart, 'for=') !== false) {
+                
+                        // Parse 'for' forwarded pair
+                        $result['for'] = is_array($result['for']) ? $result['for'] : array();
+                        $result['for'][] = substr($fpPart, strlen('for='));
+                        
+                    } elseif (stripos($fpPart, 'by=') !== false) {
+                        
+                        // Parse 'by' forwarded pair
+                        $result['by'] = is_array($result['by']) ? $result['by'] : array();
+                        $result['by'][] = substr($fpPart, strlen('by='));
+                        
+                    } 
+                    
+                }
+            }
+        }
+        
+        return $result;
+        
+    }
+    
+    public function getUrlProto()
+    {
+        $proto = '';
+        
+        if (!empty($_SERVER['HTTP_FORWARDED'])) {
+            extract($this->parseForwardedString($_SERVER['HTTP_FORWARDED']));
+        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
             $proto = strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']);
         } elseif (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
             $proto = 'https';
         } else {
             $proto = 'http';
         }
-
-        if (!empty($_SERVER['HTTP_X_FORWARDED_HOST'])) {
+        
+        return $proto;
+    }
+    
+    public function getUrlHost()
+    {
+        $host = '';
+        
+        if (!empty($_SERVER['HTTP_FORWARDED'])) {
+            extract($this->parseForwardedString($_SERVER['HTTP_FORWARDED']));
+        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_HOST'])) {
             $host = $_SERVER['HTTP_X_FORWARDED_HOST'];
         } elseif (!empty($_SERVER['HTTP_HOST'])) {
             $parts = explode(':', $_SERVER['HTTP_HOST']);
@@ -530,7 +603,14 @@ class DataBuilder implements DataBuilderInterface
         } else {
             $host = 'unknown';
         }
-
+        
+        return $host;
+    }
+    
+    public function getUrlPort($proto)
+    {
+        $port = '';
+        
         if (!empty($_SERVER['HTTP_X_FORWARDED_PORT'])) {
             $port = $_SERVER['HTTP_X_FORWARDED_PORT'];
         } elseif (!empty($_SERVER['SERVER_PORT'])) {
@@ -540,6 +620,16 @@ class DataBuilder implements DataBuilderInterface
         } else {
             $port = 80;
         }
+        
+        return $port;
+    }
+
+    public function getUrl()
+    {
+        $proto = $this->getUrlProto();
+        $host = $this->getUrlHost();
+        $port = $this->getUrlPort($proto);
+        
 
         $path = Utilities::coalesce($this->tryGet($_SERVER, 'REQUEST_URI'), '/');
         $url = $proto . '://' . $host;

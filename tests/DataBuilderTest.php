@@ -29,24 +29,230 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
-     * @dataProvider forwardHeaderProvider
+     * @dataProvider getUrlProvider
      */
-    public function testForwardedHeader($forwaded, $expected)
+    public function testGetUrl($forwaded, $expected)
+    {
+        // Given the header
+        
+        // When DataBuilder builds the data
+        $output = $this->dataBuilder->makeData(Level::fromName('error'), "testing", array());
+        
+        // The identifier, protocol and host of the origin is included
+        // in the payload
+        $this->assertEquals($expected['identifier'], $output);
+        $this->assertEquals($expected['proto'], $output);
+        $this->assertEquals($expected['host'], $output);
+        
+    }
+    
+    public function getUrlProvider()
     {
         
     }
     
-    public function forwardedHeaderProvider()
+    /**
+     * @dataProvider parseForwardedStringProvider
+     */
+    public function testParseForwardedString($forwaded, $expected)
+    {
+        $output = $this->dataBuilder->parseForwardedString($forwaded);
+        $this->assertEquals($expected, $output);
+    }
+    
+    public function parseForwardedStringProvider()
     {
         return array(
             array( // test 1
-                'forwarded header 1',
-                'expected value 1'
+                'Forwarded: for="_mdn" ',
+                array(
+                    'for' => array('"_mdn"')
+                )
             ),
             array( // test 2
-                'forwarded header 2',
-                'expected value 2'
+                'Forwarded: for="_mdn", for="_mdn2" ',
+                array(
+                    'for' => array('"_mdn"', '"_mdn2"')
+                )
             ),
+            array( // test 3
+                'Forwarded: For="[2001:db8:cafe::17]:4711"',
+                array(
+                    'for' => array('"[2001:db8:cafe::17]:4711"')
+                )
+            ),
+            array( // test 4
+                'Forwarded: for=192.0.2.60; proto=http; by=203.0.113.43',
+                array(
+                    'for' => array('192.0.2.60'),
+                    'by' => array('203.0.113.43'),
+                    'proto' => 'http'
+                )
+            ),
+            array( // test 5
+                'Forwarded: for=192.0.2.43, for=198.51.100.17;'.
+                           'by=192.0.2.44, by=198.51.100.18',
+                array(
+                    'for' => array('192.0.2.43','198.51.100.17'),
+                    'by' => array('192.0.2.44','198.51.100.18')
+                )
+            ),
+            array( // test 6
+                'Forwarded: for=192.0.2.60; host=hostname; by=203.0.113.43; proto=https',
+                array(
+                    'for' => array('192.0.2.60'), 
+                    'by' => array('203.0.113.43'), 
+                    'host' => 'hostname',
+                    'proto' => 'https'
+                )
+            )
+        );
+    }
+    
+    /**
+     * @dataProvider getUrlProtoProvider
+     */
+    public function testGetUrlProto($data, $expected)
+    {
+        $_SERVER = array_merge($_SERVER, $data);
+        
+        $output = $this->dataBuilder->getUrlProto();
+        
+        $this->assertEquals($expected, $output);
+        
+        $_SERVER = array_diff($_SERVER, $data);
+        
+    }
+    
+    public function getUrlProtoProvider()
+    {
+        return array(
+            array( // test 1: HTTP_FORWARDED
+                array(
+                    'HTTP_FORWARDED' => 'Forwarded: for=192.0.2.60; proto=http; by=203.0.113.43',
+                ),
+                'http'
+            ),
+            array( // test 2: HTTP_X_FORWARDED
+                array(
+                    'HTTP_X_FORWARDED_PROTO' => 'http',
+                ),
+                'http'
+            ),
+            array( // test 3: HTTPS server global
+                array(
+                    'HTTPS' => 'on',
+                ),
+                'https'
+            ),
+            array( // test 4: default
+                array(),
+                'http'
+            ),
+            array( // test 5: HTTP_FORWARDED https
+                array(
+                    'HTTP_FORWARDED' => 'Forwarded: for=192.0.2.60; proto=https; by=203.0.113.43',
+                ),
+                'https'
+            ),
+        );
+    }
+    
+    /**
+     * @dataProvider getUrlHostProvider
+     */
+    public function testGetUrlHost($data, $expected)
+    {
+        $_SERVER = array_merge($_SERVER, $data);
+        
+        $output = $this->dataBuilder->getUrlHost();
+        
+        $_SERVER = array_diff($_SERVER, $data);
+        
+        $this->assertEquals($expected, $output);
+        
+    }
+    
+    public function getUrlHostProvider()
+    {
+        return array(
+            array( // test 1: HTTP_FORWARDED
+                array(
+                    'HTTP_FORWARDED' => 'Forwarded: for=192.0.2.60; host=test-hostname.com; by=203.0.113.43',
+                ),
+                'test-hostname.com'
+            ),
+            array( // test 2: HTTP_X_FORWARDED
+                array(
+                    'HTTP_X_FORWARDED_HOST' => 'test-hostname.com',
+                ),
+                'test-hostname.com'
+            ),
+            array( // test 3: HTTP_HOST server global
+                array(
+                    'HTTP_HOST' => 'test-hostname.com',
+                ),
+                'test-hostname.com'
+            ),
+            array( // test 4: default
+                array(),
+                'unknown'
+            ),
+            array( // test 5: SERVER_name
+                array(
+                    'SERVER_NAME' => 'test-hostname.com',
+                ),
+                'test-hostname.com'
+            ),
+            array( // test 6: HTTP_HOST server global with port
+                array(
+                    'HTTP_HOST' => 'test-hostname.com:8080',
+                ),
+                'test-hostname.com'
+            ),
+        );
+    }
+    
+    /**
+     * @dataProvider getUrlPortProvider
+     */
+    public function testGetUrlPort($data, $expected)
+    {
+        $_SERVER = array_merge($_SERVER, $data);
+        
+        $output = $this->dataBuilder->getUrlPort($_SERVER['$proto']);
+        
+        $_SERVER = array_diff($_SERVER, $data);
+        
+        $this->assertEquals($expected, $output);
+        
+    }
+    
+    public function getUrlPortProvider()
+    {
+        return array(
+            array( // test 1: HTTP_X_FORWARDED
+                array(
+                    'HTTP_X_FORWARDED_PORT' => '8080',
+                ),
+                8080
+            ),
+            array( // test 2: SERVER_PORT server global
+                array(
+                    'SERVER_PORT' => '8080',
+                ),
+                8080
+            ),
+            array( // test 3: default
+                array(),
+                80
+            ),
+            array( // test 4: $proto param
+                array(
+                    '$proto' => 'https',
+                ),
+                443
+            )
         );
     }
 
