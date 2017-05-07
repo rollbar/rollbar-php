@@ -31,24 +31,74 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getUrlProvider
      */
-    public function testGetUrl($forwaded, $expected)
+    public function testGetUrl($protoData, $hostData, $portData, $dataName)
     {
-        // Given the header
+        // Set up proto
+        $_SERVER = array_merge(
+            $_SERVER,
+            $protoData[0],
+            $hostData[0],
+            $portData[0]
+        );
+        $expectedProto = $protoData[1];
+        $expectedHost = $hostData[1];
+        $expectedPort = $portData[1];
+        $expectedPort = ($expectedPort == 80 || $expectedPort == 443) ? "" : $expectedPort;
+        
+        $expected = $expectedProto . "://" . $expectedHost .
+                    ($expectedPort ? $expected  . ':' . $expectedPort : $expected) .
+                    '/';
+                    
+        if ($expectedHost == 'unknown') {
+            $expected = null;
+        }
         
         // When DataBuilder builds the data
-        $output = $this->dataBuilder->makeData(Level::fromName('error'), "testing", array());
+        $response = $this->dataBuilder->makeData(Level::fromName('error'), "testing", array());
+        $result = $response->getRequest()->getUrl();
         
-        // The identifier, protocol and host of the origin is included
-        // in the payload
-        $this->assertEquals($expected['identifier'], $output);
-        $this->assertEquals($expected['proto'], $output);
-        $this->assertEquals($expected['host'], $output);
+        $_SERVER = array_diff(
+            $_SERVER,
+            $protoData[0],
+            $hostData[0],
+            $portData[0]
+        );
+        
+        $this->assertEquals($expected, $result);
         
     }
     
     public function getUrlProvider()
     {
+        $protoData = $this->getUrlProtoProvider();
+        $hostData = $this->getUrlHostProvider();
+        $portData = $this->getUrlPortProvider();
         
+        $testData = array();
+        
+        $dataName = 0;
+        
+        foreach ($protoData as $protoTest) {
+            
+            foreach ($hostData as $hostTest) {
+                
+                foreach ($portData as $portTest) {
+                    
+                    $testData []= array(
+                        $protoTest, // test param 1
+                        $hostTest, // test param 2
+                        $portTest, // test param 3,
+                        $dataName // test param 4
+                    );
+                    
+                    $dataName++;
+                    
+                }
+                
+            }
+        }
+        
+        return $testData;
     }
     
     /**

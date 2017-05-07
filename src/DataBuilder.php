@@ -576,12 +576,16 @@ class DataBuilder implements DataBuilderInterface
         
         if (!empty($_SERVER['HTTP_FORWARDED'])) {
             extract($this->parseForwardedString($_SERVER['HTTP_FORWARDED']));
-        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
-            $proto = strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']);
-        } elseif (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
-            $proto = 'https';
-        } else {
-            $proto = 'http';
+        }
+        
+        if (empty($proto)) {
+            if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+                $proto = strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']);
+            } elseif (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
+                $proto = 'https';
+            } else {
+                $proto = 'http';
+            }
         }
         
         return $proto;
@@ -593,15 +597,19 @@ class DataBuilder implements DataBuilderInterface
         
         if (!empty($_SERVER['HTTP_FORWARDED'])) {
             extract($this->parseForwardedString($_SERVER['HTTP_FORWARDED']));
-        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_HOST'])) {
-            $host = $_SERVER['HTTP_X_FORWARDED_HOST'];
-        } elseif (!empty($_SERVER['HTTP_HOST'])) {
-            $parts = explode(':', $_SERVER['HTTP_HOST']);
-            $host = $parts[0];
-        } elseif (!empty($_SERVER['SERVER_NAME'])) {
-            $host = $_SERVER['SERVER_NAME'];
-        } else {
-            $host = 'unknown';
+        }
+        
+        if (empty($host)) {
+            if (!empty($_SERVER['HTTP_X_FORWARDED_HOST'])) {
+                $host = $_SERVER['HTTP_X_FORWARDED_HOST'];
+            } elseif (!empty($_SERVER['HTTP_HOST'])) {
+                $parts = explode(':', $_SERVER['HTTP_HOST']);
+                $host = $parts[0];
+            } elseif (!empty($_SERVER['SERVER_NAME'])) {
+                $host = $_SERVER['SERVER_NAME'];
+            } else {
+                $host = 'unknown';
+            }
         }
         
         return $host;
