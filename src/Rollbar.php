@@ -54,7 +54,10 @@ class Rollbar
     
     public static function exceptionHandler($exception)
     {
-        return self::log(Level::error(), $exception, array(Utilities::IS_UNCAUGHT_KEY => true));
+        self::log(Level::error(), $exception, array(Utilities::IS_UNCAUGHT_KEY => true));
+        
+        restore_exception_handler();
+        throw $exception;
     }
 
     public static function log($level, $toLog, $extra = array())
