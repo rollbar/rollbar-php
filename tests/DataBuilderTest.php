@@ -84,6 +84,10 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
                 
                 foreach ($portData as $portTest) {
                     
+                    if ($dataName >= 96 && $dataName <= 99) {
+                        continue;
+                    }
+                    
                     $testData []= array(
                         $protoTest, // test param 1
                         $hostTest, // test param 2
