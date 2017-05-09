@@ -44,6 +44,7 @@ class Config
     private $mt_randmax;
 
     private $included_errno = ROLLBAR_INCLUDED_ERRNO_BITMASK;
+    private $use_error_reporting = false;
 
     public function __construct(array $configArray)
     {
@@ -87,7 +88,7 @@ class Config
     protected function updateConfig($c)
     {
         $this->configArray = $c;
-        
+
         $this->setAccessToken($c);
         $this->setDataBuilder($c);
         $this->setTransformer($c);
@@ -100,6 +101,10 @@ class Config
 
         if (isset($c['included_errno'])) {
             $this->included_errno = $c['included_errno'];
+        }
+
+        if (isset($c['use_error_reporting'])) {
+            $this->use_error_reporting = $c['use_error_reporting'];
         }
     }
 
@@ -258,7 +263,7 @@ class Config
     {
         return $this->dataBuilder->makeData($level, $toLog, $context);
     }
-    
+
     public function getDataBuilder()
     {
         return $this->dataBuilder;
@@ -311,6 +316,11 @@ class Config
 
             if ($this->included_errno != -1 && ($errno & $this->included_errno) != $errno) {
                 // ignore
+                return true;
+            }
+
+            if ($this->use_error_reporting && ($errno & error_reporting()) != $errno) {
+                // ignore due to error_reporting level
                 return true;
             }
 
