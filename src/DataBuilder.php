@@ -339,7 +339,7 @@ class DataBuilder implements DataBuilderInterface
         $baseException = $this->getBaseException();
         while ($previous instanceof $baseException) {
             $chain[] = $this->makeTrace($previous);
-            $previous = $exc->getPrevious();
+            $previous = $previous->getPrevious();
         }
 
         if (count($chain) > 1) {
