@@ -94,7 +94,7 @@ class Rollbar
             return;
         }
         $last_error = error_get_last();
-        if (!is_null($last_error) && in_array($lastError['type'], self::$fatalErrors, true)) {
+        if (!is_null($last_error) && in_array($last_error['type'], self::$fatalErrors, true)) {
             $errno = $last_error['type'];
             $errstr = $last_error['message'];
             $errfile = $last_error['file'];
