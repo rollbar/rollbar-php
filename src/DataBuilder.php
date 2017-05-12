@@ -775,10 +775,10 @@ class DataBuilder implements DataBuilderInterface
                 $parsedValues = array_values($parsed);
                 
                 /**
-                 * If we have at least one key/value pair (i.e. a=b) then
+                 * If we have at least two pairs (i.e. a=b&c=d) then
                  * we treat the whole string as a query string.
                  */
-                if (count(array_filter($parsedValues)) > 0) {
+                if (count($parsed) > 1 && count(array_filter($parsedValues)) > 1) {
                     $query = $data;
                 }
             }

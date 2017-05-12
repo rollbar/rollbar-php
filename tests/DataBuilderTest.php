@@ -247,7 +247,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
                 array(
                     'sensitive'
                 ),
-                'b=%5B1023%2C1924%5D'
+                'b=[1023,1924]'
             )
         );
     }
@@ -298,8 +298,8 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
                 'non sensitive data 1' => '123',
                 'non sensitive data 2' => '456',
                 'non sensitive data 3' => '4&56',
-                'non sensitive data 4' => 'a=4&56=', // this is a weird edge case
-                'non sensitive data 6' => 'baz=&foo=xxxxxxxx',
+                'non sensitive data 4' => 'a=4&56',
+                'non sensitive data 6' => 'baz&foo=bar', // this is a weird edge case
                 'sensitive data' => '********',
                 array(
                     'non sensitive data 3' => '789',
