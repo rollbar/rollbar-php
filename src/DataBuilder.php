@@ -551,13 +551,13 @@ class DataBuilder implements DataBuilderInterface
                     if (stripos($fpPart, 'for=') !== false) {
                 
                         // Parse 'for' forwarded pair
-                        $result['for'] = is_array($result['for']) ? $result['for'] : array();
+                        $result['for'] = isset($result['for']) ? $result['for'] : array();
                         $result['for'][] = substr($fpPart, strlen('for='));
                         
                     } elseif (stripos($fpPart, 'by=') !== false) {
                         
                         // Parse 'by' forwarded pair
-                        $result['by'] = is_array($result['by']) ? $result['by'] : array();
+                        $result['by'] = isset($result['by']) ? $result['by'] : array();
                         $result['by'][] = substr($fpPart, strlen('by='));
                         
                     } 
