@@ -1,7 +1,7 @@
 <?php namespace Rollbar;
 
-use Rollbar\Payload\Payload;
 use Rollbar\Payload\Level;
+use Rollbar\Payload\Payload;
 
 if (!defined('ROLLBAR_INCLUDED_ERRNO_BITMASK')) {
     define(
@@ -93,7 +93,7 @@ class Config
     protected function updateConfig($c)
     {
         $this->configArray = $c;
-        
+
         $this->setAccessToken($c);
         $this->setDataBuilder($c);
         $this->setTransformer($c);
@@ -188,6 +188,24 @@ class Config
                 );
             }
         }
+
+        // set options for fluent sender
+        if (isset($c['handler']) && $c['handler'] == 'fluent') {
+            $default = "Rollbar\Senders\FluentSender";
+
+            if (isset($c['fluent_host'])) {
+                $c['senderOptions']['fluentHost'] = $c['fluent_host'];
+            }
+
+            if (isset($c['fluent_port'])) {
+                $c['senderOptions']['fluentPort'] = $c['fluent_port'];
+            }
+
+            if (isset($c['fluent_tag'])) {
+                $c['senderOptions']['fluentTag'] = $c['fluent_tag'];
+            }
+        }
+
         $this->setupWithOptions($c, "sender", $expected, $default);
     }
 
@@ -245,6 +263,7 @@ class Config
         $defaultClass = null,
         $passWholeConfig = false
     ) {
+
         $$keyName = isset($c[$keyName]) ? $c[$keyName] : null;
 
         if (is_null($defaultClass) && is_null($$keyName)) {
@@ -274,7 +293,7 @@ class Config
     {
         return $this->dataBuilder->makeData($level, $toLog, $context);
     }
-    
+
     public function getDataBuilder()
     {
         return $this->dataBuilder;
