@@ -34,6 +34,8 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     public function testGetUrl($protoData, $hostData, $portData, $dataName)
     {
         // Set up proto
+        $pre_SERVER = $_SERVER;
+        
         $_SERVER = array_merge(
             $_SERVER,
             $protoData[0],
@@ -58,12 +60,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $response = $this->dataBuilder->makeData(Level::fromName('error'), "testing", array());
         $result = $response->getRequest()->getUrl();
         
-        $_SERVER = array_diff(
-            $_SERVER,
-            $protoData[0],
-            $hostData[0],
-            $portData[0]
-        );
+        $_SERVER = $pre_SERVER;
         
         $this->assertEquals($expected, $result);
         
