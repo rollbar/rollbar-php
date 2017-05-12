@@ -5,7 +5,7 @@ use Rollbar\Utilities;
 class Notifier implements \JsonSerializable
 {
     const NAME = "rollbar-php";
-    const VERSION = "1.0.0-beta";
+    const VERSION = "1.0.1";
 
     public static function defaultNotifier()
     {
