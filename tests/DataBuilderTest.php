@@ -166,13 +166,14 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetUrlProto($data, $expected)
     {
+        $pre_SERVER = $_SERVER;
         $_SERVER = array_merge($_SERVER, $data);
         
         $output = $this->dataBuilder->getUrlProto();
         
         $this->assertEquals($expected, $output);
         
-        $_SERVER = array_diff($_SERVER, $data);
+        $_SERVER = $pre_SERVER;
         
     }
     
