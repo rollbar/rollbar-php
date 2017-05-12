@@ -45,6 +45,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $expectedPort = $portData[1];
         $expectedPort = ($expectedPort == 80 || $expectedPort == 443) ? "" : $expectedPort;
         
+        $expected = '';
         $expected = $expectedProto . "://" . $expectedHost .
                     ($expectedPort ? $expected  . ':' . $expectedPort : $expected) .
                     '/';
