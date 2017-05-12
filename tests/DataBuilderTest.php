@@ -275,7 +275,9 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $_SERVER = array_merge($_SERVER, $data);
         
-        $output = $this->dataBuilder->getUrlPort($_SERVER['$proto']);
+        $output = $this->dataBuilder->getUrlPort(
+            isset($_SERVER['$proto']) ? $_SERVER['$proto'] : null
+        );
         
         $_SERVER = array_diff($_SERVER, $data);
         
