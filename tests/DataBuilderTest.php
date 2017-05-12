@@ -216,11 +216,12 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetUrlHost($data, $expected)
     {
+        $pre_SERVER = $_SERVER;
         $_SERVER = array_merge($_SERVER, $data);
         
         $output = $this->dataBuilder->getUrlHost();
         
-        $_SERVER = array_diff($_SERVER, $data);
+        $_SERVER = $pre_SERVER;
         
         $this->assertEquals($expected, $output);
         
@@ -271,13 +272,14 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetUrlPort($data, $expected)
     {
+        $pre_SERVER = $_SERVER;
         $_SERVER = array_merge($_SERVER, $data);
         
         $output = $this->dataBuilder->getUrlPort(
             isset($_SERVER['$proto']) ? $_SERVER['$proto'] : null
         );
         
-        $_SERVER = array_diff($_SERVER, $data);
+        $_SERVER = $pre_SERVER;
         
         $this->assertEquals($expected, $output);
         
