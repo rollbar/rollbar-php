@@ -63,7 +63,6 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $_SERVER = $pre_SERVER;
         
         $this->assertEquals($expected, $result);
-        
     }
     
     public function getUrlProvider()
@@ -77,11 +76,8 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $dataName = 0;
         
         foreach ($protoData as $protoTest) {
-            
             foreach ($hostData as $hostTest) {
-                
                 foreach ($portData as $portTest) {
-                    
                     if ($dataName >= 96 && $dataName <= 99) {
                         continue;
                     }
@@ -94,9 +90,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
                     );
                     
                     $dataName++;
-                    
                 }
-                
             }
         }
         
@@ -152,8 +146,8 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             array( // test 6
                 'Forwarded: for=192.0.2.60; host=hostname; by=203.0.113.43; proto=https',
                 array(
-                    'for' => array('192.0.2.60'), 
-                    'by' => array('203.0.113.43'), 
+                    'for' => array('192.0.2.60'),
+                    'by' => array('203.0.113.43'),
                     'host' => 'hostname',
                     'proto' => 'https'
                 )
@@ -174,7 +168,6 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $output);
         
         $_SERVER = $pre_SERVER;
-        
     }
     
     public function getUrlProtoProvider()
@@ -224,7 +217,6 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $_SERVER = $pre_SERVER;
         
         $this->assertEquals($expected, $output);
-        
     }
     
     public function getUrlHostProvider()
@@ -282,7 +274,6 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $_SERVER = $pre_SERVER;
         
         $this->assertEquals($expected, $output);
-        
     }
     
     public function getUrlPortProvider()

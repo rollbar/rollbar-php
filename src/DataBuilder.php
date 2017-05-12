@@ -531,43 +531,31 @@ class DataBuilder implements DataBuilderInterface
             
             
             if (stripos($forwardedPair, 'host=') !== false) {
-                
-                // Parse 'host' forwarded pair    
+                // Parse 'host' forwarded pair
                 $result['host'] = substr($forwardedPair, strlen('host='));
-                
             } elseif (stripos($forwardedPair, 'proto=') !== false) {
-                
                 // Parse 'proto' forwarded pair
                 $result['proto'] = substr($forwardedPair, strlen('proto='));
-                
             } else {
-                
                 // Parse 'for' and 'by' forwarded pairs which are comma separated
-                $fpParts = explode(',' ,$forwardedPair);
+                $fpParts = explode(',', $forwardedPair);
                 foreach ($fpParts as $fpPart) {
-                    
                     $fpPart = trim($fpPart);
                     
                     if (stripos($fpPart, 'for=') !== false) {
-                
                         // Parse 'for' forwarded pair
                         $result['for'] = isset($result['for']) ? $result['for'] : array();
                         $result['for'][] = substr($fpPart, strlen('for='));
-                        
                     } elseif (stripos($fpPart, 'by=') !== false) {
-                        
                         // Parse 'by' forwarded pair
                         $result['by'] = isset($result['by']) ? $result['by'] : array();
                         $result['by'][] = substr($fpPart, strlen('by='));
-                        
-                    } 
-                    
+                    }
                 }
             }
         }
         
         return $result;
-        
     }
     
     public function getUrlProto()
