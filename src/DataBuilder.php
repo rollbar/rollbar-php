@@ -17,6 +17,15 @@ use Rollbar\Exceptions\PersonFuncException;
 
 class DataBuilder implements DataBuilderInterface
 {
+    const MAX_PAYLOAD_SIZE = 524288; // 512 * 1024
+    
+    protected static $truncationStrategies = array(
+        Truncation\RawStrategy::class,
+        Truncation\FramesStrategy::class,
+        Truncation\StringsStrategy::class,
+        Truncation\MinBodyStrategy::class
+    );
+    
     protected static $defaults;
 
     protected $environment;
@@ -849,4 +858,33 @@ class DataBuilder implements DataBuilderInterface
             mt_rand(0, 0xffff)
         );
     }
+    
+    /**
+     * Applies truncation strategies in order to keep the payload size under
+     * configured limit.
+     * 
+     * @param array $payload
+     * @param string $strategy
+     * 
+     * @return array
+     */
+    public function truncate(array $payload)
+    {
+        
+        foreach (static::$truncationStrategies as $strategy) {
+            
+            if (strlen(json_encode($payload)) <= DataBuilder::MAX_PAYLOAD_SIZE) {
+                break;
+            }
+            
+            $strategy = new $strategy();
+            
+            $payload = $strategy->execute($payload);
+            
+        }
+        
+        return $payload;
+    }
+    
+    
 }

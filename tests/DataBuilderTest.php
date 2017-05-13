@@ -527,4 +527,27 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         
         stream_wrapper_restore("php");
     }
+    
+    /**
+     * @dataProvider truncateProvider
+     */
+    public function testTruncate($data)
+    {
+        $result = $this->dataBuilder->truncate($data);
+        
+        $size = strlen(json_encode($result));
+        
+        $this->assertTrue($size <= DataBuilder::MAX_PAYLOAD_SIZE, "Truncation failed. Payload size exceeds MAX_PAYLOAD_SIZE.");
+    }
+    
+    public function truncateProvider()
+    {
+        return array(
+            array( // test 1
+                array(
+                    'test' => str_repeat('A', DataBuilder::MAX_PAYLOAD_SIZE+1)
+                )
+            )
+        );
+    }
 }
