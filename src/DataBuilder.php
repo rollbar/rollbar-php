@@ -846,29 +846,9 @@ class DataBuilder implements DataBuilderInterface
         }
         
         if (is_array($data)) { // scrub arrays
-        
             $data = $this->scrubArray($data, $replacement);
         } elseif (is_string($data)) { // scrub URLs and query strings
-            
             $query = parse_url($data, PHP_URL_QUERY);
-            
-            /**
-             * String is not a URL but it still might be just a plain
-             * query string in format arg1=val1&arg2=val2
-             */
-            if (!$query) {
-                parse_str($data, $parsed);
-                $parsedValues = array_values($parsed);
-                
-                /**
-                 * If we have at least one key/value pair (i.e. a=b) then
-                 * we treat the whole string as a query string.
-                 */
-                if (count(array_filter($parsedValues)) > 0) {
-                    $query = $data;
-                }
-            }
-                
             if ($query) {
                 $data = str_replace(
                     $query,
@@ -877,7 +857,6 @@ class DataBuilder implements DataBuilderInterface
                 );
             }
         }
-        
         return $data;
     }
 
