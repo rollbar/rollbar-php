@@ -277,7 +277,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
                 'non sensitive data 2' => '456',
                 'non sensitive data 3' => '4&56',
                 'non sensitive data 4' => 'a=4&56',
-                'non sensitive data 6' => 'baz&foo=bar',
+                'non sensitive data 6' => '?baz&foo=bar',
                 'sensitive data' => '456',
                 array(
                     'non sensitive data 3' => '789',
@@ -299,7 +299,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
                 'non sensitive data 2' => '456',
                 'non sensitive data 3' => '4&56',
                 'non sensitive data 4' => 'a=4&56',
-                'non sensitive data 6' => 'baz&foo=bar', // this is a weird edge case
+                'non sensitive data 6' => '?baz=&foo=xxxxxxxx',
                 'sensitive data' => '********',
                 array(
                     'non sensitive data 3' => '789',
@@ -318,7 +318,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             // $testData
-            http_build_query(
+            '?' . http_build_query(
                 array(
                     'arg1' => 'val 1',
                     'sensitive' => 'scrubit',
@@ -329,7 +329,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
                 'sensitive'
             ),
             // $expected
-            http_build_query(
+            '?' . http_build_query(
                 array(
                     'arg1' => 'val 1',
                     'sensitive' => 'xxxxxxxx',
@@ -343,7 +343,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             // $testData
-            http_build_query(
+            '?' . http_build_query(
                 array(
                     'arg1' => 'val 1',
                     'sensitive' => 'scrubit',
@@ -357,7 +357,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
                 'sensitive'
             ),
             // $expected
-            http_build_query(
+            '?' . http_build_query(
                 array(
                     'arg1' => 'val 1',
                     'sensitive' => 'xxxxxxxx',
@@ -380,7 +380,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
                 array(
                     'non sensitive data 3' => '789',
                     'recursive sensitive data' => 'qwe',
-                    'non sensitive data 3' => http_build_query(
+                    'non sensitive data 3' => '?' . http_build_query(
                         array(
                             'arg1' => 'val 1',
                             'sensitive' => 'scrubit',
@@ -407,7 +407,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
                 array(
                     'non sensitive data 3' => '789',
                     'recursive sensitive data' => '********',
-                    'non sensitive data 3' => http_build_query(
+                    'non sensitive data 3' => '?' . http_build_query(
                         array(
                             'arg1' => 'val 1',
                             'sensitive' => 'xxxxxxxx',
