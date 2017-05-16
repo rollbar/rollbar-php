@@ -224,4 +224,22 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($called);
     }
+
+    public function testSendMessageTrace()
+    {
+        $c = new Config(array(
+            "access_token" => $this->token,
+            "environment" => $this->env,
+            "sendMessageTrace" => true
+        ));
+        
+        $this->assertTrue($c->getSendMessageTrace());
+        
+        $c = new Config(array(
+            "access_token" => $this->token,
+            "environment" => $this->env
+        ));
+        
+        $this->assertFalse($c->getSendMessageTrace());
+    }
 }

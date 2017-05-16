@@ -64,7 +64,21 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     
     public function testGetMessage()
     {
-        $result = $this->dataBuilder->makeData(Level::fromName('error'), "testing", array());
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests'
+        ));
+        
+        $result = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
+        $this->assertNull($result->getBody()->getValue()->getBacktrace());
+        
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'sendMessageTrace' => true
+        ));
+    
+        $result = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
         $this->assertNotEmpty($result->getBody()->getValue()->getBacktrace());
     }
 
