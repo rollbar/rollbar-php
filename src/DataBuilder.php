@@ -333,25 +333,25 @@ class DataBuilder implements DataBuilderInterface
         return new Body($content);
     }
 
-    protected function getErrorTrace(ErrorWrapper $error)
+    public function getErrorTrace(ErrorWrapper $error)
     {
-        return $this->makeTrace($error, $error->getClassName(), true);
+        return $this->makeTrace($error, $this->includeCodeContext, $error->getClassName());
     }
 
     /**
      * @param \Throwable|\Exception $exc
      * @return Trace|TraceChain
      */
-    protected function getExceptionTrace($exc)
+    public function getExceptionTrace($exc)
     {
         $chain = array();
-        $chain[] = $this->makeTrace($exc);
+        $chain[] = $this->makeTrace($exc, $this->includeExceptionCodeContext);
 
         $previous = $exc->getPrevious();
 
         $baseException = $this->getBaseException();
         while ($previous instanceof $baseException) {
-            $chain[] = $this->makeTrace($previous);
+            $chain[] = $this->makeTrace($previous, $this->includeExceptionCodeContext);
             $previous = $previous->getPrevious();
         }
 
@@ -364,13 +364,13 @@ class DataBuilder implements DataBuilderInterface
 
     /**
      * @param \Throwable|\Exception $exception
+     * @param Boolean $includeContext whether or not to include context
      * @param string $classOverride
-     * @param Boolean $isError whether the first parameter is an error or exception
      * @return Trace
      */
-    public function makeTrace($exception, $classOverride = null, $isError = false)
+    public function makeTrace($exception, $includeContext, $classOverride = null)
     {
-        $frames = $this->makeFrames($exception, $isError);
+        $frames = $this->makeFrames($exception, $includeContext);
         $excInfo = new ExceptionInfo(
             Utilities::coalesce($classOverride, get_class($exception)),
             $exception->getMessage()
@@ -378,7 +378,7 @@ class DataBuilder implements DataBuilderInterface
         return new Trace($frames, $excInfo);
     }
 
-    public function makeFrames($exception, $isError = false)
+    public function makeFrames($exception, $includeContext)
     {
         $frames = array();
         foreach ($this->getTrace($exception) as $frameInfo) {
@@ -391,7 +391,7 @@ class DataBuilder implements DataBuilderInterface
             $frame->setLineno($lineno)
                 ->setMethod($method);
 
-            if (($isError && $this->includeCodeContext) || (!$isError && $this->includeExceptionCodeContext)) {
+            if ($includeContext) {
                 $this->addCodeContextToFrame($frame, $filename, $lineno);
             }
 

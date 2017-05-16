@@ -366,7 +366,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             'include_error_code_context' => true,
             'include_exception_code_context' => false
         ));
-        $output = $dataBuilder->makeFrames(new \Exception());
+        $output = $dataBuilder->getExceptionTrace(new \Exception())->getFrames();
         $this->assertNull($output[1]->getContext());
     }
 
@@ -376,7 +376,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             'accessToken' => 'abcd1234efef5678abcd1234567890be',
             'environment' => 'tests'
         ));
-        $output = $dataBuilder->makeFrames(new \Exception());
+        $output = $dataBuilder->getExceptionTrace(new \Exception())->getFrames();
         $this->assertNull($output[1]->getContext());
     }
 
@@ -387,7 +387,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             'environment' => 'tests',
             'include_exception_code_context' => true
         ));
-        $output = $dataBuilder->makeFrames(new \Exception());
+        $output = $dataBuilder->getExceptionTrace(new \Exception())->getFrames();
         $this->assertNotEmpty($output[1]->getContext());
     }
 
@@ -412,7 +412,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
                 'line' => 99
             ),
         );
-        $output = $dataBuilder->makeFrames(new ErrorWrapper(null, null, null, null, $backtrace), true);
+        $output = $dataBuilder->getErrorTrace(new ErrorWrapper(null, null, null, null, $backtrace))->getFrames();
         $this->assertNull($output[0]->getContext());
     }
 
@@ -455,7 +455,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         }
         fclose($file);
 
-        $output = $dataBuilder->makeFrames(new ErrorWrapper(null, null, null, null, $backTrace), true);
+        $output = $dataBuilder->getErrorTrace(new ErrorWrapper(null, null, null, null, $backTrace))->getFrames();
         $pre = $output[0]->getContext()->getPre();
 
         $expected = array();
@@ -507,7 +507,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         }
         fclose($file);
 
-        $output = $dataBuilder->makeFrames(new ErrorWrapper(null, null, null, null, $backTrace));
+        $output = $dataBuilder->getErrorTrace(new ErrorWrapper(null, null, null, null, $backTrace))->getFrames();
         $this->assertNull($output[0]->getContext());
     }
 
