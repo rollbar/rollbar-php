@@ -873,11 +873,11 @@ class DataBuilder implements DataBuilderInterface
         
         foreach (static::$truncationStrategies as $strategy) {
             
-            if (strlen(json_encode($payload)) <= DataBuilder::MAX_PAYLOAD_SIZE) {
+            if (!$this->needsTruncating($payload)) {
                 break;
             }
             
-            $strategy = new $strategy();
+            $strategy = new $strategy($this);
             
             $payload = $strategy->execute($payload);
             
@@ -886,5 +886,16 @@ class DataBuilder implements DataBuilderInterface
         return $payload;
     }
     
+    /**
+     * Check if the payload is too big to be sent
+     * 
+     * @param array $payload
+     * 
+     * @return boolean
+     */
+    public function needsTruncating(array $payload)
+    {
+       return strlen(json_encode($payload)) > self::MAX_PAYLOAD_SIZE;
+    }
     
 }
