@@ -263,7 +263,7 @@ class DataBuilder implements DataBuilderInterface
     {
         $fromConfig = $this->tryGet($c, 'include_error_code_context');
         $this->includeCodeContext = true;
-        if ($fromConfig != null) {
+        if ($fromConfig !== null) {
             $this->includeCodeContext = $fromConfig;
         }
     }
