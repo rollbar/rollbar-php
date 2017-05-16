@@ -399,7 +399,19 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             'include_error_code_context' => false,
             'include_exception_code_context' => true
         ));
-        $backtrace = array(array());
+        $testFilePath = __DIR__ . '/DataBuilderTest.php';
+        $backtrace = array(
+            array(
+                'file' => $testFilePath,
+                'function' => 'testFramesWithoutContext',
+                'line' => 42
+            ),
+            array(
+                'file' => $testFilePath,
+                'function' => 'testFramesWithContext',
+                'line' => 99
+            ),
+        );
         $output = $dataBuilder->makeFrames(new ErrorWrapper(null, null, null, null, $backtrace), true);
         $this->assertNull($output[0]->getContext());
     }
