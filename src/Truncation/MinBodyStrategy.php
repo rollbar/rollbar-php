@@ -1,6 +1,6 @@
 <?php namespace Rollbar\Truncation;
 
-class MinBodyStrategy implements IStrategy
+class MinBodyStrategy extends AbstractStrategy
 {
     public function execute(array $payload)
     {

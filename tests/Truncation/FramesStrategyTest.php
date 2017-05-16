@@ -9,7 +9,12 @@ class FramesStrategyTest extends \PHPUnit_Framework_TestCase
      */
     public function testExecute($data, $expected)
     {
-        $strategy = new FramesStrategy();
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests'
+        ));
+                    
+        $strategy = new FramesStrategy($databuilder);
         $result = $strategy->execute($data);
         
         $this->assertEquals($expected, $result);

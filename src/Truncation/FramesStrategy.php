@@ -1,6 +1,6 @@
 <?php namespace Rollbar\Truncation;
 
-class FramesStrategy implements IStrategy
+class FramesStrategy extends AbstractStrategy
 {
     
     const FRAMES_OPTIMIZATION_RANGE = 150;

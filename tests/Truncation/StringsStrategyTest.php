@@ -25,40 +25,33 @@ class StringsStrategyTest extends \PHPUnit_Framework_TestCase
     public function executeProvider()
     {
         $data = array();
+        
+        $data["truncate nothing"] = array(
+            $this->payloadStructureProvider(str_repeat("A", 10)),
+            $this->payloadStructureProvider(str_repeat("A", 10))
+        );
+        
         $thresholds = StringsStrategy::getThresholds();
-        
-        // $data["truncate nothing"] = array(
-        //     $this->payloadStructureProvider(str_repeat("A", 10)),
-        //     $this->payloadStructureProvider(str_repeat("A", 10))
-        // );
-        
-        // $threshold = $tresholds[0];
-        // $data['truncate strings to ' . $threshold] = array(
-        //     $this->payloadStructureProvider(str_repeat('A', DataBuilder::MAX_PAYLOAD_SIZE+1)),
-        //     $this->payloadStructureProvider(str_repeat('A', $threshold))
-        // );
-        
-        $threshold = $thresholds[1];
-        $stringLengthToTrim = $threshold+1;
-        
-        $payloadStrings = $expectedStrings = array();
-        
-        $numStrings = floor(DataBuilder::MAX_PAYLOAD_SIZE / $stringLengthToTrim);
-        
-        $staticNoise = strlen(json_encode($this->payloadStructureProvider(array(""))));
-        $dynamicNoise = strlen(json_encode($this->payloadStructureProvider(array("","")))) - $staticNoise;
-        
-        for ($i = 0; $i < $numStrings; $i++) {
-            $payloadStrings []= str_repeat('A', $stringLengthToTrim);
-            $expectedStrings []= str_repeat('A', $threshold);
+        foreach ($thresholds as $threshold) {
+            $data['truncate strings to ' . $threshold] = $this->thresholdTestProvider($threshold);
         }
         
-        $payload = $this->payloadStructureProvider($payloadStrings);
-        $expected = $this->payloadStructureProvider($expectedStrings);
-        
-        $data['truncate strings to ' . $threshold] = array($payload,$expected);
-        
         return $data;
+    }
+    
+    protected function thresholdTestProvider($threshold)
+    {
+        $stringLengthToTrim = $threshold+1;
+        
+        $payload = $this->payloadStructureProvider(array());
+        $expected = $this->payloadStructureProvider(array());
+        
+        while (strlen(json_encode($payload)) < DataBuilder::MAX_PAYLOAD_SIZE) {
+            $payload['data']['body']['message']['body']['value'] []= str_repeat('A', $stringLengthToTrim);
+            $expected['data']['body']['message']['body']['value'] []= str_repeat('A', $threshold);
+        }
+        
+        return array($payload,$expected);
     }
     
     protected function payloadStructureProvider($message)
