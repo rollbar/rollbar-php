@@ -4,6 +4,7 @@ namespace Rollbar;
 
 use Rollbar\Payload\Level;
 use Rollbar\TestHelpers\MockPhpStream;
+use Rollbar\Truncation\FramesStrategy;
 
 class DataBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -542,12 +543,26 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     
     public function truncateProvider()
     {
-        return array(
-            array( // test 1
+        
+        $stringsTest = new Truncation\StringsStrategyTest();
+        $framesTest = new Truncation\StringsStrategyTest();
+        $minBodyTest = new Truncation\StringsStrategyTest();
+        
+        $data = array(
+            'string truncation' => array( // test 1
                 array(
                     'test' => str_repeat('A', DataBuilder::MAX_PAYLOAD_SIZE+1)
                 )
             )
         );
+        
+        $data = array_merge(
+            $data,
+            $stringsTest->executeProvider(),
+            $framesTest->executeProvider(),
+            $minBodyTest->executeProvider()
+        );
+        
+        return $data;
     }
 }
