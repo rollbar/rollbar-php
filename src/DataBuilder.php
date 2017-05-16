@@ -20,10 +20,10 @@ class DataBuilder implements DataBuilderInterface
     const MAX_PAYLOAD_SIZE = 524288; // 512 * 1024
     
     protected static $truncationStrategies = array(
-        Truncation\RawStrategy::class,
-        Truncation\FramesStrategy::class,
-        Truncation\StringsStrategy::class,
-        Truncation\MinBodyStrategy::class
+        "Rollbar\Truncation\RawStrategy",
+        "Rollbar\Truncation\FramesStrategy",
+        "Rollbar\Truncation\StringsStrategy",
+        "Rollbar\Truncation\MinBodyStrategy"
     );
     
     protected static $defaults;

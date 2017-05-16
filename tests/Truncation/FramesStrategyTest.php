@@ -51,7 +51,7 @@ class FramesStrategyTest extends \PHPUnit_Framework_TestCase
                 array_merge(
                     range(1, FramesStrategy::FRAMES_OPTIMIZATION_RANGE),
                     range(
-                        FramesStrategy::FRAMES_OPTIMIZATION_RANGE + 2, 
+                        FramesStrategy::FRAMES_OPTIMIZATION_RANGE + 2,
                         FramesStrategy::FRAMES_OPTIMIZATION_RANGE * 2 + 1
                     )
                 )
@@ -61,7 +61,7 @@ class FramesStrategyTest extends \PHPUnit_Framework_TestCase
                     array(
                         'trace_chain' => array(
                             'frames' => range(
-                                1, 
+                                1,
                                 FramesStrategy::FRAMES_OPTIMIZATION_RANGE * 2 + 1
                             )
                         )
@@ -70,7 +70,7 @@ class FramesStrategyTest extends \PHPUnit_Framework_TestCase
                 array_merge(
                     range(1, FramesStrategy::FRAMES_OPTIMIZATION_RANGE),
                     range(
-                        FramesStrategy::FRAMES_OPTIMIZATION_RANGE + 2, 
+                        FramesStrategy::FRAMES_OPTIMIZATION_RANGE + 2,
                         FramesStrategy::FRAMES_OPTIMIZATION_RANGE * 2 + 1
                     )
                 )

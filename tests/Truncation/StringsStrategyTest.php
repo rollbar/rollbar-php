@@ -47,13 +47,11 @@ class StringsStrategyTest extends \PHPUnit_Framework_TestCase
         $expected = $this->payloadStructureProvider(array());
         
         while (strlen(json_encode($payload)) < DataBuilder::MAX_PAYLOAD_SIZE) {
-            
-            $payload['data']['body']['message']['body']['value'] []= 
+            $payload['data']['body']['message']['body']['value'] []=
                 str_repeat('A', $stringLengthToTrim);
                 
-            $expected['data']['body']['message']['body']['value'] []= 
+            $expected['data']['body']['message']['body']['value'] []=
                 str_repeat('A', $threshold);
-                
         }
         
         return array($payload,$expected);

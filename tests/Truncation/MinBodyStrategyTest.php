@@ -31,7 +31,7 @@ class MinBodyStrategyTest extends \PHPUnit_Framework_TestCase
             'exception' => array(
                 'description' => 'Test description',
                 'message' => str_repeat(
-                    'A', 
+                    'A',
                     MinBodyStrategy::EXCEPTION_MESSAGE_LIMIT+1
                 )
             ),
@@ -41,7 +41,7 @@ class MinBodyStrategyTest extends \PHPUnit_Framework_TestCase
         $expected = $traceData;
         unset($expected['exception']['description']);
         $expected['exception']['message'] = str_repeat(
-            'A', 
+            'A',
             MinBodyStrategy::EXCEPTION_MESSAGE_LIMIT
         );
         $expected['frames'] = array('Frame 1', 'Frame 3');
