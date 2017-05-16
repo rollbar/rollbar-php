@@ -412,7 +412,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
                 'line' => 99
             ),
         );
-        $output = $dataBuilder->getErrorTrace(new ErrorWrapper(null, null, null, null, $backtrace))->getFrames();
+        $output = $dataBuilder->getErrorTrace(new ErrorWrapper(E_ERROR, 'bork', null, null, $backtrace))->getFrames();
         $this->assertNull($output[0]->getContext());
     }
 
@@ -455,7 +455,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         }
         fclose($file);
 
-        $output = $dataBuilder->getErrorTrace(new ErrorWrapper(null, null, null, null, $backTrace))->getFrames();
+        $output = $dataBuilder->getErrorTrace(new ErrorWrapper(E_ERROR, 'bork', null, null, $backTrace))->getFrames();
         $pre = $output[0]->getContext()->getPre();
 
         $expected = array();
@@ -507,7 +507,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         }
         fclose($file);
 
-        $output = $dataBuilder->getErrorTrace(new ErrorWrapper(null, null, null, null, $backTrace))->getFrames();
+        $output = $dataBuilder->getErrorTrace(new ErrorWrapper(E_ERROR, 'bork', null, null, $backTrace))->getFrames();
         $this->assertNull($output[0]->getContext());
     }
 
