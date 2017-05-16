@@ -91,7 +91,7 @@ class Defaults
     private $defaultScrubFields;
     private $defaultSendMessageTrace;
     private $defaultIncludeCodeContext;
-    private $defaultExceptionIncludeCodeContext;
+    private $defaultIncludeExceptionCodeContext;
 
     public function __construct()
     {
@@ -139,7 +139,7 @@ class Defaults
         $this->defaultScrubFields = self::getScrubFields();
         $this->defaultCodeVersion = "";
         $this->defaultSendMessageTrace = false;
-        $this->defaultIncudeCodeContext = false;
+        $this->defaultIncludeCodeContext = false;
         $this->defaultIncludeExceptionCodeContext = false;
     }
 
