@@ -538,7 +538,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         
         $size = strlen(json_encode($result));
         
-        $this->assertTrue
+        $this->assertTrue(
             $size <= DataBuilder::MAX_PAYLOAD_SIZE,
             "Truncation failed. Payload size exceeds MAX_PAYLOAD_SIZE."
         );
@@ -548,19 +548,10 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     {
         
         $stringsTest = new Truncation\StringsStrategyTest();
-        $framesTest = new Truncation\StringsStrategyTest();
-        $minBodyTest = new Truncation\StringsStrategyTest();
-        
-        $data = array(
-            'string truncation' => array( // test 1
-                array(
-                    'test' => str_repeat('A', DataBuilder::MAX_PAYLOAD_SIZE+1)
-                )
-            )
-        );
+        $framesTest = new Truncation\FramesStrategyTest();
+        $minBodyTest = new Truncation\MinBodyStrategyTest();
         
         $data = array_merge(
-            $data,
             $stringsTest->executeProvider(),
             $framesTest->executeProvider(),
             $minBodyTest->executeProvider()
