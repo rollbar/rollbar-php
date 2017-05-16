@@ -44,6 +44,12 @@ class Config
     private $mt_randmax;
 
     private $included_errno = ROLLBAR_INCLUDED_ERRNO_BITMASK;
+    
+    /**
+     * @var boolean Should debug_backtrace() data be sent with string messages
+     * sent through RollbarLogger::log()
+     */
+    private $sendMessageTrace = false;
 
     public function __construct(array $configArray)
     {
@@ -97,6 +103,7 @@ class Config
         $this->setSender($c);
         $this->setResponseHandler($c);
         $this->setCheckIgnoreFunction($c);
+        $this->setSendMessageTrace($c);
 
         if (isset($c['included_errno'])) {
             $this->included_errno = $c['included_errno'];
@@ -198,6 +205,15 @@ class Config
         $this->checkIgnore = $c['checkIgnore'];
     }
 
+    private function setSendMessageTrace($c)
+    {
+        if (!isset($c['sendMessageTrace'])) {
+            return;
+        }
+
+        $this->sendMessageTrace = $c['sendMessageTrace'];
+    }
+
     /**
      * Allows setting up configuration options that might be specified by class
      * name. Any interface used with `setupWithOptions` should be constructed
@@ -282,6 +298,11 @@ class Config
     public function getAccessToken()
     {
         return $this->accessToken;
+    }
+
+    public function getSendMessageTrace()
+    {
+        return $this->sendMessageTrace;
     }
 
     public function checkIgnored($payload, $accessToken, $toLog)

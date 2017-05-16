@@ -46,6 +46,7 @@ class DataBuilder implements DataBuilderInterface
     protected $baseException;
     protected $includeCodeContext;
     protected $shiftFunction;
+    protected $sendMessageTrace;
 
     public function __construct($config)
     {
@@ -77,6 +78,7 @@ class DataBuilder implements DataBuilderInterface
         $this->setNotifier($config);
         $this->setBaseException($config);
         $this->setIncludeCodeContext($config);
+        $this->setSendMessageTrace($config);
 
         $this->shiftFunction = $this->tryGet($config, 'shift_function');
         if (!isset($this->shiftFunction)) {
@@ -140,6 +142,12 @@ class DataBuilder implements DataBuilderInterface
     {
         $fromConfig = $this->tryGet($config, 'errorLevels');
         $this->errorLevels = self::$defaults->errorLevels($fromConfig);
+    }
+
+    protected function setSendMessageTrace($config)
+    {
+        $fromConfig = $this->tryGet($config, 'sendMessageTrace');
+        $this->sendMessageTrace = self::$defaults->sendMessageTrace($fromConfig);
     }
 
     protected function setCodeVersion($c)
@@ -435,7 +443,11 @@ class DataBuilder implements DataBuilderInterface
 
     protected function getMessage($toLog, $context)
     {
-        return new Message((string)$toLog, $context, debug_backtrace());
+        return new Message(
+            (string)$toLog,
+            $context,
+            $this->sendMessageTrace ? debug_backtrace() : null
+        );
     }
 
     protected function getLevel($level, $toLog)

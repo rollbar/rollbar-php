@@ -71,6 +71,11 @@ class Defaults
             'access_token'
         );
     }
+    
+    public function sendMessageTrace($sendMessageTrace = null)
+    {
+        return $sendMessageTrace ? $sendMessageTrace : $this->defaultSendMessageTrace;
+    }
 
     private $defaultMessageLevel = "warning";
     private $defaultExceptionLevel = "error";
@@ -84,6 +89,7 @@ class Defaults
     private $defaultNotifier;
     private $defaultBaseException;
     private $defaultScrubFields;
+    private $defaultSendMessageTrace;
 
     public function __construct()
     {
@@ -130,6 +136,7 @@ class Defaults
         $this->defaultBaseException = self::getBaseException();
         $this->defaultScrubFields = self::getScrubFields();
         $this->defaultCodeVersion = "";
+        $this->defaultSendMessageTrace = false;
     }
 
     public function messageLevel($level = null)
