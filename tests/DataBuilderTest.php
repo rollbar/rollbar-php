@@ -358,14 +358,61 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEmpty($result->getBody()->getValue()->getBacktrace());
     }
 
+    public function testExceptionFramesWithoutContext()
+    {
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'include_error_code_context' => true,
+            'include_exception_code_context' => false
+        ));
+        $output = $dataBuilder->getExceptionTrace(new \Exception())->getFrames();
+        $this->assertNull($output[1]->getContext());
+    }
+
+    public function testExceptionFramesWithoutContextDefault()
+    {
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests'
+        ));
+        $output = $dataBuilder->getExceptionTrace(new \Exception())->getFrames();
+        $this->assertNull($output[1]->getContext());
+    }
+
+    public function testExceptionFramesWithContext()
+    {
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'include_exception_code_context' => true
+        ));
+        $output = $dataBuilder->getExceptionTrace(new \Exception())->getFrames();
+        $this->assertNotEmpty($output[1]->getContext());
+    }
+
     public function testFramesWithoutContext()
     {
         $dataBuilder = new DataBuilder(array(
             'accessToken' => 'abcd1234efef5678abcd1234567890be',
             'environment' => 'tests',
-            'include_error_code_context' => false
+            'include_error_code_context' => false,
+            'include_exception_code_context' => true
         ));
-        $output = $dataBuilder->makeFrames(new \Exception());
+        $testFilePath = __DIR__ . '/DataBuilderTest.php';
+        $backtrace = array(
+            array(
+                'file' => $testFilePath,
+                'function' => 'testFramesWithoutContext',
+                'line' => 42
+            ),
+            array(
+                'file' => $testFilePath,
+                'function' => 'testFramesWithContext',
+                'line' => 99
+            ),
+        );
+        $output = $dataBuilder->getErrorTrace(new ErrorWrapper(E_ERROR, 'bork', null, null, $backtrace))->getFrames();
         $this->assertNull($output[0]->getContext());
     }
 
@@ -377,7 +424,8 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $dataBuilder = new DataBuilder(array(
             'accessToken' => 'abcd1234efef5678abcd1234567890be',
             'environment' => 'tests',
-            'include_error_code_context' => true
+            'include_error_code_context' => true,
+            'include_exception_code_context' => false
         ));
 
         $backTrace = array(
@@ -407,7 +455,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         }
         fclose($file);
 
-        $output = $dataBuilder->makeFrames(new ErrorWrapper(null, null, null, null, $backTrace));
+        $output = $dataBuilder->getErrorTrace(new ErrorWrapper(E_ERROR, 'bork', null, null, $backTrace))->getFrames();
         $pre = $output[0]->getContext()->getPre();
 
         $expected = array();
@@ -421,6 +469,46 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             str_replace(array("\r", "\n"), '', $expected),
             str_replace(array("\r", "\n"), '', $pre)
         );
+    }
+
+    public function testFramesWithoutContextDefault()
+    {
+        $testFilePath = __DIR__ . '/DataBuilderTest.php';
+
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests'
+        ));
+
+        $backTrace = array(
+            array(
+                'file' => $testFilePath,
+                'function' => 'testFramesWithoutContext'
+            ),
+            array(
+                'file' => $testFilePath,
+                'function' => 'testFramesWithContext'
+            ),
+        );
+
+        $file = fopen($testFilePath, 'r');
+        $lineNumber = 0;
+        while (!feof($file)) {
+            $lineNumber++;
+            $line = fgets($file);
+
+            if ($line == '    public function testFramesWithoutContext()
+') {
+                $backTrace[0]['line'] = $lineNumber;
+            } elseif ($line == '    public function testFramesWithContext()
+') {
+                $backTrace[1]['line'] = $lineNumber;
+            }
+        }
+        fclose($file);
+
+        $output = $dataBuilder->getErrorTrace(new ErrorWrapper(E_ERROR, 'bork', null, null, $backTrace))->getFrames();
+        $this->assertNull($output[0]->getContext());
     }
 
     public function testPerson()
