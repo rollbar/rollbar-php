@@ -2,11 +2,11 @@
 
 class AbstractStrategy implements IStrategy
 {
-    protected $databuilder;
+    protected $dataBuilder;
     
-    public function __construct($databuilder)
+    public function __construct($dataBuilder)
     {
-        $this->databuilder = $databuilder;
+        $this->dataBuilder = $dataBuilder;
     }
     
     public function execute(array $payload)

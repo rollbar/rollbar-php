@@ -2,6 +2,8 @@
 
 namespace Rollbar\Truncation;
 
+use Rollbar\DataBuilder;
+
 class RawStrategyTest extends \PHPUnit_Framework_TestCase
 {
     public function testExecute()

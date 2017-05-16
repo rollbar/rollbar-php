@@ -2,6 +2,8 @@
 
 namespace Rollbar\Truncation;
 
+use Rollbar\DataBuilder;
+
 class FramesStrategyTest extends \PHPUnit_Framework_TestCase
 {
     /**

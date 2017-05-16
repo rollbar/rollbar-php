@@ -12,7 +12,7 @@ class StringsStrategy extends AbstractStrategy
     {
         foreach (static::getThresholds() as $threshold) {
             
-            if (!$this->databuilder->needsTruncating($payload)) {
+            if (!$this->dataBuilder->needsTruncating($payload)) {
                 break;
             }
             
