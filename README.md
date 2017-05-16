@@ -4,6 +4,8 @@
 
 This library detects errors and exceptions in your application and reports them to [Rollbar](https://rollbar.com) for alerts, reporting, and analysis.
 
+Supported PHP versions: 5.3, 5.4, 5.5, 5.6, 7, and HHVM (currently tested on 3.6.6).
+
 <!-- Sub:[TOC] -->
 
 ## Quick start
@@ -36,6 +38,12 @@ Rollbar::log(
     'testing extra data',
     array("some_key" => "some value") // key-value additional data
 );
+        
+// If you want to check if logging with Rollbar was successful
+$response = Rollbar::log(Level::info(), 'testing wasSuccessful()');
+if (!$response->wasSuccessful()) {
+    throw new \Exception('logging with Rollbar failed');
+}
 
 // raises an E_NOTICE which will *not* be reported by the error handler
 $foo = $bar;
@@ -54,7 +62,7 @@ Add `rollbar/rollbar` to your `composer.json`:
 ```json
 {
     "require": {
-        "rollbar/rollbar": "~1.0.0"
+        "rollbar/rollbar": "~1.0"
     }
 }
 ```

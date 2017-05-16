@@ -347,7 +347,7 @@ class DataBuilder implements DataBuilderInterface
         $baseException = $this->getBaseException();
         while ($previous instanceof $baseException) {
             $chain[] = $this->makeTrace($previous);
-            $previous = $exc->getPrevious();
+            $previous = $previous->getPrevious();
         }
 
         if (count($chain) > 1) {
@@ -521,28 +521,104 @@ class DataBuilder implements DataBuilderInterface
         }
         return $request;
     }
-
-    protected function getUrl()
+    
+    public function parseForwardedString($forwarded)
     {
-        if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
-            $proto = strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']);
-        } elseif (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
-            $proto = 'https';
-        } else {
-            $proto = 'http';
+        $result = array();
+        
+        // Remove Forwarded   = 1#forwarded-element header prefix
+        $parts = trim(str_replace('Forwarded:', '', $forwarded));
+        
+        /**
+         * Break up the forwarded-element =
+         *  [ forwarded-pair ] *( ";" [ forwarded-pair ] )
+         */
+        $parts = explode(';', $parts);
+        
+        /**
+         * Parse forwarded pairs
+         */
+        foreach ($parts as $forwardedPair) {
+            $forwardedPair = trim($forwardedPair);
+            
+            
+            if (stripos($forwardedPair, 'host=') !== false) {
+                // Parse 'host' forwarded pair
+                $result['host'] = substr($forwardedPair, strlen('host='));
+            } elseif (stripos($forwardedPair, 'proto=') !== false) {
+                // Parse 'proto' forwarded pair
+                $result['proto'] = substr($forwardedPair, strlen('proto='));
+            } else {
+                // Parse 'for' and 'by' forwarded pairs which are comma separated
+                $fpParts = explode(',', $forwardedPair);
+                foreach ($fpParts as $fpPart) {
+                    $fpPart = trim($fpPart);
+                    
+                    if (stripos($fpPart, 'for=') !== false) {
+                        // Parse 'for' forwarded pair
+                        $result['for'] = isset($result['for']) ? $result['for'] : array();
+                        $result['for'][] = substr($fpPart, strlen('for='));
+                    } elseif (stripos($fpPart, 'by=') !== false) {
+                        // Parse 'by' forwarded pair
+                        $result['by'] = isset($result['by']) ? $result['by'] : array();
+                        $result['by'][] = substr($fpPart, strlen('by='));
+                    }
+                }
+            }
         }
-
-        if (!empty($_SERVER['HTTP_X_FORWARDED_HOST'])) {
-            $host = $_SERVER['HTTP_X_FORWARDED_HOST'];
-        } elseif (!empty($_SERVER['HTTP_HOST'])) {
-            $parts = explode(':', $_SERVER['HTTP_HOST']);
-            $host = $parts[0];
-        } elseif (!empty($_SERVER['SERVER_NAME'])) {
-            $host = $_SERVER['SERVER_NAME'];
-        } else {
-            $host = 'unknown';
+        
+        return $result;
+    }
+    
+    public function getUrlProto()
+    {
+        $proto = '';
+        
+        if (!empty($_SERVER['HTTP_FORWARDED'])) {
+            extract($this->parseForwardedString($_SERVER['HTTP_FORWARDED']));
         }
-
+        
+        if (empty($proto)) {
+            if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+                $proto = strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']);
+            } elseif (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
+                $proto = 'https';
+            } else {
+                $proto = 'http';
+            }
+        }
+        
+        return $proto;
+    }
+    
+    public function getUrlHost()
+    {
+        $host = '';
+        
+        if (!empty($_SERVER['HTTP_FORWARDED'])) {
+            extract($this->parseForwardedString($_SERVER['HTTP_FORWARDED']));
+        }
+        
+        if (empty($host)) {
+            if (!empty($_SERVER['HTTP_X_FORWARDED_HOST'])) {
+                $host = $_SERVER['HTTP_X_FORWARDED_HOST'];
+            } elseif (!empty($_SERVER['HTTP_HOST'])) {
+                $parts = explode(':', $_SERVER['HTTP_HOST']);
+                $host = $parts[0];
+            } elseif (!empty($_SERVER['SERVER_NAME'])) {
+                $host = $_SERVER['SERVER_NAME'];
+            } else {
+                $host = 'unknown';
+            }
+        }
+        
+        return $host;
+    }
+    
+    public function getUrlPort($proto)
+    {
+        $port = '';
+        
         if (!empty($_SERVER['HTTP_X_FORWARDED_PORT'])) {
             $port = $_SERVER['HTTP_X_FORWARDED_PORT'];
         } elseif (!empty($_SERVER['SERVER_PORT'])) {
@@ -552,6 +628,16 @@ class DataBuilder implements DataBuilderInterface
         } else {
             $port = 80;
         }
+        
+        return $port;
+    }
+
+    public function getUrl()
+    {
+        $proto = $this->getUrlProto();
+        $host = $this->getUrlHost();
+        $port = $this->getUrlPort($proto);
+        
 
         $path = Utilities::coalesce($this->tryGet($_SERVER, 'REQUEST_URI'), '/');
         $url = $proto . '://' . $host;
@@ -772,33 +858,9 @@ class DataBuilder implements DataBuilderInterface
         }
         
         if (is_array($data)) { // scrub arrays
-        
             $data = $this->scrubArray($data, $replacement);
         } elseif (is_string($data)) { // scrub URLs and query strings
-            
             $query = parse_url($data, PHP_URL_QUERY);
-            
-            /**
-             * String is not a URL but it still might be just a plain
-             * query string in format arg1=val1&arg2=val2
-             */
-            if (!$query) {
-                parse_str($data, $parsed);
-                $parsedValues = array_values($parsed);
-                
-                /**
-                 * If parsing a string results in an associative array
-                 * with multiple elements it's valid query string (key
-                 * recognition).
-                 *
-                 * Also, if it results in first key having an assigned value
-                 * it's also a valid query string (values recognition).
-                 */
-                if (count($parsed) > 1 || $parsedValues[0]) {
-                    $query = $data;
-                }
-            }
-                
             if ($query) {
                 $data = str_replace(
                     $query,
@@ -807,7 +869,6 @@ class DataBuilder implements DataBuilderInterface
                 );
             }
         }
-        
         return $data;
     }
 

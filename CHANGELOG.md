@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1
+- Bug fix related to scrubbing potential query strings
+- Update notifier to send the correct version number in the payload
+
 ## 1.0.0
 
 Almost everything has been refactored or rewritten. The updated README has all of the current

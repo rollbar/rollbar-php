@@ -3,6 +3,7 @@
 use Psr\Log\AbstractLogger;
 use Rollbar\Payload\Payload;
 use Rollbar\Payload\Level;
+use Rollbar\Utilities;
 
 class RollbarLogger extends AbstractLogger
 {
@@ -33,10 +34,15 @@ class RollbarLogger extends AbstractLogger
         if (Level::fromName($level) === null) {
             throw new \Psr\Log\InvalidArgumentException("Invalid log level '$level'.");
         }
+        $isUncaught = false;
+        if (array_key_exists(Utilities::IS_UNCAUGHT_KEY, $context) && $context[Utilities::IS_UNCAUGHT_KEY]) {
+            $isUncaught = true;
+            unset($context[Utilities::IS_UNCAUGHT_KEY]);
+        }
         $accessToken = $this->getAccessToken();
         $payload = $this->getPayload($accessToken, $level, $toLog, $context);
         
-        if ($this->config->checkIgnored($payload, $accessToken, $toLog)) {
+        if ($this->config->checkIgnored($payload, $accessToken, $toLog, $isUncaught)) {
             $response = new Response(0, "Ignored");
         } else {
             $scrubbed = $this->scrub($payload);
