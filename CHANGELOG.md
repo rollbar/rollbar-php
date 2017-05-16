@@ -1,6 +1,25 @@
 # Changelog
 
+## 1.1.0
+
+This release includes some new features, some improvements to existing functionality, and several
+bug fixes. Below are the highlights of issues/PRs that are included in this release:
+
+- GitHub Issue #38: truncate payload #167
+- GitHub Issue #102: Support the Forwarded (RFC 7239) header #155
+- GitHub Issue #72: status 200 when using set_exception_handler #143
+- GitHub Issue #53: Option to capture stack trace in report_message() #145
+- Fix how include_error_code_context works with defaults #168
+- Fix how we handle scrubbing related to query strings so that we don't accidentially urlencode
+  things that should not be, such as sql queries #164
+- Bug: infinite loop when previous exception set #158 (@vilius-g)
+- Bug: checkIgnore was not getting passed documented arguments #152
+- Only report legitimate fatal errors during shutdown rather than anything returned by
+  error_get_last(), Fatal handler type check #161 (@vilius-g)
+- Move packfire/php5.3-compat from require to suggest in composer.json #169 (@elazar)
+
 ## 1.0.1
+
 - Bug fix related to scrubbing potential query strings
 - Update notifier to send the correct version number in the payload
 
