@@ -5,18 +5,18 @@
 This release includes some new features, some improvements to existing functionality, and several
 bug fixes. Below are the highlights of issues/PRs that are included in this release:
 
-- GitHub Issue #38: truncate payload #167
-- GitHub Issue #102: Support the Forwarded (RFC 7239) header #155
-- GitHub Issue #72: status 200 when using set_exception_handler #143
-- GitHub Issue #53: Option to capture stack trace in report_message() #145
-- Fix how include_error_code_context works with defaults #168
+- GitHub Issue [#38](https://github.com/rollbar/rollbar-php/issues/38): truncate payload [#167](https://github.com/rollbar/rollbar-php/pull/167)
+- GitHub Issue [#102](https://github.com/rollbar/rollbar-php/issues/102): Support the Forwarded (RFC 7239) header [#155](https://github.com/rollbar/rollbar-php/pulls/155)
+- GitHub Issue [#72](https://github.com/rollbar/rollbar-php/issues/72): status 200 when using set_exception_handler [#143](https://github.com/rollbar/rollbar-php/pulls/143)
+- GitHub Issue [#53](https://github.com/rollbar/rollbar-php/issues/53): Option to capture stack trace in report_message() [#145](https://github.com/rollbar/rollbar-php/pulls/145)
+- Fix how include_error_code_context works with defaults [#168](https://github.com/rollbar/rollbar-php/pulls/168)
 - Fix how we handle scrubbing related to query strings so that we don't accidentially urlencode
-  things that should not be, such as sql queries #164
-- Bug: infinite loop when previous exception set #158 (@vilius-g)
-- Bug: checkIgnore was not getting passed documented arguments #152
+  things that should not be, such as sql queries [#164](https://github.com/rollbar/rollbar-php/pulls/164)
+- Bug: infinite loop when previous exception set [#158](https://github.com/rollbar/rollbar-php/pulls/158) (@vilius-g)
+- Bug: checkIgnore was not getting passed documented arguments [#152](https://github.com/rollbar/rollbar-php/pulls/152)
 - Only report legitimate fatal errors during shutdown rather than anything returned by
-  error_get_last(), Fatal handler type check #161 (@vilius-g)
-- Move packfire/php5.3-compat from require to suggest in composer.json #169 (@elazar)
+  error_get_last(), Fatal handler type check [#161](https://github.com/rollbar/rollbar-php/pulls/161) (@vilius-g)
+- Move packfire/php5.3-compat from require to suggest in composer.json [#169](https://github.com/rollbar/rollbar-php/pulls/169) (@elazar)
 
 ## 1.0.1
 
