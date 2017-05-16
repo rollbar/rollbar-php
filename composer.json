@@ -32,8 +32,7 @@
 
   "require": {
     "ext-curl": "*",
-    "psr/log": "~1.0.2",
-    "packfire/php5.3-compat": "*"
+    "psr/log": "~1.0.2"
   },
 
   "require-dev": {
@@ -42,6 +41,10 @@
     "squizlabs/php_codesniffer": "2.*",
     "codeclimate/php-test-reporter": "dev-master",
     "monolog/monolog": "*"
+  },
+
+  "suggest": {
+    "packfire/php5.3-compat": "for backward compatibility with PHP 5.3"
   },
 
   "scripts": {
