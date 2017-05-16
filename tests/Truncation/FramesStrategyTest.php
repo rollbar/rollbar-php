@@ -16,7 +16,7 @@ class FramesStrategyTest extends \PHPUnit_Framework_TestCase
             'environment' => 'tests'
         ));
                     
-        $strategy = new FramesStrategy($databuilder);
+        $strategy = new FramesStrategy($dataBuilder);
         $result = $strategy->execute($data);
         
         $this->assertEquals($expected, $result);
