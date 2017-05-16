@@ -207,11 +207,11 @@ class Config
 
     private function setSendMessageTrace($c)
     {
-        if (!isset($c['sendMessageTrace'])) {
+        if (!isset($c['send_message_trace'])) {
             return;
         }
 
-        $this->sendMessageTrace = $c['sendMessageTrace'];
+        $this->sendMessageTrace = $c['send_message_trace'];
     }
 
     /**

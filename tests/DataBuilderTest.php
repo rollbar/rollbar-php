@@ -351,7 +351,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $dataBuilder = new DataBuilder(array(
             'accessToken' => 'abcd1234efef5678abcd1234567890be',
             'environment' => 'tests',
-            'sendMessageTrace' => true
+            'send_message_trace' => true
         ));
     
         $result = $dataBuilder->makeData(Level::fromName('error'), "testing", array());

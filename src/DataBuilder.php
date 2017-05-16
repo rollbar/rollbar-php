@@ -146,7 +146,7 @@ class DataBuilder implements DataBuilderInterface
 
     protected function setSendMessageTrace($config)
     {
-        $fromConfig = $this->tryGet($config, 'sendMessageTrace');
+        $fromConfig = $this->tryGet($config, 'send_message_trace');
         $this->sendMessageTrace = self::$defaults->sendMessageTrace($fromConfig);
     }
 
