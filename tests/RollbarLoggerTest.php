@@ -25,7 +25,7 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
     public function testLog()
     {
         $l = new RollbarLogger(array(
-            "access_token" => "eb2561a52efb4d4bba5a1d4b68be13e9",
+            "access_token" => "ad865e76e7fb496fab096ac07b1dbabb",
             "environment" => "testing-php"
         ));
         $response = $l->log(Level::warning(), "Testing PHP Notifier", array());
