@@ -8,5 +8,4 @@ interface IStrategy
      * @return array
      */
     public function execute(array $payload);
-    
 }

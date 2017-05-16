@@ -12,13 +12,9 @@ class MinBodyStrategy extends AbstractStrategy
         $traceData = null;
         
         if (isset($payload['data']['body']['trace'])) {
-            
             $traceData = &$payload['data']['body']['trace'];
-            
         } elseif (isset($payload['data']['body']['trace_chain'])) {
-            
             $traceData = &$payload['data']['body']['trace_chain'];
-            
         }
         
         /**
@@ -30,8 +26,8 @@ class MinBodyStrategy extends AbstractStrategy
          * Truncate exception message
          */
         $traceData['exception']['message'] = substr(
-            $traceData['exception']['message'], 
-            0, 
+            $traceData['exception']['message'],
+            0,
             static::EXCEPTION_MESSAGE_LIMIT
         );
         

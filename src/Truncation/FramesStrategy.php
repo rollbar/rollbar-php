@@ -10,13 +10,9 @@ class FramesStrategy extends AbstractStrategy
         $frames = array();
         
         if (isset($payload['data']['body']['trace_chain']['frames'])) {
-            
             $frames = $payload['data']['body']['trace_chain']['frames'];
-            
         } elseif (isset($payload['data']['body']['trace']['frames'])) {
-            
             $frames = $payload['data']['body']['trace']['frames'];
-            
         }
         
         return $this->selectFrames($frames);

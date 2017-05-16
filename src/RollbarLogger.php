@@ -90,5 +90,4 @@ class RollbarLogger extends AbstractLogger
     {
         return $this->config->getDataBuilder()->truncate($payload);
     }
-    
 }
