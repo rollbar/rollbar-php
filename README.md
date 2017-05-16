@@ -418,6 +418,12 @@ $config['proxy'] = array(
 Default: No proxy
 </dd>
 
+<dt>send_message_trace</dt>
+<dd>Should backtrace be include with string messages reported to Rollbar
+
+Default: `false`
+</dd>
+
 </dl>
 
 Example use of error_sample_rates:
