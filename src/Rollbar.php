@@ -9,6 +9,7 @@ class Rollbar
      * @var RollbarLogger
      */
     private static $logger = null;
+    private static $fatalErrors = array(E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR);
 
     public static function init(
         $config,
@@ -93,7 +94,7 @@ class Rollbar
             return;
         }
         $last_error = error_get_last();
-        if (!is_null($last_error)) {
+        if (!is_null($last_error) && in_array($last_error['type'], self::$fatalErrors, true)) {
             $errno = $last_error['type'];
             $errstr = $last_error['message'];
             $errfile = $last_error['file'];
