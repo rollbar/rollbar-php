@@ -45,7 +45,7 @@ class DataBuilder implements DataBuilderInterface
     protected $notifier;
     protected $baseException;
     protected $includeCodeContext;
-    protected $includeExceptionCodeContext;
+    protected $includeExcCodeContext;
     protected $shiftFunction;
     protected $sendMessageTrace;
 
@@ -79,7 +79,7 @@ class DataBuilder implements DataBuilderInterface
         $this->setNotifier($config);
         $this->setBaseException($config);
         $this->setIncludeCodeContext($config);
-        $this->setIncludeExceptionCodeContext($config);
+        $this->setIncludeExcCodeContext($config);
         $this->setSendMessageTrace($config);
 
         $this->shiftFunction = $this->tryGet($config, 'shift_function');
@@ -152,39 +152,39 @@ class DataBuilder implements DataBuilderInterface
         $this->sendMessageTrace = self::$defaults->sendMessageTrace($fromConfig);
     }
 
-    protected function setCodeVersion($c)
+    protected function setCodeVersion($config)
     {
-        $fromConfig = $this->tryGet($c, 'codeVersion');
+        $fromConfig = $this->tryGet($config, 'codeVersion');
         if (!isset($fromConfig)) {
-            $fromConfig = $this->tryGet($c, 'code_version');
+            $fromConfig = $this->tryGet($config, 'code_version');
         }
         $this->codeVersion = self::$defaults->codeVersion($fromConfig);
     }
 
-    protected function setPlatform($c)
+    protected function setPlatform($config)
     {
-        $fromConfig = $this->tryGet($c, 'platform');
+        $fromConfig = $this->tryGet($config, 'platform');
         $this->platform = self::$defaults->platform($fromConfig);
     }
 
-    protected function setFramework($c)
+    protected function setFramework($config)
     {
-        $this->framework = $this->tryGet($c, 'framework');
+        $this->framework = $this->tryGet($config, 'framework');
     }
 
-    protected function setContext($c)
+    protected function setContext($config)
     {
-        $this->context = $this->tryGet($c, 'context');
+        $this->context = $this->tryGet($config, 'context');
     }
 
-    protected function setRequestParams($c)
+    protected function setRequestParams($config)
     {
-        $this->requestParams = $this->tryGet($c, 'requestParams');
+        $this->requestParams = $this->tryGet($config, 'requestParams');
     }
 
-    protected function setRequestBody($c)
+    protected function setRequestBody($config)
     {
-        $this->requestBody = $this->tryGet($c, 'requestBody');
+        $this->requestBody = $this->tryGet($config, 'requestBody');
         
         if (!$this->requestBody) {
             $this->requestBody = file_get_contents("php://input");
@@ -196,94 +196,94 @@ class DataBuilder implements DataBuilderInterface
         $this->requestExtras = $this->tryGet($c, "requestExtras");
     }
 
-    protected function setPerson($c)
+    protected function setPerson($config)
     {
-        $this->person = $this->tryGet($c, 'person');
+        $this->person = $this->tryGet($config, 'person');
     }
 
-    protected function setPersonFunc($c)
+    protected function setPersonFunc($config)
     {
-        $this->personFunc = $this->tryGet($c, 'person_fn');
+        $this->personFunc = $this->tryGet($config, 'person_fn');
     }
 
-    protected function setServerRoot($c)
+    protected function setServerRoot($config)
     {
-        $fromConfig = $this->tryGet($c, 'serverRoot');
+        $fromConfig = $this->tryGet($config, 'serverRoot');
         if (!isset($fromConfig)) {
-            $fromConfig = $this->tryGet($c, 'root');
+            $fromConfig = $this->tryGet($config, 'root');
         }
         $this->serverRoot = self::$defaults->serverRoot($fromConfig);
     }
 
-    protected function setServerBranch($c)
+    protected function setServerBranch($config)
     {
-        $fromConfig = $this->tryGet($c, 'serverBranch');
+        $fromConfig = $this->tryGet($config, 'serverBranch');
         if (!isset($fromConfig)) {
-            $fromConfig = $this->tryGet($c, 'branch');
+            $fromConfig = $this->tryGet($config, 'branch');
         }
         $this->serverBranch = self::$defaults->gitBranch($fromConfig);
     }
 
-    protected function setServerCodeVersion($c)
+    protected function setServerCodeVersion($config)
     {
-        $this->serverCodeVersion = $this->tryGet($c, 'serverCodeVersion');
+        $this->serverCodeVersion = $this->tryGet($config, 'serverCodeVersion');
     }
 
-    protected function setServerExtras($c)
+    protected function setServerExtras($config)
     {
-        $this->serverExtras = $this->tryGet($c, 'serverExtras');
+        $this->serverExtras = $this->tryGet($config, 'serverExtras');
     }
 
-    protected function setCustom($c)
+    protected function setCustom($config)
     {
-        $this->custom = $this->tryGet($c, 'custom');
+        $this->custom = $this->tryGet($config, 'custom');
     }
 
-    protected function setFingerprint($c)
+    protected function setFingerprint($config)
     {
-        $this->fingerprint = $this->tryGet($c, 'fingerprint');
+        $this->fingerprint = $this->tryGet($config, 'fingerprint');
         if (!is_null($this->fingerprint) && !is_callable($this->fingerprint)) {
             $msg = "If set, config['fingerprint'] must be a callable that returns a uuid string";
             throw new \InvalidArgumentException($msg);
         }
     }
 
-    protected function setTitle($c)
+    protected function setTitle($config)
     {
-        $this->title = $this->tryGet($c, 'title');
+        $this->title = $this->tryGet($config, 'title');
         if (!is_null($this->title) && !is_callable($this->title)) {
             $msg = "If set, config['title'] must be a callable that returns a string";
             throw new \InvalidArgumentException($msg);
         }
     }
 
-    protected function setNotifier($c)
+    protected function setNotifier($config)
     {
-        $fromConfig = $this->tryGet($c, 'notifier');
+        $fromConfig = $this->tryGet($config, 'notifier');
         $this->notifier = self::$defaults->notifier($fromConfig);
     }
 
-    protected function setBaseException($c)
+    protected function setBaseException($config)
     {
-        $fromConfig = $this->tryGet($c, 'baseException');
+        $fromConfig = $this->tryGet($config, 'baseException');
         $this->baseException = self::$defaults->baseException($fromConfig);
     }
 
-    protected function setIncludeCodeContext($c)
+    protected function setIncludeCodeContext($config)
     {
-        $fromConfig = $this->tryGet($c, 'include_error_code_context');
+        $fromConfig = $this->tryGet($config, 'include_error_code_context');
         $this->includeCodeContext = self::$defaults->includeCodeContext($fromConfig);
     }
 
-    protected function setIncludeExceptionCodeContext($c)
+    protected function setIncludeExcCodeContext($config)
     {
-        $fromConfig = $this->tryGet($c, 'include_exception_code_context');
-        $this->includeExceptionCodeContext = self::$defaults->includeExceptionCodeContext($fromConfig);
+        $fromConfig = $this->tryGet($config, 'include_exception_code_context');
+        $this->includeExcCodeContext = self::$defaults->includeExcCodeContext($fromConfig);
     }
 
-    protected function setHost($c)
+    protected function setHost($config)
     {
-        $this->host = $this->tryGet($c, 'host');
+        $this->host = $this->tryGet($config, 'host');
     }
 
     /**
@@ -345,13 +345,13 @@ class DataBuilder implements DataBuilderInterface
     public function getExceptionTrace($exc)
     {
         $chain = array();
-        $chain[] = $this->makeTrace($exc, $this->includeExceptionCodeContext);
+        $chain[] = $this->makeTrace($exc, $this->includeExcCodeContext);
 
         $previous = $exc->getPrevious();
 
         $baseException = $this->getBaseException();
         while ($previous instanceof $baseException) {
-            $chain[] = $this->makeTrace($previous, $this->includeExceptionCodeContext);
+            $chain[] = $this->makeTrace($previous, $this->includeExcCodeContext);
             $previous = $previous->getPrevious();
         }
 

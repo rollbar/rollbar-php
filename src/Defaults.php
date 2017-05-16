@@ -91,7 +91,7 @@ class Defaults
     private $defaultScrubFields;
     private $defaultSendMessageTrace;
     private $defaultIncludeCodeContext;
-    private $defaultIncludeExceptionCodeContext;
+    private $defaultIncludeExcCodeContext;
 
     public function __construct()
     {
@@ -140,7 +140,7 @@ class Defaults
         $this->defaultCodeVersion = "";
         $this->defaultSendMessageTrace = false;
         $this->defaultIncludeCodeContext = false;
-        $this->defaultIncludeExceptionCodeContext = false;
+        $this->defaultIncludeExcCodeContext = false;
     }
 
     public function messageLevel($level = null)
@@ -208,8 +208,8 @@ class Defaults
         return Utilities::coalesce($includeCodeContext, $this->defaultIncludeCodeContext);
     }
 
-    public function includeExceptionCodeContext($includeExceptionCodeContext = null)
+    public function includeExcCodeContext($includeExcCodeContext = null)
     {
-        return Utilities::coalesce($includeExceptionCodeContext, $this->defaultIncludeExceptionCodeContext);
+        return Utilities::coalesce($includeExcCodeContext, $this->defaultIncludeExcCodeContext);
     }
 }
