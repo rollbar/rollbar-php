@@ -22,7 +22,7 @@ class FramesStrategy extends AbstractStrategy
         return $this->selectFrames($frames);
     }
     
-    protected function selectFrames($frames, $range = self::FRAMES_OPTIMIZATION_RANGE)
+    public function selectFrames($frames, $range = self::FRAMES_OPTIMIZATION_RANGE)
     {
         if (count($frames) <= $range * 2) {
             return $frames;
