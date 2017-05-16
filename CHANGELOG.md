@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+- Forgot to bump the version number in the README and in the Notifier configuration.
+
 ## 1.1.0
 
 This release includes some new features, some improvements to existing functionality, and several

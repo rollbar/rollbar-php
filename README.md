@@ -62,7 +62,7 @@ Add `rollbar/rollbar` to your `composer.json`:
 ```json
 {
     "require": {
-        "rollbar/rollbar": "~1.0"
+        "rollbar/rollbar": "~1.1"
     }
 }
 ```
