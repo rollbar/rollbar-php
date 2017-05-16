@@ -40,7 +40,8 @@
     "mockery/mockery": "0.9.*",
     "squizlabs/php_codesniffer": "2.*",
     "codeclimate/php-test-reporter": "dev-master",
-    "monolog/monolog": "*"
+    "monolog/monolog": "*",
+    "packfire/php5.3-compat": "*"
   },
 
   "suggest": {
