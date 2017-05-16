@@ -90,6 +90,8 @@ class Defaults
     private $defaultBaseException;
     private $defaultScrubFields;
     private $defaultSendMessageTrace;
+    private $defaultIncludeCodeContext;
+    private $defaultExceptionIncludeCodeContext;
 
     public function __construct()
     {
@@ -137,6 +139,8 @@ class Defaults
         $this->defaultScrubFields = self::getScrubFields();
         $this->defaultCodeVersion = "";
         $this->defaultSendMessageTrace = false;
+        $this->defaultIncudeCodeContext = false;
+        $this->defaultIncludeExceptionCodeContext = false;
     }
 
     public function messageLevel($level = null)
@@ -197,5 +201,15 @@ class Defaults
     public function scrubFields($scrubFields = null)
     {
         return Utilities::coalesce($scrubFields, $this->defaultScrubFields);
+    }
+
+    public function includeCodeContext($includeCodeContext = null)
+    {
+        return Utilities::coalesce($includeCodeContext, $this->defaultIncludeCodeContext);
+    }
+
+    public function includeExceptionCodeContext($includeExceptionCodeContext = null)
+    {
+        return Utilities::coalesce($includeExceptionCodeContext, $this->defaultIncludeExceptionCodeContext);
     }
 }

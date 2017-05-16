@@ -358,14 +358,49 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEmpty($result->getBody()->getValue()->getBacktrace());
     }
 
+    public function testExceptionFramesWithoutContext()
+    {
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'include_error_code_context' => true,
+            'include_exception_code_context' => false
+        ));
+        $output = $dataBuilder->makeFrames(new \Exception());
+        $this->assertNull($output[1]->getContext());
+    }
+
+    public function testExceptionFramesWithoutContextDefault()
+    {
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests'
+        ));
+        $output = $dataBuilder->makeFrames(new \Exception());
+        $this->assertNull($output[1]->getContext());
+    }
+
+    public function testExceptionFramesWithContext()
+    {
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'include_exception_code_context' => true
+        ));
+        $output = $dataBuilder->makeFrames(new \Exception());
+        $this->assertNotEmpty($output[1]->getContext());
+    }
+
     public function testFramesWithoutContext()
     {
         $dataBuilder = new DataBuilder(array(
             'accessToken' => 'abcd1234efef5678abcd1234567890be',
             'environment' => 'tests',
-            'include_error_code_context' => false
+            'include_error_code_context' => false,
+            'include_exception_code_context' => true
         ));
-        $output = $dataBuilder->makeFrames(new \Exception());
+        $backtrace = array(array());
+        $output = $dataBuilder->makeFrames(new ErrorWrapper(null, null, null, null, $backtrace), true);
         $this->assertNull($output[0]->getContext());
     }
 
@@ -377,7 +412,60 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $dataBuilder = new DataBuilder(array(
             'accessToken' => 'abcd1234efef5678abcd1234567890be',
             'environment' => 'tests',
-            'include_error_code_context' => true
+            'include_error_code_context' => true,
+            'include_exception_code_context' => false
+        ));
+
+        $backTrace = array(
+            array(
+                'file' => $testFilePath,
+                'function' => 'testFramesWithoutContext'
+            ),
+            array(
+                'file' => $testFilePath,
+                'function' => 'testFramesWithContext'
+            ),
+        );
+
+        $file = fopen($testFilePath, 'r');
+        $lineNumber = 0;
+        while (!feof($file)) {
+            $lineNumber++;
+            $line = fgets($file);
+
+            if ($line == '    public function testFramesWithoutContext()
+') {
+                $backTrace[0]['line'] = $lineNumber;
+            } elseif ($line == '    public function testFramesWithContext()
+') {
+                $backTrace[1]['line'] = $lineNumber;
+            }
+        }
+        fclose($file);
+
+        $output = $dataBuilder->makeFrames(new ErrorWrapper(null, null, null, null, $backTrace), true);
+        $pre = $output[0]->getContext()->getPre();
+
+        $expected = array();
+        $fileContent = file($backTrace[0]['file']);
+        for ($i = 7; $i > 1; $i--) {
+            $expectedLine = $fileContent[$backTrace[0]['line']-$i];
+            $expected[] = $expectedLine;
+        }
+
+        $this->assertEquals(
+            str_replace(array("\r", "\n"), '', $expected),
+            str_replace(array("\r", "\n"), '', $pre)
+        );
+    }
+
+    public function testFramesWithoutContextDefault()
+    {
+        $testFilePath = __DIR__ . '/DataBuilderTest.php';
+
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests'
         ));
 
         $backTrace = array(
@@ -408,19 +496,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         fclose($file);
 
         $output = $dataBuilder->makeFrames(new ErrorWrapper(null, null, null, null, $backTrace));
-        $pre = $output[0]->getContext()->getPre();
-
-        $expected = array();
-        $fileContent = file($backTrace[0]['file']);
-        for ($i = 7; $i > 1; $i--) {
-            $expectedLine = $fileContent[$backTrace[0]['line']-$i];
-            $expected[] = $expectedLine;
-        }
-
-        $this->assertEquals(
-            str_replace(array("\r", "\n"), '', $expected),
-            str_replace(array("\r", "\n"), '', $pre)
-        );
+        $this->assertNull($output[0]->getContext());
     }
 
     public function testPerson()

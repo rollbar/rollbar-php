@@ -45,6 +45,7 @@ class DataBuilder implements DataBuilderInterface
     protected $notifier;
     protected $baseException;
     protected $includeCodeContext;
+    protected $includeExceptionCodeContext;
     protected $shiftFunction;
     protected $sendMessageTrace;
 
@@ -78,6 +79,7 @@ class DataBuilder implements DataBuilderInterface
         $this->setNotifier($config);
         $this->setBaseException($config);
         $this->setIncludeCodeContext($config);
+        $this->setIncludeExceptionCodeContext($config);
         $this->setSendMessageTrace($config);
 
         $this->shiftFunction = $this->tryGet($config, 'shift_function');
@@ -270,10 +272,13 @@ class DataBuilder implements DataBuilderInterface
     protected function setIncludeCodeContext($c)
     {
         $fromConfig = $this->tryGet($c, 'include_error_code_context');
-        $this->includeCodeContext = true;
-        if ($fromConfig !== null) {
-            $this->includeCodeContext = $fromConfig;
-        }
+        $this->includeCodeContext = self::$defaults->includeCodeContext($fromConfig);
+    }
+
+    protected function setIncludeExceptionCodeContext($c)
+    {
+        $fromConfig = $this->tryGet($c, 'include_exception_code_context');
+        $this->includeExceptionCodeContext = self::$defaults->includeExceptionCodeContext($fromConfig);
     }
 
     protected function setHost($c)
@@ -330,7 +335,7 @@ class DataBuilder implements DataBuilderInterface
 
     protected function getErrorTrace(ErrorWrapper $error)
     {
-        return $this->makeTrace($error, $error->getClassName());
+        return $this->makeTrace($error, $error->getClassName(), true);
     }
 
     /**
@@ -360,11 +365,12 @@ class DataBuilder implements DataBuilderInterface
     /**
      * @param \Throwable|\Exception $exception
      * @param string $classOverride
+     * @param Boolean $isError whether the first parameter is an error or exception
      * @return Trace
      */
-    public function makeTrace($exception, $classOverride = null)
+    public function makeTrace($exception, $classOverride = null, $isError = false)
     {
-        $frames = $this->makeFrames($exception);
+        $frames = $this->makeFrames($exception, $isError);
         $excInfo = new ExceptionInfo(
             Utilities::coalesce($classOverride, get_class($exception)),
             $exception->getMessage()
@@ -372,7 +378,7 @@ class DataBuilder implements DataBuilderInterface
         return new Trace($frames, $excInfo);
     }
 
-    public function makeFrames($exception)
+    public function makeFrames($exception, $isError = false)
     {
         $frames = array();
         foreach ($this->getTrace($exception) as $frameInfo) {
@@ -385,7 +391,7 @@ class DataBuilder implements DataBuilderInterface
             $frame->setLineno($lineno)
                 ->setMethod($method);
 
-            if ($this->includeCodeContext) {
+            if (($isError && $this->includeCodeContext) || (!$isError && $this->includeExceptionCodeContext)) {
                 $this->addCodeContextToFrame($frame, $filename, $lineno);
             }
 
