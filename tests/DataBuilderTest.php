@@ -539,7 +539,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $size = strlen(json_encode($result));
         
         $this->assertTrue
-            $size <= DataBuilder::MAX_PAYLOAD_SIZE, 
+            $size <= DataBuilder::MAX_PAYLOAD_SIZE,
             "Truncation failed. Payload size exceeds MAX_PAYLOAD_SIZE."
         );
     }
