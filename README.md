@@ -207,6 +207,24 @@ $config = array(
 
 You'll also need to run the agent. See the [rollbar-agent docs](https://github.com/rollbar/rollbar-agent) for setup instructions.
 
+
+### Centralized Log Aggregation with fluentd
+
+If you have a [fluentd](https://www.fluentd.org/) instance running available you can forward payloads to this instance. To turn this on, set the following config params.
+
+```php
+<?php
+$config = array(
+  // ... rest of current config
+  'handler' => 'fluent',
+  'fluent_host' => 'localhost',  // localhost is the default setting but any other host IP or a unix socket is possible
+  'fluent_port' => 24224, // 24224 is the default setting, please adapt it to your settings
+  'fluent_tag' => 'rollbar', // rollbar is the default setting, you can adjust it to your needs
+);
+?>
+```
+
+
 ### Configuration reference
 
 All of the following options can be passed as keys in the `$config` array.
@@ -302,9 +320,27 @@ Default: `'production'`
 Default: empty array, meaning all errors are reported.
 </dd>
 
+<dt>fluent_host</dt>
+<dd>Either an `IPv4`, `IPv6`, or a `unix socket`.
+
+Default: `'127.0.0.1'`
+</dd>
+
+<dt>fluent_port</dt>
+<dd>The port on which the fluentd instance is listening on. If you use a unix socket this setting is ignored.
+
+Default: `24224`
+</dd>
+
+<dt>fluent_tag</dt>
+<dd>The tag of your fluentd filter and match sections. It can be any string, please consult the [fluentd documentation](http://docs.fluentd.org/) for valid tags.
+
+Default: `'rollbar'`
+</dd>
+
 <dt>handler
 </dt>
-<dd>Either `'blocking'` or `'agent'`. `'blocking'` uses curl to send requests immediately; `'agent'` writes a relay log to be consumed by [rollbar-agent](https://github.com/rollbar/rollbar-agent).
+<dd>Either `'blocking'`, `'agent'`, or `'fluent'`. `'blocking'` uses curl to send requests immediately; `'agent'` writes a relay log to be consumed by [rollbar-agent](https://github.com/rollbar/rollbar-agent); `'fluent'` send the requests to a [fluentd](https://www.fluentd.org/) instance.
 
 Default: `'blocking'`
 </dd>

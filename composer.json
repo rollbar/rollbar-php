@@ -32,7 +32,8 @@
 
   "require": {
     "ext-curl": "*",
-    "psr/log": "~1.0.2"
+    "psr/log": "~1.0.2",
+    "fluent/logger": "^1.0"
   },
 
   "require-dev": {
