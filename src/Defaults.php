@@ -19,9 +19,11 @@ class Defaults
     private static function getGitHash()
     {
         try {
-            exec('git rev-parse --verify HEAD 2> /dev/null', $output);
-            if ($output) {
-                return $output[0];
+            if (function_exists('exec')) {
+                exec('git rev-parse --verify HEAD 2> /dev/null', $output);
+                if ($output) {
+                    return $output[0];
+                }
             }
             return null;
         } catch (\Exception $e) {
@@ -32,9 +34,11 @@ class Defaults
     private static function getGitBranch()
     {
         try {
-            exec('git rev-parse --abbrev-ref HEAD 2> /dev/null', $output);
-            if ($output) {
-                return $output[0];
+            if (function_exists('exec')) {
+                exec('git rev-parse --abbrev-ref HEAD 2> /dev/null', $output);
+                if ($output) {
+                    return $output[0];
+                }
             }
             return null;
         } catch (\Exception $e) {
