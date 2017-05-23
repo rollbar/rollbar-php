@@ -497,7 +497,9 @@ class DataBuilder implements DataBuilderInterface
 
     protected function getLanguage()
     {
-        return "PHP " . phpversion();
+        return "php";
+        // TODO: once the backend understands a more informative language value
+        // return "PHP " . phpversion();
     }
 
     protected function getFramework()
