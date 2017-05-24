@@ -76,11 +76,12 @@ class Rollbar
 
     public static function errorHandler($errno, $errstr, $errfile, $errline)
     {
-        if (is_null(self::$logger)) {
-            return;
+        if (null !== self::$logger) {
+            $exception = self::generateErrorWrapper($errno, $errstr, $errfile, $errline);
+            self::$logger->log(Level::error(), $exception, array(Utilities::IS_UNCAUGHT_KEY => true));
         }
-        $exception = self::generateErrorWrapper($errno, $errstr, $errfile, $errline);
-        self::$logger->log(Level::error(), $exception, array(Utilities::IS_UNCAUGHT_KEY => true));
+        
+        return false;
     }
 
     public static function setupFatalHandling()
