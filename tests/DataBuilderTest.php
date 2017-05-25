@@ -395,6 +395,35 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($frames[0]['args'][0], $expected, "Arguments in stack frames NOT included when they should be.");
         
     }
+    
+    public function testExceptionTraceArguments()
+    {
+        // Negative test
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests'
+        ));
+        $ex = $this->exceptionTraceArgsHelper('trace args message');
+        $frames = $dataBuilder->getExceptionTrace($ex)->getFrames();
+        $this->assertNull($frames[0]->getArgs(), "Frames arguments available in trace when they should not be.");
+        
+        // Positive test
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'local_vars_dump' => true
+        ));
+        $expected = 'trace args message';
+        $ex = $this->exceptionTraceArgsHelper($expected);
+        $frames = $dataBuilder->getExceptionTrace($ex)->getFrames();
+        
+        $this->assertEquals($frames[0]->getArgs()[0], $expected, "Frames arguments NOT available in trace when they should be.");
+    }
+    
+    private function exceptionTraceArgsHelper($message)
+    {
+        return new \Exception($message);
+    }
 
     public function testExceptionFramesWithoutContext()
     {

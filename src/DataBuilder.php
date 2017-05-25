@@ -402,11 +402,15 @@ class DataBuilder implements DataBuilderInterface
             $filename = Utilities::coalesce($this->tryGet($frameInfo, 'file'), '<internal>');
             $lineno = Utilities::coalesce($this->tryGet($frameInfo, 'line'), 0);
             $method = $frameInfo['function'];
-            // TODO 4 (arguments are in $frame)
+            $args = Utilities::coalesce($this->tryGet($frameInfo, 'args'), null);
 
             $frame = new Frame($filename);
             $frame->setLineno($lineno)
                 ->setMethod($method);
+                
+            if ($this->localVarsDump && $args !== null) {
+                $frame->setArgs($args);
+            }
 
             if ($includeContext) {
                 $this->addCodeContextToFrame($frame, $filename, $lineno);
