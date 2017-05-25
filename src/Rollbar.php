@@ -108,10 +108,13 @@ class Rollbar
 
     private static function generateErrorWrapper($errno, $errstr, $errfile, $errline)
     {
-        // removing this function and the handler function to make sure they're
-        // not part of the backtrace
-        $backTrace = array_slice(debug_backtrace(), 2);
-        return new ErrorWrapper($errno, $errstr, $errfile, $errline, $backTrace);
+        if (null === self::$logger) {
+            return;
+        }
+        
+        $dataBuilder = self::$logger->getDataBuilder();
+        
+        return $dataBuilder->generateErrorWrapper($errno, $errstr, $errfile, $errline);
     }
 
     private static function getNotInitializedResponse()

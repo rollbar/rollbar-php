@@ -65,6 +65,11 @@ class RollbarLogger extends AbstractLogger
     {
         return $this->config->getAccessToken();
     }
+    
+    public function getDataBuilder()
+    {
+        return $this->config->getDataBuilder();
+    }
 
     protected function handleResponse($payload, $response)
     {

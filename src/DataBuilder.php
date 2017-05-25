@@ -994,4 +994,25 @@ class DataBuilder implements DataBuilderInterface
     {
         return strlen(json_encode($payload)) > self::MAX_PAYLOAD_SIZE;
     }
+    
+    /**
+     * Wrap a PHP error in an ErrorWrapper class and add backtrace information
+     * 
+     * @param string $errno
+     * @param string $errstr
+     * @param string $errfile
+     * @param string $errline
+     * 
+     * @return ErrorWrapper
+     */
+    public function generateErrorWrapper($errno, $errstr, $errfile, $errline)
+    {
+        // removing this function and the handler function to make sure they're
+        // not part of the backtrace
+        $backTrace = array_slice(
+            debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS),
+            2
+        );
+        return new ErrorWrapper($errno, $errstr, $errfile, $errline, $backTrace);
+    }
 }

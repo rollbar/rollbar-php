@@ -1009,4 +1009,11 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         
         return $data;
     }
+    
+    public function testGenerateErrorWrapper()
+    {
+        $result = $this->dataBuilder->generateErrorWrapper(E_ERROR, 'bork', null, null);
+        
+        $this->assertInstanceOf(ErrorWrapper::class, $result);
+    }
 }
