@@ -86,6 +86,11 @@ class Defaults
     {
         return $sendMessageTrace ? $sendMessageTrace : $this->defaultSendMessageTrace;
     }
+    
+    public function localVarsDump($localVarsDump = null)
+    {
+        return $localVarsDump ? $localVarsDump : $this->defaultLocalVarsDump;
+    }
 
     private $defaultMessageLevel = "warning";
     private $defaultExceptionLevel = "error";
@@ -102,6 +107,7 @@ class Defaults
     private $defaultSendMessageTrace;
     private $defaultIncludeCodeContext;
     private $defaultIncludeExcCodeContext;
+    private $defaultLocalVarsDump;
 
     public function __construct()
     {
@@ -151,6 +157,7 @@ class Defaults
         $this->defaultSendMessageTrace = false;
         $this->defaultIncludeCodeContext = false;
         $this->defaultIncludeExcCodeContext = false;
+        $this->defaultLocalVarsDump = false;
     }
 
     public function messageLevel($level = null)

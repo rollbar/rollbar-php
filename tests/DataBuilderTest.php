@@ -348,6 +348,10 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         
         $result = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
         $this->assertNull($result->getBody()->getValue()->getBacktrace());
+    }
+    
+    public function testGetMessageSendMessageTrace()
+    {
         
         $dataBuilder = new DataBuilder(array(
             'accessToken' => 'abcd1234efef5678abcd1234567890be',
@@ -357,6 +361,39 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     
         $result = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
         $this->assertNotEmpty($result->getBody()->getValue()->getBacktrace());
+        
+    }
+    
+    public function testGetMessageTraceArguments()
+    {
+        // Negative test
+        $c = new Config(array(
+            'access_token' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'send_message_trace' => true
+        ));
+        $dataBuilder = $c->getDataBuilder();
+    
+        $result = $dataBuilder->makeData(Level::fromName('error'), 'testing', array());
+        $frames = $result->getBody()->getValue()->getBacktrace();
+        
+        $this->assertArrayNotHasKey('args', $frames[0], "Arguments in stack frames included when they should have not been.");
+        
+        // Positive test
+        $c = new Config(array(
+            'access_token' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'send_message_trace' => true,
+            'local_vars_dump' => true
+        ));
+        $dataBuilder = $c->getDataBuilder();
+    
+        $expected = 'testing';
+        $result = $dataBuilder->makeData(Level::fromName('error'), $expected, array());
+        $frames = $result->getBody()->getValue()->getBacktrace();
+        
+        $this->assertEquals($frames[0]['args'][0], $expected, "Arguments in stack frames NOT included when they should be.");
+        
     }
 
     public function testExceptionFramesWithoutContext()

@@ -57,6 +57,7 @@ class DataBuilder implements DataBuilderInterface
     protected $includeExcCodeContext;
     protected $shiftFunction;
     protected $sendMessageTrace;
+    protected $localVarsDump;
 
     public function __construct($config)
     {
@@ -90,6 +91,7 @@ class DataBuilder implements DataBuilderInterface
         $this->setIncludeCodeContext($config);
         $this->setIncludeExcCodeContext($config);
         $this->setSendMessageTrace($config);
+        $this->setLocalVarsDump($config);
 
         $this->shiftFunction = $this->tryGet($config, 'shift_function');
         if (!isset($this->shiftFunction)) {
@@ -159,6 +161,12 @@ class DataBuilder implements DataBuilderInterface
     {
         $fromConfig = $this->tryGet($config, 'send_message_trace');
         $this->sendMessageTrace = self::$defaults->sendMessageTrace($fromConfig);
+    }
+
+    protected function setLocalVarsDump($config)
+    {
+        $fromConfig = $this->tryGet($config, 'local_vars_dump');
+        $this->localVarsDump = self::$defaults->localVarsDump($fromConfig);
     }
 
     protected function setCodeVersion($config)
@@ -461,7 +469,9 @@ class DataBuilder implements DataBuilderInterface
         return new Message(
             (string)$toLog,
             $context,
-            $this->sendMessageTrace ? debug_backtrace() : null
+            $this->sendMessageTrace ? 
+                debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS) : 
+                null
         );
     }
 
