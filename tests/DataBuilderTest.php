@@ -4,6 +4,7 @@ namespace Rollbar;
 
 use Rollbar\Payload\Level;
 use Rollbar\TestHelpers\MockPhpStream;
+use Rollbar\Truncation\FramesStrategy;
 
 class DataBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,6 +27,282 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $output = $this->dataBuilder->makeData(Level::fromName('error'), "testing", array());
         $this->assertEquals('tests', $output->getEnvironment());
+    }
+    
+    /**
+     * @dataProvider getUrlProvider
+     */
+    public function testGetUrl($protoData, $hostData, $portData, $dataName)
+    {
+        // Set up proto
+        $pre_SERVER = $_SERVER;
+        
+        $_SERVER = array_merge(
+            $_SERVER,
+            $protoData[0],
+            $hostData[0],
+            $portData[0]
+        );
+        $expectedProto = $protoData[1];
+        $expectedHost = $hostData[1];
+        $expectedPort = $portData[1];
+        $expectedPort = ($expectedPort == 80 || $expectedPort == 443) ? "" : $expectedPort;
+        
+        $expected = '';
+        $expected = $expectedProto . "://" . $expectedHost .
+                    ($expectedPort ? $expected  . ':' . $expectedPort : $expected) .
+                    '/';
+                    
+        if ($expectedHost == 'unknown') {
+            $expected = null;
+        }
+        
+        // When DataBuilder builds the data
+        $response = $this->dataBuilder->makeData(Level::fromName('error'), "testing", array());
+        $result = $response->getRequest()->getUrl();
+        
+        $_SERVER = $pre_SERVER;
+        
+        $this->assertEquals($expected, $result);
+    }
+    
+    public function getUrlProvider()
+    {
+        $protoData = $this->getUrlProtoProvider();
+        $hostData = $this->getUrlHostProvider();
+        $portData = $this->getUrlPortProvider();
+        
+        $testData = array();
+        
+        $dataName = 0;
+        
+        foreach ($protoData as $protoTest) {
+            foreach ($hostData as $hostTest) {
+                foreach ($portData as $portTest) {
+                    if ($dataName >= 96 && $dataName <= 99) {
+                        continue;
+                    }
+                    
+                    $testData []= array(
+                        $protoTest, // test param 1
+                        $hostTest, // test param 2
+                        $portTest, // test param 3,
+                        $dataName // test param 4
+                    );
+                    
+                    $dataName++;
+                }
+            }
+        }
+        
+        return $testData;
+    }
+    
+    /**
+     * @dataProvider parseForwardedStringProvider
+     */
+    public function testParseForwardedString($forwaded, $expected)
+    {
+        $output = $this->dataBuilder->parseForwardedString($forwaded);
+        $this->assertEquals($expected, $output);
+    }
+    
+    public function parseForwardedStringProvider()
+    {
+        return array(
+            array( // test 1
+                'Forwarded: for="_mdn" ',
+                array(
+                    'for' => array('"_mdn"')
+                )
+            ),
+            array( // test 2
+                'Forwarded: for="_mdn", for="_mdn2" ',
+                array(
+                    'for' => array('"_mdn"', '"_mdn2"')
+                )
+            ),
+            array( // test 3
+                'Forwarded: For="[2001:db8:cafe::17]:4711"',
+                array(
+                    'for' => array('"[2001:db8:cafe::17]:4711"')
+                )
+            ),
+            array( // test 4
+                'Forwarded: for=192.0.2.60; proto=http; by=203.0.113.43',
+                array(
+                    'for' => array('192.0.2.60'),
+                    'by' => array('203.0.113.43'),
+                    'proto' => 'http'
+                )
+            ),
+            array( // test 5
+                'Forwarded: for=192.0.2.43, for=198.51.100.17;'.
+                           'by=192.0.2.44, by=198.51.100.18',
+                array(
+                    'for' => array('192.0.2.43','198.51.100.17'),
+                    'by' => array('192.0.2.44','198.51.100.18')
+                )
+            ),
+            array( // test 6
+                'Forwarded: for=192.0.2.60; host=hostname; by=203.0.113.43; proto=https',
+                array(
+                    'for' => array('192.0.2.60'),
+                    'by' => array('203.0.113.43'),
+                    'host' => 'hostname',
+                    'proto' => 'https'
+                )
+            )
+        );
+    }
+    
+    /**
+     * @dataProvider getUrlProtoProvider
+     */
+    public function testGetUrlProto($data, $expected)
+    {
+        $pre_SERVER = $_SERVER;
+        $_SERVER = array_merge($_SERVER, $data);
+        
+        $output = $this->dataBuilder->getUrlProto();
+        
+        $this->assertEquals($expected, $output);
+        
+        $_SERVER = $pre_SERVER;
+    }
+    
+    public function getUrlProtoProvider()
+    {
+        return array(
+            array( // test 1: HTTP_FORWARDED
+                array(
+                    'HTTP_FORWARDED' => 'Forwarded: for=192.0.2.60; proto=http; by=203.0.113.43',
+                ),
+                'http'
+            ),
+            array( // test 2: HTTP_X_FORWARDED
+                array(
+                    'HTTP_X_FORWARDED_PROTO' => 'http',
+                ),
+                'http'
+            ),
+            array( // test 3: HTTPS server global
+                array(
+                    'HTTPS' => 'on',
+                ),
+                'https'
+            ),
+            array( // test 4: default
+                array(),
+                'http'
+            ),
+            array( // test 5: HTTP_FORWARDED https
+                array(
+                    'HTTP_FORWARDED' => 'Forwarded: for=192.0.2.60; proto=https; by=203.0.113.43',
+                ),
+                'https'
+            ),
+        );
+    }
+    
+    /**
+     * @dataProvider getUrlHostProvider
+     */
+    public function testGetUrlHost($data, $expected)
+    {
+        $pre_SERVER = $_SERVER;
+        $_SERVER = array_merge($_SERVER, $data);
+        
+        $output = $this->dataBuilder->getUrlHost();
+        
+        $_SERVER = $pre_SERVER;
+        
+        $this->assertEquals($expected, $output);
+    }
+    
+    public function getUrlHostProvider()
+    {
+        return array(
+            array( // test 1: HTTP_FORWARDED
+                array(
+                    'HTTP_FORWARDED' => 'Forwarded: for=192.0.2.60; host=test-hostname.com; by=203.0.113.43',
+                ),
+                'test-hostname.com'
+            ),
+            array( // test 2: HTTP_X_FORWARDED
+                array(
+                    'HTTP_X_FORWARDED_HOST' => 'test-hostname.com',
+                ),
+                'test-hostname.com'
+            ),
+            array( // test 3: HTTP_HOST server global
+                array(
+                    'HTTP_HOST' => 'test-hostname.com',
+                ),
+                'test-hostname.com'
+            ),
+            array( // test 4: default
+                array(),
+                'unknown'
+            ),
+            array( // test 5: SERVER_name
+                array(
+                    'SERVER_NAME' => 'test-hostname.com',
+                ),
+                'test-hostname.com'
+            ),
+            array( // test 6: HTTP_HOST server global with port
+                array(
+                    'HTTP_HOST' => 'test-hostname.com:8080',
+                ),
+                'test-hostname.com'
+            ),
+        );
+    }
+    
+    /**
+     * @dataProvider getUrlPortProvider
+     */
+    public function testGetUrlPort($data, $expected)
+    {
+        $pre_SERVER = $_SERVER;
+        $_SERVER = array_merge($_SERVER, $data);
+        
+        $output = $this->dataBuilder->getUrlPort(
+            isset($_SERVER['$proto']) ? $_SERVER['$proto'] : null
+        );
+        
+        $_SERVER = $pre_SERVER;
+        
+        $this->assertEquals($expected, $output);
+    }
+    
+    public function getUrlPortProvider()
+    {
+        return array(
+            array( // test 1: HTTP_X_FORWARDED
+                array(
+                    'HTTP_X_FORWARDED_PORT' => '8080',
+                ),
+                8080
+            ),
+            array( // test 2: SERVER_PORT server global
+                array(
+                    'SERVER_PORT' => '8080',
+                ),
+                8080
+            ),
+            array( // test 3: default
+                array(),
+                80
+            ),
+            array( // test 4: $proto param
+                array(
+                    '$proto' => 'https',
+                ),
+                443
+            )
+        );
     }
 
     public function testBranchKey()
@@ -61,15 +338,82 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
         $this->assertEquals('my host', $output->getServer()->getHost());
     }
+    
+    public function testGetMessage()
+    {
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests'
+        ));
+        
+        $result = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
+        $this->assertNull($result->getBody()->getValue()->getBacktrace());
+        
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'send_message_trace' => true
+        ));
+    
+        $result = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
+        $this->assertNotEmpty($result->getBody()->getValue()->getBacktrace());
+    }
+
+    public function testExceptionFramesWithoutContext()
+    {
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'include_error_code_context' => true,
+            'include_exception_code_context' => false
+        ));
+        $output = $dataBuilder->getExceptionTrace(new \Exception())->getFrames();
+        $this->assertNull($output[1]->getContext());
+    }
+
+    public function testExceptionFramesWithoutContextDefault()
+    {
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests'
+        ));
+        $output = $dataBuilder->getExceptionTrace(new \Exception())->getFrames();
+        $this->assertNull($output[1]->getContext());
+    }
+
+    public function testExceptionFramesWithContext()
+    {
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'include_exception_code_context' => true
+        ));
+        $output = $dataBuilder->getExceptionTrace(new \Exception())->getFrames();
+        $this->assertNotEmpty($output[1]->getContext());
+    }
 
     public function testFramesWithoutContext()
     {
         $dataBuilder = new DataBuilder(array(
             'accessToken' => 'abcd1234efef5678abcd1234567890be',
             'environment' => 'tests',
-            'include_error_code_context' => false
+            'include_error_code_context' => false,
+            'include_exception_code_context' => true
         ));
-        $output = $dataBuilder->makeFrames(new \Exception());
+        $testFilePath = __DIR__ . '/DataBuilderTest.php';
+        $backtrace = array(
+            array(
+                'file' => $testFilePath,
+                'function' => 'testFramesWithoutContext',
+                'line' => 42
+            ),
+            array(
+                'file' => $testFilePath,
+                'function' => 'testFramesWithContext',
+                'line' => 99
+            ),
+        );
+        $output = $dataBuilder->getErrorTrace(new ErrorWrapper(E_ERROR, 'bork', null, null, $backtrace))->getFrames();
         $this->assertNull($output[0]->getContext());
     }
 
@@ -81,7 +425,8 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $dataBuilder = new DataBuilder(array(
             'accessToken' => 'abcd1234efef5678abcd1234567890be',
             'environment' => 'tests',
-            'include_error_code_context' => true
+            'include_error_code_context' => true,
+            'include_exception_code_context' => false
         ));
 
         $backTrace = array(
@@ -111,7 +456,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         }
         fclose($file);
 
-        $output = $dataBuilder->makeFrames(new ErrorWrapper(null, null, null, null, $backTrace));
+        $output = $dataBuilder->getErrorTrace(new ErrorWrapper(E_ERROR, 'bork', null, null, $backTrace))->getFrames();
         $pre = $output[0]->getContext()->getPre();
 
         $expected = array();
@@ -125,6 +470,46 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             str_replace(array("\r", "\n"), '', $expected),
             str_replace(array("\r", "\n"), '', $pre)
         );
+    }
+
+    public function testFramesWithoutContextDefault()
+    {
+        $testFilePath = __DIR__ . '/DataBuilderTest.php';
+
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests'
+        ));
+
+        $backTrace = array(
+            array(
+                'file' => $testFilePath,
+                'function' => 'testFramesWithoutContext'
+            ),
+            array(
+                'file' => $testFilePath,
+                'function' => 'testFramesWithContext'
+            ),
+        );
+
+        $file = fopen($testFilePath, 'r');
+        $lineNumber = 0;
+        while (!feof($file)) {
+            $lineNumber++;
+            $line = fgets($file);
+
+            if ($line == '    public function testFramesWithoutContext()
+') {
+                $backTrace[0]['line'] = $lineNumber;
+            } elseif ($line == '    public function testFramesWithContext()
+') {
+                $backTrace[1]['line'] = $lineNumber;
+            }
+        }
+        fclose($file);
+
+        $output = $dataBuilder->getErrorTrace(new ErrorWrapper(E_ERROR, 'bork', null, null, $backTrace))->getFrames();
+        $this->assertNull($output[0]->getContext());
     }
 
     public function testPerson()
@@ -247,7 +632,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
                 array(
                     'sensitive'
                 ),
-                'b=%5B1023%2C1924%5D'
+                'b=[1023,1924]'
             )
         );
     }
@@ -277,7 +662,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
                 'non sensitive data 2' => '456',
                 'non sensitive data 3' => '4&56',
                 'non sensitive data 4' => 'a=4&56',
-                'non sensitive data 6' => 'baz&foo=bar',
+                'non sensitive data 6' => '?baz&foo=bar',
                 'sensitive data' => '456',
                 array(
                     'non sensitive data 3' => '789',
@@ -298,8 +683,8 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
                 'non sensitive data 1' => '123',
                 'non sensitive data 2' => '456',
                 'non sensitive data 3' => '4&56',
-                'non sensitive data 4' => 'a=4&56=', // this is a weird edge case
-                'non sensitive data 6' => 'baz=&foo=xxxxxxxx',
+                'non sensitive data 4' => 'a=4&56',
+                'non sensitive data 6' => '?baz=&foo=xxxxxxxx',
                 'sensitive data' => '********',
                 array(
                     'non sensitive data 3' => '789',
@@ -318,7 +703,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             // $testData
-            http_build_query(
+            '?' . http_build_query(
                 array(
                     'arg1' => 'val 1',
                     'sensitive' => 'scrubit',
@@ -329,7 +714,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
                 'sensitive'
             ),
             // $expected
-            http_build_query(
+            '?' . http_build_query(
                 array(
                     'arg1' => 'val 1',
                     'sensitive' => 'xxxxxxxx',
@@ -343,7 +728,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             // $testData
-            http_build_query(
+            '?' . http_build_query(
                 array(
                     'arg1' => 'val 1',
                     'sensitive' => 'scrubit',
@@ -357,7 +742,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
                 'sensitive'
             ),
             // $expected
-            http_build_query(
+            '?' . http_build_query(
                 array(
                     'arg1' => 'val 1',
                     'sensitive' => 'xxxxxxxx',
@@ -380,7 +765,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
                 array(
                     'non sensitive data 3' => '789',
                     'recursive sensitive data' => 'qwe',
-                    'non sensitive data 3' => http_build_query(
+                    'non sensitive data 3' => '?' . http_build_query(
                         array(
                             'arg1' => 'val 1',
                             'sensitive' => 'scrubit',
@@ -407,7 +792,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
                 array(
                     'non sensitive data 3' => '789',
                     'recursive sensitive data' => '********',
-                    'non sensitive data 3' => http_build_query(
+                    'non sensitive data 3' => '?' . http_build_query(
                         array(
                             'arg1' => 'val 1',
                             'sensitive' => 'xxxxxxxx',
@@ -526,5 +911,36 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($streamInput, $requestBody);
         
         stream_wrapper_restore("php");
+    }
+    
+    /**
+     * @dataProvider truncateProvider
+     */
+    public function testTruncate($data)
+    {
+        $result = $this->dataBuilder->truncate($data);
+        
+        $size = strlen(json_encode($result));
+        
+        $this->assertTrue(
+            $size <= DataBuilder::MAX_PAYLOAD_SIZE,
+            "Truncation failed. Payload size exceeds MAX_PAYLOAD_SIZE."
+        );
+    }
+    
+    public function truncateProvider()
+    {
+        
+        $stringsTest = new Truncation\StringsStrategyTest();
+        $framesTest = new Truncation\FramesStrategyTest();
+        $minBodyTest = new Truncation\MinBodyStrategyTest();
+        
+        $data = array_merge(
+            $stringsTest->executeProvider(),
+            $framesTest->executeProvider(),
+            $minBodyTest->executeProvider()
+        );
+        
+        return $data;
     }
 }
