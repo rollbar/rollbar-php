@@ -197,6 +197,7 @@ class DataBuilder implements DataBuilderInterface
         
         if (!$this->requestBody) {
             $this->requestBody = file_get_contents("php://input");
+            $_SERVER['php://input'] = $this->requestBody;
         }
     }
 
