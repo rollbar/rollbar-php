@@ -87,6 +87,11 @@ class Defaults
         return $sendMessageTrace ? $sendMessageTrace : $this->defaultSendMessageTrace;
     }
 
+    public function includeRawRequestBody($includeRawRequestBody = null)
+    {
+        return $includeRawRequestBody ? $includeRawRequestBody : $this->defaultIncludeRawRequestBody;
+    }
+
     private $defaultMessageLevel = "warning";
     private $defaultExceptionLevel = "error";
     private $defaultPsrLevels;
@@ -102,6 +107,7 @@ class Defaults
     private $defaultSendMessageTrace;
     private $defaultIncludeCodeContext;
     private $defaultIncludeExcCodeContext;
+    private $defaultIncludeRawRequestBody;
 
     public function __construct()
     {
@@ -151,6 +157,7 @@ class Defaults
         $this->defaultSendMessageTrace = false;
         $this->defaultIncludeCodeContext = false;
         $this->defaultIncludeExcCodeContext = false;
+        $this->defaultIncludeRawRequestBody = false;
     }
 
     public function messageLevel($level = null)
