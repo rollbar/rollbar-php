@@ -460,6 +460,17 @@ Default: No proxy
 Default: `false`
 </dd>
 
+<dt>include_raw_request_body</dt>
+<dd>Include the raw request body from php://input in payloads.
+Note: in PHP < 5.6 if you enable this, php://input will be empty for PUT requests
+as Rollbar SDK will read from it 
+@see http://php.net/manual/pl/wrappers.php.php#refsect2-wrappers.php-unknown-unknown-descriptiop
+If you still want to read the request body for your PUT requests Rollbar SDK saves
+the content of php://input in $_SERVER['php://input']
+
+Default: `false`
+</dd>
+
 </dl>
 
 Example use of error_sample_rates:
