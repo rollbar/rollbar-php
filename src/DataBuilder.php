@@ -361,6 +361,9 @@ class DataBuilder implements DataBuilderInterface
         $baseException = $this->getBaseException();
         while ($previous instanceof $baseException) {
             $chain[] = $this->makeTrace($previous, $this->includeExcCodeContext);
+            if($exc->getPrevious() === $previous){
+                break;
+            }
             $previous = $previous->getPrevious();
         }
 
