@@ -8,9 +8,12 @@ class Level implements \JsonSerializable
     {
         if (is_null(self::$values)) {
             self::$values = array(
+                "emergency" => new Level("critical", 100000),
+                "alert" => new Level("critical", 100000),
                 "critical" => new Level("critical", 100000),
                 "error" => new Level("error", 10000),
                 "warning" => new Level("warning", 1000),
+                "notice" => new Level("info", 100),
                 "info" => new Level("info", 100),
                 "debug" => new Level("debug", 10),
                 "ignored" => new Level("ignore", 0),
