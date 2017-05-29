@@ -29,8 +29,8 @@ class RollbarJsHelper
     public function addJs($headers = null, $nonce = null)
     {
         return
-            $this->configJsTag($headers = null, $nonce) .
-            $this->snippetJsTag($headers = null, $nonce);
+            $this->configJsTag($headers, $nonce) .
+            $this->snippetJsTag($headers, $nonce);
     }
     
     /**
@@ -56,7 +56,8 @@ class RollbarJsHelper
      */
     public function configJsTag($headers = null, $nonce = null)
     {
-        $configJs = "var _rollbarConfig = " . json_encode($this->config['options']) . ";";
+        $config = isset($this->config['options']) ? $this->config['options'] : new \stdClass();
+        $configJs = "var _rollbarConfig = " . json_encode($config) . ";";
         return $this->scriptTag($configJs, $headers, $nonce);
     }
     

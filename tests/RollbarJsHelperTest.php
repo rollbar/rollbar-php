@@ -268,25 +268,58 @@ class JsHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $result);
     }
     
-    public function testAddJs()
+    /**
+     * @dataProvider addJsProvider
+     */
+    public function testAddJs($setup, $expected)
     {
-        $headers = array();
-        $nonce = 'stub-nonce';
-        
-        $mock = \Mockery::mock('Rollbar\RollbarJsHelper');
-        
-        $mock->shouldReceive('snippetJsTag')
-             ->andReturn('stubJsSnippet');
+        extract($setup);
              
-        $mock->shouldReceive('configJsTag')
-             ->andReturn('stubJsConfig');
-             
-        $mock->shouldReceive('addJs')->passthru();
-             
-        $expected = 'stubJsConfig' . 'stubJsSnippet';
+        $helper = new RollbarJsHelper($config);
         
-        $result = $mock->addJs($headers, $nonce);
+        $result = $helper->addJs($headers, $nonce);
         
         $this->assertEquals($expected, $result);
+    }
+    
+    public function addJsProvider()
+    {
+        $this->setUp();
+        $expectedJs = file_get_contents($this->testSnippetPath);
+        return array(
+            array(
+                array(
+                    'config' => array(),
+                    'headers' => array(),
+                    'nonce' => null
+                ),
+                "\n<script type=\"text/javascript\">var _rollbarConfig = {};</script>" .
+                "\n<script type=\"text/javascript\">$expectedJs</script>"
+            ),
+            array(
+                array(
+                    'config' => array(
+                        'options' => array(
+                            'foo' => 'bar'
+                        )
+                    ),
+                    'headers' => array(),
+                    'nonce' => null
+                ),
+                "\n<script type=\"text/javascript\">var _rollbarConfig = {\"foo\":\"bar\"};</script>" .
+                "\n<script type=\"text/javascript\">$expectedJs</script>"
+            ),
+            array(
+                array(
+                    'config' => array(),
+                    'headers' => array(
+                        'Content-Security-Policy: script-src \'unsafe-inline\''
+                    ),
+                    'nonce' => 'stub-nonce'
+                ),
+                "\n<script type=\"text/javascript\" nonce=\"stub-nonce\">var _rollbarConfig = {};</script>" .
+                "\n<script type=\"text/javascript\" nonce=\"stub-nonce\">$expectedJs</script>"
+            ),
+        );
     }
 }
