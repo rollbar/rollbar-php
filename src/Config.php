@@ -104,7 +104,6 @@ class Config
         $this->setResponseHandler($c);
         $this->setCheckIgnoreFunction($c);
         $this->setSendMessageTrace($c);
-        $this->setJsEnabled($c);
 
         if (isset($c['included_errno'])) {
             $this->included_errno = $c['included_errno'];
