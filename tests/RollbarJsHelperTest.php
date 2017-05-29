@@ -25,9 +25,6 @@ class JsHelperTest extends \PHPUnit_Framework_TestCase
     public function testShouldAddJs($setup, $expected)
     {
         $mock = \Mockery::mock('Rollbar\RollbarJsHelper');
-        
-        $mock->shouldReceive('isEnabled')
-             ->andReturn($setup['isEnabled']);
              
         $status = $setup['status'];
         
