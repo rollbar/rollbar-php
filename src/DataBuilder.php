@@ -995,10 +995,10 @@ class DataBuilder implements DataBuilderInterface
             if (substr_count($rawSource, "\n") > substr_count($rawSource, "\r")) {
                 $source = explode("\n", $rawSource);
                 return $source;
-            } else {
-                $source = explode("\r", $rawSource);
-                return $source;
             }
+            
+            $source = explode("\r", $rawSource);
+            return $source;
         }
 
         $source = str_replace(array("\n", "\t", "\r"), '', $source);
