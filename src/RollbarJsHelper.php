@@ -6,8 +6,8 @@ class RollbarJsHelper
     protected $config;
     
     /**
-     * @param array $config The array passed to he should have the same 
-     * available options that you can find in Rollbar.js, using symbols or 
+     * @param array $config The array passed to he should have the same
+     * available options that you can find in Rollbar.js, using symbols or
      * strings for the keys.
      */
     public function __construct($config)
