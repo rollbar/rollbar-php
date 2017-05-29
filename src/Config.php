@@ -50,12 +50,6 @@ class Config
      * sent through RollbarLogger::log()
      */
     private $sendMessageTrace = false;
-    
-    /**
-     * @var boolean In case you want to report your JavaScript errors using
-     * Rollbar.js, you can configure the SDK to enable Rollbar.js on your site.
-     */
-    private $jsEnabled = false;
 
     public function __construct(array $configArray)
     {
@@ -237,15 +231,6 @@ class Config
         }
 
         $this->sendMessageTrace = $c['send_message_trace'];
-    }
-
-    private function setJsEnabled($c)
-    {
-        if (!isset($c['js_enabled'])) {
-            return;
-        }
-
-        $this->jsEnabled = $c['js_enabled'];
     }
 
     /**
