@@ -52,10 +52,10 @@ class Config
     private $sendMessageTrace = false;
     
     /**
-     * @var boolean In case you want to report your JavaScript errors using 
+     * @var boolean In case you want to report your JavaScript errors using
      * Rollbar.js, you can configure the SDK to enable Rollbar.js on your site.
      */
-     private $jsEnabled = false;
+    private $jsEnabled = false;
 
     public function __construct(array $configArray)
     {

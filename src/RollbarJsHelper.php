@@ -2,31 +2,62 @@
 
 class RollbarJsHelper
 {
-    const JS_IS_INJECTED_KEY = 'rollbar.js_is_injected';
-    
+
     protected $config;
     
-    // public function __construct($config)
-    // {
-    //     $this->config = $config;
-    // }
+    public function __construct($config)
+    {
+        $this->config = $config;
+    }
     
     /**
-     * Build RollbarJS script tag
-     * 
-     * @param array $headers
-     * @param string $nonce
-     * 
+     * Build Javascript required to include RollbarJS on
+     * an HTML page
+     *
+     * @param array $headers Response headers usually retrieved through
+     * headers_list() used to verify if nonce should be added to script
+     * tags based on Content-Security-Policy
+     * @param string $nonce Content-Security-Policy nonce string if exists
+     *
      * @return string
      */
-    public function snippetJsTag($headers, $nonce = null)
+    public function addJs($headers = null, $nonce = null)
+    {
+        return
+            $this->configJsTag($headers = null, $nonce) .
+            $this->snippetJsTag($headers = null, $nonce);
+    }
+    
+    /**
+     * Build RollbarJS snippet script tag
+     *
+     * @param array $headers
+     * @param string $nonce
+     *
+     * @return string
+     */
+    public function snippetJsTag($headers = null, $nonce = null)
     {
         return $this->scriptTag($this->jsSnippet(), $headers, $nonce);
     }
     
     /**
+     * Build RollbarJS config script tag
+     *
+     * @param array $headers
+     * @param string $nonce
+     *
+     * @return string
+     */
+    public function configJsTag($headers = null, $nonce = null)
+    {
+        $configJs = "var _rollbarConfig = " . json_encode($this->config['options']) . ";";
+        return $this->scriptTag($configJs, $headers, $nonce);
+    }
+    
+    /**
      * Build rollbar.snippet.js string
-     * 
+     *
      * @return string
      */
     public function jsSnippet()
@@ -46,14 +77,14 @@ class RollbarJsHelper
     
     /**
      * Should JS snippet be added to the HTTP response
-     * 
+     *
      * @param int $status
      * @param array $headers
-     * 
+     *
      * @return boolean
      */
     public function shouldAddJs($status, $headers)
-    {   
+    {
         return
             $status == 200 &&
             $this->isHtml($headers) &&
@@ -68,9 +99,9 @@ class RollbarJsHelper
     
     /**
      * Is the HTTP response a valid HTML response
-     * 
+     *
      * @param array $headers
-     * 
+     *
      * @return boolean
      */
     public function isHtml($headers)
@@ -80,9 +111,9 @@ class RollbarJsHelper
     
     /**
      * Does the HTTP response include an attachment
-     * 
+     *
      * @param array $headers
-     * 
+     *
      * @return boolean
      */
     public function hasAttachment($headers)
@@ -92,9 +123,9 @@ class RollbarJsHelper
     
     /**
      * Is `nonce` attribute on the script tag needed?
-     * 
+     *
      * @param array $headers
-     * 
+     *
      * @return boolean
      */
     public function shouldAppendNonce($headers)
@@ -102,9 +133,7 @@ class RollbarJsHelper
         foreach ($headers as $header) {
             if (strpos($header, 'Content-Security-Policy') !== false &&
                 strpos($header, "'unsafe-inline'") !== false) {
-                    
                 return true;
-                
             }
         }
         
@@ -113,23 +142,22 @@ class RollbarJsHelper
     
     /**
      * Build safe HTML script tag
-     * 
+     *
      * @param string $content
      * @param array $headers
-     * @param 
-     * 
+     * @param
+     *
      * @return string
      */
-    public function scriptTag($content, $headers, $nonce = null)
+    public function scriptTag($content, $headers = null, $nonce = null)
     {
-        if ($this->shouldAppendNonce($headers)) {
-            
+        if ($headers !== null && $this->shouldAppendNonce($headers)) {
             if (!$nonce) {
                 throw new \Exception('Content-Security-Policy is script-src '.
                                      'inline-unsafe but nonce value not provided.');
             }
             
-            return "\n<script type=\"text/javascript\" nonce=\"$nonce\">$content</script>";    
+            return "\n<script type=\"text/javascript\" nonce=\"$nonce\">$content</script>";
         } else {
             return "\n<script type=\"text/javascript\">$content</script>";
         }

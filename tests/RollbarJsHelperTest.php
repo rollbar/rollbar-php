@@ -7,7 +7,7 @@ class JsHelperTest extends \PHPUnit_Framework_TestCase
     
     public function setUp()
     {
-        $this->jsHelper = new RollbarJsHelper();
+        $this->jsHelper = new RollbarJsHelper(array());
         $this->testSnippetPath = realpath(__DIR__ . "/../data/rollbar.snippet.js");
     }
     
@@ -187,23 +187,17 @@ class JsHelperTest extends \PHPUnit_Framework_TestCase
     {
         if ($expected === 'Exception') {
             try {
-                
                 $result = $this->jsHelper->scriptTag($content, $headers, $nonce);
                 
                 $this->fail();
-                
             } catch (\Exception $e) {
-                
                 $this->assertTrue(true);
                 return;
-                
             }
         } else {
-            
             $result = $this->jsHelper->scriptTag($content, $headers, $nonce);
             
             $this->assertEquals($expected, $result);
-            
         }
     }
     
@@ -233,7 +227,6 @@ class JsHelperTest extends \PHPUnit_Framework_TestCase
                 "\n<script type=\"text/javascript\">var test = \"value 1\";</script>"
             ),
         );
-        
     }
     
     public function testSnippetJsTag()
@@ -247,12 +240,53 @@ class JsHelperTest extends \PHPUnit_Framework_TestCase
              ->andReturn('stubJsSnippet');
         
         $mock->shouldReceive('scriptTag')
-             ->with('stubJsSnippet')
-             ->with($headers)
-             ->with($nonce);
+             ->with('stubJsSnippet', $headers, $nonce);
         
         $mock->shouldReceive('snippetJsTag')->passthru();
         
         $snippetJsTag = $mock->snippetJsTag($headers, $nonce);
+    }
+    
+    public function testConfigJsTag()
+    {
+        $headers = array();
+        $nonce = 'nonce-string';
+        $config = array(
+            'options' => array(
+                'config1' => 'value 1'
+            )
+        );
+        
+        $expectedJson = json_encode($config['options']);
+        $expected = "\n<script type=\"text/javascript\">" .
+            "var _rollbarConfig = $expectedJson;" .
+            "</script>";
+        
+        $helper = new RollbarJsHelper($config);
+        $result = $helper->configJsTag($headers, $nonce);
+        
+        $this->assertEquals($expected, $result);
+    }
+    
+    public function testAddJs()
+    {
+        $headers = array();
+        $nonce = 'stub-nonce';
+        
+        $mock = \Mockery::mock('Rollbar\RollbarJsHelper');
+        
+        $mock->shouldReceive('snippetJsTag')
+             ->andReturn('stubJsSnippet');
+             
+        $mock->shouldReceive('configJsTag')
+             ->andReturn('stubJsConfig');
+             
+        $mock->shouldReceive('addJs')->passthru();
+             
+        $expected = 'stubJsConfig' . 'stubJsSnippet';
+        
+        $result = $mock->addJs($headers, $nonce);
+        
+        $this->assertEquals($expected, $result);
     }
 }
