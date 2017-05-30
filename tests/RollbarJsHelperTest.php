@@ -268,6 +268,18 @@ class JsHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider addJsProvider
      */
+    public function testBuildJs($setup, $expected)
+    {
+        extract($setup);
+        
+        $result = RollbarJsHelper::buildJs($config, $headers, $nonce);
+        
+        $this->assertEquals($expected, $result);
+    }
+    
+    /**
+     * @dataProvider addJsProvider
+     */
     public function testAddJs($setup, $expected)
     {
         extract($setup);
