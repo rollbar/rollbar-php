@@ -1044,9 +1044,8 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             array()
         );
         $frames = $result->getBody()->getValue()->getFrames();
-        $result = empty($frames);
         
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($expected, count($frames) === 0);
     }
     
     /**
@@ -1064,8 +1063,9 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         ));
         
         $result = $dataBuilder->generateErrorWrapper(E_ERROR, 'bork', null, null);
+        $frames = $result->getBacktrace();
         
-        $this->assertEquals($expected, empty($result->getBacktrace()));
+        $this->assertEquals($expected, count($frames) === 0);
     }
     
     public function captureErrorStacktracesProvider()
