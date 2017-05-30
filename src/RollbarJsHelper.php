@@ -17,10 +17,10 @@ class RollbarJsHelper
     
     /**
      * Shortcut method for building the RollbarJS Javascript
-     * 
+     *
      * @param array $config @see addJs()
      * @param string $nonce @see addJs()
-     * 
+     *
      * @return string
      */
     public static function buildJs($config, $headers = null, $nonce = null)
