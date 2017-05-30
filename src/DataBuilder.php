@@ -58,6 +58,7 @@ class DataBuilder implements DataBuilderInterface
     protected $shiftFunction;
     protected $sendMessageTrace;
     protected $localVarsDump;
+    protected $captureErrorStacktraces;
 
     public function __construct($config)
     {
@@ -92,6 +93,7 @@ class DataBuilder implements DataBuilderInterface
         $this->setIncludeExcCodeContext($config);
         $this->setSendMessageTrace($config);
         $this->setLocalVarsDump($config);
+        $this->setCaptureErrorStacktraces($config);
 
         $this->shiftFunction = $this->tryGet($config, 'shift_function');
         if (!isset($this->shiftFunction)) {
@@ -167,6 +169,12 @@ class DataBuilder implements DataBuilderInterface
     {
         $fromConfig = $this->tryGet($config, 'local_vars_dump');
         $this->localVarsDump = self::$defaults->localVarsDump($fromConfig);
+    }
+    
+    protected function setCaptureErrorStacktraces($config)
+    {
+        $fromConfig = $this->tryGet($config, 'capture_error_stacktraces');
+        $this->captureErrorStacktraces = self::$defaults->captureErrorStacktraces($fromConfig);
     }
 
     protected function setCodeVersion($config)
@@ -387,7 +395,12 @@ class DataBuilder implements DataBuilderInterface
      */
     public function makeTrace($exception, $includeContext, $classOverride = null)
     {
-        $frames = $this->makeFrames($exception, $includeContext);
+        if ($this->captureErrorStacktraces) {
+            $frames = $this->makeFrames($exception, $includeContext);
+        } else {
+            $frames = array();
+        }
+        
         $excInfo = new ExceptionInfo(
             Utilities::coalesce($classOverride, get_class($exception)),
             $exception->getMessage()
@@ -1007,12 +1020,14 @@ class DataBuilder implements DataBuilderInterface
      */
     public function generateErrorWrapper($errno, $errstr, $errfile, $errline)
     {
-        // removing this function and the handler function to make sure they're
-        // not part of the backtrace
-        $backTrace = array_slice(
-            debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS),
-            2
-        );
+        if ($this->captureErrorStacktraces) {
+            $backTrace = array_slice(
+                debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS),
+                2
+            );
+        } else {
+            $backTrace = array();
+        }
         return new ErrorWrapper($errno, $errstr, $errfile, $errline, $backTrace);
     }
 }

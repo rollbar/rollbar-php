@@ -1023,4 +1023,57 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         
         $this->assertTrue($result instanceof ErrorWrapper);
     }
+
+    /**
+     * @dataProvider captureErrorStacktracesProvider
+     */
+    public function testCaptureErrorStacktracesException(
+        $captureErrorStacktraces,
+        $expected
+    ) {
+    
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'capture_error_stacktraces' => $captureErrorStacktraces
+        ));
+        
+        $result = $dataBuilder->makeData(
+            Level::fromName('error'),
+            new \Exception(),
+            array()
+        );
+        
+        $this->assertEquals(
+            $expected,
+            empty($result->getBody()->getValue()->getFrames())
+        );
+    }
+    
+    /**
+     * @dataProvider captureErrorStacktracesProvider
+     */
+    public function testCaptureErrorStacktracesError(
+        $captureErrorStacktraces,
+        $expected
+    ) {
+    
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'capture_error_stacktraces' => $captureErrorStacktraces
+        ));
+        
+        $result = $dataBuilder->generateErrorWrapper(E_ERROR, 'bork', null, null);
+        
+        $this->assertEquals($expected, empty($result->getBacktrace()));
+    }
+    
+    public function captureErrorStacktracesProvider()
+    {
+        return array(
+            array(false,true),
+            array(true, false)
+        );
+    }
 }
