@@ -38,6 +38,11 @@ class CurlSender implements SenderInterface
             $this->verifyPeer = $opts['verifyPeer'];
         }
     }
+    
+    public function getEndpoint()
+    {
+        return $this->endpoint;
+    }
 
     public function send($scrubbedPayload, $accessToken)
     {

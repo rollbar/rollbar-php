@@ -224,9 +224,16 @@ All of the following options can be passed as keys in the `$config` array.
 Default: `/var/www`
 </dd>
 
+<dt>endpoint
+</dt>
+<dd>The API URL to post to. Note: the URL has to end with a trailing slash.
+
+Default: `https://api.rollbar.com/api/1/`
+</dd>
+
 <dt>base_api_url
 </dt>
-<dd>The base api url to post to.
+<dd><strong>Deprecated (use <i>endpoint</i> instead).</strong> The base api url to post to.
 
 Default: `https://api.rollbar.com/api/1/`
 </dd>
