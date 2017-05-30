@@ -1043,11 +1043,9 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             new \Exception(),
             array()
         );
+        $result = empty($result->getBody()->getValue()->getFrames());
         
-        $this->assertEquals(
-            $expected,
-            empty($result->getBody()->getValue()->getFrames())
-        );
+        $this->assertEquals($expected, $result);
     }
     
     /**
