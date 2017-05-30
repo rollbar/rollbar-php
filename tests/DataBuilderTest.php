@@ -416,8 +416,9 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $expected = 'trace args message';
         $ex = $this->exceptionTraceArgsHelper($expected);
         $frames = $dataBuilder->getExceptionTrace($ex)->getFrames();
+        $args = $frames[0]->getArgs();
         
-        $this->assertEquals($frames[0]->getArgs()[0], $expected, "Frames arguments NOT available in trace when they should be.");
+        $this->assertEquals($expected, $args[0], "Frames arguments NOT available in trace when they should be.");
     }
     
     private function exceptionTraceArgsHelper($message)
