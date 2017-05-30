@@ -473,8 +473,8 @@ class DataBuilder implements DataBuilderInterface
         return new Message(
             (string)$toLog,
             $context,
-            $this->sendMessageTrace ? 
-                debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS) : 
+            $this->sendMessageTrace ?
+                debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS) :
                 null
         );
     }
@@ -997,12 +997,12 @@ class DataBuilder implements DataBuilderInterface
     
     /**
      * Wrap a PHP error in an ErrorWrapper class and add backtrace information
-     * 
+     *
      * @param string $errno
      * @param string $errstr
      * @param string $errfile
      * @param string $errline
-     * 
+     *
      * @return ErrorWrapper
      */
     public function generateErrorWrapper($errno, $errstr, $errfile, $errline)

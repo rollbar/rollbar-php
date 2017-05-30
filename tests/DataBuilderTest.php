@@ -361,7 +361,6 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     
         $result = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
         $this->assertNotEmpty($result->getBody()->getValue()->getBacktrace());
-        
     }
     
     public function testGetMessageTraceArguments()
@@ -393,7 +392,6 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $frames = $result->getBody()->getValue()->getBacktrace();
         
         $this->assertEquals($frames[0]['args'][0], $expected, "Arguments in stack frames NOT included when they should be.");
-        
     }
     
     public function testExceptionTraceArguments()
