@@ -215,7 +215,6 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $config = new Config(array(
             "access_token" => $this->token,
             "environment" => $this->env,
-            "sender" => $sender,
             "endpoint" => "http://localhost/api/1/"
         ));
         
@@ -232,7 +231,6 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $config = new Config(array(
             "access_token" => $this->token,
             "environment" => $this->env,
-            "sender" => $sender,
             "base_api_url" => "http://localhost/api/1/"
         ));
         
