@@ -376,7 +376,11 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $result = $dataBuilder->makeData(Level::fromName('error'), 'testing', array());
         $frames = $result->getBody()->getValue()->getBacktrace();
         
-        $this->assertArrayNotHasKey('args', $frames[0], "Arguments in stack frames included when they should have not been.");
+        $this->assertArrayNotHasKey(
+            'args',
+            $frames[0], 
+            "Arguments in stack frames included when they should have not been."
+        );
         
         // Positive test
         $c = new Config(array(
@@ -391,7 +395,11 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $result = $dataBuilder->makeData(Level::fromName('error'), $expected, array());
         $frames = $result->getBody()->getValue()->getBacktrace();
         
-        $this->assertEquals($frames[0]['args'][0], $expected, "Arguments in stack frames NOT included when they should be.");
+        $this->assertEquals(
+            $expected,
+            $frames[0]['args'][0],
+            "Arguments in stack frames NOT included when they should be."
+        );
     }
     
     public function testExceptionTraceArguments()
