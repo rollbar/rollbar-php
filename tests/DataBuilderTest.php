@@ -904,7 +904,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $dataBuilder = new DataBuilder(array(
             'accessToken' => 'abcd1234efef5678abcd1234567890be',
             'environment' => 'tests',
-            'include_raW_request_body' => true
+            'include_raw_request_body' => true
         ));
         $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
         $requestBody = $output->getRequest()->getBody();

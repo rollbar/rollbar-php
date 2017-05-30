@@ -165,7 +165,7 @@ class DataBuilder implements DataBuilderInterface
     
     protected function setIncludeRawRequestBody($config)
     {
-        $fromConfig = $this->tryGet($config, 'include_raW_request_body');
+        $fromConfig = $this->tryGet($config, 'include_raw_request_body');
         $this->includeRawRequestBody = self::$defaults->includeRawRequestBody($fromConfig);
     }
 
