@@ -18,7 +18,7 @@ class Rollbar
         $handleFatal = true
     ) {
         if (is_null(self::$logger)) {
-            self::$logger = new RollbarLogger($config);
+            self::$logger = $config instanceof RollbarLogger ? $config : new RollbarLogger($config);
 
             if ($handleException) {
                 self::setupExceptionHandling();
