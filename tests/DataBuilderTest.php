@@ -378,7 +378,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         
         $this->assertArrayNotHasKey(
             'args',
-            $frames[0], 
+            $frames[0],
             "Arguments in stack frames included when they should have not been."
         );
         
