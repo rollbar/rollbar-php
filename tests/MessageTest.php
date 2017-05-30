@@ -2,6 +2,13 @@
 
 class MessageTest extends \PHPUnit_Framework_TestCase
 {
+    public function testBacktrace()
+    {
+        $expected = array('trace 1' => 'value 1');
+        $msg = new Message("Test", array(), $expected);
+        $this->assertEquals($expected, $msg->getBacktrace());
+    }
+    
     public function testBody()
     {
         $msg = new Message("Test");

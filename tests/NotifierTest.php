@@ -29,6 +29,6 @@ class NotifierTest extends \PHPUnit_Framework_TestCase
     {
         $notifier = Notifier::defaultNotifier();
         $encoded = json_encode($notifier->jsonSerialize());
-        $this->assertEquals('{"name":"rollbar-php","version":"1.0.1"}', $encoded);
+        $this->assertEquals('{"name":"rollbar-php","version":"1.1.1"}', $encoded);
     }
 }

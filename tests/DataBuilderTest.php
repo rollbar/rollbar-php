@@ -4,6 +4,7 @@ namespace Rollbar;
 
 use Rollbar\Payload\Level;
 use Rollbar\TestHelpers\MockPhpStream;
+use Rollbar\Truncation\FramesStrategy;
 
 class DataBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -337,15 +338,82 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
         $this->assertEquals('my host', $output->getServer()->getHost());
     }
+    
+    public function testGetMessage()
+    {
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests'
+        ));
+        
+        $result = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
+        $this->assertNull($result->getBody()->getValue()->getBacktrace());
+        
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'send_message_trace' => true
+        ));
+    
+        $result = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
+        $this->assertNotEmpty($result->getBody()->getValue()->getBacktrace());
+    }
+
+    public function testExceptionFramesWithoutContext()
+    {
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'include_error_code_context' => true,
+            'include_exception_code_context' => false
+        ));
+        $output = $dataBuilder->getExceptionTrace(new \Exception())->getFrames();
+        $this->assertNull($output[1]->getContext());
+    }
+
+    public function testExceptionFramesWithoutContextDefault()
+    {
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests'
+        ));
+        $output = $dataBuilder->getExceptionTrace(new \Exception())->getFrames();
+        $this->assertNull($output[1]->getContext());
+    }
+
+    public function testExceptionFramesWithContext()
+    {
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'include_exception_code_context' => true
+        ));
+        $output = $dataBuilder->getExceptionTrace(new \Exception())->getFrames();
+        $this->assertNotEmpty($output[1]->getContext());
+    }
 
     public function testFramesWithoutContext()
     {
         $dataBuilder = new DataBuilder(array(
             'accessToken' => 'abcd1234efef5678abcd1234567890be',
             'environment' => 'tests',
-            'include_error_code_context' => false
+            'include_error_code_context' => false,
+            'include_exception_code_context' => true
         ));
-        $output = $dataBuilder->makeFrames(new \Exception());
+        $testFilePath = __DIR__ . '/DataBuilderTest.php';
+        $backtrace = array(
+            array(
+                'file' => $testFilePath,
+                'function' => 'testFramesWithoutContext',
+                'line' => 42
+            ),
+            array(
+                'file' => $testFilePath,
+                'function' => 'testFramesWithContext',
+                'line' => 99
+            ),
+        );
+        $output = $dataBuilder->getErrorTrace(new ErrorWrapper(E_ERROR, 'bork', null, null, $backtrace))->getFrames();
         $this->assertNull($output[0]->getContext());
     }
 
@@ -357,7 +425,8 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $dataBuilder = new DataBuilder(array(
             'accessToken' => 'abcd1234efef5678abcd1234567890be',
             'environment' => 'tests',
-            'include_error_code_context' => true
+            'include_error_code_context' => true,
+            'include_exception_code_context' => false
         ));
 
         $backTrace = array(
@@ -387,7 +456,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         }
         fclose($file);
 
-        $output = $dataBuilder->makeFrames(new ErrorWrapper(null, null, null, null, $backTrace));
+        $output = $dataBuilder->getErrorTrace(new ErrorWrapper(E_ERROR, 'bork', null, null, $backTrace))->getFrames();
         $pre = $output[0]->getContext()->getPre();
 
         $expected = array();
@@ -401,6 +470,46 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             str_replace(array("\r", "\n"), '', $expected),
             str_replace(array("\r", "\n"), '', $pre)
         );
+    }
+
+    public function testFramesWithoutContextDefault()
+    {
+        $testFilePath = __DIR__ . '/DataBuilderTest.php';
+
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests'
+        ));
+
+        $backTrace = array(
+            array(
+                'file' => $testFilePath,
+                'function' => 'testFramesWithoutContext'
+            ),
+            array(
+                'file' => $testFilePath,
+                'function' => 'testFramesWithContext'
+            ),
+        );
+
+        $file = fopen($testFilePath, 'r');
+        $lineNumber = 0;
+        while (!feof($file)) {
+            $lineNumber++;
+            $line = fgets($file);
+
+            if ($line == '    public function testFramesWithoutContext()
+') {
+                $backTrace[0]['line'] = $lineNumber;
+            } elseif ($line == '    public function testFramesWithContext()
+') {
+                $backTrace[1]['line'] = $lineNumber;
+            }
+        }
+        fclose($file);
+
+        $output = $dataBuilder->getErrorTrace(new ErrorWrapper(E_ERROR, 'bork', null, null, $backTrace))->getFrames();
+        $this->assertNull($output[0]->getContext());
     }
 
     public function testPerson()
@@ -802,5 +911,36 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($streamInput, $requestBody);
         
         stream_wrapper_restore("php");
+    }
+    
+    /**
+     * @dataProvider truncateProvider
+     */
+    public function testTruncate($data)
+    {
+        $result = $this->dataBuilder->truncate($data);
+        
+        $size = strlen(json_encode($result));
+        
+        $this->assertTrue(
+            $size <= DataBuilder::MAX_PAYLOAD_SIZE,
+            "Truncation failed. Payload size exceeds MAX_PAYLOAD_SIZE."
+        );
+    }
+    
+    public function truncateProvider()
+    {
+        
+        $stringsTest = new Truncation\StringsStrategyTest();
+        $framesTest = new Truncation\FramesStrategyTest();
+        $minBodyTest = new Truncation\MinBodyStrategyTest();
+        
+        $data = array_merge(
+            $stringsTest->executeProvider(),
+            $framesTest->executeProvider(),
+            $minBodyTest->executeProvider()
+        );
+        
+        return $data;
     }
 }

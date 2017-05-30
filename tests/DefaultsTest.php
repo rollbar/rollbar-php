@@ -134,4 +134,9 @@ class DefaultsTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals($expected, $this->d->scrubFields());
     }
+    
+    public function testSendMessageTrace()
+    {
+        $this->assertFalse($this->d->sendMessageTrace());
+    }
 }
