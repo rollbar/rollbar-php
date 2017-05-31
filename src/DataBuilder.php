@@ -57,14 +57,14 @@ class DataBuilder implements DataBuilderInterface
     protected $includeExcCodeContext;
     protected $shiftFunction;
     protected $sendMessageTrace;
-    protected $includeRawRequestBody;
+    protected $rawRequestBody;
 
     public function __construct($config)
     {
         self::$defaults = Defaults::get();
         $this->setEnvironment($config);
 
-        $this->setIncludeRawRequestBody($config);
+        $this->setRawRequestBody($config);
         $this->setDefaultMessageLevel($config);
         $this->setDefaultExceptionLevel($config);
         $this->setDefaultPsrLevels($config);
@@ -163,10 +163,10 @@ class DataBuilder implements DataBuilderInterface
         $this->sendMessageTrace = self::$defaults->sendMessageTrace($fromConfig);
     }
     
-    protected function setIncludeRawRequestBody($config)
+    protected function setRawRequestBody($config)
     {
         $fromConfig = $this->tryGet($config, 'include_raw_request_body');
-        $this->includeRawRequestBody = self::$defaults->includeRawRequestBody($fromConfig);
+        $this->rawRequestBody = self::$defaults->rawRequestBody($fromConfig);
     }
 
     protected function setCodeVersion($config)
@@ -204,7 +204,7 @@ class DataBuilder implements DataBuilderInterface
         
         $this->requestBody = $this->tryGet($config, 'requestBody');
         
-        if (!$this->requestBody && $this->includeRawRequestBody) {
+        if (!$this->requestBody && $this->rawRequestBody) {
             $this->requestBody = file_get_contents("php://input");
             $_SERVER['php://input'] = $this->requestBody;
         }
