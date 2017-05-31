@@ -371,6 +371,9 @@ class DataBuilder implements DataBuilderInterface
         $baseException = $this->getBaseException();
         while ($previous instanceof $baseException) {
             $chain[] = $this->makeTrace($previous, $this->includeExcCodeContext);
+            if ($previous->getPrevious() === $previous) {
+                break;
+            }
             $previous = $previous->getPrevious();
         }
 
@@ -607,7 +610,8 @@ class DataBuilder implements DataBuilderInterface
         
         if (empty($proto)) {
             if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
-                $proto = strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']);
+                $proto = explode(',', strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']));
+                $proto = $proto[0];
             } elseif (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
                 $proto = 'https';
             } else {

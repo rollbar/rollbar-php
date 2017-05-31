@@ -186,6 +186,12 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
                 ),
                 'http'
             ),
+            array( // test 2: HTTP_X_FORWARDED with commas
+                array(
+                    'HTTP_X_FORWARDED_PROTO' => 'http,https',
+                ),
+                'http'
+            ),
             array( // test 3: HTTPS server global
                 array(
                     'HTTPS' => 'on',
