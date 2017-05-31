@@ -224,6 +224,21 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         );
     }
     
+    public function testEndpointDefault()
+    {
+        $payload = m::mock("Rollbar\Payload\Payload");
+            
+        $config = new Config(array(
+            "access_token" => $this->token,
+            "environment" => $this->env
+        ));
+        
+        $this->assertEquals(
+            "https://api.rollbar.com/api/1/item/",
+            $config->getSender()->getEndpoint()
+        );
+    }
+    
     public function testBaseApiUrl()
     {
         $payload = m::mock("Rollbar\Payload\Payload");
@@ -236,6 +251,21 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         
         $this->assertEquals(
             "http://localhost/api/1/item/",
+            $config->getSender()->getEndpoint()
+        );
+    }
+    
+    public function testBaseApiUrlDefault()
+    {
+        $payload = m::mock("Rollbar\Payload\Payload");
+            
+        $config = new Config(array(
+            "access_token" => $this->token,
+            "environment" => $this->env
+        ));
+        
+        $this->assertEquals(
+            "https://api.rollbar.com/api/1/item/",
             $config->getSender()->getEndpoint()
         );
     }
