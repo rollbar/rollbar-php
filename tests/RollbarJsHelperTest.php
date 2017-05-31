@@ -282,7 +282,7 @@ class JsHelperTest extends \PHPUnit_Framework_TestCase
                 ),
                 "\n<script type=\"text/javascript\">" .
                 "var _rollbarConfig = {};" .
-                $expectedJs . 
+                $expectedJs .
                 "</script>"
             ),
             array(
@@ -295,7 +295,7 @@ class JsHelperTest extends \PHPUnit_Framework_TestCase
                     'headers' => array(),
                     'nonce' => null
                 ),
-                "\n<script type=\"text/javascript\">" . 
+                "\n<script type=\"text/javascript\">" .
                 "var _rollbarConfig = {\"foo\":\"bar\"};" .
                 $expectedJs .
                 "</script>"
