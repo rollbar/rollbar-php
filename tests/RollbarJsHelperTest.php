@@ -226,28 +226,8 @@ class JsHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
     
-    public function testSnippetJsTag()
-    {
-        $headers = array();
-        $nonce = 'nonce-string';
-        
-        $mock = \Mockery::mock('Rollbar\RollbarJsHelper');
-             
-        $mock->shouldReceive('jsSnippet')
-             ->andReturn('stubJsSnippet');
-        
-        $mock->shouldReceive('scriptTag')
-             ->with('stubJsSnippet', $headers, $nonce);
-        
-        $mock->shouldReceive('snippetJsTag')->passthru();
-        
-        $snippetJsTag = $mock->snippetJsTag($headers, $nonce);
-    }
-    
     public function testConfigJsTag()
     {
-        $headers = array();
-        $nonce = 'nonce-string';
         $config = array(
             'options' => array(
                 'config1' => 'value 1'
@@ -255,12 +235,10 @@ class JsHelperTest extends \PHPUnit_Framework_TestCase
         );
         
         $expectedJson = json_encode($config['options']);
-        $expected = "\n<script type=\"text/javascript\">" .
-            "var _rollbarConfig = $expectedJson;" .
-            "</script>";
+        $expected = "var _rollbarConfig = $expectedJson;";
         
         $helper = new RollbarJsHelper($config);
-        $result = $helper->configJsTag($headers, $nonce);
+        $result = $helper->configJsTag();
         
         $this->assertEquals($expected, $result);
     }
@@ -302,8 +280,10 @@ class JsHelperTest extends \PHPUnit_Framework_TestCase
                     'headers' => array(),
                     'nonce' => null
                 ),
-                "\n<script type=\"text/javascript\">var _rollbarConfig = {};</script>" .
-                "\n<script type=\"text/javascript\">$expectedJs</script>"
+                "\n<script type=\"text/javascript\">" .
+                "var _rollbarConfig = {};" .
+                $expectedJs . 
+                "</script>"
             ),
             array(
                 array(
@@ -315,8 +295,10 @@ class JsHelperTest extends \PHPUnit_Framework_TestCase
                     'headers' => array(),
                     'nonce' => null
                 ),
-                "\n<script type=\"text/javascript\">var _rollbarConfig = {\"foo\":\"bar\"};</script>" .
-                "\n<script type=\"text/javascript\">$expectedJs</script>"
+                "\n<script type=\"text/javascript\">" . 
+                "var _rollbarConfig = {\"foo\":\"bar\"};" .
+                $expectedJs .
+                "</script>"
             ),
             array(
                 array(
@@ -326,8 +308,10 @@ class JsHelperTest extends \PHPUnit_Framework_TestCase
                     ),
                     'nonce' => 'stub-nonce'
                 ),
-                "\n<script type=\"text/javascript\" nonce=\"stub-nonce\">var _rollbarConfig = {};</script>" .
-                "\n<script type=\"text/javascript\" nonce=\"stub-nonce\">$expectedJs</script>"
+                "\n<script type=\"text/javascript\" nonce=\"stub-nonce\">" .
+                "var _rollbarConfig = {};" .
+                $expectedJs .
+                "</script>"
             ),
         );
     }
