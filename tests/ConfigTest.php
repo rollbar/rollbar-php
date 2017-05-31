@@ -327,4 +327,63 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($isUncaughtPassed);
         $this->assertEquals($this->error, $errorPassed);
     }
+
+    /**
+     * @dataProvider useErrorReportingProvider
+     */
+    public function testUseErrorReporting($setup, $expected)
+    {
+        extract($setup);
+        $called = false;
+        $c = new Config(array(
+            "access_token" => $this->token,
+            "environment" => $this->env,
+            "checkIgnore" => function ($isUncaught, $exc, $payload) use (&$called) {
+                $called = true;
+            },
+            "use_error_reporting" => $use_error_reporting
+        ));
+        
+        $data = new Data($this->env, new Body(new Message("test")));
+        $data->setLevel(Level::fromName('error'));
+        
+        if ($error_reporting !== null) {
+            $errorReportingTemp = error_reporting();
+            error_reporting($error_reporting);
+        }
+        
+        $result = $c->checkIgnored(new Payload($data, $c->getAccessToken()), $this->token, $this->error, false);
+        $this->assertEquals($expected, $result);
+        
+        if ($error_reporting) {
+            error_reporting($errorReportingTemp);
+        }
+    }
+    
+    public function useErrorReportingProvider()
+    {
+        return array(
+            "use_error_reporting off" => array(
+                array(
+                    "use_error_reporting" => false,
+                    "error_reporting" => null
+                ),
+                false
+            ),
+            "use_error_reporting on & errno not covered" => array(
+                array(
+                    "use_error_reporting" => true,
+                    "error_reporting" => E_WARNING
+                ),
+                true
+            ),
+            "use_error_reporting on & errno covered" => array(
+                array(
+                    "use_error_reporting" => true,
+                    "error_reporting" => E_ERROR
+                ),
+                false
+            )
+        );
+    }
 }

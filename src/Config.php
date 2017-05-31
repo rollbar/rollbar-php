@@ -44,6 +44,7 @@ class Config
     private $mt_randmax;
 
     private $included_errno = ROLLBAR_INCLUDED_ERRNO_BITMASK;
+    private $use_error_reporting = false;
     
     /**
      * @var boolean Should debug_backtrace() data be sent with string messages
@@ -107,6 +108,10 @@ class Config
 
         if (isset($c['included_errno'])) {
             $this->included_errno = $c['included_errno'];
+        }
+
+        if (isset($c['use_error_reporting'])) {
+            $this->use_error_reporting = $c['use_error_reporting'];
         }
     }
 
@@ -360,6 +365,11 @@ class Config
 
             if ($this->included_errno != -1 && ($errno & $this->included_errno) != $errno) {
                 // ignore
+                return true;
+            }
+
+            if ($this->use_error_reporting && ($errno & error_reporting()) != $errno) {
+                // ignore due to error_reporting level
                 return true;
             }
 
