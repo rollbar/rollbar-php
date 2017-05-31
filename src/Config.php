@@ -174,7 +174,11 @@ class Config
         $default = "Rollbar\Senders\CurlSender";
 
         if (array_key_exists('base_api_url', $c)) {
-            $c['senderOptions']['endpoint'] = $c['base_api_url'];
+            $c['senderOptions']['endpoint'] = $c['base_api_url'] . 'item/';
+        }
+
+        if (array_key_exists('endpoint', $c)) {
+            $c['senderOptions']['endpoint'] = $c['endpoint'] . 'item/';
         }
 
         if (array_key_exists('timeout', $c)) {
@@ -302,6 +306,11 @@ class Config
     public function getDataBuilder()
     {
         return $this->dataBuilder;
+    }
+    
+    public function getSender()
+    {
+        return $this->sender;
     }
 
     /**
