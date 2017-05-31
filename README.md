@@ -128,6 +128,39 @@ Rollbar::init(array(
 ?>
 ```
 
+## Integration with Rollbar.js
+
+In case you want to report your JavaScript errors using [Rollbar.js](https://github.com/rollbar/rollbar.js), you can configure the SDK to enable Rollbar.js on your site. Example:
+
+```php
+$rollbarJs = Rollbar\RollbarJsHelper::buildJs(
+    array(
+        "accessToken" => "POST_CLIENT_ITEM_ACCESS_TOKEN",
+        "captureUncaught" => true,
+        "payload" => array(
+            "environment" => "production"
+        ),
+        /* other configuration you want to pass to RollbarJS */
+    )
+);
+```
+
+Or if you are using Content-Security-Policy: script-src 'unsafe-inline'
+```php
+$rollbarJs = Rollbar\RollbarJsHelper::buildJs(
+    array(
+        "accessToken" => "POST_CLIENT_ITEM_ACCESS_TOKEN",
+        "captureUncaught" => true,
+        "payload" => array(
+            "environment" => "production"
+        ),
+        /* other configuration you want to pass to RollbarJS */
+    ),
+    headers_list(),
+    $yourNonceString
+);
+```
+
 ## Basic Usage
 
 That's it! Uncaught errors and exceptions will now be reported to Rollbar.
@@ -242,9 +275,16 @@ All of the following options can be passed as keys in the `$config` array.
 Default: `/var/www`
 </dd>
 
+<dt>endpoint
+</dt>
+<dd>The API URL to post to. Note: the URL has to end with a trailing slash.
+
+Default: `https://api.rollbar.com/api/1/`
+</dd>
+
 <dt>base_api_url
 </dt>
-<dd>The base api url to post to.
+<dd><strong>Deprecated (use <i>endpoint</i> instead).</strong> The base api url to post to.
 
 Default: `https://api.rollbar.com/api/1/`
 </dd>
