@@ -240,7 +240,7 @@ class Config
 
         $this->sendMessageTrace = $c['send_message_trace'];
     }
-    
+
     /**
      * Allows setting up configuration options that might be specified by class
      * name. Any interface used with `setupWithOptions` should be constructed
