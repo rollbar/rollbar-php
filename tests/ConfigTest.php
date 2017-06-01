@@ -7,6 +7,7 @@ use Rollbar\Payload\Data;
 use Rollbar\Payload\Level;
 use Rollbar\Payload\Message;
 use Rollbar\Payload\Payload;
+use Rollbar\RollbarLogger;
 use Psr\Log\LogLevel;
 
 class ConfigTest extends \PHPUnit_Framework_TestCase
@@ -326,6 +327,25 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($called);
         $this->assertTrue($isUncaughtPassed);
         $this->assertEquals($this->error, $errorPassed);
+    }
+    
+    public function testCaptureErrorStacktraces()
+    {
+        $logger = new RollbarLogger(array(
+            "access_token" => $this->token,
+            "environment" => $this->env,
+            "capture_error_stacktraces" => false
+        ));
+        
+        $dataBuilder = $logger->getDataBuilder();
+        
+        $result = $dataBuilder->makeData(
+            Level::fromName('error'),
+            new \Exception(),
+            array()
+        );
+        
+        $this->assertEmpty($result->getBody()->getValue()->getFrames());
     }
 
     /**

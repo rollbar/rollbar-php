@@ -354,6 +354,10 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         
         $result = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
         $this->assertNull($result->getBody()->getValue()->getBacktrace());
+    }
+    
+    public function testGetMessageSendMessageTrace()
+    {
         
         $dataBuilder = new DataBuilder(array(
             'accessToken' => 'abcd1234efef5678abcd1234567890be',
@@ -363,6 +367,75 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     
         $result = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
         $this->assertNotEmpty($result->getBody()->getValue()->getBacktrace());
+    }
+    
+    public function testGetMessageTraceArguments()
+    {
+        // Negative test
+        $c = new Config(array(
+            'access_token' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'send_message_trace' => true
+        ));
+        $dataBuilder = $c->getDataBuilder();
+    
+        $result = $dataBuilder->makeData(Level::fromName('error'), 'testing', array());
+        $frames = $result->getBody()->getValue()->getBacktrace();
+        
+        $this->assertArrayNotHasKey(
+            'args',
+            $frames[0],
+            "Arguments in stack frames included when they should have not been."
+        );
+        
+        // Positive test
+        $c = new Config(array(
+            'access_token' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'send_message_trace' => true,
+            'local_vars_dump' => true
+        ));
+        $dataBuilder = $c->getDataBuilder();
+    
+        $expected = 'testing';
+        $result = $dataBuilder->makeData(Level::fromName('error'), $expected, array());
+        $frames = $result->getBody()->getValue()->getBacktrace();
+        
+        $this->assertEquals(
+            $expected,
+            $frames[0]['args'][0],
+            "Arguments in stack frames NOT included when they should be."
+        );
+    }
+    
+    public function testExceptionTraceArguments()
+    {
+        // Negative test
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests'
+        ));
+        $ex = $this->exceptionTraceArgsHelper('trace args message');
+        $frames = $dataBuilder->getExceptionTrace($ex)->getFrames();
+        $this->assertNull($frames[0]->getArgs(), "Frames arguments available in trace when they should not be.");
+        
+        // Positive test
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'local_vars_dump' => true
+        ));
+        $expected = 'trace args message';
+        $ex = $this->exceptionTraceArgsHelper($expected);
+        $frames = $dataBuilder->getExceptionTrace($ex)->getFrames();
+        $args = $frames[0]->getArgs();
+        
+        $this->assertEquals($expected, $args[0], "Frames arguments NOT available in trace when they should be.");
+    }
+    
+    private function exceptionTraceArgsHelper($message)
+    {
+        return new \Exception($message);
     }
 
     public function testExceptionFramesWithoutContext()
@@ -948,5 +1021,64 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         );
         
         return $data;
+    }
+    
+    public function testGenerateErrorWrapper()
+    {
+        $result = $this->dataBuilder->generateErrorWrapper(E_ERROR, 'bork', null, null);
+        
+        $this->assertTrue($result instanceof ErrorWrapper);
+    }
+
+    /**
+     * @dataProvider captureErrorStacktracesProvider
+     */
+    public function testCaptureErrorStacktracesException(
+        $captureErrorStacktraces,
+        $expected
+    ) {
+    
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'capture_error_stacktraces' => $captureErrorStacktraces
+        ));
+        
+        $result = $dataBuilder->makeData(
+            Level::fromName('error'),
+            new \Exception(),
+            array()
+        );
+        $frames = $result->getBody()->getValue()->getFrames();
+        
+        $this->assertEquals($expected, count($frames) === 0);
+    }
+    
+    /**
+     * @dataProvider captureErrorStacktracesProvider
+     */
+    public function testCaptureErrorStacktracesError(
+        $captureErrorStacktraces,
+        $expected
+    ) {
+    
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'capture_error_stacktraces' => $captureErrorStacktraces
+        ));
+        
+        $result = $dataBuilder->generateErrorWrapper(E_ERROR, 'bork', null, null);
+        $frames = $result->getBacktrace();
+        
+        $this->assertEquals($expected, count($frames) === 0);
+    }
+    
+    public function captureErrorStacktracesProvider()
+    {
+        return array(
+            array(false,true),
+            array(true, false)
+        );
     }
 }

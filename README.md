@@ -500,6 +500,12 @@ Default: No proxy
 Default: `false`
 </dd>
 
+<dt>local_vars_dump</dt>
+<dd>Should backtraces include arguments passed to stack frames.
+
+Default: `false`
+</dd>
+
 </dl>
 
 Example use of error_sample_rates:

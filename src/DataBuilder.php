@@ -57,6 +57,8 @@ class DataBuilder implements DataBuilderInterface
     protected $includeExcCodeContext;
     protected $shiftFunction;
     protected $sendMessageTrace;
+    protected $localVarsDump;
+    protected $captureErrorStacktraces;
 
     public function __construct($config)
     {
@@ -90,6 +92,8 @@ class DataBuilder implements DataBuilderInterface
         $this->setIncludeCodeContext($config);
         $this->setIncludeExcCodeContext($config);
         $this->setSendMessageTrace($config);
+        $this->setLocalVarsDump($config);
+        $this->setCaptureErrorStacktraces($config);
 
         $this->shiftFunction = $this->tryGet($config, 'shift_function');
         if (!isset($this->shiftFunction)) {
@@ -159,6 +163,18 @@ class DataBuilder implements DataBuilderInterface
     {
         $fromConfig = $this->tryGet($config, 'send_message_trace');
         $this->sendMessageTrace = self::$defaults->sendMessageTrace($fromConfig);
+    }
+
+    protected function setLocalVarsDump($config)
+    {
+        $fromConfig = $this->tryGet($config, 'local_vars_dump');
+        $this->localVarsDump = self::$defaults->localVarsDump($fromConfig);
+    }
+    
+    protected function setCaptureErrorStacktraces($config)
+    {
+        $fromConfig = $this->tryGet($config, 'capture_error_stacktraces');
+        $this->captureErrorStacktraces = self::$defaults->captureErrorStacktraces($fromConfig);
     }
 
     protected function setCodeVersion($config)
@@ -382,7 +398,12 @@ class DataBuilder implements DataBuilderInterface
      */
     public function makeTrace($exception, $includeContext, $classOverride = null)
     {
-        $frames = $this->makeFrames($exception, $includeContext);
+        if ($this->captureErrorStacktraces) {
+            $frames = $this->makeFrames($exception, $includeContext);
+        } else {
+            $frames = array();
+        }
+        
         $excInfo = new ExceptionInfo(
             Utilities::coalesce($classOverride, get_class($exception)),
             $exception->getMessage()
@@ -397,11 +418,15 @@ class DataBuilder implements DataBuilderInterface
             $filename = Utilities::coalesce($this->tryGet($frameInfo, 'file'), '<internal>');
             $lineno = Utilities::coalesce($this->tryGet($frameInfo, 'line'), 0);
             $method = $frameInfo['function'];
-            // TODO 4 (arguments are in $frame)
+            $args = Utilities::coalesce($this->tryGet($frameInfo, 'args'), null);
 
             $frame = new Frame($filename);
             $frame->setLineno($lineno)
                 ->setMethod($method);
+                
+            if ($this->localVarsDump && $args !== null) {
+                $frame->setArgs($args);
+            }
 
             if ($includeContext) {
                 $this->addCodeContextToFrame($frame, $filename, $lineno);
@@ -464,7 +489,9 @@ class DataBuilder implements DataBuilderInterface
         return new Message(
             (string)$toLog,
             $context,
-            $this->sendMessageTrace ? debug_backtrace() : null
+            $this->sendMessageTrace ?
+                debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS) :
+                null
         );
     }
 
@@ -983,5 +1010,28 @@ class DataBuilder implements DataBuilderInterface
     public function needsTruncating(array $payload)
     {
         return strlen(json_encode($payload)) > self::MAX_PAYLOAD_SIZE;
+    }
+    
+    /**
+     * Wrap a PHP error in an ErrorWrapper class and add backtrace information
+     *
+     * @param string $errno
+     * @param string $errstr
+     * @param string $errfile
+     * @param string $errline
+     *
+     * @return ErrorWrapper
+     */
+    public function generateErrorWrapper($errno, $errstr, $errfile, $errline)
+    {
+        if ($this->captureErrorStacktraces) {
+            $backTrace = array_slice(
+                debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS),
+                2
+            );
+        } else {
+            $backTrace = array();
+        }
+        return new ErrorWrapper($errno, $errstr, $errfile, $errline, $backTrace);
     }
 }
