@@ -96,7 +96,7 @@ class Defaults
     
     public function localVarsDump($localVarsDump = null)
     {
-        return $localVarsDump ? $localVarsDump : $this->defaultLocalVarsDump;
+        return $localVarsDump !== null ? $localVarsDump : $this->defaultLocalVarsDump;
     }
 
     private $defaultMessageLevel = "warning";
