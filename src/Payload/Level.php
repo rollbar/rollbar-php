@@ -1,5 +1,14 @@
 <?php namespace Rollbar\Payload;
 
+/**
+ * @method static critical
+ * @method static error
+ * @method static warning
+ * @method static info
+ * @method static debug
+ * @method static ignored
+ * @method static ignore
+ */
 class Level implements \JsonSerializable
 {
     private static $values;
