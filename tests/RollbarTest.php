@@ -15,13 +15,56 @@ class RollbarTest extends \PHPUnit_Framework_TestCase
         'environment' => 'test'
     );
     
-    public function setUp()
+    public function tearDown()
     {
+        $reflLoggerProperty = new \ReflectionProperty(Rollbar::class, 'logger');
+        $reflLoggerProperty->setAccessible(true);
+        $reflLoggerProperty->setValue(null);
+    }
+    
+    public function testInitWithConfig()
+    {
+        Rollbar::init(self::$simpleConfig);
+        
+        $this->assertInstanceOf(RollbarLogger::class, Rollbar::logger());
+        $this->assertAttributeEquals(new Config(self::$simpleConfig), 'config', Rollbar::logger());
+    }
+    
+    public function testInitWithLogger()
+    {
+        $logger = $this->getMockBuilder(RollbarLogger::class)->disableOriginalConstructor()->getMock();
+
+        Rollbar::init($logger);
+        
+        $this->assertSame($logger, Rollbar::logger());
+    }
+    
+    public function testInitConfigureLogger()
+    {
+        $logger = $this->getMockBuilder(RollbarLogger::class)->disableOriginalConstructor()->getMock();
+        $logger->expects($this->once())->method('configure')->with(self::$simpleConfig);
+
+        Rollbar::init($logger);
         Rollbar::init(self::$simpleConfig);
     }
     
+    public function testInitReplaceLogger()
+    {
+        Rollbar::init(self::$simpleConfig);
+
+        $this->assertInstanceOf(RollbarLogger::class, Rollbar::logger());
+
+        $logger = $this->getMockBuilder(RollbarLogger::class)->disableOriginalConstructor()->getMock();
+
+        Rollbar::init($logger);
+
+        $this->assertSame($logger, Rollbar::logger());
+    }
+
     public function testLogException()
     {
+        Rollbar::init(self::$simpleConfig);
+
         try {
             throw new \Exception('test exception');
         } catch (\Exception $e) {
@@ -33,12 +76,16 @@ class RollbarTest extends \PHPUnit_Framework_TestCase
     
     public function testLogMessage()
     {
+        Rollbar::init(self::$simpleConfig);
+
         Rollbar::log(Level::info(), 'testing info level');
         $this->assertTrue(true);
     }
     
     public function testLogExtraData()
     {
+        Rollbar::init(self::$simpleConfig);
+
         Rollbar::log(
             Level::info(),
             'testing extra data',
@@ -84,6 +131,8 @@ class RollbarTest extends \PHPUnit_Framework_TestCase
 
     public function testBackwardsFlush()
     {
+        Rollbar::init(self::$simpleConfig);
+
         Rollbar::flush();
         $this->assertTrue(true);
     }
