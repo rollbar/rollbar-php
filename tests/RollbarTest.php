@@ -17,7 +17,7 @@ class RollbarTest extends \PHPUnit_Framework_TestCase
 
     private static function clearLogger()
     {
-        $reflLoggerProperty = new \ReflectionProperty(Rollbar::class, 'logger');
+        $reflLoggerProperty = new \ReflectionProperty('Rollbar\Rollbar', 'logger');
         $reflLoggerProperty->setAccessible(true);
         $reflLoggerProperty->setValue(null);
     }
@@ -36,13 +36,13 @@ class RollbarTest extends \PHPUnit_Framework_TestCase
     {
         Rollbar::init(self::$simpleConfig);
         
-        $this->assertInstanceOf(RollbarLogger::class, Rollbar::logger());
+        $this->assertInstanceOf('Rollbar\RollbarLogger', Rollbar::logger());
         $this->assertAttributeEquals(new Config(self::$simpleConfig), 'config', Rollbar::logger());
     }
     
     public function testInitWithLogger()
     {
-        $logger = $this->getMockBuilder(RollbarLogger::class)->disableOriginalConstructor()->getMock();
+        $logger = $this->getMockBuilder('Rollbar\RollbarLogger')->disableOriginalConstructor()->getMock();
 
         Rollbar::init($logger);
         
@@ -51,7 +51,7 @@ class RollbarTest extends \PHPUnit_Framework_TestCase
     
     public function testInitConfigureLogger()
     {
-        $logger = $this->getMockBuilder(RollbarLogger::class)->disableOriginalConstructor()->getMock();
+        $logger = $this->getMockBuilder('Rollbar\RollbarLogger')->disableOriginalConstructor()->getMock();
         $logger->expects($this->once())->method('configure')->with(self::$simpleConfig);
 
         Rollbar::init($logger);
@@ -62,9 +62,9 @@ class RollbarTest extends \PHPUnit_Framework_TestCase
     {
         Rollbar::init(self::$simpleConfig);
 
-        $this->assertInstanceOf(RollbarLogger::class, Rollbar::logger());
+        $this->assertInstanceOf('Rollbar\RollbarLogger', Rollbar::logger());
 
-        $logger = $this->getMockBuilder(RollbarLogger::class)->disableOriginalConstructor()->getMock();
+        $logger = $this->getMockBuilder('Rollbar\RollbarLogger')->disableOriginalConstructor()->getMock();
 
         Rollbar::init($logger);
 
