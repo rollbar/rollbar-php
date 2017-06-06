@@ -38,17 +38,15 @@ class Rollbar
     {
         if ($configOrLogger instanceof RollbarLogger) {
             $logger = $configOrLogger;
-        } else {
-            $config = $configOrLogger;
         }
 
         // Replacing the logger rather than configuring the existing logger breaks BC
-        if (self::$logger && isset($config)) {
-            self::$logger->configure($config);
+        if (self::$logger && !isset($logger)) {
+            self::$logger->configure($configOrLogger);
             return;
         }
 
-        self::$logger = isset($logger) ? $logger : new RollbarLogger($config);
+        self::$logger = isset($logger) ? $logger : new RollbarLogger($configOrLogger);
     }
 
     public static function logger()
