@@ -14,12 +14,22 @@ class RollbarTest extends \PHPUnit_Framework_TestCase
         'access_token' => ROLLBAR_TEST_TOKEN,
         'environment' => 'test'
     );
-    
-    public function tearDown()
+
+    private static function clearLogger()
     {
         $reflLoggerProperty = new \ReflectionProperty(Rollbar::class, 'logger');
         $reflLoggerProperty->setAccessible(true);
         $reflLoggerProperty->setValue(null);
+    }
+    
+    public static function setupBeforeClass()
+    {
+        self::clearLogger();
+    }
+
+    public function tearDown()
+    {
+        self::clearLogger();
     }
     
     public function testInitWithConfig()
