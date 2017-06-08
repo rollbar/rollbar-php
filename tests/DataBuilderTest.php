@@ -372,12 +372,12 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     public function testGetMessageTraceArguments()
     {
         // Negative test
-        $c = new Config(array(
+        $config = new Config(array(
             'access_token' => 'abcd1234efef5678abcd1234567890be',
             'environment' => 'tests',
             'send_message_trace' => true
         ));
-        $dataBuilder = $c->getDataBuilder();
+        $dataBuilder = $config->getDataBuilder();
     
         $result = $dataBuilder->makeData(Level::fromName('error'), 'testing', array());
         $frames = $result->getBody()->getValue()->getBacktrace();
@@ -389,13 +389,13 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         );
         
         // Positive test
-        $c = new Config(array(
+        $config = new Config(array(
             'access_token' => 'abcd1234efef5678abcd1234567890be',
             'environment' => 'tests',
             'send_message_trace' => true,
             'local_vars_dump' => true
         ));
-        $dataBuilder = $c->getDataBuilder();
+        $dataBuilder = $config->getDataBuilder();
     
         $expected = 'testing';
         $result = $dataBuilder->makeData(Level::fromName('error'), $expected, array());
@@ -415,9 +415,12 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             'accessToken' => 'abcd1234efef5678abcd1234567890be',
             'environment' => 'tests'
         ));
-        $ex = $this->exceptionTraceArgsHelper('trace args message');
-        $frames = $dataBuilder->getExceptionTrace($ex)->getFrames();
-        $this->assertNull($frames[0]->getArgs(), "Frames arguments available in trace when they should not be.");
+        $exception = $this->exceptionTraceArgsHelper('trace args message');
+        $frames = $dataBuilder->getExceptionTrace($exception)->getFrames();
+        $this->assertNull(
+            $frames[0]->getArgs(),
+            "Frames arguments available in trace when they should not be."
+        );
         
         // Positive test
         $dataBuilder = new DataBuilder(array(
@@ -426,11 +429,15 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             'local_vars_dump' => true
         ));
         $expected = 'trace args message';
-        $ex = $this->exceptionTraceArgsHelper($expected);
-        $frames = $dataBuilder->getExceptionTrace($ex)->getFrames();
+        $exception = $this->exceptionTraceArgsHelper($expected);
+        $frames = $dataBuilder->getExceptionTrace($exception)->getFrames();
         $args = $frames[0]->getArgs();
         
-        $this->assertEquals($expected, $args[0], "Frames arguments NOT available in trace when they should be.");
+        $this->assertEquals(
+            $expected, 
+            $args[0], 
+            "Frames arguments NOT available in trace when they should be."
+        );
     }
     
     private function exceptionTraceArgsHelper($message)
