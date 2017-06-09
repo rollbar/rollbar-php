@@ -2,9 +2,10 @@
 
 namespace Rollbar\Truncation;
 
+use Rollbar\BaseUnitTestCase;
 use Rollbar\DataBuilder;
 
-class FramesStrategyTest extends \PHPUnit_Framework_TestCase
+class FramesStrategyTest extends BaseUnitTestCase
 {
     /**
      * @dataProvider executeProvider
@@ -15,13 +16,13 @@ class FramesStrategyTest extends \PHPUnit_Framework_TestCase
             'accessToken' => 'abcd1234efef5678abcd1234567890be',
             'environment' => 'tests'
         ));
-                    
+
         $strategy = new FramesStrategy($dataBuilder);
         $result = $strategy->execute($data);
-        
+
         $this->assertEquals($expected, $result);
     }
-    
+
     public function executeProvider()
     {
         $data = array(
@@ -76,7 +77,7 @@ class FramesStrategyTest extends \PHPUnit_Framework_TestCase
                 )
             )
         );
-        
+
         return $data;
     }
 }

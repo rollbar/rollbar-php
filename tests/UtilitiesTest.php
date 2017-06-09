@@ -1,6 +1,6 @@
 <?php namespace Rollbar;
 
-class UtilitiesTest extends \PHPUnit_Framework_TestCase
+class UtilitiesTest extends BaseUnitTestCase
 {
     public function testCoalesce()
     {

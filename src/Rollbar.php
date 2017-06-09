@@ -52,11 +52,11 @@ class Rollbar
     {
         set_exception_handler('Rollbar\Rollbar::exceptionHandler');
     }
-    
+
     public static function exceptionHandler($exception)
     {
         self::log(Level::error(), $exception, array(Utilities::IS_UNCAUGHT_KEY => true));
-        
+
         restore_exception_handler();
         throw $exception;
     }
@@ -80,7 +80,7 @@ class Rollbar
             $exception = self::generateErrorWrapper($errno, $errstr, $errfile, $errline);
             self::$logger->log(Level::error(), $exception, array(Utilities::IS_UNCAUGHT_KEY => true));
         }
-        
+
         return false;
     }
 
@@ -106,14 +106,24 @@ class Rollbar
         }
     }
 
+    /**
+     * resets the instance
+     */
+    public static function reset()
+    {
+        restore_error_handler();
+        restore_exception_handler();
+        self::$logger = null;
+    }
+
     private static function generateErrorWrapper($errno, $errstr, $errfile, $errline)
     {
         if (null === self::$logger) {
             return;
         }
-        
+
         $dataBuilder = self::$logger->getDataBuilder();
-        
+
         return $dataBuilder->generateErrorWrapper($errno, $errstr, $errfile, $errline);
     }
 
@@ -121,15 +131,15 @@ class Rollbar
     {
         return new Response(0, "Rollbar Not Initialized");
     }
-    
+
     // @codingStandardsIgnoreStart
-    
+
     /**
      * Below methods are deprecated and still available only for backwards
      * compatibility. If you're still using them in your application, please
      * transition to using the ::log method as soon as possible.
      */
-    
+
     /**
      * @param \Exception $exc Exception to be logged
      * @param array $extra_data Additional data to be logged with the exception
@@ -143,7 +153,7 @@ class Rollbar
      */
     public static function report_exception($exc, $extra_data = null, $payload_data = null)
     {
-        
+
         if ($payload_data) {
             $extra_data = array_merge($extra_data, $payload_data);
         }
@@ -164,7 +174,7 @@ class Rollbar
      */
     public static function report_message($message, $level = null, $extra_data = null, $payload_data = null)
     {
-        
+
         $level = $level ? Level::fromName($level) : Level::error();
         if ($payload_data) {
             $extra_data = array_merge($extra_data, $payload_data);
@@ -204,6 +214,6 @@ class Rollbar
     {
         return;
     }
-    
+
     // @codingStandardsIgnoreEnd
 }

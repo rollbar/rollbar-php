@@ -2,7 +2,7 @@
 
 use Rollbar\Response;
 
-class ResponseTest extends \PHPUnit_Framework_TestCase
+class ResponseTest extends BaseUnitTestCase
 {
     public function testStatus()
     {

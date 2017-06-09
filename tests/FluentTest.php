@@ -4,7 +4,7 @@ namespace Rollbar;
 
 use Psr\Log\LogLevel;
 
-class FluentTest extends \PHPUnit_Framework_TestCase
+class FluentTest extends BaseUnitTestCase
 {
 
     public function testFluent()

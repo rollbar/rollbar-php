@@ -5,7 +5,7 @@ use Rollbar\Payload\Level;
 use Rollbar\Payload\Notifier;
 use Psr\Log\LogLevel;
 
-class DefaultsTest extends \PHPUnit_Framework_TestCase
+class DefaultsTest extends BaseUnitTestCase
 {
     /**
      * @var Defaults
@@ -134,7 +134,7 @@ class DefaultsTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals($expected, $this->d->scrubFields());
     }
-    
+
     public function testSendMessageTrace()
     {
         $this->assertFalse($this->d->sendMessageTrace());

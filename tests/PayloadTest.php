@@ -4,7 +4,7 @@ use \Mockery as m;
 use Rollbar\Payload\Payload;
 use Rollbar\Payload\Level;
 
-class PayloadTest extends \PHPUnit_Framework_TestCase
+class PayloadTest extends BaseUnitTestCase
 {
     public function testPayloadData()
     {
@@ -13,7 +13,7 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
                     ->shouldReceive('getAccessToken')
                     ->andReturn('012345678901234567890123456789ab')
                     ->mock();
-        
+
         $payload = new Payload($data, $config->getAccessToken());
 
         $this->assertEquals($data, $payload->getData());
@@ -83,7 +83,7 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
             ->shouldReceive('scrub')
             ->andReturn(new \ArrayObject())
             ->mock();
-        
+
         $payload = new Payload($data, $accessToken);
         $encoded = json_encode($payload->jsonSerialize());
         $json = '{"data":{},"access_token":"'.$accessToken.'"}';

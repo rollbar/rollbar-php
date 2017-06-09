@@ -3,13 +3,14 @@
 namespace Rollbar\Senders; // in a different namespace, so we can monkey-patch microtime.
 
 use Rollbar;
+use Rollbar\BaseUnitTestCase;
 
 function microtime($getAsFloat)
 {
     return 2;
 }
 
-class AgentTest extends \PHPUnit_Framework_TestCase
+class AgentTest extends BaseUnitTestCase
 {
     private $path = '/tmp/rollbar-php';
 
@@ -38,6 +39,7 @@ class AgentTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         $this->rrmdir($this->path);
+        parent::tearDown();
     }
 
     private function rrmdir($dir)

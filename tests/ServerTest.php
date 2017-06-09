@@ -2,7 +2,7 @@
 
 use Rollbar\Payload\Server;
 
-class ServerTest extends \PHPUnit_Framework_TestCase
+class ServerTest extends BaseUnitTestCase
 {
     public function testHost()
     {

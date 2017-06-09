@@ -3,9 +3,9 @@
 use Rollbar\Payload\Level;
 use Rollbar\Payload\Payload;
 
-class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
+class RollbarLoggerTest extends BaseUnitTestCase
 {
-    
+
     public function setUp()
     {
         $_SESSION = array();
@@ -55,17 +55,17 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
         $response = $l->log(Level::error(), new ErrorWrapper(E_USER_ERROR, '', null, null, array()), array());
         $this->assertEquals(0, $response->getStatus());
     }
-    
+
     private function scrubTestHelper($config = array(), $context = array())
     {
         $scrubFields = array('sensitive');
-        
+
         $defaultConfig = array(
             'access_token' => 'abcd1234efef5678abcd1234567890be',
             'environment' => 'tests',
             'scrub_fields' => $scrubFields
         );
-        
+
         $config = new Config(array_replace_recursive($defaultConfig, $config));
 
         $dataBuilder = new DataBuilder($config->getConfigArray());
@@ -75,10 +75,10 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
         $scrubbed = $payload->jsonSerialize();
 
         $result = $dataBuilder->scrub($scrubbed);
-        
+
         return $result;
     }
-    
+
     /**
      * @param string $dataName Human-readable name of the type of data under test
      * @param array $result The result of the code under test
@@ -93,8 +93,8 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
         $recursive = true,
         $replacement = '*'
     ) {
-    
-        
+
+
         $this->assertEquals(
             str_repeat($replacement, 8),
             $result[$scrubField],
@@ -109,7 +109,7 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
             );
         }
     }
-    
+
     public function scrubDataProvider()
     {
         return array(
@@ -125,7 +125,7 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
             )
         );
     }
-    
+
     /**
      * @dataProvider scrubDataProvider
      */
@@ -135,8 +135,8 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
         $result = $this->scrubTestHelper();
         $this->scrubTestAssert('$_GET', $result['data']['request']['GET']);
     }
-    
-    
+
+
     /**
      * @dataProvider scrubDataProvider
      */
@@ -156,14 +156,14 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
         $result = $this->scrubTestHelper();
         $this->scrubTestAssert('$_SESSION', $result['data']['request']['session']);
     }
-    
+
     public function testGetScrubbedHeaders()
     {
         $_SERVER['HTTP_CONTENT_TYPE'] = 'text/html; charset=utf-8';
         $_SERVER['HTTP_SENSITIVE'] = 'Scrub this';
-        
+
         $scrubField = 'Sensitive';
-        
+
         $result = $this->scrubTestHelper(array('scrub_fields' => array($scrubField)));
         $this->scrubTestAssert(
             'Headers',
@@ -181,15 +181,15 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
         $extras = array(
             'extraField1' => $testData
         );
-        
+
         $result = $this->scrubTestHelper(array('requestExtras' => $extras));
-        
+
         $this->scrubTestAssert(
             "Request extras",
             $result['data']['request']['extraField1']
         );
     }
-    
+
     /**
      * @dataProvider scrubDataProvider
      */
@@ -198,15 +198,15 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
         $extras = array(
             'extraField1' => $testData
         );
-        
+
         $result = $this->scrubTestHelper(array('serverExtras' => $extras));
-        
+
         $this->scrubTestAssert(
             "Server extras",
             $result['data']['server']['extraField1']
         );
     }
-    
+
     /**
      * @dataProvider scrubDataProvider
      */
@@ -220,7 +220,7 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
             $result['data']['custom']
         );
     }
-    
+
     /**
      * @dataProvider scrubDataProvider
      */
@@ -229,7 +229,7 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
         $bodyContext = array(
             'context1' => $testData
         );
-        
+
         $result = $this->scrubTestHelper(
             array('custom' => $bodyContext),
             $bodyContext
@@ -240,18 +240,18 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
             $result['data']['body']['message']['context1']
         );
     }
-    
+
     public function scrubQueryStringDataProvider()
     {
         $data = $this->scrubDataProvider();
-        
+
         foreach ($data as &$test) {
             $test[0] = http_build_query($test[0]);
         }
-        
+
         return $data;
     }
-    
+
     /**
      * @dataProvider scrubQueryStringDataProvider
      */
@@ -259,7 +259,7 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
     {
         $_SERVER['SERVER_NAME'] = 'localhost';
         $_SERVER['REQUEST_URI'] = "/index.php?$testData";
-        
+
         $result = $this->scrubTestHelper();
         $parsed = array();
         parse_str(parse_url($result['data']['request']['url'], PHP_URL_QUERY), $parsed);
@@ -272,18 +272,18 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
             'x' // query string is scrubbed with "x" rather than "*"
         );
     }
-    
+
     /**
      * @dataProvider scrubQueryStringDataProvider
      */
     public function testGetRequestScrubQueryString($testData)
     {
         $_SERVER['QUERY_STRING'] = "?$testData";
-        
+
         $result = $this->scrubTestHelper();
         $parsed = array();
         parse_str($result['data']['request']['query_string'], $parsed);
-        
+
         $this->scrubTestAssert(
             "Query string",
             $parsed,

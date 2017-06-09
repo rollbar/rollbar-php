@@ -1,6 +1,8 @@
 <?php namespace Rollbar\Payload;
 
-class MessageTest extends \PHPUnit_Framework_TestCase
+use Rollbar\BaseUnitTestCase;
+
+class MessageTest extends BaseUnitTestCase
 {
     public function testBacktrace()
     {
@@ -8,7 +10,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         $msg = new Message("Test", array(), $expected);
         $this->assertEquals($expected, $msg->getBacktrace());
     }
-    
+
     public function testBody()
     {
         $msg = new Message("Test");

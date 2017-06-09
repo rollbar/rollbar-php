@@ -7,19 +7,19 @@ if (!defined('ROLLBAR_TEST_TOKEN')) {
 use Rollbar\Rollbar;
 use Rollbar\Payload\Level;
 
-class RollbarTest extends \PHPUnit_Framework_TestCase
+class RollbarTest extends BaseUnitTestCase
 {
 
     private static $simpleConfig = array(
         'access_token' => ROLLBAR_TEST_TOKEN,
         'environment' => 'test'
     );
-    
+
     public function setUp()
     {
         Rollbar::init(self::$simpleConfig);
     }
-    
+
     public function testLogException()
     {
         try {
@@ -27,16 +27,16 @@ class RollbarTest extends \PHPUnit_Framework_TestCase
         } catch (\Exception $e) {
             Rollbar::log(Level::error(), $e);
         }
-        
+
         $this->assertTrue(true);
     }
-    
+
     public function testLogMessage()
     {
         Rollbar::log(Level::info(), 'testing info level');
         $this->assertTrue(true);
     }
-    
+
     public function testLogExtraData()
     {
         Rollbar::log(
@@ -44,7 +44,7 @@ class RollbarTest extends \PHPUnit_Framework_TestCase
             'testing extra data',
             array("some_key" => "some value") // key-value additional data
         );
-        
+
         $this->assertTrue(true);
     }
 
@@ -58,20 +58,20 @@ class RollbarTest extends \PHPUnit_Framework_TestCase
         $uuid = Rollbar::report_message("Hello world");
         $this->assertStringMatchesFormat('%x-%x-%x-%x-%x', $uuid);
     }
-    
+
     public function testBackwardsSimpleError()
     {
         Rollbar::init(self::$simpleConfig);
-        
+
         $result = Rollbar::report_php_error(E_ERROR, "Runtime error", "the_file.php", 1);
         // always returns false.
         $this->assertFalse($result);
     }
-    
+
     public function testBackwardsSimpleException()
     {
         Rollbar::init(self::$simpleConfig);
-        
+
         $uuid = null;
         try {
             throw new \Exception("test exception");

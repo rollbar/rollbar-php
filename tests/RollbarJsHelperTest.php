@@ -1,16 +1,16 @@
 <?php namespace Rollbar;
 
-class JsHelperTest extends \PHPUnit_Framework_TestCase
+class JsHelperTest extends BaseUnitTestCase
 {
     protected $jsHelper;
     protected $testSnippetPath;
-    
+
     public function setUp()
     {
         $this->jsHelper = new RollbarJsHelper(array());
         $this->testSnippetPath = realpath(__DIR__ . "/../data/rollbar.snippet.js");
     }
-    
+
     public function testSnippetPath()
     {
         $this->assertEquals(
@@ -18,28 +18,28 @@ class JsHelperTest extends \PHPUnit_Framework_TestCase
             $this->jsHelper->snippetPath()
         );
     }
-    
+
     /**
      * @dataProvider shouldAddJsProvider
      */
     public function testShouldAddJs($setup, $expected)
     {
         $mock = \Mockery::mock('Rollbar\RollbarJsHelper');
-             
+
         $status = $setup['status'];
-        
+
         $mock->shouldReceive('isHtml')
              ->andReturn($setup['isHtml']);
-             
+
         $mock->shouldReceive('hasAttachment')
              ->andReturn($setup['hasAttachment']);
-             
+
         $mock->shouldReceive('shouldAddJs')
              ->passthru();
-        
+
         $this->assertEquals($expected, $mock->shouldAddJs($status, array()));
     }
-    
+
     public function shouldAddJsProvider()
     {
         return array(
@@ -77,7 +77,7 @@ class JsHelperTest extends \PHPUnit_Framework_TestCase
             ),
         );
     }
-    
+
     /**
      * @dataProvider isHtmlProvider
      */
@@ -88,7 +88,7 @@ class JsHelperTest extends \PHPUnit_Framework_TestCase
             $this->jsHelper->isHtml($headers)
         );
     }
-    
+
     public function isHtmlProvider()
     {
         return array(
@@ -106,7 +106,7 @@ class JsHelperTest extends \PHPUnit_Framework_TestCase
             ),
         );
     }
-    
+
     /**
      * @dataProvider hasAttachmentProvider
      */
@@ -117,7 +117,7 @@ class JsHelperTest extends \PHPUnit_Framework_TestCase
             $this->jsHelper->hasAttachment($headers)
         );
     }
-    
+
     public function hasAttachmentProvider()
     {
         return array(
@@ -134,14 +134,14 @@ class JsHelperTest extends \PHPUnit_Framework_TestCase
             ),
         );
     }
-    
+
     public function testJsSnippet()
     {
         $expected = file_get_contents($this->testSnippetPath);
-        
+
         $this->assertEquals($expected, $this->jsHelper->jsSnippet());
     }
-    
+
     /**
      * @dataProvider shouldAppendNonceProvider
      */
@@ -152,7 +152,7 @@ class JsHelperTest extends \PHPUnit_Framework_TestCase
             $this->jsHelper->shouldAppendNonce($headers)
         );
     }
-    
+
     public function shouldAppendNonceProvider()
     {
         return array(
@@ -176,7 +176,7 @@ class JsHelperTest extends \PHPUnit_Framework_TestCase
             ),
         );
     }
-    
+
     /**
      * @dataProvider scriptTagProvider
      */
@@ -185,7 +185,7 @@ class JsHelperTest extends \PHPUnit_Framework_TestCase
         if ($expected === 'Exception') {
             try {
                 $result = $this->jsHelper->scriptTag($content, $headers, $nonce);
-                
+
                 $this->fail();
             } catch (\Exception $e) {
                 $this->assertTrue(true);
@@ -193,11 +193,11 @@ class JsHelperTest extends \PHPUnit_Framework_TestCase
             }
         } else {
             $result = $this->jsHelper->scriptTag($content, $headers, $nonce);
-            
+
             $this->assertEquals($expected, $result);
         }
     }
-    
+
     public function scriptTagProvider()
     {
         return array(
@@ -225,7 +225,7 @@ class JsHelperTest extends \PHPUnit_Framework_TestCase
             ),
         );
     }
-    
+
     public function testConfigJsTag()
     {
         $config = array(
@@ -233,42 +233,42 @@ class JsHelperTest extends \PHPUnit_Framework_TestCase
                 'config1' => 'value 1'
             )
         );
-        
+
         $expectedJson = json_encode($config['options']);
         $expected = "var _rollbarConfig = $expectedJson;";
-        
+
         $helper = new RollbarJsHelper($config);
         $result = $helper->configJsTag();
-        
+
         $this->assertEquals($expected, $result);
     }
-    
+
     /**
      * @dataProvider addJsProvider
      */
     public function testBuildJs($setup, $expected)
     {
         extract($setup);
-        
+
         $result = RollbarJsHelper::buildJs($config, $headers, $nonce);
-        
+
         $this->assertEquals($expected, $result);
     }
-    
+
     /**
      * @dataProvider addJsProvider
      */
     public function testAddJs($setup, $expected)
     {
         extract($setup);
-             
+
         $helper = new RollbarJsHelper($config);
-        
+
         $result = $helper->addJs($headers, $nonce);
-        
+
         $this->assertEquals($expected, $result);
     }
-    
+
     public function addJsProvider()
     {
         $this->setUp();
