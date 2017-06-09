@@ -26,21 +26,21 @@ Rollbar::init(
 try {
     throw new \Exception('test exception');
 } catch (\Exception $e) {
-    Rollbar::log(Level::error(), $e);
+    Rollbar::log(Level::ERROR, $e);
 }
 
 // Message at level 'info'
-Rollbar::log(Level::info(), 'testing info level');
+Rollbar::log(Level::INFO, 'testing info level');
 
 // With extra data (3rd arg) and custom payload options (4th arg)
 Rollbar::log(
-    Level::info(),
+    Level::INFO,
     'testing extra data',
     array("some_key" => "some value") // key-value additional data
 );
         
 // If you want to check if logging with Rollbar was successful
-$response = Rollbar::log(Level::info(), 'testing wasSuccessful()');
+$response = Rollbar::log(Level::INFO, 'testing wasSuccessful()');
 if (!$response->wasSuccessful()) {
     throw new \Exception('logging with Rollbar failed');
 }
@@ -175,9 +175,9 @@ use Rollbar\Payload\Level;
 try {
     do_something();
 } catch (\Exception $e) {
-    Rollbar::log(Level::error(), $e);
+    Rollbar::log(Level::ERROR, $e);
     // or
-    Rollbar::log(Level::error(), $e, array("my" => "extra", "data" => 42));
+    Rollbar::log(Level::ERROR, $e, array("my" => "extra", "data" => 42));
 }
 ?>
 ```
@@ -189,9 +189,9 @@ You can also send Rollbar log-like messages:
 use Rollbar\Rollbar;
 use Rollbar\Payload\Level;
 
-Rollbar::log(Level::warning(), 'could not connect to mysql server');
+Rollbar::log(Level::WARNING, 'could not connect to mysql server');
 Rollbar::log(
-    Level::info(), 
+    Level::INFO, 
     'Here is a message with some additional data',
     array('x' => 10, 'code' => 'blue')
 );

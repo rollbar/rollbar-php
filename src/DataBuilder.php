@@ -312,7 +312,7 @@ class DataBuilder implements DataBuilderInterface
     }
 
     /**
-     * @param Level $level
+     * @param string $level
      * @param \Exception | \Throwable | string $toLog
      * @param $context
      * @return Data
@@ -507,7 +507,7 @@ class DataBuilder implements DataBuilderInterface
             }
         }
         $level = strtolower($level);
-        return Level::fromName($this->tryGet($this->psrLevels, $level));
+        return $this->tryGet($this->psrLevels, $level);
     }
 
     protected function getTimestamp()
@@ -766,7 +766,7 @@ class DataBuilder implements DataBuilderInterface
                 $personData = call_user_func($this->personFunc);
             } catch (\Exception $exception) {
                 Rollbar::scope(array('person_fn' => null))->
-                    log(Level::fromName("error"), $exception);
+                    log(Level::ERROR, $exception);
             }
         }
 

@@ -25,7 +25,7 @@ class RollbarTest extends \PHPUnit_Framework_TestCase
         try {
             throw new \Exception('test exception');
         } catch (\Exception $e) {
-            Rollbar::log(Level::error(), $e);
+            Rollbar::log(Level::ERROR, $e);
         }
         
         $this->assertTrue(true);
@@ -33,14 +33,14 @@ class RollbarTest extends \PHPUnit_Framework_TestCase
     
     public function testLogMessage()
     {
-        Rollbar::log(Level::info(), 'testing info level');
+        Rollbar::log(Level::INFO, 'testing info level');
         $this->assertTrue(true);
     }
     
     public function testLogExtraData()
     {
         Rollbar::log(
-            Level::info(),
+            Level::INFO,
             'testing extra data',
             array("some_key" => "some value") // key-value additional data
         );

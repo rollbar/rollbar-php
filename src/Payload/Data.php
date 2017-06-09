@@ -60,9 +60,9 @@ class Data implements \JsonSerializable
         return $this->level;
     }
 
-    public function setLevel(Level $level)
+    public function setLevel($level)
     {
-        $this->level = $level;
+        $this->level = Level::fromName($level);
         return $this;
     }
 

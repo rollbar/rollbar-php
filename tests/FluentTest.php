@@ -2,7 +2,7 @@
 
 namespace Rollbar;
 
-use Psr\Log\LogLevel;
+use Rollbar\Payload\Level;
 
 class FluentTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,7 +20,7 @@ class FluentTest extends \PHPUnit_Framework_TestCase
             'handler' => 'fluent',
         ), false, false, false);
         $logger = Rollbar::logger();
-        $this->assertEquals(200, $logger->log(LogLevel::INFO, 'this is a test', array())->getStatus());
+        $this->assertEquals(200, $logger->log(Level::INFO, 'this is a test', array())->getStatus());
 
         socket_close($socket);
     }

@@ -55,7 +55,7 @@ class Rollbar
     
     public static function exceptionHandler($exception)
     {
-        self::log(Level::error(), $exception, array(Utilities::IS_UNCAUGHT_KEY => true));
+        self::log(Level::ERROR, $exception, array(Utilities::IS_UNCAUGHT_KEY => true));
         
         restore_exception_handler();
         throw $exception;
@@ -78,7 +78,7 @@ class Rollbar
     {
         if (null !== self::$logger) {
             $exception = self::generateErrorWrapper($errno, $errstr, $errfile, $errline);
-            self::$logger->log(Level::error(), $exception, array(Utilities::IS_UNCAUGHT_KEY => true));
+            self::$logger->log(Level::ERROR, $exception, array(Utilities::IS_UNCAUGHT_KEY => true));
         }
         
         return false;
@@ -102,7 +102,7 @@ class Rollbar
             $errline = $last_error['line'];
             $exception = self::generateErrorWrapper($errno, $errstr, $errfile, $errline);
             $extra = array(Utilities::IS_UNCAUGHT_KEY => true);
-            self::$logger->log(Level::critical(), $exception, $extra);
+            self::$logger->log(Level::CRITICAL, $exception, $extra);
         }
     }
 
@@ -147,12 +147,12 @@ class Rollbar
         if ($payload_data) {
             $extra_data = array_merge($extra_data, $payload_data);
         }
-        return self::log(Level::error(), $exc, $extra_data)->getUuid();
+        return self::log(Level::ERROR, $exc, $extra_data)->getUuid();
     }
 
     /**
      * @param string $message Message to be logged
-     * @param string|Level::error() $level One of the values in \Rollbar\Payload\Level::$values
+     * @param string $level One of the values in \Rollbar\Payload\Level::$values
      * @param array $extra_data Additional data to be logged with the exception
      * @param array $payload_data This is deprecated as of v1.0.0 and remains for
      * backwards compatibility. The content fo this array will be merged with
@@ -165,7 +165,7 @@ class Rollbar
     public static function report_message($message, $level = null, $extra_data = null, $payload_data = null)
     {
         
-        $level = $level ? Level::fromName($level) : Level::error();
+        $level = $level ? $level : Level::ERROR;
         if ($payload_data) {
             $extra_data = array_merge($extra_data, $payload_data);
         }

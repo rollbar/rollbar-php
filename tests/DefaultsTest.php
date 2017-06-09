@@ -26,13 +26,13 @@ class DefaultsTest extends \PHPUnit_Framework_TestCase
     public function testMessageLevel()
     {
         $this->assertEquals("warning", $this->d->messageLevel());
-        $this->assertEquals("error", $this->d->messageLevel(Level::ERROR()));
+        $this->assertEquals("error", $this->d->messageLevel(Level::ERROR));
     }
 
     public function testExceptionLevel()
     {
         $this->assertEquals("error", $this->d->exceptionLevel());
-        $this->assertEquals("warning", $this->d->exceptionLevel(Level::Warning()));
+        $this->assertEquals("warning", $this->d->exceptionLevel(Level::WARNING));
     }
 
     public function testErrorLevels()

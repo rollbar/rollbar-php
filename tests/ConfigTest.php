@@ -8,7 +8,6 @@ use Rollbar\Payload\Level;
 use Rollbar\Payload\Message;
 use Rollbar\Payload\Payload;
 use Rollbar\RollbarLogger;
-use Psr\Log\LogLevel;
 
 class ConfigTest extends \PHPUnit_Framework_TestCase
 {
@@ -100,7 +99,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             "dataBuilder" => $fdb
         );
         $config = new Config($arr);
-        $expected = array(LogLevel::EMERGENCY, "oops", array());
+        $expected = array(Level::EMERGENCY, "oops", array());
         $config->getRollbarData($expected[0], $expected[1], $expected[2]);
         $this->assertEquals($expected, array_pop(FakeDataBuilder::$logged));
     }
@@ -132,9 +131,9 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         ));
         $this->runConfigTest($c);
 
-        $c->configure(array("minimumLevel" => Level::WARNING()));
+        $c->configure(array("minimumLevel" => Level::WARNING));
         $this->runConfigTest($c);
-
+        
         $c->configure(array("minimumLevel" => Level::WARNING()->toInt()));
         $this->runConfigTest($c);
     }
@@ -300,7 +299,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             }
         ));
         $data = new Data($this->env, new Body(new Message("test")));
-        $data->setLevel(Level::fromName('error'));
+        $data->setLevel(Level::ERROR);
         $c->checkIgnored(new Payload($data, $c->getAccessToken()), $this->token, $this->error, false);
 
         $this->assertTrue($called);
@@ -321,7 +320,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             }
         ));
         $data = new Data($this->env, new Body(new Message("test")));
-        $data->setLevel(Level::fromName('error'));
+        $data->setLevel(Level::ERROR);
         $c->checkIgnored(new Payload($data, $c->getAccessToken()), $this->token, $this->error, true);
 
         $this->assertTrue($called);
@@ -365,7 +364,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         ));
         
         $data = new Data($this->env, new Body(new Message("test")));
-        $data->setLevel(Level::fromName('error'));
+        $data->setLevel(Level::ERROR);
         
         if ($error_reporting !== null) {
             $errorReportingTemp = error_reporting();

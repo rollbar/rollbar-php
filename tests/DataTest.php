@@ -2,6 +2,7 @@
 
 use \Mockery as m;
 use Rollbar\Payload\Data;
+use Rollbar\Payload\Level;
 
 class DataTest extends \PHPUnit_Framework_TestCase
 {
@@ -47,8 +48,12 @@ class DataTest extends \PHPUnit_Framework_TestCase
 
     public function testLevel()
     {
-        $level = m::mock("Rollbar\Payload\Level");
-        $this->assertEquals($level, $this->data->setLevel($level)->getLevel());
+        $level = Level::ERROR;
+        
+        $this->assertEquals(
+            Level::fromName($level),
+            $this->data->setLevel($level)->getLevel()
+        );
     }
 
     public function testTimestamp()
@@ -143,7 +148,6 @@ class DataTest extends \PHPUnit_Framework_TestCase
     public function testEncode()
     {
         $time = time();
-        $level = $this->mockSerialize("Rollbar\Payload\Level", "{LEVEL}");
         $body = $this->mockSerialize($this->body, "{BODY}");
         $request = $this->mockSerialize("Rollbar\Payload\Request", "{REQUEST}");
         $person = $this->mockSerialize("Rollbar\Payload\Person", "{PERSON}");
@@ -153,7 +157,7 @@ class DataTest extends \PHPUnit_Framework_TestCase
         $data = $this->data
             ->setEnvironment("testing")
             ->setBody($body)
-            ->setLevel($level)
+            ->setLevel(Level::ERROR)
             ->setTimestamp($time)
             ->setCodeVersion("v0.17.3")
             ->setPlatform("LAMP")
@@ -173,7 +177,7 @@ class DataTest extends \PHPUnit_Framework_TestCase
 
         $this->assertContains("\"environment\":\"testing\"", $encoded);
         $this->assertContains("\"body\":\"{BODY}\"", $encoded);
-        $this->assertContains("\"level\":\"{LEVEL}\"", $encoded);
+        $this->assertContains("\"level\":\"error\"", $encoded);
         $this->assertContains("\"timestamp\":$time", $encoded);
         $this->assertContains("\"code_version\":\"v0.17.3\"", $encoded);
         $this->assertContains("\"platform\":\"LAMP\"", $encoded);

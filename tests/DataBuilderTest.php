@@ -25,7 +25,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testMakeData()
     {
-        $output = $this->dataBuilder->makeData(Level::fromName('error'), "testing", array());
+        $output = $this->dataBuilder->makeData(Level::ERROR, "testing", array());
         $this->assertEquals('tests', $output->getEnvironment());
     }
     
@@ -58,7 +58,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         }
         
         // When DataBuilder builds the data
-        $response = $this->dataBuilder->makeData(Level::fromName('error'), "testing", array());
+        $response = $this->dataBuilder->makeData(Level::ERROR, "testing", array());
         $result = $response->getRequest()->getUrl();
         
         $_SERVER = $pre_SERVER;
@@ -319,7 +319,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             'branch' => 'test-branch'
         ));
 
-        $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
+        $output = $dataBuilder->makeData(Level::ERROR, "testing", array());
         $this->assertEquals('test-branch', $output->getServer()->getBranch());
     }
 
@@ -330,7 +330,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             'environment' => 'tests',
             'code_version' => '3.4.1'
         ));
-        $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
+        $output = $dataBuilder->makeData(Level::ERROR, "testing", array());
         $this->assertEquals('3.4.1', $output->getCodeVersion());
     }
 
@@ -341,7 +341,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             'environment' => 'tests',
             'host' => 'my host'
         ));
-        $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
+        $output = $dataBuilder->makeData(Level::ERROR, "testing", array());
         $this->assertEquals('my host', $output->getServer()->getHost());
     }
     
@@ -352,7 +352,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             'environment' => 'tests'
         ));
         
-        $result = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
+        $result = $dataBuilder->makeData(Level::ERROR, "testing", array());
         $this->assertNull($result->getBody()->getValue()->getBacktrace());
     }
     
@@ -365,7 +365,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             'send_message_trace' => true
         ));
     
-        $result = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
+        $result = $dataBuilder->makeData(Level::ERROR, "testing", array());
         $this->assertNotEmpty($result->getBody()->getValue()->getBacktrace());
     }
     
@@ -379,7 +379,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         ));
         $dataBuilder = $c->getDataBuilder();
     
-        $result = $dataBuilder->makeData(Level::fromName('error'), 'testing', array());
+        $result = $dataBuilder->makeData(Level::ERROR, 'testing', array());
         $frames = $result->getBody()->getValue()->getBacktrace();
         
         $this->assertArrayNotHasKey(
@@ -398,7 +398,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $dataBuilder = $c->getDataBuilder();
     
         $expected = 'testing';
-        $result = $dataBuilder->makeData(Level::fromName('error'), $expected, array());
+        $result = $dataBuilder->makeData(Level::ERROR, $expected, array());
         $frames = $result->getBody()->getValue()->getBacktrace();
         
         $this->assertEquals(
@@ -601,7 +601,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
                 'email' => 'test@test.com'
             )
         ));
-        $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
+        $output = $dataBuilder->makeData(Level::ERROR, "testing", array());
         $this->assertEquals('test@test.com', $output->getPerson()->getEmail());
     }
 
@@ -617,7 +617,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
                 );
             }
         ));
-        $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
+        $output = $dataBuilder->makeData(Level::ERROR, "testing", array());
         $this->assertEquals('test@test.com', $output->getPerson()->getEmail());
     }
     
@@ -632,7 +632,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         ));
         
         try {
-            $logger->log(Level::fromName('error'), "testing exceptions in person_fn", array());
+            $logger->log(Level::ERROR, "testing exceptions in person_fn", array());
             $this->assertTrue(true); // assert that exception was not thrown
         } catch (\Exception $exception) {
             $this->fail("Exception in person_fn was not caught.");
@@ -646,7 +646,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             'environment' => 'tests',
             'root' => '/var/www/app'
         ));
-        $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
+        $output = $dataBuilder->makeData(Level::ERROR, "testing", array());
         $this->assertEquals('/var/www/app', $output->getServer()->getRoot());
     }
 
@@ -984,7 +984,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             'accessToken' => 'abcd1234efef5678abcd1234567890be',
             'environment' => 'tests'
         ));
-        $output = $dataBuilder->makeData(Level::fromName('error'), "testing", array());
+        $output = $dataBuilder->makeData(Level::ERROR, "testing", array());
         $requestBody = $output->getRequest()->getBody();
         
         $this->assertEquals($streamInput, $requestBody);
@@ -1045,7 +1045,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         ));
         
         $result = $dataBuilder->makeData(
-            Level::fromName('error'),
+            Level::ERROR,
             new \Exception(),
             array()
         );
