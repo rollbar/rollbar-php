@@ -3,7 +3,7 @@
 use \Mockery as m;
 use Rollbar\Payload\Data;
 
-class DataTest extends \PHPUnit_Framework_TestCase
+class DataTest extends BaseUnitTestCase
 {
     private $body;
     private $data;

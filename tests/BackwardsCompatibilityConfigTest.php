@@ -2,7 +2,7 @@
 
 namespace Rollbar;
 
-class BackwardsCompatibilityConfigTest extends \PHPUnit_Framework_TestCase
+class BackwardsCompatibilityConfigTest extends BaseUnitTestCase
 {
     public function testConfigValues()
     {

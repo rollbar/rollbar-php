@@ -3,7 +3,7 @@
 use \Mockery as m;
 use Rollbar\Payload\Request;
 
-class RequestTest extends \PHPUnit_Framework_TestCase
+class RequestTest extends BaseUnitTestCase
 {
     public function testUrl()
     {

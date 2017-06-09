@@ -3,7 +3,7 @@
 use \Mockery as m;
 use Rollbar\Payload\Frame;
 
-class FrameTest extends \PHPUnit_Framework_TestCase
+class FrameTest extends BaseUnitTestCase
 {
     private $exception;
     private $frame;

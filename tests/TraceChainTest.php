@@ -1,9 +1,10 @@
 <?php namespace Rollbar\Payload\TraceChain;
 
 use \Mockery as m;
+use Rollbar\BaseUnitTestCase;
 use Rollbar\Payload\TraceChain;
 
-class TraceChainTest extends \PHPUnit_Framework_TestCase
+class TraceChainTest extends BaseUnitTestCase
 {
     private $trace1;
     private $trace2;
