@@ -59,6 +59,8 @@ class DataBuilder implements DataBuilderInterface
     protected $sendMessageTrace;
     protected $localVarsDump;
     protected $captureErrorStacktraces;
+    
+    protected $levelFactory;
 
     public function __construct($config)
     {
@@ -99,6 +101,8 @@ class DataBuilder implements DataBuilderInterface
         if (!isset($this->shiftFunction)) {
             $this->shiftFunction = true;
         }
+        
+        $this->levelFactory = new LevelFactory();
     }
 
     protected function getOrCall($name, $level, $toLog, $context)
@@ -506,8 +510,8 @@ class DataBuilder implements DataBuilderInterface
                 $level = $this->messageLevel;
             }
         }
-        $level = strtolower($level);
-        return $this->tryGet($this->psrLevels, $level);
+        $level = $this->tryGet($this->psrLevels, strtolower($level));
+        return $this->levelFactory->fromName($level);
     }
 
     protected function getTimestamp()

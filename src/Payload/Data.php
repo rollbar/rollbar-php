@@ -62,7 +62,7 @@ class Data implements \JsonSerializable
 
     public function setLevel($level)
     {
-        $this->level = Level::fromName($level);
+        $this->level = $level;
         return $this;
     }
 

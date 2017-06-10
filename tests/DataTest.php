@@ -48,10 +48,11 @@ class DataTest extends \PHPUnit_Framework_TestCase
 
     public function testLevel()
     {
+        $levelFactory = new LevelFactory;
         $level = Level::ERROR;
         
         $this->assertEquals(
-            Level::fromName($level),
+            $levelFactory->fromName($level),
             $this->data->setLevel($level)->getLevel()
         );
     }
@@ -148,6 +149,7 @@ class DataTest extends \PHPUnit_Framework_TestCase
     public function testEncode()
     {
         $time = time();
+        $level = $this->mockSerialize("Rollbar\Payload\Level", "{LEVEL}");
         $body = $this->mockSerialize($this->body, "{BODY}");
         $request = $this->mockSerialize("Rollbar\Payload\Request", "{REQUEST}");
         $person = $this->mockSerialize("Rollbar\Payload\Person", "{PERSON}");
@@ -157,7 +159,7 @@ class DataTest extends \PHPUnit_Framework_TestCase
         $data = $this->data
             ->setEnvironment("testing")
             ->setBody($body)
-            ->setLevel(Level::ERROR)
+            ->setLevel($level)
             ->setTimestamp($time)
             ->setCodeVersion("v0.17.3")
             ->setPlatform("LAMP")
@@ -177,7 +179,7 @@ class DataTest extends \PHPUnit_Framework_TestCase
 
         $this->assertContains("\"environment\":\"testing\"", $encoded);
         $this->assertContains("\"body\":\"{BODY}\"", $encoded);
-        $this->assertContains("\"level\":\"error\"", $encoded);
+        $this->assertContains("\"level\":\"{LEVEL}\"", $encoded);
         $this->assertContains("\"timestamp\":$time", $encoded);
         $this->assertContains("\"code_version\":\"v0.17.3\"", $encoded);
         $this->assertContains("\"platform\":\"LAMP\"", $encoded);

@@ -1,5 +1,7 @@
 <?php namespace Rollbar\Payload;
 
+use Rollbar\LevelFactory;
+
 class Level implements \JsonSerializable
 {
     /**
@@ -23,42 +25,24 @@ class Level implements \JsonSerializable
      * @deprecated 1.2.0
      */
     const IGNORE = 'ignore';
-    
-    private static $values;
-
-    private static function init()
-    {
-        if (is_null(self::$values)) {
-            self::$values = array(
-                self::EMERGENCY => new Level("critical", 100000),
-                self::ALERT => new Level("critical", 100000),
-                self::CRITICAL => new Level("critical", 100000),
-                self::ERROR => new Level("error", 10000),
-                self::WARNING => new Level("warning", 1000),
-                self::NOTICE => new Level("info", 100),
-                self::INFO => new Level("info", 100),
-                self::DEBUG => new Level("debug", 10),
-                self::IGNORED => new Level("ignore", 0),
-                self::IGNORE => new Level("ignore", 0)
-
-            );
-        }
-    }
-
-    public static function __callStatic($name, $args)
-    {
-        return self::fromName($name);
-    }
 
     /**
-     * @param string $name level name
-     * @return Level
+     * @deprecated 1.2.0
+     * 
+     * Usage of Level::error(), Level::warning(), Level::info(), Level::notice(),
+     * Level::debug() is no longer supported. It has been replaced with matching
+     * class constants, i.e.: Level::ERROR
      */
-    public static function fromName($name)
+    public static function __callStatic($name, $args)
     {
-        self::init();
-        $name = strtolower($name);
-        return array_key_exists($name, self::$values) ? self::$values[$name] : null;
+        $factory = new LevelFactory();
+        $level = $factory->fromName($name);
+        
+        if (!$level) {
+            throw new \Exception("Level '$level' doesn't exist.");
+        }
+        
+        return $level;
     }
 
     /**
@@ -67,7 +51,7 @@ class Level implements \JsonSerializable
     private $level;
     private $val;
 
-    private function __construct($level, $val)
+    public function __construct($level, $val)
     {
         $this->level = $level;
         $this->val = $val;

@@ -18,6 +18,12 @@ class Config
      */
     private $dataBuilder;
     private $configArray;
+    
+    /**
+     * @var LevelFactory
+     */
+    private $levelFactory;
+    
     /**
      * @var TransformerInterface
      */
@@ -54,6 +60,8 @@ class Config
 
     public function __construct(array $configArray)
     {
+        $this->levelFactory = new LevelFactory();
+        
         $this->updateConfig($configArray);
 
         if (isset($configArray['error_sample_rates'])) {
@@ -144,7 +152,7 @@ class Config
         } elseif ($c['minimumLevel'] instanceof Level) {
             $this->minimumLevel = $c['minimumLevel']->toInt();
         } elseif (is_string($c['minimumLevel'])) {
-            $level = Level::fromName($c['minimumLevel']);
+            $level = $this->levelFactory->fromName($c['minimumLevel']);
             if ($level !== null) {
                 $this->minimumLevel = $level->toInt();
             }

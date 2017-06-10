@@ -298,8 +298,9 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                 $called = true;
             }
         ));
+        $levelFactory = new LevelFactory();
         $data = new Data($this->env, new Body(new Message("test")));
-        $data->setLevel(Level::ERROR);
+        $data->setLevel($levelFactory->fromName(Level::ERROR));
         $c->checkIgnored(new Payload($data, $c->getAccessToken()), $this->token, $this->error, false);
 
         $this->assertTrue($called);
@@ -319,8 +320,9 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                 $errorPassed = $exc;
             }
         ));
+        $levelFactory = new LevelFactory();
         $data = new Data($this->env, new Body(new Message("test")));
-        $data->setLevel(Level::ERROR);
+        $data->setLevel($levelFactory->fromName(Level::ERROR));
         $c->checkIgnored(new Payload($data, $c->getAccessToken()), $this->token, $this->error, true);
 
         $this->assertTrue($called);
@@ -339,7 +341,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $dataBuilder = $logger->getDataBuilder();
         
         $result = $dataBuilder->makeData(
-            Level::fromName('error'),
+            Level::ERROR,
             new \Exception(),
             array()
         );
@@ -363,8 +365,10 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             "use_error_reporting" => $use_error_reporting
         ));
         
+        $levelFactory = new LevelFactory();
+        
         $data = new Data($this->env, new Body(new Message("test")));
-        $data->setLevel(Level::ERROR);
+        $data->setLevel($levelFactory->fromName(Level::ERROR));
         
         if ($error_reporting !== null) {
             $errorReportingTemp = error_reporting();
