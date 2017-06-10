@@ -1,7 +1,19 @@
 <?php namespace Rollbar\Payload;
 
+<<<<<<< HEAD
 use Rollbar\LevelFactory;
 
+=======
+/**
+ * @method static Level critical()
+ * @method static Level error()
+ * @method static Level warning()
+ * @method static Level debug()
+ * @method static Level info()
+ * @method static Level ignored()
+ * @method static Level ignore()
+ */
+>>>>>>> origin/master
 class Level implements \JsonSerializable
 {
     /**
