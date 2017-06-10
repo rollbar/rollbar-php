@@ -28,7 +28,7 @@ class LevelFactory
 
     /**
      * @param string $name level name
-     * 
+     *
      * @return Level
      */
     public function fromName($name)
@@ -40,14 +40,13 @@ class LevelFactory
     
     /**
      * Check if the provided level is a valid level
-     * 
+     *
      * @param string $level
-     * 
+     *
      * @return string
      */
     public function isValidLevel($level)
     {
         return $this->fromName($level) ? true : false;
     }
-    
 }

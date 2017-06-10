@@ -303,11 +303,11 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         
         $config->checkIgnored(
             new Payload(
-                $data, 
+                $data,
                 $config->getAccessToken()
-            ), 
-            $this->token, 
-            $this->error, 
+            ),
+            $this->token,
+            $this->error,
             false
         );
 
@@ -323,8 +323,15 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $config = new Config(array(
             "access_token" => $this->token,
             "environment" => $this->env,
-            "checkIgnore" => function ($isUncaught, $exc, $payload) use 
-                             (&$called, &$isUncaughtPassed, &$errorPassed) {
+            "checkIgnore" => function (
+                $isUncaught,
+                $exc,
+                $payload
+            ) use (
+                &$called,
+                &$isUncaughtPassed,
+                &$errorPassed
+) {
                 $called = true;
                 $isUncaughtPassed = $isUncaught;
                 $errorPassed = $exc;
@@ -338,11 +345,11 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         
         $config->checkIgnored(
             new Payload(
-                $data, 
+                $data,
                 $config->getAccessToken()
-            ), 
-            $this->token, 
-            $this->error, 
+            ),
+            $this->token,
+            $this->error,
             true
         );
 
@@ -399,11 +406,11 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         
         $result = $config->checkIgnored(
             new Payload(
-                $data, 
+                $data,
                 $config->getAccessToken()
-            ), 
-            $this->token, 
-            $this->error, 
+            ),
+            $this->token,
+            $this->error,
             false
         );
         

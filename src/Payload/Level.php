@@ -28,7 +28,7 @@ class Level implements \JsonSerializable
 
     /**
      * @deprecated 1.2.0
-     * 
+     *
      * Usage of Level::error(), Level::warning(), Level::info(), Level::notice(),
      * Level::debug() is no longer supported. It has been replaced with matching
      * class constants, i.e.: Level::ERROR

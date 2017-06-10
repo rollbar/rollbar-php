@@ -10,7 +10,7 @@ class LevelTest extends \PHPUnit_Framework_TestCase
         try {
             $level = Level::TEST();
             $this->fail();
-        } catch(\Exception $exception) {
+        } catch (\Exception $exception) {
             $this->assertTrue(true);
         }
         
