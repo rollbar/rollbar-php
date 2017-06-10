@@ -6,7 +6,7 @@ class Level implements \JsonSerializable
      * Those are PSR-3 compatible loggin levels. They are mapped to Rollbar
      * service supported levels in Level::init()
      */
-    const EMERGENCY = 'emergency';  
+    const EMERGENCY = 'emergency';
     const ALERT = 'alert';
     const CRITICAL = 'critical';
     const ERROR = 'error';
