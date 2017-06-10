@@ -78,7 +78,7 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
         
         $config = new Config(array_replace_recursive($defaultConfig, $config));
 
-        $dataBuilder = new DataBuilder($config->getConfigArray());
+        $dataBuilder = $config->getDataBuilder();
         $data = $dataBuilder->makeData(Level::ERROR, "testing", $context);
         $payload = new Payload($data, $config->getAccessToken());
 

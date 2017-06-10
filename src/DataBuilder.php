@@ -60,6 +60,9 @@ class DataBuilder implements DataBuilderInterface
     protected $localVarsDump;
     protected $captureErrorStacktraces;
     
+    /**
+     * @var LevelFactory
+     */
     protected $levelFactory;
 
     public function __construct($config)
@@ -96,13 +99,12 @@ class DataBuilder implements DataBuilderInterface
         $this->setSendMessageTrace($config);
         $this->setLocalVarsDump($config);
         $this->setCaptureErrorStacktraces($config);
+        $this->setLevelFactory($config);
 
         $this->shiftFunction = $this->tryGet($config, 'shift_function');
         if (!isset($this->shiftFunction)) {
             $this->shiftFunction = true;
         }
-        
-        $this->levelFactory = new LevelFactory();
     }
 
     protected function getOrCall($name, $level, $toLog, $context)
@@ -308,6 +310,16 @@ class DataBuilder implements DataBuilderInterface
     {
         $fromConfig = $this->tryGet($config, 'include_exception_code_context');
         $this->includeExcCodeContext = self::$defaults->includeExcCodeContext($fromConfig);
+    }
+    
+    protected function setLevelFactory($config)
+    {
+        $this->levelFactory = $this->tryGet($config, 'levelFactory');
+        if (!$this->levelFactory) {
+            throw new \InvalidArgumentException(
+                'Missing dependency: LevelFactory not provided to the DataBuilder.'
+            );
+        }
     }
 
     protected function setHost($config)

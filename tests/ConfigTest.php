@@ -48,12 +48,10 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     {
         $arr = array(
             "access_token" => $this->token,
-            "environment" => $this->env,
-            "dataBuilder" => "Rollbar\FakeDataBuilder",
-            "dataBuilderOptions" => array("options")
+            "environment" => $this->env
         );
         $config = new Config($arr);
-        $this->assertEquals($arr, array_pop(FakeDataBuilder::$args));
+        $this->assertInstanceOf('Rollbar\DataBuilder', $config->getDataBuilder());
     }
 
     public function testExtend()
@@ -291,17 +289,27 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function testCheckIgnore()
     {
         $called = false;
-        $c = new Config(array(
+        $config = new Config(array(
             "access_token" => $this->token,
             "environment" => $this->env,
             "checkIgnore" => function ($isUncaught, $exc, $payload) use (&$called) {
                 $called = true;
             }
         ));
-        $levelFactory = new LevelFactory();
+        $levelFactory = $config->getLevelFactory();
+        
         $data = new Data($this->env, new Body(new Message("test")));
         $data->setLevel($levelFactory->fromName(Level::ERROR));
-        $c->checkIgnored(new Payload($data, $c->getAccessToken()), $this->token, $this->error, false);
+        
+        $config->checkIgnored(
+            new Payload(
+                $data, 
+                $config->getAccessToken()
+            ), 
+            $this->token, 
+            $this->error, 
+            false
+        );
 
         $this->assertTrue($called);
     }
@@ -311,19 +319,32 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $called = false;
         $isUncaughtPassed = null;
         $errorPassed = null;
-        $c = new Config(array(
+        
+        $config = new Config(array(
             "access_token" => $this->token,
             "environment" => $this->env,
-            "checkIgnore" => function ($isUncaught, $exc, $payload) use (&$called, &$isUncaughtPassed, &$errorPassed) {
+            "checkIgnore" => function ($isUncaught, $exc, $payload) use 
+                             (&$called, &$isUncaughtPassed, &$errorPassed) {
                 $called = true;
                 $isUncaughtPassed = $isUncaught;
                 $errorPassed = $exc;
             }
         ));
-        $levelFactory = new LevelFactory();
+        
+        $levelFactory = $config->getLevelFactory();
+        
         $data = new Data($this->env, new Body(new Message("test")));
         $data->setLevel($levelFactory->fromName(Level::ERROR));
-        $c->checkIgnored(new Payload($data, $c->getAccessToken()), $this->token, $this->error, true);
+        
+        $config->checkIgnored(
+            new Payload(
+                $data, 
+                $config->getAccessToken()
+            ), 
+            $this->token, 
+            $this->error, 
+            true
+        );
 
         $this->assertTrue($called);
         $this->assertTrue($isUncaughtPassed);
@@ -356,7 +377,8 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     {
         extract($setup);
         $called = false;
-        $c = new Config(array(
+        
+        $config = new Config(array(
             "access_token" => $this->token,
             "environment" => $this->env,
             "checkIgnore" => function ($isUncaught, $exc, $payload) use (&$called) {
@@ -365,7 +387,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             "use_error_reporting" => $use_error_reporting
         ));
         
-        $levelFactory = new LevelFactory();
+        $levelFactory = $config->getLevelFactory();
         
         $data = new Data($this->env, new Body(new Message("test")));
         $data->setLevel($levelFactory->fromName(Level::ERROR));
@@ -375,7 +397,16 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             error_reporting($error_reporting);
         }
         
-        $result = $c->checkIgnored(new Payload($data, $c->getAccessToken()), $this->token, $this->error, false);
+        $result = $config->checkIgnored(
+            new Payload(
+                $data, 
+                $config->getAccessToken()
+            ), 
+            $this->token, 
+            $this->error, 
+            false
+        );
+        
         $this->assertEquals($expected, $result);
         
         if ($error_reporting) {

@@ -134,6 +134,10 @@ class Config
 
     private function setDataBuilder($c)
     {
+        if (!isset($c['levelFactory'])) {
+            $c['levelFactory'] = $this->levelFactory;
+        }
+        
         $exp = "Rollbar\DataBuilderInterface";
         $def = "Rollbar\DataBuilder";
         $this->setupWithOptions($c, "dataBuilder", $exp, $def, true);
@@ -314,6 +318,11 @@ class Config
     public function getDataBuilder()
     {
         return $this->dataBuilder;
+    }
+    
+    public function getLevelFactory()
+    {
+        return $this->levelFactory;
     }
     
     public function getSender()
