@@ -2,16 +2,27 @@
 
 class Level implements \JsonSerializable
 {
-    const IGNORE = 'ignore';
-    const IGNORED = 'ignored';
-    const DEBUG = 'debug';
-    const INFO = 'info';
-    const NOTICE = 'notice';
-    const WARNING = 'warning';
-    const ERROR = 'error';
-    const CRITICAL = 'critical';
-    const ALERT = 'alert';
+    /**
+     * Those are PSR-3 compatible loggin levels. They are mapped to Rollbar
+     * service supported levels in Level::init()
+     */
     const EMERGENCY = 'emergency';  
+    const ALERT = 'alert';
+    const CRITICAL = 'critical';
+    const ERROR = 'error';
+    const WARNING = 'warning';
+    const NOTICE = 'notice';
+    const INFO = 'info';
+    const DEBUG = 'debug';
+    
+    /**
+     * @deprecated 1.2.0
+     */
+    const IGNORED = 'ignored';
+    /**
+     * @deprecated 1.2.0
+     */
+    const IGNORE = 'ignore';
     
     private static $values;
 
@@ -19,16 +30,16 @@ class Level implements \JsonSerializable
     {
         if (is_null(self::$values)) {
             self::$values = array(
-                "emergency" => new Level("critical", 100000),
-                "alert" => new Level("critical", 100000),
-                "critical" => new Level("critical", 100000),
-                "error" => new Level("error", 10000),
-                "warning" => new Level("warning", 1000),
-                "notice" => new Level("info", 100),
-                "info" => new Level("info", 100),
-                "debug" => new Level("debug", 10),
-                "ignored" => new Level("ignore", 0),
-                "ignore" => new Level("ignore", 0)
+                self::EMERGENCY => new Level("critical", 100000),
+                self::ALERT => new Level("critical", 100000),
+                self::CRITICAL => new Level("critical", 100000),
+                self::ERROR => new Level("error", 10000),
+                self::WARNING => new Level("warning", 1000),
+                self::NOTICE => new Level("info", 100),
+                self::INFO => new Level("info", 100),
+                self::DEBUG => new Level("debug", 10),
+                self::IGNORED => new Level("ignore", 0),
+                self::IGNORE => new Level("ignore", 0)
 
             );
         }
