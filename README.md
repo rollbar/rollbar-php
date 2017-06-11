@@ -128,6 +128,39 @@ Rollbar::init(array(
 ?>
 ```
 
+## Integration with Rollbar.js
+
+In case you want to report your JavaScript errors using [Rollbar.js](https://github.com/rollbar/rollbar.js), you can configure the SDK to enable Rollbar.js on your site. Example:
+
+```php
+$rollbarJs = Rollbar\RollbarJsHelper::buildJs(
+    array(
+        "accessToken" => "POST_CLIENT_ITEM_ACCESS_TOKEN",
+        "captureUncaught" => true,
+        "payload" => array(
+            "environment" => "production"
+        ),
+        /* other configuration you want to pass to RollbarJS */
+    )
+);
+```
+
+Or if you are using Content-Security-Policy: script-src 'unsafe-inline'
+```php
+$rollbarJs = Rollbar\RollbarJsHelper::buildJs(
+    array(
+        "accessToken" => "POST_CLIENT_ITEM_ACCESS_TOKEN",
+        "captureUncaught" => true,
+        "payload" => array(
+            "environment" => "production"
+        ),
+        /* other configuration you want to pass to RollbarJS */
+    ),
+    headers_list(),
+    $yourNonceString
+);
+```
+
 ## Basic Usage
 
 That's it! Uncaught errors and exceptions will now be reported to Rollbar.
@@ -163,6 +196,23 @@ Rollbar::log(
     array('x' => 10, 'code' => 'blue')
 );
 ?>
+```
+
+## Using dependency injection
+
+If you're using dependency injection containers, you can create and get a `RollbarLogger` from the container and use it
+to initialize Rollbar error logging.
+
+It's up to the container to properly create and configure the logger.
+
+```php
+use Rollbar\Rollbar;
+use Rollbar\RollbarLogger;
+
+$logger = $container->get(RollbarLogger::class);
+
+// installs global error and exception handlers
+Rollbar::init($logger);
 ```
 
 ## Using Monolog
@@ -242,9 +292,16 @@ All of the following options can be passed as keys in the `$config` array.
 Default: `/var/www`
 </dd>
 
+<dt>endpoint
+</dt>
+<dd>The API URL to post to. Note: the URL has to end with a trailing slash.
+
+Default: `https://api.rollbar.com/api/1/`
+</dd>
+
 <dt>base_api_url
 </dt>
-<dd>The base api url to post to.
+<dd><strong>Deprecated (use <i>endpoint</i> instead).</strong> The base api url to post to.
 
 Default: `https://api.rollbar.com/api/1/`
 </dd>
@@ -460,6 +517,12 @@ Default: No proxy
 Default: `false`
 </dd>
 
+<dt>local_vars_dump</dt>
+<dd>Should backtraces include arguments passed to stack frames.
+
+Default: `false`
+</dd>
+
 </dl>
 
 Example use of error_sample_rates:
@@ -497,12 +560,16 @@ $config['person_fn'] = 'get_current_user';
 
 ## Related projects
 
-A Laravel-specific package is available for integrating with Laravel: [Laravel-Rollbar](https://github.com/jenssegers/Laravel-Rollbar)
+A Laravel-specific package is available for integrating with Laravel: [Rollbar Laravel](https://github.com/rollbar/rollbar-php-laravel)
 
 A CakePHP-specific package is avaliable for integrating with CakePHP 2.x:
 [CakeRollbar](https://github.com/tranfuga25s/CakeRollbar)
 
 A Flow-specific package is available for integrating with Neos Flow: [m12/flow-rollbar](https://packagist.org/packages/m12/flow-rollbar)
+
+Yii package: [baibaratsky/yii-rollbar](https://github.com/baibaratsky/yii-rollbar)
+
+Yii2 package: [baibaratsky/yii2-rollbar](https://github.com/baibaratsky/yii2-rollbar)
 
 ## Help / Support
 

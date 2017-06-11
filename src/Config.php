@@ -44,6 +44,7 @@ class Config
     private $mt_randmax;
 
     private $included_errno = ROLLBAR_INCLUDED_ERRNO_BITMASK;
+    private $use_error_reporting = false;
     
     /**
      * @var boolean Should debug_backtrace() data be sent with string messages
@@ -108,6 +109,10 @@ class Config
         if (isset($c['included_errno'])) {
             $this->included_errno = $c['included_errno'];
         }
+
+        if (isset($c['use_error_reporting'])) {
+            $this->use_error_reporting = $c['use_error_reporting'];
+        }
     }
 
     private function setAccessToken($c)
@@ -169,7 +174,11 @@ class Config
         $default = "Rollbar\Senders\CurlSender";
 
         if (array_key_exists('base_api_url', $c)) {
-            $c['senderOptions']['endpoint'] = $c['base_api_url'];
+            $c['senderOptions']['endpoint'] = $c['base_api_url'] . 'item/';
+        }
+
+        if (array_key_exists('endpoint', $c)) {
+            $c['senderOptions']['endpoint'] = $c['endpoint'] . 'item/';
         }
 
         if (array_key_exists('timeout', $c)) {
@@ -298,6 +307,11 @@ class Config
     {
         return $this->dataBuilder;
     }
+    
+    public function getSender()
+    {
+        return $this->sender;
+    }
 
     /**
      * @param Payload $payload
@@ -351,6 +365,11 @@ class Config
 
             if ($this->included_errno != -1 && ($errno & $this->included_errno) != $errno) {
                 // ignore
+                return true;
+            }
+
+            if ($this->use_error_reporting && ($errno & error_reporting()) != $errno) {
+                // ignore due to error_reporting level
                 return true;
             }
 
