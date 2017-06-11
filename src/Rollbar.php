@@ -12,14 +12,16 @@ class Rollbar
     private static $fatalErrors = array(E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR);
 
     public static function init(
-        $config,
+        $configOrLogger,
         $handleException = true,
         $handleError = true,
         $handleFatal = true
     ) {
-        if (is_null(self::$logger)) {
-            self::$logger = new RollbarLogger($config);
+        $setupHandlers = is_null(self::$logger);
 
+        self::setLogger($configOrLogger);
+
+        if ($setupHandlers) {
             if ($handleException) {
                 self::setupExceptionHandling();
             }
@@ -29,9 +31,22 @@ class Rollbar
             if ($handleFatal) {
                 self::setupFatalHandling();
             }
-        } else {
-            self::$logger->configure($config);
         }
+    }
+
+    private static function setLogger($configOrLogger)
+    {
+        if ($configOrLogger instanceof RollbarLogger) {
+            $logger = $configOrLogger;
+        }
+
+        // Replacing the logger rather than configuring the existing logger breaks BC
+        if (self::$logger && !isset($logger)) {
+            self::$logger->configure($configOrLogger);
+            return;
+        }
+
+        self::$logger = isset($logger) ? $logger : new RollbarLogger($configOrLogger);
     }
 
     public static function logger()

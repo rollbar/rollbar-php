@@ -198,6 +198,23 @@ Rollbar::log(
 ?>
 ```
 
+## Using dependency injection
+
+If you're using dependency injection containers, you can create and get a `RollbarLogger` from the container and use it
+to initialize Rollbar error logging.
+
+It's up to the container to properly create and configure the logger.
+
+```php
+use Rollbar\Rollbar;
+use Rollbar\RollbarLogger;
+
+$logger = $container->get(RollbarLogger::class);
+
+// installs global error and exception handlers
+Rollbar::init($logger);
+```
+
 ## Using Monolog
 
 Here is an example of how to use Rollbar as a handler for Monolog:
