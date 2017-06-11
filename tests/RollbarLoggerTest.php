@@ -292,4 +292,92 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
             'x' // query string is scrubbed with "x" rather than "*"
         );
     }
+
+    public function testPsr3Emergency()
+    {
+        $l = new RollbarLogger(array(
+            "access_token" => "ad865e76e7fb496fab096ac07b1dbabb",
+            "environment" => "testing-php"
+        ));
+
+        // Test that no \Psr\Log\InvalidArgumentException is thrown
+        $l->emergency("Testing PHP Notifier");
+    }
+
+    public function testPsr3Alert()
+    {
+        $l = new RollbarLogger(array(
+            "access_token" => "ad865e76e7fb496fab096ac07b1dbabb",
+            "environment" => "testing-php"
+        ));
+
+        // Test that no \Psr\Log\InvalidArgumentException is thrown
+        $l->alert("Testing PHP Notifier");
+    }
+
+    public function testPsr3Critical()
+    {
+        $l = new RollbarLogger(array(
+            "access_token" => "ad865e76e7fb496fab096ac07b1dbabb",
+            "environment" => "testing-php"
+        ));
+
+        // Test that no \Psr\Log\InvalidArgumentException is thrown
+        $l->critical("Testing PHP Notifier");
+    }
+
+    public function testPsr3Error()
+    {
+        $l = new RollbarLogger(array(
+            "access_token" => "ad865e76e7fb496fab096ac07b1dbabb",
+            "environment" => "testing-php"
+        ));
+
+        // Test that no \Psr\Log\InvalidArgumentException is thrown
+        $l->error("Testing PHP Notifier");
+    }
+
+    public function testPsr3Warning()
+    {
+        $l = new RollbarLogger(array(
+            "access_token" => "ad865e76e7fb496fab096ac07b1dbabb",
+            "environment" => "testing-php"
+        ));
+
+        // Test that no \Psr\Log\InvalidArgumentException is thrown
+        $l->warning("Testing PHP Notifier");
+    }
+
+    public function testPsr3Notice()
+    {
+        $l = new RollbarLogger(array(
+            "access_token" => "ad865e76e7fb496fab096ac07b1dbabb",
+            "environment" => "testing-php"
+        ));
+
+        // Test that no \Psr\Log\InvalidArgumentException is thrown
+        $l->notice("Testing PHP Notifier");
+    }
+
+    public function testPsr3Info()
+    {
+        $l = new RollbarLogger(array(
+            "access_token" => "ad865e76e7fb496fab096ac07b1dbabb",
+            "environment" => "testing-php"
+        ));
+
+        // Test that no \Psr\Log\InvalidArgumentException is thrown
+        $l->info("Testing PHP Notifier");
+    }
+
+    public function testPsr3Debug()
+    {
+        $l = new RollbarLogger(array(
+            "access_token" => "ad865e76e7fb496fab096ac07b1dbabb",
+            "environment" => "testing-php"
+        ));
+
+        // Test that no \Psr\Log\InvalidArgumentException is thrown
+        $l->debug("Testing PHP Notifier");
+    }
 }

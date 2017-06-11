@@ -84,7 +84,19 @@ class Defaults
     
     public function sendMessageTrace($sendMessageTrace = null)
     {
-        return $sendMessageTrace ? $sendMessageTrace : $this->defaultSendMessageTrace;
+        return $sendMessageTrace !== null ? $sendMessageTrace : $this->defaultSendMessageTrace;
+    }
+    
+    public function captureErrorStacktraces($captureErrorStracktraces = null)
+    {
+        return $captureErrorStracktraces !== null ?
+            $captureErrorStracktraces :
+            $this->defaultCaptureErrorStacktraces;
+    }
+    
+    public function localVarsDump($localVarsDump = null)
+    {
+        return $localVarsDump !== null ? $localVarsDump : $this->defaultLocalVarsDump;
     }
 
     public function rawRequestBody($rawRequestBody = null)
@@ -108,6 +120,8 @@ class Defaults
     private $defaultIncludeCodeContext;
     private $defaultIncludeExcCodeContext;
     private $defaultRawRequestBody;
+    private $defaultLocalVarsDump;
+    private $defaultCaptureErrorStacktraces;
 
     public function __construct()
     {
@@ -158,6 +172,8 @@ class Defaults
         $this->defaultIncludeCodeContext = false;
         $this->defaultIncludeExcCodeContext = false;
         $this->defaultRawRequestBody = false;
+        $this->defaultLocalVarsDump = false;
+        $this->defaultCaptureErrorStacktraces = true;
     }
 
     public function messageLevel($level = null)

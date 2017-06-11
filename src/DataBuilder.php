@@ -58,6 +58,8 @@ class DataBuilder implements DataBuilderInterface
     protected $shiftFunction;
     protected $sendMessageTrace;
     protected $rawRequestBody;
+    protected $localVarsDump;
+    protected $captureErrorStacktraces;
 
     public function __construct($config)
     {
@@ -92,6 +94,8 @@ class DataBuilder implements DataBuilderInterface
         $this->setIncludeCodeContext($config);
         $this->setIncludeExcCodeContext($config);
         $this->setSendMessageTrace($config);
+        $this->setLocalVarsDump($config);
+        $this->setCaptureErrorStacktraces($config);
 
         $this->shiftFunction = $this->tryGet($config, 'shift_function');
         if (!isset($this->shiftFunction)) {
@@ -167,6 +171,18 @@ class DataBuilder implements DataBuilderInterface
     {
         $fromConfig = $this->tryGet($config, 'include_raw_request_body');
         $this->rawRequestBody = self::$defaults->rawRequestBody($fromConfig);
+    }
+
+    protected function setLocalVarsDump($config)
+    {
+        $fromConfig = $this->tryGet($config, 'local_vars_dump');
+        $this->localVarsDump = self::$defaults->localVarsDump($fromConfig);
+    }
+    
+    protected function setCaptureErrorStacktraces($config)
+    {
+        $fromConfig = $this->tryGet($config, 'capture_error_stacktraces');
+        $this->captureErrorStacktraces = self::$defaults->captureErrorStacktraces($fromConfig);
     }
 
     protected function setCodeVersion($config)
@@ -392,7 +408,12 @@ class DataBuilder implements DataBuilderInterface
      */
     public function makeTrace($exception, $includeContext, $classOverride = null)
     {
-        $frames = $this->makeFrames($exception, $includeContext);
+        if ($this->captureErrorStacktraces) {
+            $frames = $this->makeFrames($exception, $includeContext);
+        } else {
+            $frames = array();
+        }
+        
         $excInfo = new ExceptionInfo(
             Utilities::coalesce($classOverride, get_class($exception)),
             $exception->getMessage()
@@ -407,11 +428,15 @@ class DataBuilder implements DataBuilderInterface
             $filename = Utilities::coalesce($this->tryGet($frameInfo, 'file'), '<internal>');
             $lineno = Utilities::coalesce($this->tryGet($frameInfo, 'line'), 0);
             $method = $frameInfo['function'];
-            // TODO 4 (arguments are in $frame)
+            $args = Utilities::coalesce($this->tryGet($frameInfo, 'args'), null);
 
             $frame = new Frame($filename);
             $frame->setLineno($lineno)
                 ->setMethod($method);
+                
+            if ($this->localVarsDump && $args !== null) {
+                $frame->setArgs($args);
+            }
 
             if ($includeContext) {
                 $this->addCodeContextToFrame($frame, $filename, $lineno);
@@ -474,7 +499,9 @@ class DataBuilder implements DataBuilderInterface
         return new Message(
             (string)$toLog,
             $context,
-            $this->sendMessageTrace ? debug_backtrace() : null
+            $this->sendMessageTrace ?
+                debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS) :
+                null
         );
     }
 
@@ -528,15 +555,24 @@ class DataBuilder implements DataBuilderInterface
     protected function getRequest()
     {
         $request = new Request();
+
         $request->setUrl($this->getUrl())
-            ->setMethod($this->tryGet($_SERVER, 'REQUEST_METHOD'))
             ->setHeaders($this->getHeaders())
             ->setParams($this->getRequestParams())
-            ->setGet($_GET)
-            ->setQueryString($this->tryGet($_SERVER, "QUERY_STRING"))
-            ->setPost($_POST)
             ->setBody($this->getRequestBody())
             ->setUserIp($this->getUserIp());
+      
+        if (isset($_SERVER)) {
+            $request->setMethod($this->tryGet($_SERVER, 'REQUEST_METHOD'))
+                ->setQueryString($this->tryGet($_SERVER, "QUERY_STRING"));
+        }
+      
+        if (isset($_GET)) {
+            $request->setGet($_GET);
+        }
+        if (isset($_POST)) {
+            $request->setPost($_POST);
+        }
         $extras = $this->getRequestExtras();
         if (!$extras) {
             $extras = array();
@@ -670,13 +706,15 @@ class DataBuilder implements DataBuilderInterface
         $port = $this->getUrlPort($proto);
         
 
-        $path = Utilities::coalesce($this->tryGet($_SERVER, 'REQUEST_URI'), '/');
         $url = $proto . '://' . $host;
         if (($proto == 'https' && $port != 443) || ($proto == 'http' && $port != 80)) {
             $url .= ':' . $port;
         }
 
-        $url .= $path;
+        if (isset($_SERVER)) {
+            $path = Utilities::coalesce($this->tryGet($_SERVER, 'REQUEST_URI'), '/');
+            $url .= $path;
+        }
 
         if ($host == 'unknown') {
             $url = null;
@@ -688,16 +726,18 @@ class DataBuilder implements DataBuilderInterface
     protected function getHeaders()
     {
         $headers = array();
-        foreach ($_SERVER as $key => $val) {
-            if (substr($key, 0, 5) == 'HTTP_') {
-                // convert HTTP_CONTENT_TYPE to Content-Type, HTTP_HOST to Host, etc.
-                $name = strtolower(substr($key, 5));
-                if (strpos($name, '_') != -1) {
-                    $name = preg_replace('/ /', '-', ucwords(preg_replace('/_/', ' ', $name)));
-                } else {
-                    $name = ucfirst($name);
+        if (isset($_SERVER)) {
+            foreach ($_SERVER as $key => $val) {
+                if (substr($key, 0, 5) == 'HTTP_') {
+                    // convert HTTP_CONTENT_TYPE to Content-Type, HTTP_HOST to Host, etc.
+                    $name = strtolower(substr($key, 5));
+                    if (strpos($name, '_') != -1) {
+                        $name = preg_replace('/ /', '-', ucwords(preg_replace('/_/', ' ', $name)));
+                    } else {
+                        $name = ucfirst($name);
+                    }
+                    $headers[$name] = $val;
                 }
-                $headers[$name] = $val;
             }
         }
         if (count($headers) > 0) {
@@ -720,6 +760,9 @@ class DataBuilder implements DataBuilderInterface
 
     protected function getUserIp()
     {
+        if (!isset($_SERVER)) {
+            return null;
+        }
         $forwardFor = $this->tryGet($_SERVER, 'HTTP_X_FORWARDED_FOR');
         if ($forwardFor) {
             // return everything until the first comma
@@ -788,7 +831,7 @@ class DataBuilder implements DataBuilderInterface
         foreach ($extras as $key => $val) {
             $server->$key = $val;
         }
-        if (array_key_exists('argv', $_SERVER)) {
+        if (isset($_SERVER) && array_key_exists('argv', $_SERVER)) {
             $server->argv = $_SERVER['argv'];
         }
         return $server;
@@ -993,5 +1036,28 @@ class DataBuilder implements DataBuilderInterface
     public function needsTruncating(array $payload)
     {
         return strlen(json_encode($payload)) > self::MAX_PAYLOAD_SIZE;
+    }
+    
+    /**
+     * Wrap a PHP error in an ErrorWrapper class and add backtrace information
+     *
+     * @param string $errno
+     * @param string $errstr
+     * @param string $errfile
+     * @param string $errline
+     *
+     * @return ErrorWrapper
+     */
+    public function generateErrorWrapper($errno, $errstr, $errfile, $errline)
+    {
+        if ($this->captureErrorStacktraces) {
+            $backTrace = array_slice(
+                debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS),
+                2
+            );
+        } else {
+            $backTrace = array();
+        }
+        return new ErrorWrapper($errno, $errstr, $errfile, $errline, $backTrace);
     }
 }
