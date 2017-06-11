@@ -2,6 +2,8 @@
 
 use Psr\Log\AbstractLogger;
 use Rollbar\Payload\Payload;
+use Rollbar\Payload\Level;
+use Rollbar\Utilities;
 
 class RollbarLogger extends AbstractLogger
 {
@@ -29,9 +31,25 @@ class RollbarLogger extends AbstractLogger
 
     public function log($level, $toLog, array $context = array())
     {
+        if (Level::fromName($level) === null) {
+            throw new \Psr\Log\InvalidArgumentException("Invalid log level '$level'.");
+        }
+        $isUncaught = false;
+        if (array_key_exists(Utilities::IS_UNCAUGHT_KEY, $context) && $context[Utilities::IS_UNCAUGHT_KEY]) {
+            $isUncaught = true;
+            unset($context[Utilities::IS_UNCAUGHT_KEY]);
+        }
         $accessToken = $this->getAccessToken();
         $payload = $this->getPayload($accessToken, $level, $toLog, $context);
-        $response = $this->sendOrIgnore($payload, $accessToken, $toLog);
+        
+        if ($this->config->checkIgnored($payload, $accessToken, $toLog, $isUncaught)) {
+            $response = new Response(0, "Ignored");
+        } else {
+            $toSend = $this->scrub($payload);
+            $toSend = $this->truncate($toSend);
+            $response = $this->config->send($toSend, $accessToken);
+        }
+        
         $this->handleResponse($payload, $response);
         return $response;
     }
@@ -47,24 +65,34 @@ class RollbarLogger extends AbstractLogger
     {
         return $this->config->getAccessToken();
     }
-
-    /**
-     * @param Payload $payload
-     * @param string $accessToken
-     * @param mixed $toLog
-     * @return Response
-     */
-    protected function sendOrIgnore($payload, $accessToken, $toLog)
+    
+    public function getDataBuilder()
     {
-        if ($this->config->checkIgnored($payload, $accessToken, $toLog)) {
-            return new Response(0, "Ignored");
-        }
-
-        return $this->config->send($payload, $accessToken);
+        return $this->config->getDataBuilder();
     }
 
     protected function handleResponse($payload, $response)
     {
         $this->config->handleResponse($payload, $response);
+    }
+    
+    /**
+     * @param Payload $payload
+     * @return array
+     */
+    protected function scrub(Payload $payload)
+    {
+        $serialized = $payload->jsonSerialize();
+        $serialized['data'] = $this->config->getDataBuilder()->scrub($serialized['data']);
+        return $serialized;
+    }
+    
+    /**
+     * @param array $payload
+     * @return array
+     */
+    protected function truncate(array $payload)
+    {
+        return $this->config->getDataBuilder()->truncate($payload);
     }
 }

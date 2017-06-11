@@ -32,19 +32,26 @@
 
   "require": {
     "ext-curl": "*",
-    "psr/log": "dev-master",
-    "packfire/php5.3-compat": "*"
+    "psr/log": "~1.0.2",
+    "fluent/logger": "^1.0"
   },
 
   "require-dev": {
     "phpunit/phpunit": "4.8.*",
     "mockery/mockery": "0.9.*",
-    "squizlabs/php_codesniffer": "2.*"
+    "squizlabs/php_codesniffer": "2.*",
+    "codeclimate/php-test-reporter": "dev-master",
+    "monolog/monolog": "*",
+    "packfire/php5.3-compat": "*"
+  },
+
+  "suggest": {
+    "packfire/php5.3-compat": "for backward compatibility with PHP 5.3"
   },
 
   "scripts": {
     "test": [
-      "phpunit",
+      "phpunit --coverage-clover build/logs/clover.xml",
       "phpcs --standard=PSR1,PSR2 src tests"
     ],
     "fix": "phpcbf --standard=PSR1,PSR2 src tests"

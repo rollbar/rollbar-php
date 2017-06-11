@@ -1,7 +1,7 @@
 <?php namespace Rollbar;
 
-use Rollbar\Payload\Payload;
 use Rollbar\Payload\Level;
+use Rollbar\Payload\Payload;
 
 if (!defined('ROLLBAR_INCLUDED_ERRNO_BITMASK')) {
     define(
@@ -44,6 +44,13 @@ class Config
     private $mt_randmax;
 
     private $included_errno = ROLLBAR_INCLUDED_ERRNO_BITMASK;
+    private $use_error_reporting = false;
+    
+    /**
+     * @var boolean Should debug_backtrace() data be sent with string messages
+     * sent through RollbarLogger::log()
+     */
+    private $sendMessageTrace = false;
 
     public function __construct(array $configArray)
     {
@@ -87,7 +94,7 @@ class Config
     protected function updateConfig($c)
     {
         $this->configArray = $c;
-        
+
         $this->setAccessToken($c);
         $this->setDataBuilder($c);
         $this->setTransformer($c);
@@ -97,9 +104,14 @@ class Config
         $this->setSender($c);
         $this->setResponseHandler($c);
         $this->setCheckIgnoreFunction($c);
+        $this->setSendMessageTrace($c);
 
         if (isset($c['included_errno'])) {
             $this->included_errno = $c['included_errno'];
+        }
+
+        if (isset($c['use_error_reporting'])) {
+            $this->use_error_reporting = $c['use_error_reporting'];
         }
     }
 
@@ -162,7 +174,11 @@ class Config
         $default = "Rollbar\Senders\CurlSender";
 
         if (array_key_exists('base_api_url', $c)) {
-            $c['senderOptions']['endpoint'] = $c['base_api_url'];
+            $c['senderOptions']['endpoint'] = $c['base_api_url'] . 'item/';
+        }
+
+        if (array_key_exists('endpoint', $c)) {
+            $c['senderOptions']['endpoint'] = $c['endpoint'] . 'item/';
         }
 
         if (array_key_exists('timeout', $c)) {
@@ -181,6 +197,24 @@ class Config
                 );
             }
         }
+
+        // set options for fluent sender
+        if (isset($c['handler']) && $c['handler'] == 'fluent') {
+            $default = "Rollbar\Senders\FluentSender";
+
+            if (isset($c['fluent_host'])) {
+                $c['senderOptions']['fluentHost'] = $c['fluent_host'];
+            }
+
+            if (isset($c['fluent_port'])) {
+                $c['senderOptions']['fluentPort'] = $c['fluent_port'];
+            }
+
+            if (isset($c['fluent_tag'])) {
+                $c['senderOptions']['fluentTag'] = $c['fluent_tag'];
+            }
+        }
+
         $this->setupWithOptions($c, "sender", $expected, $default);
     }
 
@@ -196,6 +230,15 @@ class Config
         }
 
         $this->checkIgnore = $c['checkIgnore'];
+    }
+
+    private function setSendMessageTrace($c)
+    {
+        if (!isset($c['send_message_trace'])) {
+            return;
+        }
+
+        $this->sendMessageTrace = $c['send_message_trace'];
     }
 
     /**
@@ -229,6 +272,7 @@ class Config
         $defaultClass = null,
         $passWholeConfig = false
     ) {
+
         $$keyName = isset($c[$keyName]) ? $c[$keyName] : null;
 
         if (is_null($defaultClass) && is_null($$keyName)) {
@@ -259,6 +303,16 @@ class Config
         return $this->dataBuilder->makeData($level, $toLog, $context);
     }
 
+    public function getDataBuilder()
+    {
+        return $this->dataBuilder;
+    }
+    
+    public function getSender()
+    {
+        return $this->sender;
+    }
+
     /**
      * @param Payload $payload
      * @param Level $level
@@ -279,13 +333,25 @@ class Config
         return $this->accessToken;
     }
 
-    public function checkIgnored($payload, $accessToken, $toLog)
+    public function getSendMessageTrace()
+    {
+        return $this->sendMessageTrace;
+    }
+
+    public function checkIgnored($payload, $accessToken, $toLog, $isUncaught)
     {
         if ($this->shouldSuppress()) {
             return true;
         }
-        if (isset($this->checkIgnore) && call_user_func($this->checkIgnore)) {
-            return true;
+        if (isset($this->checkIgnore)) {
+            try {
+                if (call_user_func($this->checkIgnore, $isUncaught, $toLog, $payload)) {
+                    return true;
+                }
+            } catch (Exception $e) {
+                // We should log that we are removing the custom checkIgnore
+                $this->checkIgnore = null;
+            }
         }
         if ($this->levelTooLow($payload)) {
             return true;
@@ -299,6 +365,11 @@ class Config
 
             if ($this->included_errno != -1 && ($errno & $this->included_errno) != $errno) {
                 // ignore
+                return true;
+            }
+
+            if ($this->use_error_reporting && ($errno & error_reporting()) != $errno) {
+                // ignore due to error_reporting level
                 return true;
             }
 
@@ -329,9 +400,9 @@ class Config
         return error_reporting() === 0 && !$this->reportSuppressed;
     }
 
-    public function send($payload, $accessToken)
+    public function send(&$scrubbedPayload, $accessToken)
     {
-        return $this->sender->send($payload, $accessToken);
+        return $this->sender->send($scrubbedPayload, $accessToken);
     }
 
     public function handleResponse($payload, $response)

@@ -12,9 +12,20 @@ use Rollbar\Payload\Trace;
 use Rollbar\Payload\Frame;
 use Rollbar\Payload\TraceChain;
 use Rollbar\Payload\ExceptionInfo;
+use Rollbar\Rollbar;
+use Rollbar\Exceptions\PersonFuncException;
 
 class DataBuilder implements DataBuilderInterface
 {
+    const MAX_PAYLOAD_SIZE = 524288; // 512 * 1024
+    
+    protected static $truncationStrategies = array(
+        "Rollbar\Truncation\RawStrategy",
+        "Rollbar\Truncation\FramesStrategy",
+        "Rollbar\Truncation\StringsStrategy",
+        "Rollbar\Truncation\MinBodyStrategy"
+    );
+    
     protected static $defaults;
 
     protected $environment;
@@ -43,7 +54,11 @@ class DataBuilder implements DataBuilderInterface
     protected $notifier;
     protected $baseException;
     protected $includeCodeContext;
+    protected $includeExcCodeContext;
     protected $shiftFunction;
+    protected $sendMessageTrace;
+    protected $localVarsDump;
+    protected $captureErrorStacktraces;
 
     public function __construct($config)
     {
@@ -75,6 +90,10 @@ class DataBuilder implements DataBuilderInterface
         $this->setNotifier($config);
         $this->setBaseException($config);
         $this->setIncludeCodeContext($config);
+        $this->setIncludeExcCodeContext($config);
+        $this->setSendMessageTrace($config);
+        $this->setLocalVarsDump($config);
+        $this->setCaptureErrorStacktraces($config);
 
         $this->shiftFunction = $this->tryGet($config, 'shift_function');
         if (!isset($this->shiftFunction)) {
@@ -140,39 +159,61 @@ class DataBuilder implements DataBuilderInterface
         $this->errorLevels = self::$defaults->errorLevels($fromConfig);
     }
 
-    protected function setCodeVersion($c)
+    protected function setSendMessageTrace($config)
     {
-        $fromConfig = $this->tryGet($c, 'codeVersion');
+        $fromConfig = $this->tryGet($config, 'send_message_trace');
+        $this->sendMessageTrace = self::$defaults->sendMessageTrace($fromConfig);
+    }
+
+    protected function setLocalVarsDump($config)
+    {
+        $fromConfig = $this->tryGet($config, 'local_vars_dump');
+        $this->localVarsDump = self::$defaults->localVarsDump($fromConfig);
+    }
+    
+    protected function setCaptureErrorStacktraces($config)
+    {
+        $fromConfig = $this->tryGet($config, 'capture_error_stacktraces');
+        $this->captureErrorStacktraces = self::$defaults->captureErrorStacktraces($fromConfig);
+    }
+
+    protected function setCodeVersion($config)
+    {
+        $fromConfig = $this->tryGet($config, 'codeVersion');
         if (!isset($fromConfig)) {
-            $fromConfig = $this->tryGet($c, 'code_version');
+            $fromConfig = $this->tryGet($config, 'code_version');
         }
         $this->codeVersion = self::$defaults->codeVersion($fromConfig);
     }
 
-    protected function setPlatform($c)
+    protected function setPlatform($config)
     {
-        $fromConfig = $this->tryGet($c, 'platform');
+        $fromConfig = $this->tryGet($config, 'platform');
         $this->platform = self::$defaults->platform($fromConfig);
     }
 
-    protected function setFramework($c)
+    protected function setFramework($config)
     {
-        $this->framework = $this->tryGet($c, 'framework');
+        $this->framework = $this->tryGet($config, 'framework');
     }
 
-    protected function setContext($c)
+    protected function setContext($config)
     {
-        $this->context = $this->tryGet($c, 'context');
+        $this->context = $this->tryGet($config, 'context');
     }
 
-    protected function setRequestParams($c)
+    protected function setRequestParams($config)
     {
-        $this->requestParams = $this->tryGet($c, 'requestParams');
+        $this->requestParams = $this->tryGet($config, 'requestParams');
     }
 
-    protected function setRequestBody($c)
+    protected function setRequestBody($config)
     {
-        $this->requestBody = $this->tryGet($c, 'requestBody');
+        $this->requestBody = $this->tryGet($config, 'requestBody');
+        
+        if (!$this->requestBody) {
+            $this->requestBody = file_get_contents("php://input");
+        }
     }
 
     protected function setRequestExtras($c)
@@ -180,91 +221,94 @@ class DataBuilder implements DataBuilderInterface
         $this->requestExtras = $this->tryGet($c, "requestExtras");
     }
 
-    protected function setPerson($c)
+    protected function setPerson($config)
     {
-        $this->person = $this->tryGet($c, 'person');
+        $this->person = $this->tryGet($config, 'person');
     }
 
-    protected function setPersonFunc($c)
+    protected function setPersonFunc($config)
     {
-        $this->personFunc = $this->tryGet($c, 'person_fn');
+        $this->personFunc = $this->tryGet($config, 'person_fn');
     }
 
-    protected function setServerRoot($c)
+    protected function setServerRoot($config)
     {
-        $fromConfig = $this->tryGet($c, 'serverRoot');
+        $fromConfig = $this->tryGet($config, 'serverRoot');
         if (!isset($fromConfig)) {
-            $fromConfig = $this->tryGet($c, 'root');
+            $fromConfig = $this->tryGet($config, 'root');
         }
         $this->serverRoot = self::$defaults->serverRoot($fromConfig);
     }
 
-    protected function setServerBranch($c)
+    protected function setServerBranch($config)
     {
-        $fromConfig = $this->tryGet($c, 'serverBranch');
+        $fromConfig = $this->tryGet($config, 'serverBranch');
         if (!isset($fromConfig)) {
-            $fromConfig = $this->tryGet($c, 'branch');
+            $fromConfig = $this->tryGet($config, 'branch');
         }
         $this->serverBranch = self::$defaults->gitBranch($fromConfig);
     }
 
-    protected function setServerCodeVersion($c)
+    protected function setServerCodeVersion($config)
     {
-        $this->serverCodeVersion = $this->tryGet($c, 'serverCodeVersion');
+        $this->serverCodeVersion = $this->tryGet($config, 'serverCodeVersion');
     }
 
-    protected function setServerExtras($c)
+    protected function setServerExtras($config)
     {
-        $this->serverExtras = $this->tryGet($c, 'serverExtras');
+        $this->serverExtras = $this->tryGet($config, 'serverExtras');
     }
 
-    protected function setCustom($c)
+    protected function setCustom($config)
     {
-        $this->custom = $this->tryGet($c, 'custom');
+        $this->custom = $this->tryGet($config, 'custom');
     }
 
-    protected function setFingerprint($c)
+    protected function setFingerprint($config)
     {
-        $this->fingerprint = $this->tryGet($c, 'fingerprint');
+        $this->fingerprint = $this->tryGet($config, 'fingerprint');
         if (!is_null($this->fingerprint) && !is_callable($this->fingerprint)) {
             $msg = "If set, config['fingerprint'] must be a callable that returns a uuid string";
             throw new \InvalidArgumentException($msg);
         }
     }
 
-    protected function setTitle($c)
+    protected function setTitle($config)
     {
-        $this->title = $this->tryGet($c, 'title');
+        $this->title = $this->tryGet($config, 'title');
         if (!is_null($this->title) && !is_callable($this->title)) {
             $msg = "If set, config['title'] must be a callable that returns a string";
             throw new \InvalidArgumentException($msg);
         }
     }
 
-    protected function setNotifier($c)
+    protected function setNotifier($config)
     {
-        $fromConfig = $this->tryGet($c, 'notifier');
+        $fromConfig = $this->tryGet($config, 'notifier');
         $this->notifier = self::$defaults->notifier($fromConfig);
     }
 
-    protected function setBaseException($c)
+    protected function setBaseException($config)
     {
-        $fromConfig = $this->tryGet($c, 'baseException');
+        $fromConfig = $this->tryGet($config, 'baseException');
         $this->baseException = self::$defaults->baseException($fromConfig);
     }
 
-    protected function setIncludeCodeContext($c)
+    protected function setIncludeCodeContext($config)
     {
-        $fromConfig = $this->tryGet($c, 'include_error_code_context');
-        $this->includeCodeContext = true;
-        if ($fromConfig != null) {
-            $this->includeCodeContext = $fromConfig;
-        }
+        $fromConfig = $this->tryGet($config, 'include_error_code_context');
+        $this->includeCodeContext = self::$defaults->includeCodeContext($fromConfig);
     }
 
-    protected function setHost($c)
+    protected function setIncludeExcCodeContext($config)
     {
-        $this->host = $this->tryGet($c, 'host');
+        $fromConfig = $this->tryGet($config, 'include_exception_code_context');
+        $this->includeExcCodeContext = self::$defaults->includeExcCodeContext($fromConfig);
+    }
+
+    protected function setHost($config)
+    {
+        $this->host = $this->tryGet($config, 'host');
     }
 
     /**
@@ -307,50 +351,59 @@ class DataBuilder implements DataBuilderInterface
         if ($toLog instanceof ErrorWrapper) {
             $content = $this->getErrorTrace($toLog);
         } elseif ($toLog instanceof $baseException) {
-            $content = $this->getExceptionTrace($baseException);
+            $content = $this->getExceptionTrace($toLog);
         } else {
-            $scrubFields = $this->getScrubFields();
-            $content = $this->getMessage($toLog, self::scrub($context, $scrubFields));
+            $content = $this->getMessage($toLog, $context);
         }
         return new Body($content);
     }
 
-    protected function getErrorTrace(ErrorWrapper $error)
+    public function getErrorTrace(ErrorWrapper $error)
     {
-        return $this->makeTrace($error, $error->getClassName());
+        return $this->makeTrace($error, $this->includeCodeContext, $error->getClassName());
     }
 
     /**
      * @param \Throwable|\Exception $exc
      * @return Trace|TraceChain
      */
-    protected function getExceptionTrace($exc)
+    public function getExceptionTrace($exc)
     {
         $chain = array();
-        $chain[] = $this->makeTrace($exc);
+        $chain[] = $this->makeTrace($exc, $this->includeExcCodeContext);
 
         $previous = $exc->getPrevious();
 
         $baseException = $this->getBaseException();
         while ($previous instanceof $baseException) {
-            $chain[] = $this->makeTrace($previous);
-            $previous = $exc->getPrevious();
+            $chain[] = $this->makeTrace($previous, $this->includeExcCodeContext);
+            if ($previous->getPrevious() === $previous) {
+                break;
+            }
+            $previous = $previous->getPrevious();
         }
 
         if (count($chain) > 1) {
             return new TraceChain($chain);
         }
-        return new Trace($chain[0], $chain[0]->getException());
+
+        return $chain[0];
     }
 
     /**
      * @param \Throwable|\Exception $exception
+     * @param Boolean $includeContext whether or not to include context
      * @param string $classOverride
      * @return Trace
      */
-    public function makeTrace($exception, $classOverride = null)
+    public function makeTrace($exception, $includeContext, $classOverride = null)
     {
-        $frames = $this->makeFrames($exception);
+        if ($this->captureErrorStacktraces) {
+            $frames = $this->makeFrames($exception, $includeContext);
+        } else {
+            $frames = array();
+        }
+        
         $excInfo = new ExceptionInfo(
             Utilities::coalesce($classOverride, get_class($exception)),
             $exception->getMessage()
@@ -358,20 +411,24 @@ class DataBuilder implements DataBuilderInterface
         return new Trace($frames, $excInfo);
     }
 
-    public function makeFrames($exception)
+    public function makeFrames($exception, $includeContext)
     {
         $frames = array();
         foreach ($this->getTrace($exception) as $frameInfo) {
             $filename = Utilities::coalesce($this->tryGet($frameInfo, 'file'), '<internal>');
             $lineno = Utilities::coalesce($this->tryGet($frameInfo, 'line'), 0);
             $method = $frameInfo['function'];
-            // TODO 4 (arguments are in $frame)
+            $args = Utilities::coalesce($this->tryGet($frameInfo, 'args'), null);
 
             $frame = new Frame($filename);
             $frame->setLineno($lineno)
                 ->setMethod($method);
+                
+            if ($this->localVarsDump && $args !== null) {
+                $frame->setArgs($args);
+            }
 
-            if ($this->includeCodeContext) {
+            if ($includeContext) {
                 $this->addCodeContextToFrame($frame, $filename, $lineno);
             }
 
@@ -429,7 +486,13 @@ class DataBuilder implements DataBuilderInterface
 
     protected function getMessage($toLog, $context)
     {
-        return new Message((string)$toLog, $context);
+        return new Message(
+            (string)$toLog,
+            $context,
+            $this->sendMessageTrace ?
+                debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS) :
+                null
+        );
     }
 
     protected function getLevel($level, $toLog)
@@ -464,7 +527,9 @@ class DataBuilder implements DataBuilderInterface
 
     protected function getLanguage()
     {
-        return "PHP " . phpversion();
+        return "php";
+        // TODO: once the backend understands a more informative language value
+        // return "PHP " . phpversion();
     }
 
     protected function getFramework()
@@ -479,17 +544,19 @@ class DataBuilder implements DataBuilderInterface
 
     protected function getRequest()
     {
-        $scrubFields = $this->getScrubFields();
         $request = new Request();
-        $request->setUrl($this->getUrl($scrubFields))
-            ->setHeaders($this->getScrubbedHeaders($scrubFields))
+
+        $request->setUrl($this->getUrl())
+            ->setHeaders($this->getHeaders())
             ->setParams($this->getRequestParams())
             ->setBody($this->getRequestBody())
             ->setUserIp($this->getUserIp());
+      
         if (isset($_SERVER)) {
             $request->setMethod($this->tryGet($_SERVER, 'REQUEST_METHOD'))
                 ->setQueryString(self::scrubUrl($this->tryGet($_SERVER, "QUERY_STRING"), $scrubFields));
         }
+      
         if (isset($_GET)) {
             $request->setGet(self::scrub($_GET, $scrubFields));
         }
@@ -500,40 +567,115 @@ class DataBuilder implements DataBuilderInterface
         if (!$extras) {
             $extras = array();
         }
+
         foreach ($extras as $key => $val) {
-            if (in_array($scrubFields, $key)) {
-                $request->$key = str_repeat("*", 8);
-            } else {
-                $request->$key = $val;
-            }
+            $request->$key = $val;
         }
+        
         if (isset($_SESSION) && is_array($_SESSION) && count($_SESSION) > 0) {
-            $request->session = self::scrub($_SESSION, $scrubFields);
+            $request->session = $_SESSION;
         }
         return $request;
     }
-
-    protected function getUrl($scrubFields)
+    
+    public function parseForwardedString($forwarded)
     {
-        if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
-            $proto = strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']);
-        } elseif (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
-            $proto = 'https';
-        } else {
-            $proto = 'http';
+        $result = array();
+        
+        // Remove Forwarded   = 1#forwarded-element header prefix
+        $parts = trim(str_replace('Forwarded:', '', $forwarded));
+        
+        /**
+         * Break up the forwarded-element =
+         *  [ forwarded-pair ] *( ";" [ forwarded-pair ] )
+         */
+        $parts = explode(';', $parts);
+        
+        /**
+         * Parse forwarded pairs
+         */
+        foreach ($parts as $forwardedPair) {
+            $forwardedPair = trim($forwardedPair);
+            
+            
+            if (stripos($forwardedPair, 'host=') !== false) {
+                // Parse 'host' forwarded pair
+                $result['host'] = substr($forwardedPair, strlen('host='));
+            } elseif (stripos($forwardedPair, 'proto=') !== false) {
+                // Parse 'proto' forwarded pair
+                $result['proto'] = substr($forwardedPair, strlen('proto='));
+            } else {
+                // Parse 'for' and 'by' forwarded pairs which are comma separated
+                $fpParts = explode(',', $forwardedPair);
+                foreach ($fpParts as $fpPart) {
+                    $fpPart = trim($fpPart);
+                    
+                    if (stripos($fpPart, 'for=') !== false) {
+                        // Parse 'for' forwarded pair
+                        $result['for'] = isset($result['for']) ? $result['for'] : array();
+                        $result['for'][] = substr($fpPart, strlen('for='));
+                    } elseif (stripos($fpPart, 'by=') !== false) {
+                        // Parse 'by' forwarded pair
+                        $result['by'] = isset($result['by']) ? $result['by'] : array();
+                        $result['by'][] = substr($fpPart, strlen('by='));
+                    }
+                }
+            }
         }
-
-        if (!empty($_SERVER['HTTP_X_FORWARDED_HOST'])) {
-            $host = $_SERVER['HTTP_X_FORWARDED_HOST'];
-        } elseif (!empty($_SERVER['HTTP_HOST'])) {
-            $parts = explode(':', $_SERVER['HTTP_HOST']);
-            $host = $parts[0];
-        } elseif (!empty($_SERVER['SERVER_NAME'])) {
-            $host = $_SERVER['SERVER_NAME'];
-        } else {
-            $host = 'unknown';
+        
+        return $result;
+    }
+    
+    public function getUrlProto()
+    {
+        $proto = '';
+        
+        if (!empty($_SERVER['HTTP_FORWARDED'])) {
+            extract($this->parseForwardedString($_SERVER['HTTP_FORWARDED']));
         }
-
+        
+        if (empty($proto)) {
+            if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+                $proto = explode(',', strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']));
+                $proto = $proto[0];
+            } elseif (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
+                $proto = 'https';
+            } else {
+                $proto = 'http';
+            }
+        }
+        
+        return $proto;
+    }
+    
+    public function getUrlHost()
+    {
+        $host = '';
+        
+        if (!empty($_SERVER['HTTP_FORWARDED'])) {
+            extract($this->parseForwardedString($_SERVER['HTTP_FORWARDED']));
+        }
+        
+        if (empty($host)) {
+            if (!empty($_SERVER['HTTP_X_FORWARDED_HOST'])) {
+                $host = $_SERVER['HTTP_X_FORWARDED_HOST'];
+            } elseif (!empty($_SERVER['HTTP_HOST'])) {
+                $parts = explode(':', $_SERVER['HTTP_HOST']);
+                $host = $parts[0];
+            } elseif (!empty($_SERVER['SERVER_NAME'])) {
+                $host = $_SERVER['SERVER_NAME'];
+            } else {
+                $host = 'unknown';
+            }
+        }
+        
+        return $host;
+    }
+    
+    public function getUrlPort($proto)
+    {
+        $port = '';
+        
         if (!empty($_SERVER['HTTP_X_FORWARDED_PORT'])) {
             $port = $_SERVER['HTTP_X_FORWARDED_PORT'];
         } elseif (!empty($_SERVER['SERVER_PORT'])) {
@@ -543,6 +685,16 @@ class DataBuilder implements DataBuilderInterface
         } else {
             $port = 80;
         }
+        
+        return $port;
+    }
+
+    public function getUrl()
+    {
+        $proto = $this->getUrlProto();
+        $host = $this->getUrlHost();
+        $port = $this->getUrlPort($proto);
+        
 
         $url = $proto . '://' . $host;
         if (($proto == 'https' && $port != 443) || ($proto == 'http' && $port != 80)) {
@@ -558,13 +710,7 @@ class DataBuilder implements DataBuilderInterface
             $url = null;
         }
 
-        return self::scrubUrl($url, $scrubFields);
-    }
-
-    protected function getScrubbedHeaders($scrubFields)
-    {
-        $headers = $this->getHeaders();
-        return self::scrub($headers, $scrubFields);
+        return $url;
     }
 
     protected function getHeaders()
@@ -591,6 +737,7 @@ class DataBuilder implements DataBuilderInterface
         }
     }
 
+    
     protected function getRequestParams()
     {
         return $this->requestParams;
@@ -631,7 +778,12 @@ class DataBuilder implements DataBuilderInterface
     {
         $personData = $this->person;
         if (!isset($personData) && is_callable($this->personFunc)) {
-            $personData = call_user_func($this->personFunc);
+            try {
+                $personData = call_user_func($this->personFunc);
+            } catch (\Exception $exception) {
+                Rollbar::scope(array('person_fn' => null))->
+                    log(Level::fromName("error"), $exception);
+            }
         }
 
         if (!isset($personData['id'])) {
@@ -661,17 +813,13 @@ class DataBuilder implements DataBuilderInterface
             ->setRoot($this->getServerRoot())
             ->setBranch($this->getServerBranch())
             ->setCodeVersion($this->getServerCodeVersion());
-        $scrubFields = $this->getScrubFields();
         $extras = $this->getServerExtras();
         if (!$extras) {
             $extras = array();
         }
+
         foreach ($extras as $key => $val) {
-            if (in_array($scrubFields, $key)) {
-                $server->$key = str_repeat("*", 8);
-            } {
-                $server->$key = $val;
-            }
+            $server->$key = $val;
         }
         if (isset($_SERVER) && array_key_exists('argv', $_SERVER)) {
             $server->argv = $_SERVER['argv'];
@@ -725,8 +873,6 @@ class DataBuilder implements DataBuilderInterface
             return array_replace_recursive(array(), $custom);
         }
 
-        $scrubFields = $this->getScrubFields();
-        $custom = self::scrub($custom, $scrubFields);
         return array_replace_recursive(array(), $context, $custom);
     }
 
@@ -755,38 +901,69 @@ class DataBuilder implements DataBuilderInterface
         return $this->baseException;
     }
 
-    protected function getScrubFields()
+    public function getScrubFields()
     {
         return $this->scrubFields;
     }
-
-    protected function scrub($arr, $fields, $replacement = '*')
+    
+    /**
+     * Scrub a data structure including arrays and query strings.
+     *
+     * @param mixed $data Data to be scrubbed.
+     * @param array $fields Sequence of field names to scrub.
+     * @param string $replacement Character used for scrubbing.
+     */
+    public function scrub(&$data, $replacement = '*')
     {
-        if (!$fields || !$arr) {
-            return null;
+        $fields = $this->getScrubFields();
+        
+        if (!$fields || !$data) {
+            return $data;
         }
+        
+        if (is_array($data)) { // scrub arrays
+            $data = $this->scrubArray($data, $replacement);
+        } elseif (is_string($data)) { // scrub URLs and query strings
+            $query = parse_url($data, PHP_URL_QUERY);
+            if ($query) {
+                $data = str_replace(
+                    $query,
+                    $this->scrubQueryString($query),
+                    $data
+                );
+            }
+        }
+        return $data;
+    }
 
-        $scrubber = function (&$val, $key) use ($fields, $replacement, $arr) {
+    protected function scrubArray(&$arr, $replacement = '*')
+    {
+        $fields = $this->getScrubFields();
+        
+        if (!$fields || !$arr) {
+            return $arr;
+        }
+        
+        $dataBuilder = $this;
 
-            if (key_exists($key, $arr)) {
+        $scrubber = function (&$val, $key) use ($fields, $replacement, &$scrubber, $dataBuilder) {
+            if (in_array($key, $fields, true)) {
                 $val = str_repeat($replacement, 8);
+            } else {
+                $val = $dataBuilder->scrub($val, $replacement);
             }
         };
-        array_walk_recursive($arr, $scrubber);
+
+        array_walk($arr, $scrubber);
+
         return $arr;
     }
 
-    protected function scrubUrl($url, $fields)
+    protected function scrubQueryString($query, $replacement = 'x')
     {
-        $urlQuery = parse_url($url, PHP_URL_QUERY);
-        if (!$urlQuery) {
-            return $url;
-        }
-
-        parse_str($urlQuery, $parsedOutput);
-        $scrubbedOutput = $this->scrub($parsedOutput, $fields, 'x');
-
-        return str_replace($urlQuery, http_build_query($scrubbedOutput), $url);
+        parse_str($query, $parsed);
+        $scrubbed = $this->scrub($parsed, $replacement);
+        return http_build_query($scrubbed);
     }
 
     // from http://www.php.net/manual/en/function.uniqid.php#94959
@@ -812,5 +989,65 @@ class DataBuilder implements DataBuilderInterface
             mt_rand(0, 0xffff),
             mt_rand(0, 0xffff)
         );
+    }
+    
+    /**
+     * Applies truncation strategies in order to keep the payload size under
+     * configured limit.
+     *
+     * @param array $payload
+     * @param string $strategy
+     *
+     * @return array
+     */
+    public function truncate(array $payload)
+    {
+        
+        foreach (static::$truncationStrategies as $strategy) {
+            if (!$this->needsTruncating($payload)) {
+                break;
+            }
+            
+            $strategy = new $strategy($this);
+            
+            $payload = $strategy->execute($payload);
+        }
+        
+        return $payload;
+    }
+    
+    /**
+     * Check if the payload is too big to be sent
+     *
+     * @param array $payload
+     *
+     * @return boolean
+     */
+    public function needsTruncating(array $payload)
+    {
+        return strlen(json_encode($payload)) > self::MAX_PAYLOAD_SIZE;
+    }
+    
+    /**
+     * Wrap a PHP error in an ErrorWrapper class and add backtrace information
+     *
+     * @param string $errno
+     * @param string $errstr
+     * @param string $errfile
+     * @param string $errline
+     *
+     * @return ErrorWrapper
+     */
+    public function generateErrorWrapper($errno, $errstr, $errfile, $errline)
+    {
+        if ($this->captureErrorStacktraces) {
+            $backTrace = array_slice(
+                debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS),
+                2
+            );
+        } else {
+            $backTrace = array();
+        }
+        return new ErrorWrapper($errno, $errstr, $errfile, $errline, $backTrace);
     }
 }

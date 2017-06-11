@@ -19,8 +19,13 @@ class Defaults
     private static function getGitHash()
     {
         try {
-            @exec('git rev-parse --verify HEAD 2> /dev/null', $output);
-            return @$output[0];
+            if (function_exists('exec')) {
+                exec('git rev-parse --verify HEAD 2> /dev/null', $output);
+                if ($output) {
+                    return $output[0];
+                }
+            }
+            return null;
         } catch (\Exception $e) {
             return null;
         }
@@ -29,8 +34,13 @@ class Defaults
     private static function getGitBranch()
     {
         try {
-            @exec('git rev-parse --abbrev-ref HEAD 2> /dev/null', $output);
-            return @$output[0];
+            if (function_exists('exec')) {
+                exec('git rev-parse --abbrev-ref HEAD 2> /dev/null', $output);
+                if ($output) {
+                    return $output[0];
+                }
+            }
+            return null;
         } catch (\Exception $e) {
             return null;
         }
@@ -71,6 +81,23 @@ class Defaults
             'access_token'
         );
     }
+    
+    public function sendMessageTrace($sendMessageTrace = null)
+    {
+        return $sendMessageTrace !== null ? $sendMessageTrace : $this->defaultSendMessageTrace;
+    }
+    
+    public function captureErrorStacktraces($captureErrorStracktraces = null)
+    {
+        return $captureErrorStracktraces !== null ?
+            $captureErrorStracktraces :
+            $this->defaultCaptureErrorStacktraces;
+    }
+    
+    public function localVarsDump($localVarsDump = null)
+    {
+        return $localVarsDump !== null ? $localVarsDump : $this->defaultLocalVarsDump;
+    }
 
     private $defaultMessageLevel = "warning";
     private $defaultExceptionLevel = "error";
@@ -84,6 +111,11 @@ class Defaults
     private $defaultNotifier;
     private $defaultBaseException;
     private $defaultScrubFields;
+    private $defaultSendMessageTrace;
+    private $defaultIncludeCodeContext;
+    private $defaultIncludeExcCodeContext;
+    private $defaultLocalVarsDump;
+    private $defaultCaptureErrorStacktraces;
 
     public function __construct()
     {
@@ -130,6 +162,11 @@ class Defaults
         $this->defaultBaseException = self::getBaseException();
         $this->defaultScrubFields = self::getScrubFields();
         $this->defaultCodeVersion = "";
+        $this->defaultSendMessageTrace = false;
+        $this->defaultIncludeCodeContext = false;
+        $this->defaultIncludeExcCodeContext = false;
+        $this->defaultLocalVarsDump = false;
+        $this->defaultCaptureErrorStacktraces = true;
     }
 
     public function messageLevel($level = null)
@@ -190,5 +227,15 @@ class Defaults
     public function scrubFields($scrubFields = null)
     {
         return Utilities::coalesce($scrubFields, $this->defaultScrubFields);
+    }
+
+    public function includeCodeContext($includeCodeContext = null)
+    {
+        return Utilities::coalesce($includeCodeContext, $this->defaultIncludeCodeContext);
+    }
+
+    public function includeExcCodeContext($includeExcCodeContext = null)
+    {
+        return Utilities::coalesce($includeExcCodeContext, $this->defaultIncludeExcCodeContext);
     }
 }

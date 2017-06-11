@@ -1,93 +1,80 @@
-# Rollbar notifier for PHP [![Build Status](https://travis-ci.org/rollbar/rollbar-php.png?branch=v0.15.0)](https://travis-ci.org/rollbar/rollbar-php)
+# Rollbar notifier for PHP [![Build Status](https://api.travis-ci.org/rollbar/rollbar-php.png)](https://travis-ci.org/rollbar/rollbar-php)
 
 <!-- RemoveNext -->
 
 This library detects errors and exceptions in your application and reports them to [Rollbar](https://rollbar.com) for alerts, reporting, and analysis.
 
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-##Table of Contents
+Supported PHP versions: 5.3, 5.4, 5.5, 5.6, 7, and HHVM (currently tested on 3.6.6).
 
-- [Quick start](#quick-start)
-- [Installation](#installation)
-  - [General](#general)
-  - [If Using Composer](#if-using-composer)
-- [Setup](#setup)
-  - [For Heroku Users](#for-heroku-users)
-- [Basic Usage](#basic-usage)
-- [Batching](#batching)
-- [Using Monolog](#using-monolog)
-- [Configuration](#configuration)
-  - [Asynchronous Reporting](#asynchronous-reporting)
-  - [Configuration reference](#configuration-reference)
-- [Related projects](#related-projects)
-- [Help / Support](#help--support)
-- [Contributing](#contributing)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+<!-- Sub:[TOC] -->
 
 ## Quick start
 
 ```php
 <?php
+use \Rollbar\Rollbar;
+use \Rollbar\Payload\Level;
+
 // installs global error and exception handlers
-Rollbar::init(array('access_token' => 'POST_SERVER_ITEM_ACCESS_TOKEN'));
+Rollbar::init(
+    array(
+        'access_token' => ROLLBAR_TEST_TOKEN,
+        'environment' => 'production'
+    )
+);
 
 try {
-    throw new Exception('test exception');
-} catch (Exception $e) {
-    Rollbar::report_exception($e);
+    throw new \Exception('test exception');
+} catch (\Exception $e) {
+    Rollbar::log(Level::error(), $e);
 }
 
 // Message at level 'info'
-Rollbar::report_message('testing 123', Level::INFO);
+Rollbar::log(Level::info(), 'testing info level');
 
 // With extra data (3rd arg) and custom payload options (4th arg)
-Rollbar::report_message('testing 123', Level::INFO,
-                        // key-value additional data
-                        array("some_key" => "some value"),  
-                        // payload options (overrides defaults) - see api docs
-                        array("fingerprint" => "custom-fingerprint-here"));
+Rollbar::log(
+    Level::info(),
+    'testing extra data',
+    array("some_key" => "some value") // key-value additional data
+);
+        
+// If you want to check if logging with Rollbar was successful
+$response = Rollbar::log(Level::info(), 'testing wasSuccessful()');
+if (!$response->wasSuccessful()) {
+    throw new \Exception('logging with Rollbar failed');
+}
 
 // raises an E_NOTICE which will *not* be reported by the error handler
 $foo = $bar;
 
 // will be reported by the exception handler
-throw new Exception('test 2');
+throw new \Exception('testing exception handler');
 ?>
 ```
 
 ## Installation
 
-### General
-
-Download [rollbar.php](https://raw.githubusercontent.com/rollbar/rollbar-php/v0.18.2/src/rollbar.php) and [Level.php](https://raw.githubusercontent.com/rollbar/rollbar-php/v0.18.2/src/Level.php)
-and put them together somewhere you can access.
-
-### If Using Composer
+### Using Composer (recommended)
 
 Add `rollbar/rollbar` to your `composer.json`:
 
 ```json
 {
     "require": {
-        "rollbar/rollbar": "~0.18.2"
+        "rollbar/rollbar": "~1.1"
     }
 }
 ```
 
-### Upcoming Release
+### Manual installation if you are not using composer.json for your project
 
-If you'd like to run the next release of rollbar-php, you can use it via composer by adding the following to
-your `composer.json`
+Keep in mind, that even if you're not using composer for your project (using composer.json), you will still need composer package to install rollbar-php dependencies.
 
-```json
-{
-    "require": {
-        "rollbar/rollbar": "~1.0.0-beta"
-    }
-}
-```
+1. If you don't have composer yet, follow these instructions to get the package: [install composer](https://getcomposer.org/doc/00-intro.md). It will be needed to install dependencies.
+2. Clone git repository [rollbar/rollbar-php](https://github.com/rollbar/rollbar-php) into a your external libraries path: `git clone https://github.com/rollbar/rollbar-php`
+2. Install rollbar-php dependencies: `cd rollbar-php && composer install && cd ..`
+3. Require rollbar-php in your PHP scripts: `require_once YOUR_LIBS_PATH . '/rollbar-php/vendor/autoload.php';`
 
 ## Setup
 
@@ -95,7 +82,7 @@ Add the following code at your application's entry point:
 
 ```php
 <?php
-require_once 'rollbar.php';
+use \Rollbar\Rollbar;
 
 $config = array(
     // required
@@ -133,10 +120,45 @@ The `access_token` and `root` config variables will be automatically detected, s
 
 ```php
 <?php
+use Rollbar\Rollbar;
+
 Rollbar::init(array(
     'environment' => 'production'
 ));
 ?>
+```
+
+## Integration with Rollbar.js
+
+In case you want to report your JavaScript errors using [Rollbar.js](https://github.com/rollbar/rollbar.js), you can configure the SDK to enable Rollbar.js on your site. Example:
+
+```php
+$rollbarJs = Rollbar\RollbarJsHelper::buildJs(
+    array(
+        "accessToken" => "POST_CLIENT_ITEM_ACCESS_TOKEN",
+        "captureUncaught" => true,
+        "payload" => array(
+            "environment" => "production"
+        ),
+        /* other configuration you want to pass to RollbarJS */
+    )
+);
+```
+
+Or if you are using Content-Security-Policy: script-src 'unsafe-inline'
+```php
+$rollbarJs = Rollbar\RollbarJsHelper::buildJs(
+    array(
+        "accessToken" => "POST_CLIENT_ITEM_ACCESS_TOKEN",
+        "captureUncaught" => true,
+        "payload" => array(
+            "environment" => "production"
+        ),
+        /* other configuration you want to pass to RollbarJS */
+    ),
+    headers_list(),
+    $yourNonceString
+);
 ```
 
 ## Basic Usage
@@ -147,12 +169,15 @@ If you'd like to report exceptions that you catch yourself:
 
 ```php
 <?php
+use Rollbar\Rollbar;
+use Rollbar\Payload\Level;
+
 try {
     do_something();
-} catch (Exception $e) {
-    Rollbar::report_exception($e);
+} catch (\Exception $e) {
+    Rollbar::log(Level::error(), $e);
     // or
-    Rollbar::report_exception($e, array("my" => "extra", "data" => 42));
+    Rollbar::log(Level::error(), $e, array("my" => "extra", "data" => 42));
 }
 ?>
 ```
@@ -161,33 +186,26 @@ You can also send Rollbar log-like messages:
 
 ```php
 <?php
-Rollbar::report_message('could not connect to mysql server', Level::WARNING);
-Rollbar::report_message('Here is a message with some additional data',
-    Level::INFO, array('x' => 10, 'code' => 'blue'));
+use Rollbar\Rollbar;
+use Rollbar\Payload\Level;
+
+Rollbar::log(Level::warning(), 'could not connect to mysql server');
+Rollbar::log(
+    Level::info(), 
+    'Here is a message with some additional data',
+    array('x' => 10, 'code' => 'blue')
+);
 ?>
 ```
-
-## Batching
-
-By default, payloads are batched and sent to the Rollbar servers at the end of every script execution via a shutdown handler, or when the batch size reaches 50, whichever comes first. This works well in standard short-lived scripts, like serving web requests.
-
-If you're using Rollbar in a long-running script, such as a Laravel project or a background worker, you may want to manually flush the batch. To flush, simply call:
-
-```php
-Rollbar::flush();
-```
-
-For example, if using Laravel, add the above line to your `App::after()` event handler. Or in a looping background worker, call it at the end of each loop.
-
-You can also tune the max batch size or disable batching altogether. See the `batch_size` and `batched` config variables, documented below.
 
 ## Using Monolog
 
 Here is an example of how to use Rollbar as a handler for Monolog:
 
-```
+```php
 use Monolog\Logger;
-use Monolog\Handler\RollbarHandler;
+use Rollbar\Rollbar;
+use Rollbar\Payload\Level;
 
 $config = array('access_token' => 'POST_SERVER_ITEM_ACCESS_TOKEN');
 
@@ -195,11 +213,11 @@ $config = array('access_token' => 'POST_SERVER_ITEM_ACCESS_TOKEN');
 Rollbar::init($config);
 
 $log = new Logger('test');
-$log->pushHandler(new RollbarHandler(Rollbar::$instance));
+$log->pushHandler(new \Monolog\Handler\PsrHandler(Rollbar::logger()));
 
 try {
-    throw new Exception('exception for monolog');
-} catch (Exception $e) {
+    throw new \Exception('exception for monolog');
+} catch (\Exception $e) {
     $log->error($e);
 }
 ```
@@ -222,6 +240,24 @@ $config = array(
 
 You'll also need to run the agent. See the [rollbar-agent docs](https://github.com/rollbar/rollbar-agent) for setup instructions.
 
+
+### Centralized Log Aggregation with fluentd
+
+If you have a [fluentd](https://www.fluentd.org/) instance running available you can forward payloads to this instance. To turn this on, set the following config params.
+
+```php
+<?php
+$config = array(
+  // ... rest of current config
+  'handler' => 'fluent',
+  'fluent_host' => 'localhost',  // localhost is the default setting but any other host IP or a unix socket is possible
+  'fluent_port' => 24224, // 24224 is the default setting, please adapt it to your settings
+  'fluent_tag' => 'rollbar', // rollbar is the default setting, you can adjust it to your needs
+);
+?>
+```
+
+
 ### Configuration reference
 
 All of the following options can be passed as keys in the `$config` array.
@@ -239,25 +275,18 @@ All of the following options can be passed as keys in the `$config` array.
 Default: `/var/www`
 </dd>
 
-<dt>base_api_url
+<dt>endpoint
 </dt>
-<dd>The base api url to post to.
+<dd>The API URL to post to. Note: the URL has to end with a trailing slash.
 
 Default: `https://api.rollbar.com/api/1/`
 </dd>
 
-<dt>batch_size
+<dt>base_api_url
 </dt>
-<dd>Flush batch early if it reaches this size.
+<dd><strong>Deprecated (use <i>endpoint</i> instead).</strong> The base api url to post to.
 
-Default: `50`
-</dd>
-
-<dt>batched
-</dt>
-<dd>True to batch all reports from a single request together.
-
-Default: `true`
+Default: `https://api.rollbar.com/api/1/`
 </dd>
 
 <dt>branch
@@ -331,9 +360,27 @@ Default: `'production'`
 Default: empty array, meaning all errors are reported.
 </dd>
 
+<dt>fluent_host</dt>
+<dd>Either an `IPv4`, `IPv6`, or a `unix socket`.
+
+Default: `'127.0.0.1'`
+</dd>
+
+<dt>fluent_port</dt>
+<dd>The port on which the fluentd instance is listening on. If you use a unix socket this setting is ignored.
+
+Default: `24224`
+</dd>
+
+<dt>fluent_tag</dt>
+<dd>The tag of your fluentd filter and match sections. It can be any string, please consult the [fluentd documentation](http://docs.fluentd.org/) for valid tags.
+
+Default: `'rollbar'`
+</dd>
+
 <dt>handler
 </dt>
-<dd>Either `'blocking'` or `'agent'`. `'blocking'` uses curl to send requests immediately; `'agent'` writes a relay log to be consumed by [rollbar-agent](https://github.com/rollbar/rollbar-agent).
+<dd>Either `'blocking'`, `'agent'`, or `'fluent'`. `'blocking'` uses curl to send requests immediately; `'agent'` writes a relay log to be consumed by [rollbar-agent](https://github.com/rollbar/rollbar-agent); `'fluent'` send the requests to a [fluentd](https://www.fluentd.org/) instance.
 
 Default: `'blocking'`
 </dd>
@@ -447,6 +494,18 @@ $config['proxy'] = array(
 Default: No proxy
 </dd>
 
+<dt>send_message_trace</dt>
+<dd>Should backtrace be include with string messages reported to Rollbar
+
+Default: `false`
+</dd>
+
+<dt>local_vars_dump</dt>
+<dd>Should backtraces include arguments passed to stack frames.
+
+Default: `false`
+</dd>
+
 </dl>
 
 Example use of error_sample_rates:
@@ -484,11 +543,16 @@ $config['person_fn'] = 'get_current_user';
 
 ## Related projects
 
-A Laravel-specific package is available for integrating with Laravel: [Laravel-Rollbar](https://github.com/jenssegers/Laravel-Rollbar)
+A Laravel-specific package is available for integrating with Laravel: [Rollbar Laravel](https://github.com/rollbar/rollbar-php-laravel)
 
 A CakePHP-specific package is avaliable for integrating with CakePHP 2.x:
 [CakeRollbar](https://github.com/tranfuga25s/CakeRollbar)
 
+A Flow-specific package is available for integrating with Neos Flow: [m12/flow-rollbar](https://packagist.org/packages/m12/flow-rollbar)
+
+Yii package: [baibaratsky/yii-rollbar](https://github.com/baibaratsky/yii-rollbar)
+
+Yii2 package: [baibaratsky/yii2-rollbar](https://github.com/baibaratsky/yii2-rollbar)
 
 ## Help / Support
 
@@ -507,4 +571,8 @@ For bug reports, please [open an issue on GitHub](https://github.com/rollbar/rol
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
 
-Tests are in `tests`. To run the tests: `phpunit`
+
+## Testing
+Tests are in `tests`.
+To run the tests: `composer test`
+To fix code style issues: `composer fix`

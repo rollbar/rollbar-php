@@ -14,7 +14,7 @@ class BackwardsCompatibilityConfigTest extends \PHPUnit_Framework_TestCase
             'batched' => true,
             'branch' => 'other',
             'capture_error_stacktraces' => true,
-            'checkIgnore' => function ($isUncaught, $exception, $payload) {
+            'checkIgnore' => function () {
                 $check = isset($_SERVER['HTTP_USER_AGENT']) &&
                     strpos($_SERVER['HTTP_USER_AGENT'], 'Baiduspider') !== false;
                 if ($check) {
@@ -37,13 +37,13 @@ class BackwardsCompatibilityConfigTest extends \PHPUnit_Framework_TestCase
             'included_errno' => E_ERROR | E_WARNING,
             'logger' => new FakeLog(),
             'person' => array(
-                'id' => 1,
+                'id' => "1",
                 'username' => 'test-user',
                 'email' => 'test@rollbar.com'
             ),
             'person_fn' => function () {
                 return array(
-                    'id' => 1,
+                    'id' => "1",
                     'username' => 'test-user',
                     'email' => 'test@rollbar.com'
                 );

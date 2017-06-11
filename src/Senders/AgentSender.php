@@ -18,12 +18,12 @@ class AgentSender implements SenderInterface
         }
     }
 
-    public function send(Payload $payload, $accessToken)
+    public function send($scrubbedPayload, $accessToken)
     {
         if (empty($this->agentLog)) {
             $this->loadAgentFile();
         }
-        fwrite($this->agentLog, json_encode($payload->jsonSerialize()) . "\n");
+        fwrite($this->agentLog, json_encode($scrubbedPayload) . "\n");
     }
 
     private function loadAgentFile()

@@ -2,13 +2,19 @@
 
 use \Mockery as m;
 use Rollbar\Payload\Payload;
+use Rollbar\Payload\Level;
 
 class PayloadTest extends \PHPUnit_Framework_TestCase
 {
     public function testPayloadData()
     {
         $data = m::mock("Rollbar\Payload\Data");
-        $payload = new Payload($data, "012345678901234567890123456789ab");
+        $config = m::mock("Rollbar\Config")
+                    ->shouldReceive('getAccessToken')
+                    ->andReturn('012345678901234567890123456789ab')
+                    ->mock();
+        
+        $payload = new Payload($data, $config->getAccessToken());
 
         $this->assertEquals($data, $payload->getData());
 
@@ -18,13 +24,21 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
 
     public function testPayloadAccessToken()
     {
-        $data = m::mock("Rollbar\Payload\Data");
         $accessToken = "012345678901234567890123456789ab";
+        $data = m::mock("Rollbar\Payload\Data");
+        $config = m::mock("Rollbar\Config")
+                    ->shouldReceive('getAccessToken')
+                    ->andReturn($accessToken)
+                    ->mock();
 
         $payload = new Payload($data, $accessToken);
         $this->assertEquals($accessToken, $payload->getAccessToken());
 
         $accessToken = "too_short";
+        $config = m::mock("Rollbar\Config")
+                    ->shouldReceive('getAccessToken')
+                    ->andReturn($accessToken)
+                    ->mock();
         try {
             new Payload($data, $accessToken);
             $this->fail("Above should throw");
@@ -33,6 +47,10 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
         }
 
         $accessToken = "too_longtoo_longtoo_longtoo_longtoo_longtoo_long";
+        $config = m::mock("Rollbar\Config")
+                    ->shouldReceive('getAccessToken')
+                    ->andReturn($accessToken)
+                    ->mock();
         try {
             new Payload($data, $accessToken);
             $this->fail("Above should throw");
@@ -41,6 +59,10 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
         }
 
         $accessToken = "012345678901234567890123456789ab";
+        $config = m::mock("Rollbar\Config")
+                    ->shouldReceive('getAccessToken')
+                    ->andReturn($accessToken)
+                    ->mock();
         $payload = new Payload($data, $accessToken);
         $this->assertEquals($accessToken, $payload->getAccessToken());
 
@@ -50,13 +72,21 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
 
     public function testEncode()
     {
+        $accessToken = '012345678901234567890123456789ab';
         $data = m::mock('Rollbar\Payload\Data, \JsonSerializable')
             ->shouldReceive('jsonSerialize')
             ->andReturn(new \ArrayObject())
             ->mock();
-        $payload = new Payload($data, "012345678901234567890123456789ab");
+        $dataBuilder = m::mock('Rollbar\DataBuilder')
+            ->shouldReceive('getScrubFields')
+            ->andReturn(array())
+            ->shouldReceive('scrub')
+            ->andReturn(new \ArrayObject())
+            ->mock();
+        
+        $payload = new Payload($data, $accessToken);
         $encoded = json_encode($payload->jsonSerialize());
-        $json = '{"data":{},"access_token":"012345678901234567890123456789ab"}';
+        $json = '{"data":{},"access_token":"'.$accessToken.'"}';
         $this->assertEquals($json, $encoded);
     }
 }

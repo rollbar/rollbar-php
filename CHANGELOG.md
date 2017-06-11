@@ -1,5 +1,38 @@
 # Changelog
 
+## 1.1.1
+
+- Forgot to bump the version number in the README and in the Notifier configuration.
+
+## 1.1.0
+
+This release includes some new features, some improvements to existing functionality, and several
+bug fixes. Below are the highlights of issues/PRs that are included in this release:
+
+- GitHub Issue [#38](https://github.com/rollbar/rollbar-php/issues/38): truncate payload [#167](https://github.com/rollbar/rollbar-php/pull/167)
+- GitHub Issue [#102](https://github.com/rollbar/rollbar-php/issues/102): Support the Forwarded (RFC 7239) header [#155](https://github.com/rollbar/rollbar-php/pull/155)
+- GitHub Issue [#72](https://github.com/rollbar/rollbar-php/issues/72): status 200 when using set_exception_handler [#143](https://github.com/rollbar/rollbar-php/pull/143)
+- GitHub Issue [#53](https://github.com/rollbar/rollbar-php/issues/53): Option to capture stack trace in report_message() [#145](https://github.com/rollbar/rollbar-php/pull/145)
+- Fix how include_error_code_context works with defaults [#168](https://github.com/rollbar/rollbar-php/pull/168)
+- Fix how we handle scrubbing related to query strings so that we don't accidentially urlencode
+  things that should not be, such as sql queries [#164](https://github.com/rollbar/rollbar-php/pull/164)
+- Bug: infinite loop when previous exception set [#158](https://github.com/rollbar/rollbar-php/pull/158) (@vilius-g)
+- Bug: checkIgnore was not getting passed documented arguments [#152](https://github.com/rollbar/rollbar-php/pull/152)
+- Only report legitimate fatal errors during shutdown rather than anything returned by
+  error_get_last(), Fatal handler type check [#161](https://github.com/rollbar/rollbar-php/pull/161) (@vilius-g)
+- Move packfire/php5.3-compat from require to suggest in composer.json [#169](https://github.com/rollbar/rollbar-php/pull/169) (@elazar)
+
+## 1.0.1
+
+- Bug fix related to scrubbing potential query strings
+- Update notifier to send the correct version number in the payload
+
+## 1.0.0
+
+Almost everything has been refactored or rewritten. The updated README has all of the current
+information on how to use the notifier. This release includes API that is backwards compatible with 0.18.2,
+however this is for convenience only and the methods that have changed have been marked deprecated.
+
 ## 0.18.2
 
 - removed type hinting from RollbarException
