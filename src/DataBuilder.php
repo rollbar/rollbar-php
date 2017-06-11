@@ -554,14 +554,14 @@ class DataBuilder implements DataBuilderInterface
       
         if (isset($_SERVER)) {
             $request->setMethod($this->tryGet($_SERVER, 'REQUEST_METHOD'))
-                ->setQueryString(self::scrubUrl($this->tryGet($_SERVER, "QUERY_STRING"), $scrubFields));
+                ->setQueryString($this->tryGet($_SERVER, "QUERY_STRING"));
         }
       
         if (isset($_GET)) {
-            $request->setGet(self::scrub($_GET, $scrubFields));
+            $request->setGet($_GET);
         }
         if (isset($_POST)) {
-            $request->setPost(self::scrub($_POST, $scrubFields));
+            $request->setPost($_POST);
         }
         $extras = $this->getRequestExtras();
         if (!$extras) {
