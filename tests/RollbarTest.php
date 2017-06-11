@@ -7,6 +7,11 @@ if (!defined('ROLLBAR_TEST_TOKEN')) {
 use Rollbar\Rollbar;
 use Rollbar\Payload\Level;
 
+/**
+ * Usage of static method Rollbar::logger() is intended here.
+ *
+ * @SuppressWarnings(PHPMD.StaticAccess)
+ */
 class RollbarTest extends \PHPUnit_Framework_TestCase
 {
 
