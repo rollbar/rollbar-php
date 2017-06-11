@@ -545,15 +545,24 @@ class DataBuilder implements DataBuilderInterface
     protected function getRequest()
     {
         $request = new Request();
+
         $request->setUrl($this->getUrl())
-            ->setMethod($this->tryGet($_SERVER, 'REQUEST_METHOD'))
             ->setHeaders($this->getHeaders())
             ->setParams($this->getRequestParams())
-            ->setGet($_GET)
-            ->setQueryString($this->tryGet($_SERVER, "QUERY_STRING"))
-            ->setPost($_POST)
             ->setBody($this->getRequestBody())
             ->setUserIp($this->getUserIp());
+      
+        if (isset($_SERVER)) {
+            $request->setMethod($this->tryGet($_SERVER, 'REQUEST_METHOD'))
+                ->setQueryString($this->tryGet($_SERVER, "QUERY_STRING"));
+        }
+      
+        if (isset($_GET)) {
+            $request->setGet($_GET);
+        }
+        if (isset($_POST)) {
+            $request->setPost($_POST);
+        }
         $extras = $this->getRequestExtras();
         if (!$extras) {
             $extras = array();
@@ -687,13 +696,15 @@ class DataBuilder implements DataBuilderInterface
         $port = $this->getUrlPort($proto);
         
 
-        $path = Utilities::coalesce($this->tryGet($_SERVER, 'REQUEST_URI'), '/');
         $url = $proto . '://' . $host;
         if (($proto == 'https' && $port != 443) || ($proto == 'http' && $port != 80)) {
             $url .= ':' . $port;
         }
 
-        $url .= $path;
+        if (isset($_SERVER)) {
+            $path = Utilities::coalesce($this->tryGet($_SERVER, 'REQUEST_URI'), '/');
+            $url .= $path;
+        }
 
         if ($host == 'unknown') {
             $url = null;
@@ -705,16 +716,18 @@ class DataBuilder implements DataBuilderInterface
     protected function getHeaders()
     {
         $headers = array();
-        foreach ($_SERVER as $key => $val) {
-            if (substr($key, 0, 5) == 'HTTP_') {
-                // convert HTTP_CONTENT_TYPE to Content-Type, HTTP_HOST to Host, etc.
-                $name = strtolower(substr($key, 5));
-                if (strpos($name, '_') != -1) {
-                    $name = preg_replace('/ /', '-', ucwords(preg_replace('/_/', ' ', $name)));
-                } else {
-                    $name = ucfirst($name);
+        if (isset($_SERVER)) {
+            foreach ($_SERVER as $key => $val) {
+                if (substr($key, 0, 5) == 'HTTP_') {
+                    // convert HTTP_CONTENT_TYPE to Content-Type, HTTP_HOST to Host, etc.
+                    $name = strtolower(substr($key, 5));
+                    if (strpos($name, '_') != -1) {
+                        $name = preg_replace('/ /', '-', ucwords(preg_replace('/_/', ' ', $name)));
+                    } else {
+                        $name = ucfirst($name);
+                    }
+                    $headers[$name] = $val;
                 }
-                $headers[$name] = $val;
             }
         }
         if (count($headers) > 0) {
@@ -737,6 +750,9 @@ class DataBuilder implements DataBuilderInterface
 
     protected function getUserIp()
     {
+        if (!isset($_SERVER)) {
+            return null;
+        }
         $forwardFor = $this->tryGet($_SERVER, 'HTTP_X_FORWARDED_FOR');
         if ($forwardFor) {
             // return everything until the first comma
@@ -805,7 +821,7 @@ class DataBuilder implements DataBuilderInterface
         foreach ($extras as $key => $val) {
             $server->$key = $val;
         }
-        if (array_key_exists('argv', $_SERVER)) {
+        if (isset($_SERVER) && array_key_exists('argv', $_SERVER)) {
             $server->argv = $_SERVER['argv'];
         }
         return $server;
