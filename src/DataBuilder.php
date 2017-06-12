@@ -216,9 +216,9 @@ class DataBuilder implements DataBuilderInterface
         }
     }
 
-    protected function setRequestExtras($c)
+    protected function setRequestExtras($config)
     {
-        $this->requestExtras = $this->tryGet($c, "requestExtras");
+        $this->requestExtras = $this->tryGet($config, "requestExtras");
     }
 
     protected function setPerson($config)
@@ -774,7 +774,7 @@ class DataBuilder implements DataBuilderInterface
             return null;
         }
 
-        $id = $personData['id'];
+        $identifier = $personData['id'];
 
         $email = null;
         if (isset($personData['email'])) {
@@ -787,7 +787,7 @@ class DataBuilder implements DataBuilderInterface
         }
 
         unset($personData['id'], $personData['email'], $personData['username']);
-        return new Person($id, $username, $email, $personData);
+        return new Person($identifier, $username, $email, $personData);
     }
 
     protected function getServer()
