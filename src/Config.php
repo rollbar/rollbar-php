@@ -91,154 +91,154 @@ class Config
         return $this->configArray;
     }
 
-    protected function updateConfig($c)
+    protected function updateConfig($config)
     {
-        $this->configArray = $c;
+        $this->configArray = $config;
 
-        $this->setAccessToken($c);
-        $this->setDataBuilder($c);
-        $this->setTransformer($c);
-        $this->setMinimumLevel($c);
-        $this->setReportSuppressed($c);
-        $this->setFilters($c);
-        $this->setSender($c);
-        $this->setResponseHandler($c);
-        $this->setCheckIgnoreFunction($c);
-        $this->setSendMessageTrace($c);
+        $this->setAccessToken($config);
+        $this->setDataBuilder($config);
+        $this->setTransformer($config);
+        $this->setMinimumLevel($config);
+        $this->setReportSuppressed($config);
+        $this->setFilters($config);
+        $this->setSender($config);
+        $this->setResponseHandler($config);
+        $this->setCheckIgnoreFunction($config);
+        $this->setSendMessageTrace($config);
 
-        if (isset($c['included_errno'])) {
-            $this->included_errno = $c['included_errno'];
+        if (isset($config['included_errno'])) {
+            $this->included_errno = $config['included_errno'];
         }
 
-        if (isset($c['use_error_reporting'])) {
-            $this->use_error_reporting = $c['use_error_reporting'];
+        if (isset($config['use_error_reporting'])) {
+            $this->use_error_reporting = $config['use_error_reporting'];
         }
     }
 
-    private function setAccessToken($c)
+    private function setAccessToken($config)
     {
-        if (isset($_ENV['ROLLBAR_ACCESS_TOKEN']) && !isset($c['access_token'])) {
-            $c['access_token'] = $_ENV['ROLLBAR_ACCESS_TOKEN'];
+        if (isset($_ENV['ROLLBAR_ACCESS_TOKEN']) && !isset($config['access_token'])) {
+            $config['access_token'] = $_ENV['ROLLBAR_ACCESS_TOKEN'];
         }
-        Utilities::validateString($c['access_token'], "config['access_token']", 32, false);
-        $this->accessToken = $c['access_token'];
+        Utilities::validateString($config['access_token'], "config['access_token']", 32, false);
+        $this->accessToken = $config['access_token'];
     }
 
-    private function setDataBuilder($c)
+    private function setDataBuilder($config)
     {
         $exp = "Rollbar\DataBuilderInterface";
         $def = "Rollbar\DataBuilder";
-        $this->setupWithOptions($c, "dataBuilder", $exp, $def, true);
+        $this->setupWithOptions($config, "dataBuilder", $exp, $def, true);
     }
 
-    private function setTransformer($c)
+    private function setTransformer($config)
     {
         $expected = "Rollbar\TransformerInterface";
-        $this->setupWithOptions($c, "transformer", $expected);
+        $this->setupWithOptions($config, "transformer", $expected);
     }
 
-    private function setMinimumLevel($c)
+    private function setMinimumLevel($config)
     {
-        if (empty($c['minimumLevel'])) {
+        if (empty($config['minimumLevel'])) {
             $this->minimumLevel = 0;
-        } elseif ($c['minimumLevel'] instanceof Level) {
-            $this->minimumLevel = $c['minimumLevel']->toInt();
-        } elseif (is_string($c['minimumLevel'])) {
-            $level = Level::fromName($c['minimumLevel']);
+        } elseif ($config['minimumLevel'] instanceof Level) {
+            $this->minimumLevel = $config['minimumLevel']->toInt();
+        } elseif (is_string($config['minimumLevel'])) {
+            $level = Level::fromName($config['minimumLevel']);
             if ($level !== null) {
                 $this->minimumLevel = $level->toInt();
             }
-        } elseif (is_int($c['minimumLevel'])) {
-            $this->minimumLevel = $c['minimumLevel'];
+        } elseif (is_int($config['minimumLevel'])) {
+            $this->minimumLevel = $config['minimumLevel'];
         } else {
             $this->minimumLevel = 0;
         }
     }
 
-    private function setReportSuppressed($c)
+    private function setReportSuppressed($config)
     {
-        $this->reportSuppressed = isset($c['reportSuppressed']) && $c['reportSuppressed'];
+        $this->reportSuppressed = isset($config['reportSuppressed']) && $config['reportSuppressed'];
         if (!isset($this->reportSuppressed)) {
-            $this->reportSuppressed = isset($c['report_suppressed']) && $c['report_suppressed'];
+            $this->reportSuppressed = isset($config['report_suppressed']) && $config['report_suppressed'];
         }
     }
 
-    private function setFilters($c)
+    private function setFilters($config)
     {
-        $this->setupWithOptions($c, "filter", "Rollbar\FilterInterface");
+        $this->setupWithOptions($config, "filter", "Rollbar\FilterInterface");
     }
 
-    private function setSender($c)
+    private function setSender($config)
     {
         $expected = "Rollbar\Senders\SenderInterface";
         $default = "Rollbar\Senders\CurlSender";
 
-        if (array_key_exists('base_api_url', $c)) {
-            $c['senderOptions']['endpoint'] = $c['base_api_url'] . 'item/';
+        if (array_key_exists('base_api_url', $config)) {
+            $config['senderOptions']['endpoint'] = $config['base_api_url'] . 'item/';
         }
 
-        if (array_key_exists('endpoint', $c)) {
-            $c['senderOptions']['endpoint'] = $c['endpoint'] . 'item/';
+        if (array_key_exists('endpoint', $config)) {
+            $config['senderOptions']['endpoint'] = $config['endpoint'] . 'item/';
         }
 
-        if (array_key_exists('timeout', $c)) {
-            $c['senderOptions']['timeout'] = $c['timeout'];
+        if (array_key_exists('timeout', $config)) {
+            $config['senderOptions']['timeout'] = $config['timeout'];
         }
 
-        if (array_key_exists('proxy', $c)) {
-            $c['senderOptions']['proxy'] = $c['proxy'];
+        if (array_key_exists('proxy', $config)) {
+            $config['senderOptions']['proxy'] = $config['proxy'];
         }
 
-        if (array_key_exists('handler', $c) && $c['handler'] == 'agent') {
+        if (array_key_exists('handler', $config) && $config['handler'] == 'agent') {
             $default = "Rollbar\Senders\AgentSender";
-            if (array_key_exists('agent_log_location', $c)) {
-                $c['senderOptions'] = array(
-                    'agentLogLocation' => $c['agent_log_location']
+            if (array_key_exists('agent_log_location', $config)) {
+                $config['senderOptions'] = array(
+                    'agentLogLocation' => $config['agent_log_location']
                 );
             }
         }
 
         // set options for fluent sender
-        if (isset($c['handler']) && $c['handler'] == 'fluent') {
+        if (isset($config['handler']) && $config['handler'] == 'fluent') {
             $default = "Rollbar\Senders\FluentSender";
 
-            if (isset($c['fluent_host'])) {
-                $c['senderOptions']['fluentHost'] = $c['fluent_host'];
+            if (isset($config['fluent_host'])) {
+                $config['senderOptions']['fluentHost'] = $config['fluent_host'];
             }
 
-            if (isset($c['fluent_port'])) {
-                $c['senderOptions']['fluentPort'] = $c['fluent_port'];
+            if (isset($config['fluent_port'])) {
+                $config['senderOptions']['fluentPort'] = $config['fluent_port'];
             }
 
-            if (isset($c['fluent_tag'])) {
-                $c['senderOptions']['fluentTag'] = $c['fluent_tag'];
+            if (isset($config['fluent_tag'])) {
+                $config['senderOptions']['fluentTag'] = $config['fluent_tag'];
             }
         }
 
-        $this->setupWithOptions($c, "sender", $expected, $default);
+        $this->setupWithOptions($config, "sender", $expected, $default);
     }
 
-    private function setResponseHandler($c)
+    private function setResponseHandler($config)
     {
-        $this->setupWithOptions($c, "responseHandler", "Rollbar\ResponseHandlerInterface");
+        $this->setupWithOptions($config, "responseHandler", "Rollbar\ResponseHandlerInterface");
     }
 
-    private function setCheckIgnoreFunction($c)
+    private function setCheckIgnoreFunction($config)
     {
-        if (!isset($c['checkIgnore'])) {
+        if (!isset($config['checkIgnore'])) {
             return;
         }
 
-        $this->checkIgnore = $c['checkIgnore'];
+        $this->checkIgnore = $config['checkIgnore'];
     }
 
-    private function setSendMessageTrace($c)
+    private function setSendMessageTrace($config)
     {
-        if (!isset($c['send_message_trace'])) {
+        if (!isset($config['send_message_trace'])) {
             return;
         }
 
-        $this->sendMessageTrace = $c['send_message_trace'];
+        $this->sendMessageTrace = $config['send_message_trace'];
     }
 
     /**
@@ -259,21 +259,21 @@ class Config
      * `new MySender(array("speed"=>11,"protocol"=>"First Contact"));`
      * You can also just pass an instance in directly. (In which case options
      * are ignored)
-     * @param $c
+     * @param $config
      * @param $keyName
      * @param $expectedType
      * @param mixed $defaultClass
      * @param bool $passWholeConfig
      */
     protected function setupWithOptions(
-        $c,
+        $config,
         $keyName,
         $expectedType,
         $defaultClass = null,
         $passWholeConfig = false
     ) {
 
-        $$keyName = isset($c[$keyName]) ? $c[$keyName] : null;
+        $$keyName = isset($config[$keyName]) ? $config[$keyName] : null;
 
         if (is_null($defaultClass) && is_null($$keyName)) {
             return;
@@ -284,9 +284,11 @@ class Config
         }
         if (is_string($$keyName)) {
             if ($passWholeConfig) {
-                $options = $c;
+                $options = $config;
             } else {
-                $options = isset($c[$keyName . "Options"]) ? $c[$keyName . "Options"] : array();
+                $options = isset($config[$keyName . "Options"]) ?
+                            $config[$keyName . "Options"] :
+                            array();
             }
             $this->$keyName = new $$keyName($options);
         } else {
@@ -294,7 +296,9 @@ class Config
         }
 
         if (!$this->$keyName instanceof $expectedType) {
-            throw new \InvalidArgumentException("$keyName must be a $expectedType");
+            throw new \InvalidArgumentException(
+                "$keyName must be a $expectedType"
+            );
         }
     }
 
@@ -348,7 +352,7 @@ class Config
                 if (call_user_func($this->checkIgnore, $isUncaught, $toLog, $payload)) {
                     return true;
                 }
-            } catch (Exception $e) {
+            } catch (Exception $exception) {
                 // We should log that we are removing the custom checkIgnore
                 $this->checkIgnore = null;
             }
