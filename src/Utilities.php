@@ -16,7 +16,7 @@ final class Utilities
 
     public static function coalesceArray(array $values)
     {
-        foreach ($values as $key => $val) {
+        foreach ($values as $val) {
             if ($val) {
                 return $val;
             }
