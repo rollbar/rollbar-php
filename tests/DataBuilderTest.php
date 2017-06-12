@@ -623,13 +623,14 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     
     public function testPersonFuncException()
     {
-        $logger = \Rollbar\Rollbar::scope(array(
+        \Rollbar\Rollbar::init(array(
             'access_token' => 'abcd1234efef5678abcd1234567890be',
             'environment' => 'tests',
             'person_fn' => function () {
                 throw new \Exception("Exception from person_fn");
             }
         ));
+        $logger = \Rollbar\Rollbar::logger();
         
         try {
             $logger->log(Level::fromName('error'), "testing exceptions in person_fn", array());
