@@ -57,10 +57,9 @@ class FluentSender implements SenderInterface
 
     /**
      * @param $scrubbedPayload
-     * @param $accessToken
      * @return Response
      */
-    public function send($scrubbedPayload, $accessToken)
+    public function send($scrubbedPayload)
     {
         if (empty($this->fluentLogger)) {
             $this->loadFluentLogger();
