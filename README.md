@@ -198,6 +198,23 @@ Rollbar::log(
 ?>
 ```
 
+## Using dependency injection
+
+If you're using dependency injection containers, you can create and get a `RollbarLogger` from the container and use it
+to initialize Rollbar error logging.
+
+It's up to the container to properly create and configure the logger.
+
+```php
+use Rollbar\Rollbar;
+use Rollbar\RollbarLogger;
+
+$logger = $container->get(RollbarLogger::class);
+
+// installs global error and exception handlers
+Rollbar::init($logger);
+```
+
 ## Using Monolog
 
 Here is an example of how to use Rollbar as a handler for Monolog:
@@ -549,6 +566,10 @@ A CakePHP-specific package is avaliable for integrating with CakePHP 2.x:
 [CakeRollbar](https://github.com/tranfuga25s/CakeRollbar)
 
 A Flow-specific package is available for integrating with Neos Flow: [m12/flow-rollbar](https://packagist.org/packages/m12/flow-rollbar)
+
+Yii package: [baibaratsky/yii-rollbar](https://github.com/baibaratsky/yii-rollbar)
+
+Yii2 package: [baibaratsky/yii2-rollbar](https://github.com/baibaratsky/yii2-rollbar)
 
 ## Help / Support
 
