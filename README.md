@@ -526,6 +526,9 @@ as Rollbar SDK will read from it
 If you still want to read the request body for your PUT requests Rollbar SDK saves
 the content of php://input in $_SERVER['php://input']
 
+Default: `false`
+</dd>
+
 <dt>local_vars_dump</dt>
 <dd>Should backtraces include arguments passed to stack frames.
 
