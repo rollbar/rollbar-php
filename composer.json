@@ -57,5 +57,9 @@
     ],
     "fix": "phpcbf --standard=PSR1,PSR2 src tests"
 
+  },
+  
+  "config": {
+    "process-timeout": 600
   }
 }

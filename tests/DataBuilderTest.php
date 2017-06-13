@@ -642,12 +642,13 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     {
         \Rollbar\Rollbar::init(array(
             'access_token' => 'abcd1234efef5678abcd1234567890be',
-            'environment' => 'tests',
+            'environment' => 'tests'
+        ));
+        $logger = \Rollbar\Rollbar::scope(array(
             'person_fn' => function () {
                 throw new \Exception("Exception from person_fn");
             }
         ));
-        $logger = \Rollbar\Rollbar::logger();
         
         try {
             $logger->log(Level::ERROR, "testing exceptions in person_fn", array());
@@ -1005,12 +1006,16 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $dataBuilder = new DataBuilder(array(
             'accessToken' => 'abcd1234efef5678abcd1234567890be',
             'environment' => 'tests',
-            'levelFactory' => new LevelFactory
+            'levelFactory' => new LevelFactory,
+            'include_raw_request_body' => true
         ));
         $output = $dataBuilder->makeData(Level::ERROR, "testing", array());
         $requestBody = $output->getRequest()->getBody();
         
         $this->assertEquals($streamInput, $requestBody);
+        if (version_compare(PHP_VERSION, '5.6.0') < 0) {
+            $this->assertEquals($streamInput, $_SERVER['php://input']);
+        }
         
         stream_wrapper_restore("php");
     }
