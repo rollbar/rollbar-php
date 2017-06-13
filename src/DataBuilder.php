@@ -60,6 +60,11 @@ class DataBuilder implements DataBuilderInterface
     protected $rawRequestBody;
     protected $localVarsDump;
     protected $captureErrorStacktraces;
+    
+    /**
+     * @var LevelFactory
+     */
+    protected $levelFactory;
 
     public function __construct($config)
     {
@@ -96,6 +101,7 @@ class DataBuilder implements DataBuilderInterface
         $this->setSendMessageTrace($config);
         $this->setLocalVarsDump($config);
         $this->setCaptureErrorStacktraces($config);
+        $this->setLevelFactory($config);
 
         $this->shiftFunction = $this->tryGet($config, 'shift_function');
         if (!isset($this->shiftFunction)) {
@@ -317,6 +323,16 @@ class DataBuilder implements DataBuilderInterface
         $fromConfig = $this->tryGet($config, 'include_exception_code_context');
         $this->includeExcCodeContext = self::$defaults->includeExcCodeContext($fromConfig);
     }
+    
+    protected function setLevelFactory($config)
+    {
+        $this->levelFactory = $this->tryGet($config, 'levelFactory');
+        if (!$this->levelFactory) {
+            throw new \InvalidArgumentException(
+                'Missing dependency: LevelFactory not provided to the DataBuilder.'
+            );
+        }
+    }
 
     protected function setHost($config)
     {
@@ -324,7 +340,7 @@ class DataBuilder implements DataBuilderInterface
     }
 
     /**
-     * @param Level $level
+     * @param string $level
      * @param \Exception | \Throwable | string $toLog
      * @param $context
      * @return Data
@@ -514,8 +530,8 @@ class DataBuilder implements DataBuilderInterface
                 $level = $this->messageLevel;
             }
         }
-        $level = strtolower($level);
-        return Level::fromName($this->tryGet($this->psrLevels, $level));
+        $level = $this->tryGet($this->psrLevels, strtolower($level));
+        return $this->levelFactory->fromName($level);
     }
 
     protected function getTimestamp()
@@ -790,7 +806,7 @@ class DataBuilder implements DataBuilderInterface
                 $personData = call_user_func($this->personFunc);
             } catch (\Exception $exception) {
                 Rollbar::scope(array('person_fn' => null))->
-                    log(Level::fromName("error"), $exception);
+                    log(Level::ERROR, $exception);
             }
         }
 

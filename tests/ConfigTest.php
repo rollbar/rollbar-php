@@ -8,7 +8,6 @@ use Rollbar\Payload\Level;
 use Rollbar\Payload\Message;
 use Rollbar\Payload\Payload;
 use Rollbar\RollbarLogger;
-use Psr\Log\LogLevel;
 
 class ConfigTest extends \PHPUnit_Framework_TestCase
 {
@@ -49,12 +48,10 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     {
         $arr = array(
             "access_token" => $this->token,
-            "environment" => $this->env,
-            "dataBuilder" => "Rollbar\FakeDataBuilder",
-            "dataBuilderOptions" => array("options")
+            "environment" => $this->env
         );
         $config = new Config($arr);
-        $this->assertEquals($arr, array_pop(FakeDataBuilder::$args));
+        $this->assertInstanceOf('Rollbar\DataBuilder', $config->getDataBuilder());
     }
 
     public function testExtend()
@@ -100,7 +97,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             "dataBuilder" => $fdb
         );
         $config = new Config($arr);
-        $expected = array(LogLevel::EMERGENCY, "oops", array());
+        $expected = array(Level::EMERGENCY, "oops", array());
         $config->getRollbarData($expected[0], $expected[1], $expected[2]);
         $this->assertEquals($expected, array_pop(FakeDataBuilder::$logged));
     }
@@ -132,9 +129,9 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         ));
         $this->runConfigTest($c);
 
-        $c->configure(array("minimumLevel" => Level::WARNING()));
+        $c->configure(array("minimumLevel" => Level::WARNING));
         $this->runConfigTest($c);
-
+        
         $c->configure(array("minimumLevel" => Level::WARNING()->toInt()));
         $this->runConfigTest($c);
     }
@@ -292,16 +289,27 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function testCheckIgnore()
     {
         $called = false;
-        $c = new Config(array(
+        $config = new Config(array(
             "access_token" => $this->token,
             "environment" => $this->env,
             "checkIgnore" => function ($isUncaught, $exc, $payload) use (&$called) {
                 $called = true;
             }
         ));
+        $levelFactory = $config->getLevelFactory();
+        
         $data = new Data($this->env, new Body(new Message("test")));
-        $data->setLevel(Level::fromName('error'));
-        $c->checkIgnored(new Payload($data, $c->getAccessToken()), $this->token, $this->error, false);
+        $data->setLevel($levelFactory->fromName(Level::ERROR));
+        
+        $config->checkIgnored(
+            new Payload(
+                $data,
+                $config->getAccessToken()
+            ),
+            $this->token,
+            $this->error,
+            false
+        );
 
         $this->assertTrue($called);
     }
@@ -311,18 +319,39 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $called = false;
         $isUncaughtPassed = null;
         $errorPassed = null;
-        $c = new Config(array(
+        
+        $config = new Config(array(
             "access_token" => $this->token,
             "environment" => $this->env,
-            "checkIgnore" => function ($isUncaught, $exc, $payload) use (&$called, &$isUncaughtPassed, &$errorPassed) {
+            "checkIgnore" => function (
+                $isUncaught,
+                $exc,
+                $payload
+            ) use (
+                &$called,
+                &$isUncaughtPassed,
+                &$errorPassed
+) {
                 $called = true;
                 $isUncaughtPassed = $isUncaught;
                 $errorPassed = $exc;
             }
         ));
+        
+        $levelFactory = $config->getLevelFactory();
+        
         $data = new Data($this->env, new Body(new Message("test")));
-        $data->setLevel(Level::fromName('error'));
-        $c->checkIgnored(new Payload($data, $c->getAccessToken()), $this->token, $this->error, true);
+        $data->setLevel($levelFactory->fromName(Level::ERROR));
+        
+        $config->checkIgnored(
+            new Payload(
+                $data,
+                $config->getAccessToken()
+            ),
+            $this->token,
+            $this->error,
+            true
+        );
 
         $this->assertTrue($called);
         $this->assertTrue($isUncaughtPassed);
@@ -340,7 +369,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $dataBuilder = $logger->getDataBuilder();
         
         $result = $dataBuilder->makeData(
-            Level::fromName('error'),
+            Level::ERROR,
             new \Exception(),
             array()
         );
@@ -355,7 +384,8 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     {
         extract($setup);
         $called = false;
-        $c = new Config(array(
+        
+        $config = new Config(array(
             "access_token" => $this->token,
             "environment" => $this->env,
             "checkIgnore" => function ($isUncaught, $exc, $payload) use (&$called) {
@@ -364,15 +394,26 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             "use_error_reporting" => $use_error_reporting
         ));
         
+        $levelFactory = $config->getLevelFactory();
+        
         $data = new Data($this->env, new Body(new Message("test")));
-        $data->setLevel(Level::fromName('error'));
+        $data->setLevel($levelFactory->fromName(Level::ERROR));
         
         if ($error_reporting !== null) {
             $errorReportingTemp = error_reporting();
             error_reporting($error_reporting);
         }
         
-        $result = $c->checkIgnored(new Payload($data, $c->getAccessToken()), $this->token, $this->error, false);
+        $result = $config->checkIgnored(
+            new Payload(
+                $data,
+                $config->getAccessToken()
+            ),
+            $this->token,
+            $this->error,
+            false
+        );
+        
         $this->assertEquals($expected, $result);
         
         if ($error_reporting) {

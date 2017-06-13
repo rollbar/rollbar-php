@@ -2,6 +2,7 @@
 
 use \Mockery as m;
 use Rollbar\Payload\Data;
+use Rollbar\Payload\Level;
 
 class DataTest extends \PHPUnit_Framework_TestCase
 {
@@ -47,8 +48,13 @@ class DataTest extends \PHPUnit_Framework_TestCase
 
     public function testLevel()
     {
-        $level = m::mock("Rollbar\Payload\Level");
-        $this->assertEquals($level, $this->data->setLevel($level)->getLevel());
+        $levelFactory = new LevelFactory;
+        $level = Level::ERROR;
+        
+        $this->assertEquals(
+            $levelFactory->fromName($level),
+            $this->data->setLevel($level)->getLevel()
+        );
     }
 
     public function testTimestamp()

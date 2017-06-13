@@ -8,10 +8,12 @@ use Rollbar\Utilities;
 class RollbarLogger extends AbstractLogger
 {
     private $config;
+    private $levelFactory;
 
     public function __construct(array $config)
     {
         $this->config = new Config($config);
+        $this->levelFactory = new LevelFactory();
     }
 
     public function configure(array $config)
@@ -31,7 +33,7 @@ class RollbarLogger extends AbstractLogger
 
     public function log($level, $toLog, array $context = array())
     {
-        if (Level::fromName($level) === null) {
+        if (!$this->levelFactory->isValidLevel($level)) {
             throw new \Psr\Log\InvalidArgumentException("Invalid log level '$level'.");
         }
         $isUncaught = false;

@@ -18,6 +18,12 @@ class Config
      */
     private $dataBuilder;
     private $configArray;
+    
+    /**
+     * @var LevelFactory
+     */
+    private $levelFactory;
+    
     /**
      * @var TransformerInterface
      */
@@ -54,6 +60,8 @@ class Config
 
     public function __construct(array $configArray)
     {
+        $this->levelFactory = new LevelFactory();
+        
         $this->updateConfig($configArray);
 
         if (isset($configArray['error_sample_rates'])) {
@@ -126,6 +134,10 @@ class Config
 
     private function setDataBuilder($c)
     {
+        if (!isset($c['levelFactory'])) {
+            $c['levelFactory'] = $this->levelFactory;
+        }
+        
         $exp = "Rollbar\DataBuilderInterface";
         $def = "Rollbar\DataBuilder";
         $this->setupWithOptions($c, "dataBuilder", $exp, $def, true);
@@ -144,7 +156,7 @@ class Config
         } elseif ($c['minimumLevel'] instanceof Level) {
             $this->minimumLevel = $c['minimumLevel']->toInt();
         } elseif (is_string($c['minimumLevel'])) {
-            $level = Level::fromName($c['minimumLevel']);
+            $level = $this->levelFactory->fromName($c['minimumLevel']);
             if ($level !== null) {
                 $this->minimumLevel = $level->toInt();
             }
@@ -306,6 +318,11 @@ class Config
     public function getDataBuilder()
     {
         return $this->dataBuilder;
+    }
+    
+    public function getLevelFactory()
+    {
+        return $this->levelFactory;
     }
     
     public function getSender()

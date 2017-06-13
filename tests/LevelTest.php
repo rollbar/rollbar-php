@@ -5,19 +5,21 @@ use Rollbar\Payload\Level;
 
 class LevelTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @expectedException \Exception
+     */
     public function testLevel()
     {
-        $l = Level::TEST();
-        $this->assertNull($l);
+        $level = Level::TEST();
 
-        $l = Level::CRITICAL();
-        $this->assertNotNull($l);
-        $this->assertSame(Level::CRITICAL(), $l);
-        $this->assertSame(Level::critical(), $l);
+        $level = Level::CRITICAL();
+        $this->assertNotNull($level);
+        $this->assertSame(Level::CRITICAL(), $level);
+        $this->assertSame(Level::critical(), $level);
 
-        $l = Level::Info();
-        $this->assertNotNull($l);
-        $this->assertSame(Level::INFO(), $l);
-        $this->assertSame('"info"', json_encode($l->jsonSerialize()));
+        $level = Level::Info();
+        $this->assertNotNull($level);
+        $this->assertSame(Level::INFO(), $level);
+        $this->assertSame('"info"', json_encode($level->jsonSerialize()));
     }
 }

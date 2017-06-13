@@ -1,51 +1,48 @@
 <?php namespace Rollbar\Payload;
 
-/**
- * @method static Level critical()
- * @method static Level error()
- * @method static Level warning()
- * @method static Level debug()
- * @method static Level info()
- * @method static Level ignored()
- * @method static Level ignore()
- */
+use Rollbar\LevelFactory;
+
 class Level implements \JsonSerializable
 {
-    private static $values;
-
-    private static function init()
-    {
-        if (is_null(self::$values)) {
-            self::$values = array(
-                "emergency" => new Level("critical", 100000),
-                "alert" => new Level("critical", 100000),
-                "critical" => new Level("critical", 100000),
-                "error" => new Level("error", 10000),
-                "warning" => new Level("warning", 1000),
-                "notice" => new Level("info", 100),
-                "info" => new Level("info", 100),
-                "debug" => new Level("debug", 10),
-                "ignored" => new Level("ignore", 0),
-                "ignore" => new Level("ignore", 0)
-
-            );
-        }
-    }
-
-    public static function __callStatic($name, $args)
-    {
-        return self::fromName($name);
-    }
+    /**
+     * Those are PSR-3 compatible loggin levels. They are mapped to Rollbar
+     * service supported levels in Level::init()
+     */
+    const EMERGENCY = 'emergency';
+    const ALERT = 'alert';
+    const CRITICAL = 'critical';
+    const ERROR = 'error';
+    const WARNING = 'warning';
+    const NOTICE = 'notice';
+    const INFO = 'info';
+    const DEBUG = 'debug';
+    
+    /**
+     * @deprecated 1.2.0
+     */
+    const IGNORED = 'ignored';
+    /**
+     * @deprecated 1.2.0
+     */
+    const IGNORE = 'ignore';
 
     /**
-     * @param string $name level name
-     * @return Level
+     * @deprecated 1.2.0
+     *
+     * Usage of Level::error(), Level::warning(), Level::info(), Level::notice(),
+     * Level::debug() is no longer supported. It has been replaced with matching
+     * class constants, i.e.: Level::ERROR
      */
-    public static function fromName($name)
+    public static function __callStatic($name, $args)
     {
-        self::init();
-        $name = strtolower($name);
-        return array_key_exists($name, self::$values) ? self::$values[$name] : null;
+        $factory = new LevelFactory();
+        $level = $factory->fromName($name);
+        
+        if (!$level) {
+            throw new \Exception("Level '$level' doesn't exist.");
+        }
+        
+        return $level;
     }
 
     /**
@@ -54,7 +51,7 @@ class Level implements \JsonSerializable
     private $level;
     private $val;
 
-    private function __construct($level, $val)
+    public function __construct($level, $val)
     {
         $this->level = $level;
         $this->val = $val;
