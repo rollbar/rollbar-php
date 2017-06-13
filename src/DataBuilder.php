@@ -464,12 +464,8 @@ class DataBuilder implements DataBuilderInterface
             return;
         }
 
-        $source = explode(PHP_EOL, file_get_contents($filename));
-        if (!is_array($source)) {
-            return;
-        }
+        $source = $this->getSourceLines($filename);
 
-        $source = str_replace(array("\n", "\t", "\r"), '', $source);
         $total = count($source);
         $line = $line - 1;
         $frame->setCode($source[$line]);
@@ -1038,6 +1034,33 @@ class DataBuilder implements DataBuilderInterface
     public function needsTruncating(array $payload)
     {
         return strlen(json_encode($payload)) > self::MAX_PAYLOAD_SIZE;
+    }
+
+    /**
+     * Parses an array of code lines from source file with given filename.
+     *
+     * Attempts to automatically detect the line break character used in the file.
+     *
+     * @param string $filename
+     * @return string[] An array of lines of code from the given source file.
+     */
+    private function getSourceLines($filename)
+    {
+        $rawSource = file_get_contents($filename);
+
+        $source = explode(PHP_EOL, $rawSource);
+
+        if (count($source) === 1) {
+            if (substr_count($rawSource, "\n") > substr_count($rawSource, "\r")) {
+                $source = explode("\n", $rawSource);
+            } else {
+                $source = explode("\r", $rawSource);
+            }
+        }
+
+        $source = str_replace(array("\n", "\t", "\r"), '', $source);
+
+        return $source;
     }
     
     /**
