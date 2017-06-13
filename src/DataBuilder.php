@@ -222,7 +222,9 @@ class DataBuilder implements DataBuilderInterface
         
         if (!$this->requestBody && $this->rawRequestBody) {
             $this->requestBody = file_get_contents("php://input");
-            $_SERVER['php://input'] = $this->requestBody;
+            if (version_compare(PHP_VERSION, '5.6.0') < 0) {
+                $_SERVER['php://input'] = $this->requestBody;
+            }
         }
     }
 

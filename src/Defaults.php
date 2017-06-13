@@ -101,7 +101,7 @@ class Defaults
 
     public function rawRequestBody($rawRequestBody = null)
     {
-        return $rawRequestBody ? $rawRequestBody : $this->defaultRawRequestBody;
+        return $rawRequestBody !== null ? $rawRequestBody : $this->defaultRawRequestBody;
     }
 
     private $defaultMessageLevel = "warning";
