@@ -14,12 +14,13 @@ class FluentTest extends \PHPUnit_Framework_TestCase
 
         Rollbar::init(array(
             'access_token' => 'ad865e76e7fb496fab096ac07b1dbabb',
-            'environment' => 'testing',
+            'environment' => 'testing'
+        ), false, false, false);
+        $logger = Rollbar::scope(array(
             'fluent_host' => $address,
             'fluent_port' => $port,
-            'handler' => 'fluent',
-        ), false, false, false);
-        $logger = Rollbar::logger();
+            'handler' => 'fluent'
+          ));
         $this->assertEquals(200, $logger->log(LogLevel::INFO, 'this is a test', array())->getStatus());
 
         socket_close($socket);
