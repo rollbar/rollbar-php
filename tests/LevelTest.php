@@ -5,15 +5,12 @@ use Rollbar\Payload\Level;
 
 class LevelTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @expectedException \Exception
+     */
     public function testLevel()
     {
-        try {
-            $level = Level::TEST();
-            $this->fail();
-        } catch (\Exception $exception) {
-            $this->assertTrue(true);
-        }
-        
+        $level = Level::TEST();
 
         $level = Level::CRITICAL();
         $this->assertNotNull($level);
