@@ -989,7 +989,9 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $requestBody = $output->getRequest()->getBody();
         
         $this->assertEquals($streamInput, $requestBody);
-        $this->assertEquals($streamInput, $_SERVER['php://input']);
+        if (version_compare(PHP_VERSION, '5.6.0') < 0) {
+            $this->assertEquals($streamInput, $_SERVER['php://input']);
+        }
         
         stream_wrapper_restore("php");
     }
