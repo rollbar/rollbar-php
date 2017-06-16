@@ -42,7 +42,8 @@
     "squizlabs/php_codesniffer": "2.*",
     "codeclimate/php-test-reporter": "dev-master",
     "monolog/monolog": "*",
-    "packfire/php5.3-compat": "*"
+    "packfire/php5.3-compat": "*",
+    "phpmd/phpmd" : "@stable"
   },
 
   "suggest": {
@@ -56,5 +57,9 @@
     ],
     "fix": "phpcbf --standard=PSR1,PSR2 src tests"
 
+  },
+  
+  "config": {
+    "process-timeout": 600
   }
 }

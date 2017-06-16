@@ -99,6 +99,11 @@ class Defaults
         return $localVarsDump !== null ? $localVarsDump : $this->defaultLocalVarsDump;
     }
 
+    public function rawRequestBody($rawRequestBody = null)
+    {
+        return $rawRequestBody !== null ? $rawRequestBody : $this->defaultRawRequestBody;
+    }
+
     private $defaultMessageLevel = "warning";
     private $defaultExceptionLevel = "error";
     private $defaultPsrLevels;
@@ -114,6 +119,7 @@ class Defaults
     private $defaultSendMessageTrace;
     private $defaultIncludeCodeContext;
     private $defaultIncludeExcCodeContext;
+    private $defaultRawRequestBody;
     private $defaultLocalVarsDump;
     private $defaultCaptureErrorStacktraces;
 
@@ -165,6 +171,7 @@ class Defaults
         $this->defaultSendMessageTrace = false;
         $this->defaultIncludeCodeContext = false;
         $this->defaultIncludeExcCodeContext = false;
+        $this->defaultRawRequestBody = false;
         $this->defaultLocalVarsDump = false;
         $this->defaultCaptureErrorStacktraces = true;
     }

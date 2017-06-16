@@ -3,6 +3,7 @@
 namespace Rollbar\Truncation;
 
 use Rollbar\DataBuilder;
+use Rollbar\LevelFactory;
 
 class FramesStrategyTest extends \PHPUnit_Framework_TestCase
 {
@@ -13,7 +14,8 @@ class FramesStrategyTest extends \PHPUnit_Framework_TestCase
     {
         $dataBuilder = new DataBuilder(array(
             'accessToken' => 'abcd1234efef5678abcd1234567890be',
-            'environment' => 'tests'
+            'environment' => 'tests',
+            'levelFactory' => new LevelFactory
         ));
                     
         $strategy = new FramesStrategy($dataBuilder);

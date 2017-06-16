@@ -30,36 +30,36 @@ class ReadmeTest extends \PHPUnit_Framework_TestCase
                 'environment' => 'production'
             )
         );
-        
+
         try {
             throw new \Exception('test exception');
         } catch (\Exception $e) {
-            Rollbar::log(Level::error(), $e);
+            Rollbar::log(Level::ERROR, $e);
         }
-        
+
         // Message at level 'info'
-        Rollbar::log(Level::info(), 'testing info level');
-        
+        Rollbar::log(Level::INFO, 'testing info level');
+       
         // With extra data (3rd arg) and custom payload options (4th arg)
         Rollbar::log(
-            Level::info(),
+            Level::INFO,
             'testing extra data',
             array("some_key" => "some value") // key-value additional data
         );
-        
+
         // If you want to check if logging with Rollbar was successful
-        $response = Rollbar::log(Level::info(), 'testing wasSuccessful()');
+        $response = Rollbar::log(Level::INFO, 'testing wasSuccessful()');
         if (!$response->wasSuccessful()) {
             throw new \Exception('logging with Rollbar failed');
         }
-        
+
         // raises an E_NOTICE which will *not* be reported by the error handler
         // $foo = $bar;
-        
+
         // will be reported by the exception handler
         throw new \Exception('testing exception handler');
     }
-    
+
     public function testSetup1()
     {
         $config = array(
@@ -71,10 +71,10 @@ class ReadmeTest extends \PHPUnit_Framework_TestCase
             'root' => '/Users/brian/www/myapp'
         );
         Rollbar::init($config);
-        
+
         $this->assertTrue(true);
     }
-    
+
     public function testSetup2()
     {
         $config = array(
@@ -85,45 +85,45 @@ class ReadmeTest extends \PHPUnit_Framework_TestCase
             // optional - path to directory your code is in. used for linking stack traces.
             'root' => '/Users/brian/www/myapp'
         );
-        
+
         $set_exception_handler = false;
         $set_error_handler = false;
         Rollbar::init($config, $set_exception_handler, $set_error_handler);
-        
+
         $this->assertTrue(true);
     }
-    
+
     public function testBasicUsage()
     {
         try {
             do_something();
         } catch (\Exception $e) {
-            Rollbar::log(Level::error(), $e);
+            Rollbar::log(Level::ERROR, $e);
             // or
-            Rollbar::log(Level::error(), $e, array("my" => "extra", "data" => 42));
+            Rollbar::log(Level::ERROR, $e, array("my" => "extra", "data" => 42));
         }
     }
-    
+
     public function testBasicUsage2()
     {
-        Rollbar::log(Level::warning(), 'could not connect to mysql server');
+        Rollbar::log(Level::WARNING, 'could not connect to mysql server');
         Rollbar::log(
-            Level::info(),
+            Level::INFO,
             'Here is a message with some additional data',
             array('x' => 10, 'code' => 'blue')
         );
     }
-    
+
     public function testMonolog()
     {
-        $config = array('access_token' => ROLLBAR_TEST_TOKEN);
-        
+        $config = array('access_token' => ROLLBAR_TEST_TOKEN, 'environment' => 'testing');
+
         // installs global error and exception handlers
         Rollbar::init($config);
-        
+
         $log = new Logger('test');
         $log->pushHandler(new \Monolog\Handler\PsrHandler(Rollbar::logger()));
-        
+
         try {
             throw new \Exception('exception for monolog');
         } catch (\Exception $e) {

@@ -57,14 +57,21 @@ class DataBuilder implements DataBuilderInterface
     protected $includeExcCodeContext;
     protected $shiftFunction;
     protected $sendMessageTrace;
+    protected $rawRequestBody;
     protected $localVarsDump;
     protected $captureErrorStacktraces;
+    
+    /**
+     * @var LevelFactory
+     */
+    protected $levelFactory;
 
     public function __construct($config)
     {
         self::$defaults = Defaults::get();
         $this->setEnvironment($config);
 
+        $this->setRawRequestBody($config);
         $this->setDefaultMessageLevel($config);
         $this->setDefaultExceptionLevel($config);
         $this->setDefaultPsrLevels($config);
@@ -94,6 +101,7 @@ class DataBuilder implements DataBuilderInterface
         $this->setSendMessageTrace($config);
         $this->setLocalVarsDump($config);
         $this->setCaptureErrorStacktraces($config);
+        $this->setLevelFactory($config);
 
         $this->shiftFunction = $this->tryGet($config, 'shift_function');
         if (!isset($this->shiftFunction)) {
@@ -164,6 +172,12 @@ class DataBuilder implements DataBuilderInterface
         $fromConfig = $this->tryGet($config, 'send_message_trace');
         $this->sendMessageTrace = self::$defaults->sendMessageTrace($fromConfig);
     }
+    
+    protected function setRawRequestBody($config)
+    {
+        $fromConfig = $this->tryGet($config, 'include_raw_request_body');
+        $this->rawRequestBody = self::$defaults->rawRequestBody($fromConfig);
+    }
 
     protected function setLocalVarsDump($config)
     {
@@ -209,10 +223,14 @@ class DataBuilder implements DataBuilderInterface
 
     protected function setRequestBody($config)
     {
+        
         $this->requestBody = $this->tryGet($config, 'requestBody');
         
-        if (!$this->requestBody) {
+        if (!$this->requestBody && $this->rawRequestBody) {
             $this->requestBody = file_get_contents("php://input");
+            if (version_compare(PHP_VERSION, '5.6.0') < 0) {
+                $_SERVER['php://input'] = $this->requestBody;
+            }
         }
     }
 
@@ -305,6 +323,16 @@ class DataBuilder implements DataBuilderInterface
         $fromConfig = $this->tryGet($config, 'include_exception_code_context');
         $this->includeExcCodeContext = self::$defaults->includeExcCodeContext($fromConfig);
     }
+    
+    protected function setLevelFactory($config)
+    {
+        $this->levelFactory = $this->tryGet($config, 'levelFactory');
+        if (!$this->levelFactory) {
+            throw new \InvalidArgumentException(
+                'Missing dependency: LevelFactory not provided to the DataBuilder.'
+            );
+        }
+    }
 
     protected function setHost($config)
     {
@@ -312,7 +340,7 @@ class DataBuilder implements DataBuilderInterface
     }
 
     /**
-     * @param Level $level
+     * @param string $level
      * @param \Exception | \Throwable | string $toLog
      * @param $context
      * @return Data
@@ -452,12 +480,8 @@ class DataBuilder implements DataBuilderInterface
             return;
         }
 
-        $source = explode(PHP_EOL, file_get_contents($filename));
-        if (!is_array($source)) {
-            return;
-        }
+        $source = $this->getSourceLines($filename);
 
-        $source = str_replace(array("\n", "\t", "\r"), '', $source);
         $total = count($source);
         $line = $line - 1;
         $frame->setCode($source[$line]);
@@ -506,8 +530,8 @@ class DataBuilder implements DataBuilderInterface
                 $level = $this->messageLevel;
             }
         }
-        $level = strtolower($level);
-        return Level::fromName($this->tryGet($this->psrLevels, $level));
+        $level = $this->tryGet($this->psrLevels, strtolower($level));
+        return $this->levelFactory->fromName($level);
     }
 
     protected function getTimestamp()
@@ -545,15 +569,24 @@ class DataBuilder implements DataBuilderInterface
     protected function getRequest()
     {
         $request = new Request();
+
         $request->setUrl($this->getUrl())
-            ->setMethod($this->tryGet($_SERVER, 'REQUEST_METHOD'))
             ->setHeaders($this->getHeaders())
             ->setParams($this->getRequestParams())
-            ->setGet($_GET)
-            ->setQueryString($this->tryGet($_SERVER, "QUERY_STRING"))
-            ->setPost($_POST)
             ->setBody($this->getRequestBody())
             ->setUserIp($this->getUserIp());
+      
+        if (isset($_SERVER)) {
+            $request->setMethod($this->tryGet($_SERVER, 'REQUEST_METHOD'))
+                ->setQueryString($this->tryGet($_SERVER, "QUERY_STRING"));
+        }
+      
+        if (isset($_GET)) {
+            $request->setGet($_GET);
+        }
+        if (isset($_POST)) {
+            $request->setPost($_POST);
+        }
         $extras = $this->getRequestExtras();
         if (!$extras) {
             $extras = array();
@@ -687,13 +720,15 @@ class DataBuilder implements DataBuilderInterface
         $port = $this->getUrlPort($proto);
         
 
-        $path = Utilities::coalesce($this->tryGet($_SERVER, 'REQUEST_URI'), '/');
         $url = $proto . '://' . $host;
         if (($proto == 'https' && $port != 443) || ($proto == 'http' && $port != 80)) {
             $url .= ':' . $port;
         }
 
-        $url .= $path;
+        if (isset($_SERVER)) {
+            $path = Utilities::coalesce($this->tryGet($_SERVER, 'REQUEST_URI'), '/');
+            $url .= $path;
+        }
 
         if ($host == 'unknown') {
             $url = null;
@@ -705,16 +740,18 @@ class DataBuilder implements DataBuilderInterface
     protected function getHeaders()
     {
         $headers = array();
-        foreach ($_SERVER as $key => $val) {
-            if (substr($key, 0, 5) == 'HTTP_') {
-                // convert HTTP_CONTENT_TYPE to Content-Type, HTTP_HOST to Host, etc.
-                $name = strtolower(substr($key, 5));
-                if (strpos($name, '_') != -1) {
-                    $name = preg_replace('/ /', '-', ucwords(preg_replace('/_/', ' ', $name)));
-                } else {
-                    $name = ucfirst($name);
+        if (isset($_SERVER)) {
+            foreach ($_SERVER as $key => $val) {
+                if (substr($key, 0, 5) == 'HTTP_') {
+                    // convert HTTP_CONTENT_TYPE to Content-Type, HTTP_HOST to Host, etc.
+                    $name = strtolower(substr($key, 5));
+                    if (strpos($name, '_') != -1) {
+                        $name = preg_replace('/ /', '-', ucwords(preg_replace('/_/', ' ', $name)));
+                    } else {
+                        $name = ucfirst($name);
+                    }
+                    $headers[$name] = $val;
                 }
-                $headers[$name] = $val;
             }
         }
         if (count($headers) > 0) {
@@ -737,6 +774,9 @@ class DataBuilder implements DataBuilderInterface
 
     protected function getUserIp()
     {
+        if (!isset($_SERVER)) {
+            return null;
+        }
         $forwardFor = $this->tryGet($_SERVER, 'HTTP_X_FORWARDED_FOR');
         if ($forwardFor) {
             // return everything until the first comma
@@ -766,7 +806,7 @@ class DataBuilder implements DataBuilderInterface
                 $personData = call_user_func($this->personFunc);
             } catch (\Exception $exception) {
                 Rollbar::scope(array('person_fn' => null))->
-                    log(Level::fromName("error"), $exception);
+                    log(Level::ERROR, $exception);
             }
         }
 
@@ -805,7 +845,7 @@ class DataBuilder implements DataBuilderInterface
         foreach ($extras as $key => $val) {
             $server->$key = $val;
         }
-        if (array_key_exists('argv', $_SERVER)) {
+        if (isset($_SERVER) && array_key_exists('argv', $_SERVER)) {
             $server->argv = $_SERVER['argv'];
         }
         return $server;
@@ -1010,6 +1050,33 @@ class DataBuilder implements DataBuilderInterface
     public function needsTruncating(array $payload)
     {
         return strlen(json_encode($payload)) > self::MAX_PAYLOAD_SIZE;
+    }
+
+    /**
+     * Parses an array of code lines from source file with given filename.
+     *
+     * Attempts to automatically detect the line break character used in the file.
+     *
+     * @param string $filename
+     * @return string[] An array of lines of code from the given source file.
+     */
+    private function getSourceLines($filename)
+    {
+        $rawSource = file_get_contents($filename);
+
+        $source = explode(PHP_EOL, $rawSource);
+
+        if (count($source) === 1) {
+            if (substr_count($rawSource, "\n") > substr_count($rawSource, "\r")) {
+                $source = explode("\n", $rawSource);
+            } else {
+                $source = explode("\r", $rawSource);
+            }
+        }
+
+        $source = str_replace(array("\n", "\t", "\r"), '', $source);
+
+        return $source;
     }
     
     /**

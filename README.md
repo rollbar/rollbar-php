@@ -26,21 +26,21 @@ Rollbar::init(
 try {
     throw new \Exception('test exception');
 } catch (\Exception $e) {
-    Rollbar::log(Level::error(), $e);
+    Rollbar::log(Level::ERROR, $e);
 }
 
 // Message at level 'info'
-Rollbar::log(Level::info(), 'testing info level');
+Rollbar::log(Level::INFO, 'testing info level');
 
 // With extra data (3rd arg) and custom payload options (4th arg)
 Rollbar::log(
-    Level::info(),
+    Level::INFO,
     'testing extra data',
     array("some_key" => "some value") // key-value additional data
 );
         
 // If you want to check if logging with Rollbar was successful
-$response = Rollbar::log(Level::info(), 'testing wasSuccessful()');
+$response = Rollbar::log(Level::INFO, 'testing wasSuccessful()');
 if (!$response->wasSuccessful()) {
     throw new \Exception('logging with Rollbar failed');
 }
@@ -107,6 +107,33 @@ $set_error_handler = false;
 Rollbar::init($config, $set_exception_handler, $set_error_handler);
 ?>
 ```
+
+### For CodeIgniter Users
+
+If you are using CodeIgniter you can place `Rollbar::init` in either of the two places:
+* inside the Controller's constructor
+```php
+	public function __construct()
+	{
+		Rollbar::init(array(
+			'access_token' => config_item('rollbar_access_token'),
+		 	'environment' => ENVIRONMENT
+		));
+		parent::__construct();
+	}
+```
+* `pre_system` hook
+```php
+$hook['pre_system'] = function () {
+    Rollbar::init([
+        'access_token' => config_item('rollbar_access_token'),
+        'environment' => ENVIRONMENT,
+        'root' => APPPATH . '../'
+    ]);
+};
+```
+
+**Note: If you wish to log `E_NOTICE` errors make sure to pass `'included_errno' => E_ALL` to `Rollbar::init`.**
 
 ### For Heroku Users
 
@@ -175,9 +202,9 @@ use Rollbar\Payload\Level;
 try {
     do_something();
 } catch (\Exception $e) {
-    Rollbar::log(Level::error(), $e);
+    Rollbar::log(Level::ERROR, $e);
     // or
-    Rollbar::log(Level::error(), $e, array("my" => "extra", "data" => 42));
+    Rollbar::log(Level::ERROR, $e, array("my" => "extra", "data" => 42));
 }
 ?>
 ```
@@ -189,13 +216,30 @@ You can also send Rollbar log-like messages:
 use Rollbar\Rollbar;
 use Rollbar\Payload\Level;
 
-Rollbar::log(Level::warning(), 'could not connect to mysql server');
+Rollbar::log(Level::WARNING, 'could not connect to mysql server');
 Rollbar::log(
-    Level::info(), 
+    Level::INFO, 
     'Here is a message with some additional data',
     array('x' => 10, 'code' => 'blue')
 );
 ?>
+```
+
+## Using dependency injection
+
+If you're using dependency injection containers, you can create and get a `RollbarLogger` from the container and use it
+to initialize Rollbar error logging.
+
+It's up to the container to properly create and configure the logger.
+
+```php
+use Rollbar\Rollbar;
+use Rollbar\RollbarLogger;
+
+$logger = $container->get(RollbarLogger::class);
+
+// installs global error and exception handlers
+Rollbar::init($logger);
 ```
 
 ## Using Monolog
@@ -500,6 +544,18 @@ Default: No proxy
 Default: `false`
 </dd>
 
+
+<dt>include_raw_request_body</dt>
+<dd>Include the raw request body from php://input in payloads.
+Note: in PHP < 5.6 if you enable this, php://input will be empty for PUT requests
+as Rollbar SDK will read from it 
+@see http://php.net/manual/pl/wrappers.php.php#refsect2-wrappers.php-unknown-unknown-descriptiop
+If you still want to read the request body for your PUT requests Rollbar SDK saves
+the content of php://input in $_SERVER['php://input']
+
+Default: `false`
+</dd>
+
 <dt>local_vars_dump</dt>
 <dd>Should backtraces include arguments passed to stack frames.
 
@@ -549,6 +605,10 @@ A CakePHP-specific package is avaliable for integrating with CakePHP 2.x:
 [CakeRollbar](https://github.com/tranfuga25s/CakeRollbar)
 
 A Flow-specific package is available for integrating with Neos Flow: [m12/flow-rollbar](https://packagist.org/packages/m12/flow-rollbar)
+
+Yii package: [baibaratsky/yii-rollbar](https://github.com/baibaratsky/yii-rollbar)
+
+Yii2 package: [baibaratsky/yii2-rollbar](https://github.com/baibaratsky/yii2-rollbar)
 
 ## Help / Support
 
