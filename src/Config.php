@@ -134,8 +134,8 @@ class Config
 
     private function setDataBuilder($config)
     {
-        if (!isset($c['levelFactory'])) {
-            $c['levelFactory'] = $this->levelFactory;
+        if (!isset($config['levelFactory'])) {
+            $config['levelFactory'] = $this->levelFactory;
         }
         
         $exp = "Rollbar\DataBuilderInterface";
