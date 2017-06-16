@@ -108,6 +108,33 @@ Rollbar::init($config, $set_exception_handler, $set_error_handler);
 ?>
 ```
 
+### For CodeIgniter Users
+
+If you are using CodeIgniter you can place `Rollbar::init` in either of the two places:
+* inside the Controller's constructor
+```php
+	public function __construct()
+	{
+		Rollbar::init(array(
+			'access_token' => config_item('rollbar_access_token'),
+		 	'environment' => ENVIRONMENT
+		));
+		parent::__construct();
+	}
+```
+* `pre_system` hook
+```php
+$hook['pre_system'] = function () {
+    Rollbar::init([
+        'access_token' => config_item('rollbar_access_token'),
+        'environment' => ENVIRONMENT,
+        'root' => APPPATH . '../'
+    ]);
+};
+```
+
+**Note: If you wish to log `E_NOTICE` errors make sure to pass `'included_errno' => E_ALL` to `Rollbar::init`.**
+
 ### For Heroku Users
 
 First, add the addon:
