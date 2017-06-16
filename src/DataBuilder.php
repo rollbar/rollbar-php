@@ -1104,6 +1104,13 @@ class DataBuilder implements DataBuilderInterface
         } else {
             $backTrace = array();
         }
-        return new ErrorWrapper($errno, $errstr, $errfile, $errline, $backTrace);
+        return new ErrorWrapper(
+            $errno,
+            $errstr,
+            $errfile,
+            $errline,
+            $backTrace,
+            $this->utilities
+        );
     }
 }

@@ -496,13 +496,15 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testFramesWithoutContext()
     {
+        $utilities = new Utilities;
+        
         $dataBuilder = new DataBuilder(array(
             'accessToken' => 'abcd1234efef5678abcd1234567890be',
             'environment' => 'tests',
             'include_error_code_context' => false,
             'include_exception_code_context' => true,
             'levelFactory' => new LevelFactory,
-            'utilities' => new Utilities
+            'utilities' => $utilities
         ));
         $testFilePath = __DIR__ . '/DataBuilderTest.php';
         $backtrace = array(
@@ -517,12 +519,23 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
                 'line' => 99
             ),
         );
-        $output = $dataBuilder->getErrorTrace(new ErrorWrapper(E_ERROR, 'bork', null, null, $backtrace))->getFrames();
+        $output = $dataBuilder->getErrorTrace(
+            new ErrorWrapper(
+                E_ERROR,
+                'bork',
+                null,
+                null,
+                $backtrace,
+                $utilities
+            )
+        )->getFrames();
+        
         $this->assertNull($output[0]->getContext());
     }
 
     public function testFramesWithContext()
     {
+        $utilities = new Utilities;
 
         $testFilePath = __DIR__ . '/DataBuilderTest.php';
 
@@ -532,7 +545,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             'include_error_code_context' => true,
             'include_exception_code_context' => false,
             'levelFactory' => new LevelFactory,
-            'utilities' => new Utilities
+            'utilities' => $utilities
         ));
 
         $backTrace = array(
@@ -562,7 +575,16 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         }
         fclose($file);
 
-        $output = $dataBuilder->getErrorTrace(new ErrorWrapper(E_ERROR, 'bork', null, null, $backTrace))->getFrames();
+        $output = $dataBuilder->getErrorTrace(
+            new ErrorWrapper(
+                E_ERROR,
+                'bork',
+                null,
+                null,
+                $backTrace,
+                $utilities
+            )
+        )->getFrames();
         $pre = $output[0]->getContext()->getPre();
 
         $expected = array();
@@ -581,12 +603,14 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     public function testFramesWithoutContextDefault()
     {
         $testFilePath = __DIR__ . '/DataBuilderTest.php';
+        
+        $utilities = new Utilities;
 
         $dataBuilder = new DataBuilder(array(
             'accessToken' => 'abcd1234efef5678abcd1234567890be',
             'environment' => 'tests',
             'levelFactory' => new LevelFactory,
-            'utilities' => new Utilities
+            'utilities' => $utilities
         ));
 
         $backTrace = array(
@@ -616,7 +640,16 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         }
         fclose($file);
 
-        $output = $dataBuilder->getErrorTrace(new ErrorWrapper(E_ERROR, 'bork', null, null, $backTrace))->getFrames();
+        $output = $dataBuilder->getErrorTrace(
+            new ErrorWrapper(
+                E_ERROR,
+                'bork',
+                null,
+                null,
+                $backTrace,
+                $utilities
+            )
+        )->getFrames();
         $this->assertNull($output[0]->getContext());
     }
 

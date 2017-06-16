@@ -51,7 +51,18 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
                 E_ERROR => 0
             )
         ));
-        $response = $l->log(Level::ERROR, new ErrorWrapper(E_ERROR, '', null, null, array()), array());
+        $response = $l->log(
+            Level::ERROR,
+            new ErrorWrapper(
+                E_ERROR,
+                '',
+                null,
+                null,
+                array(),
+                new Utilities
+            ),
+            array()
+        );
         $this->assertEquals(0, $response->getStatus());
     }
 
@@ -62,7 +73,18 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
             "environment" => "testing-php",
             "included_errno" => E_ERROR | E_WARNING
         ));
-        $response = $l->log(Level::ERROR, new ErrorWrapper(E_USER_ERROR, '', null, null, array()), array());
+        $response = $l->log(
+            Level::ERROR,
+            new ErrorWrapper(
+                E_USER_ERROR,
+                '',
+                null,
+                null,
+                array(),
+                new Utilities
+            ),
+            array()
+        );
         $this->assertEquals(0, $response->getStatus());
     }
     

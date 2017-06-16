@@ -15,7 +15,14 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->error = new ErrorWrapper(E_ERROR, "test", null, null, null);
+        $this->error = new ErrorWrapper(
+            E_ERROR,
+            "test",
+            null,
+            null,
+            null,
+            new Utilities
+        );
     }
 
     public function tearDown()

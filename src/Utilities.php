@@ -3,16 +3,6 @@
 final class Utilities
 {
     const IS_UNCAUGHT_KEY = "__rollbar_is_uncaught_key";
-
-    // In order to support < 5.6 we had to use __callStatic to define
-    // coalesce, because the splat operator was introduced in 5.6
-    public static function __callStatic($name, $args)
-    {
-        if ($name == 'coalesce') {
-            return self::coalesceArray($args);
-        }
-        return null;
-    }
     
     public function coalesce()
     {
