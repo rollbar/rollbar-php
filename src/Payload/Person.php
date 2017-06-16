@@ -2,6 +2,12 @@
 
 use Rollbar\Utilities;
 
+/**
+ * Suppress PHPMD.ShortVariable for this class, since using property $id is
+ * intended.
+ *
+ * @SuppressWarnings(PHPMD.ShortVariable)
+ */
 class Person implements \JsonSerializable
 {
     private $id;

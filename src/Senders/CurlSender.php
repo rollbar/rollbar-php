@@ -47,39 +47,39 @@ class CurlSender implements SenderInterface
     public function send($scrubbedPayload, $accessToken)
     {
 
-        $ch = curl_init();
+        $handle = curl_init();
 
-        $this->setCurlOptions($ch, $scrubbedPayload, $accessToken);
-        $result = curl_exec($ch);
-        $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $this->setCurlOptions($handle, $scrubbedPayload, $accessToken);
+        $result = curl_exec($handle);
+        $statusCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
 
-        curl_close($ch);
+        curl_close($handle);
 
         $uuid = $scrubbedPayload['data']['uuid'];
         return new Response($statusCode, json_decode($result, true), $uuid);
     }
 
-    public function setCurlOptions($ch, $scrubbedPayload, $accessToken)
+    public function setCurlOptions($handle, $scrubbedPayload, $accessToken)
     {
-        curl_setopt($ch, CURLOPT_URL, $this->endpoint);
-        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($handle, CURLOPT_URL, $this->endpoint);
+        curl_setopt($handle, CURLOPT_POST, true);
         $encoded = json_encode($scrubbedPayload);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $encoded);
-        curl_setopt($ch, CURLOPT_VERBOSE, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-Rollbar-Access-Token: ' . $accessToken));
-        curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+        curl_setopt($handle, CURLOPT_POSTFIELDS, $encoded);
+        curl_setopt($handle, CURLOPT_VERBOSE, false);
+        curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
+        curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($handle, CURLOPT_TIMEOUT, $this->timeout);
+        curl_setopt($handle, CURLOPT_HTTPHEADER, array('X-Rollbar-Access-Token: ' . $accessToken));
+        curl_setopt($handle, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
 
         if ($this->proxy) {
             $proxy = is_array($this->proxy) ? $this->proxy : array('address' => $this->proxy);
             if (isset($proxy['address'])) {
-                curl_setopt($ch, CURLOPT_PROXY, $proxy['address']);
-                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+                curl_setopt($handle, CURLOPT_PROXY, $proxy['address']);
+                curl_setopt($handle, CURLOPT_FOLLOWLOCATION, true);
             }
             if (isset($proxy['username']) && isset($proxy['password'])) {
-                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $proxy['username'] . ':' . $proxy['password']);
+                curl_setopt($handle, CURLOPT_PROXYUSERPWD, $proxy['username'] . ':' . $proxy['password']);
             }
         }
     }

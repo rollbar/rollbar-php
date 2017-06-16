@@ -3,20 +3,15 @@
 final class Utilities
 {
     const IS_UNCAUGHT_KEY = "__rollbar_is_uncaught_key";
-
-    // In order to support < 5.6 we had to use __callStatic to define
-    // coalesce, because the splat operator was introduced in 5.6
-    public static function __callStatic($name, $args)
+    
+    public function coalesce()
     {
-        if ($name == 'coalesce') {
-            return self::coalesceArray($args);
-        }
-        return null;
+        return self::coalesceArray(func_get_args());
     }
 
     public static function coalesceArray(array $values)
     {
-        foreach ($values as $key => $val) {
+        foreach ($values as $val) {
             if ($val) {
                 return $val;
             }
@@ -27,8 +22,8 @@ final class Utilities
     // Modified from: http://stackoverflow.com/a/1176023/456188
     public static function pascalToCamel($input)
     {
-        $s1 = preg_replace('/([^_])([A-Z][a-z]+)/', '$1_$2', $input);
-        return strtolower(preg_replace('/([a-z0-9])([A-Z])/', '$1_$2', $s1));
+        $temp = preg_replace('/([^_])([A-Z][a-z]+)/', '$1_$2', $input);
+        return strtolower(preg_replace('/([a-z0-9])([A-Z])/', '$1_$2', $temp));
     }
 
     public static function validateString(
@@ -109,7 +104,7 @@ final class Utilities
             }
             $newKey = array_key_exists($key, $overrideNames)
                 ? $overrideNames[$key]
-                : Utilities::pascalToCamel($key);
+                : self::pascalToCamel($key);
             if (in_array($key, $customKeys)) {
                 $returnVal[$key] = $val;
             } elseif (!is_null($val)) {
