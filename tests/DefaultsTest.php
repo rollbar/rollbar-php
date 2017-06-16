@@ -10,29 +10,29 @@ class DefaultsTest extends \PHPUnit_Framework_TestCase
     /**
      * @var Defaults
      */
-    private $d;
+    private $defaults;
 
     public function setUp()
     {
-        $this->d = new Defaults(new Utilities());
+        $this->defaults = new Defaults(new Utilities());
     }
 
     public function testGet()
     {
-        $d = Defaults::get();
-        $this->assertInstanceOf("Rollbar\Defaults", $d);
+        $defaults = Defaults::get();
+        $this->assertInstanceOf("Rollbar\Defaults", $defaults);
     }
 
     public function testMessageLevel()
     {
-        $this->assertEquals("warning", $this->d->messageLevel());
-        $this->assertEquals("error", $this->d->messageLevel(Level::ERROR));
+        $this->assertEquals("warning", $this->defaults->messageLevel());
+        $this->assertEquals("error", $this->defaults->messageLevel(Level::ERROR));
     }
 
     public function testExceptionLevel()
     {
-        $this->assertEquals("error", $this->d->exceptionLevel());
-        $this->assertEquals("warning", $this->d->exceptionLevel(Level::WARNING));
+        $this->assertEquals("error", $this->defaults->exceptionLevel());
+        $this->assertEquals("warning", $this->defaults->exceptionLevel(Level::WARNING));
     }
 
     public function testErrorLevels()
@@ -54,7 +54,7 @@ class DefaultsTest extends \PHPUnit_Framework_TestCase
             E_DEPRECATED => "info",
             E_USER_DEPRECATED => "info"
         );
-        $this->assertEquals($expected, $this->d->errorLevels());
+        $this->assertEquals($expected, $this->defaults->errorLevels());
     }
 
     public function testPsrLevels()
@@ -77,36 +77,36 @@ class DefaultsTest extends \PHPUnit_Framework_TestCase
             LogLevel::DEBUG => "debug",
             "debug" => "debug"
         );
-        $this->assertEquals($expected, $this->d->psrLevels());
+        $this->assertEquals($expected, $this->defaults->psrLevels());
     }
 
     public function testGitHash()
     {
         $val = exec('git rev-parse --verify HEAD');
-        $this->assertEquals($val, $this->d->gitHash());
+        $this->assertEquals($val, $this->defaults->gitHash());
     }
 
     public function testGitBranch()
     {
         $val = exec('git rev-parse --abbrev-ref HEAD');
-        $this->assertEquals($val, $this->d->gitBranch());
+        $this->assertEquals($val, $this->defaults->gitBranch());
     }
 
     public function testServerRoot()
     {
         $_ENV["HEROKU_APP_DIR"] = "abc123";
-        $d = new Defaults(new Utilities);
-        $this->assertEquals("abc123", $d->serverRoot());
+        $defaults = new Defaults(new Utilities);
+        $this->assertEquals("abc123", $defaults->serverRoot());
     }
 
     public function testPlatform()
     {
-        $this->assertEquals(php_uname('a'), $this->d->platform());
+        $this->assertEquals(php_uname('a'), $this->defaults->platform());
     }
 
     public function testNotifier()
     {
-        $this->assertEquals(Notifier::defaultNotifier(), $this->d->notifier());
+        $this->assertEquals(Notifier::defaultNotifier(), $this->defaults->notifier());
     }
 
     public function testBaseException()
@@ -116,7 +116,7 @@ class DefaultsTest extends \PHPUnit_Framework_TestCase
         } else {
             $expected = "\Throwable";
         }
-        $base = $this->d->baseException();
+        $base = $this->defaults->baseException();
         $this->assertEquals($expected, $base);
     }
 
@@ -132,11 +132,11 @@ class DefaultsTest extends \PHPUnit_Framework_TestCase
             'csrf_token',
             'access_token'
         );
-        $this->assertEquals($expected, $this->d->scrubFields());
+        $this->assertEquals($expected, $this->defaults->scrubFields());
     }
     
     public function testSendMessageTrace()
     {
-        $this->assertFalse($this->d->sendMessageTrace());
+        $this->assertFalse($this->defaults->sendMessageTrace());
     }
 }
