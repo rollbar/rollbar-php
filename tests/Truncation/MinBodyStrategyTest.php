@@ -4,6 +4,7 @@ namespace Rollbar\Truncation;
 
 use Rollbar\DataBuilder;
 use Rollbar\LevelFactory;
+use Rollbar\Utilities;
 
 class MinBodyStrategyTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,7 +17,8 @@ class MinBodyStrategyTest extends \PHPUnit_Framework_TestCase
         $dataBuilder = new DataBuilder(array(
             'accessToken' => 'abcd1234efef5678abcd1234567890be',
             'environment' => 'tests',
-            'levelFactory' => new LevelFactory
+            'levelFactory' => new LevelFactory,
+            'utilities' => new Utilities
         ));
                     
         $strategy = new MinBodyStrategy($dataBuilder);

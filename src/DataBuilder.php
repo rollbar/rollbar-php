@@ -65,10 +65,18 @@ class DataBuilder implements DataBuilderInterface
      * @var LevelFactory
      */
     protected $levelFactory;
+    
+    /**
+     * @var Utilities
+     */
+    protected $utilities;
 
     public function __construct($config)
     {
         self::$defaults = Defaults::get();
+        
+        $this->setUtilities($config);
+        
         $this->setEnvironment($config);
 
         $this->setRawRequestBody($config);
@@ -109,19 +117,6 @@ class DataBuilder implements DataBuilderInterface
         }
     }
 
-    protected function getOrCall($name, $level, $toLog, $context)
-    {
-        if (is_callable($this->$name)) {
-            try {
-                return $this->$name($level, $toLog, $context);
-            } catch (\Exception $e) {
-                // TODO Report the configuration error.
-                return null;
-            }
-        }
-        return $this->$name;
-    }
-
     protected function tryGet($array, $key)
     {
         return isset($array[$key]) ? $array[$key] : null;
@@ -130,7 +125,7 @@ class DataBuilder implements DataBuilderInterface
     protected function setEnvironment($config)
     {
         $fromConfig = $this->tryGet($config, 'environment');
-        Utilities::validateString($fromConfig, "config['environment']", null, false);
+        $this->utilities->validateString($fromConfig, "config['environment']", null, false);
         $this->environment = $fromConfig;
     }
 
@@ -333,6 +328,16 @@ class DataBuilder implements DataBuilderInterface
             );
         }
     }
+    
+    protected function setUtilities($config)
+    {
+        $this->utilities = $this->tryGet($config, 'utilities');
+        if (!$this->utilities) {
+            throw new \InvalidArgumentException(
+                'Missing dependency: Utilities not provided to the DataBuilder.'
+            );
+        }
+    }
 
     protected function setHost($config)
     {
@@ -433,7 +438,7 @@ class DataBuilder implements DataBuilderInterface
         }
         
         $excInfo = new ExceptionInfo(
-            Utilities::coalesce($classOverride, get_class($exception)),
+            $this->utilities->coalesce($classOverride, get_class($exception)),
             $exception->getMessage()
         );
         return new Trace($frames, $excInfo);
@@ -443,10 +448,10 @@ class DataBuilder implements DataBuilderInterface
     {
         $frames = array();
         foreach ($this->getTrace($exception) as $frameInfo) {
-            $filename = Utilities::coalesce($this->tryGet($frameInfo, 'file'), '<internal>');
-            $lineno = Utilities::coalesce($this->tryGet($frameInfo, 'line'), 0);
+            $filename = $this->utilities->coalesce($this->tryGet($frameInfo, 'file'), '<internal>');
+            $lineno = $this->utilities->coalesce($this->tryGet($frameInfo, 'line'), 0);
             $method = $frameInfo['function'];
-            $args = Utilities::coalesce($this->tryGet($frameInfo, 'args'), null);
+            $args = $this->utilities->coalesce($this->tryGet($frameInfo, 'args'), null);
 
             $frame = new Frame($filename);
             $frame->setLineno($lineno)
@@ -726,7 +731,7 @@ class DataBuilder implements DataBuilderInterface
         }
 
         if (isset($_SERVER)) {
-            $path = Utilities::coalesce($this->tryGet($_SERVER, 'REQUEST_URI'), '/');
+            $path = $this->utilities->coalesce($this->tryGet($_SERVER, 'REQUEST_URI'), '/');
             $url .= $path;
         }
 

@@ -11,7 +11,7 @@ class Defaults
     public static function get()
     {
         if (is_null(self::$singleton)) {
-            self::$singleton = new Defaults();
+            self::$singleton = new Defaults(new Utilities());
         }
         return self::$singleton;
     }
@@ -56,6 +56,10 @@ class Defaults
         return php_uname('a');
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.StaticAccess) Static access to default notifier
+     * intended.
+     */
     private static function getNotifier()
     {
         return Notifier::defaultNotifier();
@@ -122,8 +126,9 @@ class Defaults
     private $defaultRawRequestBody;
     private $defaultLocalVarsDump;
     private $defaultCaptureErrorStacktraces;
+    private $utilities;
 
-    public function __construct()
+    public function __construct($utilties)
     {
         $this->defaultPsrLevels = array(
             LogLevel::EMERGENCY => "critical",
@@ -174,75 +179,95 @@ class Defaults
         $this->defaultRawRequestBody = false;
         $this->defaultLocalVarsDump = false;
         $this->defaultCaptureErrorStacktraces = true;
+        
+        $this->utilities = $utilties;
     }
 
     public function messageLevel($level = null)
     {
-        return Utilities::coalesce($level, $this->defaultMessageLevel);
+        return $this->utilities->coalesce($level, $this->defaultMessageLevel);
     }
 
     public function exceptionLevel($level = null)
     {
-        return Utilities::coalesce($level, $this->defaultExceptionLevel);
+        return $this->utilities->coalesce($level, $this->defaultExceptionLevel);
     }
 
     public function errorLevels($level = null)
     {
-        return Utilities::coalesce($level, $this->defaultErrorLevels);
+        return $this->utilities->coalesce($level, $this->defaultErrorLevels);
     }
-
+    
     public function psrLevels($level = null)
     {
-        return Utilities::coalesce($level, $this->defaultPsrLevels);
+        return $this->utilities->coalesce($level, $this->defaultPsrLevels);
     }
 
     public function codeVersion($codeVersion = null)
     {
-        return Utilities::coalesce($codeVersion, $this->defaultCodeVersion);
+        return $this->utilities->coalesce(
+            $codeVersion,
+            $this->defaultCodeVersion
+        );
     }
 
     public function gitHash($gitHash = null)
     {
-        return Utilities::coalesce($gitHash, $this->defaultGitHash);
+        return $this->utilities->coalesce($gitHash, $this->defaultGitHash);
     }
 
     public function gitBranch($gitBranch = null)
     {
-        return Utilities::coalesce($gitBranch, $this->defaultGitBranch);
+        return $this->utilities->coalesce($gitBranch, $this->defaultGitBranch);
     }
 
     public function serverRoot($serverRoot = null)
     {
-        return Utilities::coalesce($serverRoot, $this->defaultServerRoot);
+        return $this->utilities->coalesce(
+            $serverRoot,
+            $this->defaultServerRoot
+        );
     }
 
     public function platform($platform = null)
     {
-        return Utilities::coalesce($platform, $this->defaultPlatform);
+        return $this->utilities->coalesce($platform, $this->defaultPlatform);
     }
 
     public function notifier($notifier = null)
     {
-        return Utilities::coalesce($notifier, $this->defaultNotifier);
+        return $this->utilities->coalesce($notifier, $this->defaultNotifier);
     }
 
     public function baseException($baseException = null)
     {
-        return Utilities::coalesce($baseException, $this->defaultBaseException);
+        return $this->utilities->coalesce(
+            $baseException,
+            $this->defaultBaseException
+        );
     }
 
     public function scrubFields($scrubFields = null)
     {
-        return Utilities::coalesce($scrubFields, $this->defaultScrubFields);
+        return $this->utilities->coalesce(
+            $scrubFields,
+            $this->defaultScrubFields
+        );
     }
 
     public function includeCodeContext($includeCodeContext = null)
     {
-        return Utilities::coalesce($includeCodeContext, $this->defaultIncludeCodeContext);
+        return $this->utilities->coalesce(
+            $includeCodeContext,
+            $this->defaultIncludeCodeContext
+        );
     }
 
     public function includeExcCodeContext($includeExcCodeContext = null)
     {
-        return Utilities::coalesce($includeExcCodeContext, $this->defaultIncludeExcCodeContext);
+        return $this->utilities->coalesce(
+            $includeExcCodeContext,
+            $this->defaultIncludeExcCodeContext
+        );
     }
 }

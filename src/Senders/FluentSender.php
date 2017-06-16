@@ -59,7 +59,7 @@ class FluentSender implements SenderInterface
      * @param $scrubbedPayload
      * @param $accessToken
      * @return Response
-     * 
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter) Unsued parameter is
      * intended here to comply to SenderInterface
      */

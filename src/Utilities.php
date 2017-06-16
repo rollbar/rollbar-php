@@ -13,6 +13,11 @@ final class Utilities
         }
         return null;
     }
+    
+    public function coalesce()
+    {
+        return self::coalesceArray(func_get_args());
+    }
 
     public static function coalesceArray(array $values)
     {
@@ -109,7 +114,7 @@ final class Utilities
             }
             $newKey = array_key_exists($key, $overrideNames)
                 ? $overrideNames[$key]
-                : Utilities::pascalToCamel($key);
+                : self::pascalToCamel($key);
             if (in_array($key, $customKeys)) {
                 $returnVal[$key] = $val;
             } elseif (!is_null($val)) {

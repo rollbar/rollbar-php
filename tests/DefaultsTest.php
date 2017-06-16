@@ -14,7 +14,7 @@ class DefaultsTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->d = new Defaults();
+        $this->d = new Defaults(new Utilities());
     }
 
     public function testGet()
@@ -95,7 +95,7 @@ class DefaultsTest extends \PHPUnit_Framework_TestCase
     public function testServerRoot()
     {
         $_ENV["HEROKU_APP_DIR"] = "abc123";
-        $d = new Defaults();
+        $d = new Defaults(new Utilities);
         $this->assertEquals("abc123", $d->serverRoot());
     }
 

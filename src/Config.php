@@ -25,6 +25,11 @@ class Config
     private $levelFactory;
     
     /**
+     * @var Utilities
+     */
+    private $utilities;
+    
+    /**
      * @var TransformerInterface
      */
     private $transformer;
@@ -61,6 +66,7 @@ class Config
     public function __construct(array $configArray)
     {
         $this->levelFactory = new LevelFactory();
+        $this->utilities = new Utilities();
         
         $this->updateConfig($configArray);
 
@@ -128,7 +134,7 @@ class Config
         if (isset($_ENV['ROLLBAR_ACCESS_TOKEN']) && !isset($config['access_token'])) {
             $config['access_token'] = $_ENV['ROLLBAR_ACCESS_TOKEN'];
         }
-        Utilities::validateString($config['access_token'], "config['access_token']", 32, false);
+        $this->utilities->validateString($config['access_token'], "config['access_token']", 32, false);
         $this->accessToken = $config['access_token'];
     }
 
@@ -136,6 +142,10 @@ class Config
     {
         if (!isset($config['levelFactory'])) {
             $config['levelFactory'] = $this->levelFactory;
+        }
+        
+        if (!isset($config['utilities'])) {
+            $config['utilities'] = $this->utilities;
         }
         
         $exp = "Rollbar\DataBuilderInterface";
