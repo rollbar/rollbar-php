@@ -4,7 +4,7 @@ namespace Rollbar\Senders; // in a different namespace, so we can monkey-patch m
 
 use Rollbar;
 
-function microtime($getAsFloat = null)
+function microtime()
 {
     return 2;
 }
