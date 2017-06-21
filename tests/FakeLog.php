@@ -4,7 +4,8 @@ namespace Rollbar;
 
 class FakeLog
 {
-    public function log($level, $message)
+    // log($level, $message)
+    public function log()
     {
     }
 }

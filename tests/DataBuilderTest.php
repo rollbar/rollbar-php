@@ -35,7 +35,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getUrlProvider
      */
-    public function testGetUrl($protoData, $hostData, $portData, $dataName)
+    public function testGetUrl($protoData, $hostData, $portData)
     {
         // Set up proto
         $pre_SERVER = $_SERVER;
@@ -89,8 +89,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
                     $testData []= array(
                         $protoTest, // test param 1
                         $hostTest, // test param 2
-                        $portTest, // test param 3,
-                        $dataName // test param 4
+                        $portTest // test param 3,
                     );
                     
                     $dataName++;

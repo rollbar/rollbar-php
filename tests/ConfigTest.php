@@ -215,8 +215,6 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     
     public function testEndpoint()
     {
-        $payload = m::mock("Rollbar\Payload\Payload");
-            
         $config = new Config(array(
             "access_token" => $this->token,
             "environment" => $this->env,
@@ -231,8 +229,6 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     
     public function testEndpointDefault()
     {
-        $payload = m::mock("Rollbar\Payload\Payload");
-            
         $config = new Config(array(
             "access_token" => $this->token,
             "environment" => $this->env
@@ -246,8 +242,6 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     
     public function testBaseApiUrl()
     {
-        $payload = m::mock("Rollbar\Payload\Payload");
-            
         $config = new Config(array(
             "access_token" => $this->token,
             "environment" => $this->env,
@@ -262,8 +256,6 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     
     public function testBaseApiUrlDefault()
     {
-        $payload = m::mock("Rollbar\Payload\Payload");
-            
         $config = new Config(array(
             "access_token" => $this->token,
             "environment" => $this->env
@@ -299,7 +291,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $config = new Config(array(
             "access_token" => $this->token,
             "environment" => $this->env,
-            "checkIgnore" => function ($isUncaught, $exc, $payload) use (&$called) {
+            "checkIgnore" => function () use (&$called) {
                 $called = true;
             }
         ));
@@ -332,8 +324,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             "environment" => $this->env,
             "checkIgnore" => function (
                 $isUncaught,
-                $exc,
-                $payload
+                $exc
             ) use (
                 &$called,
                 &$isUncaughtPassed,
@@ -387,15 +378,14 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider useErrorReportingProvider
      */
-    public function testUseErrorReporting($setup, $expected)
+    public function testUseErrorReporting($use_error_reporting, $error_reporting, $expected)
     {
-        extract($setup);
         $called = false;
         
         $config = new Config(array(
             "access_token" => $this->token,
             "environment" => $this->env,
-            "checkIgnore" => function ($isUncaught, $exc, $payload) use (&$called) {
+            "checkIgnore" => function () use (&$called) {
                 $called = true;
             },
             "use_error_reporting" => $use_error_reporting
@@ -432,24 +422,18 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             "use_error_reporting off" => array(
-                array(
-                    "use_error_reporting" => false,
-                    "error_reporting" => null
-                ),
+                false, // "use_error_reporting"
+                null,  // "error_reporting"
                 false
             ),
             "use_error_reporting on & errno not covered" => array(
-                array(
-                    "use_error_reporting" => true,
-                    "error_reporting" => E_WARNING
-                ),
+                true,      // "use_error_reporting"
+                E_WARNING, // "error_reporting"
                 true
             ),
             "use_error_reporting on & errno covered" => array(
-                array(
-                    "use_error_reporting" => true,
-                    "error_reporting" => E_ERROR
-                ),
+                true,    // "use_error_reporting"
+                E_ERROR, // "error_reporting"
                 false
             )
         );
