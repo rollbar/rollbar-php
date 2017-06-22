@@ -161,6 +161,7 @@ class Config
 
     private function setMinimumLevel($config)
     {
+        $this->minimumLevel = 0;
         if (empty($config['minimumLevel'])) {
             $this->minimumLevel = 0;
         } elseif ($config['minimumLevel'] instanceof Level) {
@@ -172,8 +173,6 @@ class Config
             }
         } elseif (is_int($config['minimumLevel'])) {
             $this->minimumLevel = $config['minimumLevel'];
-        } else {
-            $this->minimumLevel = 0;
         }
     }
 
