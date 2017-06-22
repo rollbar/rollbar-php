@@ -163,8 +163,7 @@ class RollbarJsHelper
             }
             
             return "\n<script type=\"text/javascript\" nonce=\"$nonce\">$content</script>";
-        } else {
-            return "\n<script type=\"text/javascript\">$content</script>";
         }
+        return "\n<script type=\"text/javascript\">$content</script>";
     }
 }
