@@ -196,6 +196,9 @@ class DataBuilder implements DataBuilderInterface
         $this->requestParams = $this->tryGet($config, 'requestParams');
     }
 
+    /*
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
     protected function setRequestBody($config)
     {
         
@@ -551,6 +554,9 @@ class DataBuilder implements DataBuilderInterface
         return $this->context;
     }
 
+    /*
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
     protected function getRequest()
     {
         $request = new Request();
@@ -635,6 +641,9 @@ class DataBuilder implements DataBuilderInterface
         return $result;
     }
     
+    /*
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
     public function getUrlProto()
     {
         $proto = '';
@@ -657,6 +666,9 @@ class DataBuilder implements DataBuilderInterface
         return $proto;
     }
     
+    /*
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
     public function getUrlHost()
     {
         $host = '';
@@ -681,6 +693,9 @@ class DataBuilder implements DataBuilderInterface
         return $host;
     }
     
+    /*
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
     public function getUrlPort($proto)
     {
         $port = '';
@@ -698,6 +713,9 @@ class DataBuilder implements DataBuilderInterface
         return $port;
     }
 
+    /*
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
     public function getUrl()
     {
         $proto = $this->getUrlProto();
@@ -722,6 +740,9 @@ class DataBuilder implements DataBuilderInterface
         return $url;
     }
 
+    /*
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
     protected function getHeaders()
     {
         $headers = array();
@@ -757,6 +778,9 @@ class DataBuilder implements DataBuilderInterface
         return $this->requestBody;
     }
 
+    /*
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
     protected function getUserIp()
     {
         if (!isset($_SERVER)) {
@@ -815,6 +839,9 @@ class DataBuilder implements DataBuilderInterface
         return new Person($identifier, $username, $email, $personData);
     }
 
+    /*
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
     protected function getServer()
     {
         $server = new Server();
