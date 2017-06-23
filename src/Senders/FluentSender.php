@@ -4,10 +4,13 @@ namespace Rollbar\Senders;
 
 use Fluent\Logger\FluentLogger;
 use Rollbar\Response;
-use Rollbar\Utilities;
 
 class FluentSender implements SenderInterface
 {
+    /**
+     * @var Utilities
+     */
+    private $utilities;
 
     /**
      * @var FluentLogger FluentLogger instance
@@ -36,22 +39,21 @@ class FluentSender implements SenderInterface
      */
     public function __construct($opts)
     {
-        // @codingStandardsIgnoreStart
+        $this->utilities = new \Rollbar\Utilities();
         if (isset($opts['fluentHost'])) {
-            Utilities::validateString($opts['fluentHost'], 'opts["fluentHost"]', null, false);
+            $this->utilities->validateString($opts['fluentHost'], 'opts["fluentHost"]', null, false);
             $this->fluentHost = $opts['fluentHost'];
         }
 
         if (isset($opts['fluentPort'])) {
-            Utilities::validateInteger($opts['fluentPort'], 'opts["fluentPort"]', null, null, false);
+            $this->utilities->validateInteger($opts['fluentPort'], 'opts["fluentPort"]', null, null, false);
             $this->fluentPort = $opts['fluentPort'];
         }
 
         if (isset($opts['fluentTag'])) {
-            Utilities::validateString($opts['fluentTag'], 'opts["fluentTag"]', null, false);
+            $this->utilities->validateString($opts['fluentTag'], 'opts["fluentTag"]', null, false);
             $this->fluentTag = $opts['fluentTag'];
         }
-        // @codingStandardsIgnoreEnd
     }
 
 

@@ -1,15 +1,15 @@
 <?php namespace Rollbar\Payload;
 
-use Rollbar\Utilities;
-
 class ExceptionInfo implements \JsonSerializable
 {
     private $class;
     private $message;
     private $description;
+    private $utilities;
 
     public function __construct($class, $message, $description = null)
     {
+        $this->utilities = new \Rollbar\Utilities();
         $this->setClass($class);
         $this->setMessage($message);
         $this->setDescription($description);
@@ -22,7 +22,7 @@ class ExceptionInfo implements \JsonSerializable
 
     public function setClass($class)
     {
-        Utilities::validateString($class, "class", null, false);
+        $this->utilities->validateString($class, "class", null, false);
         $this->class = $class;
         return $this;
     }
@@ -34,7 +34,7 @@ class ExceptionInfo implements \JsonSerializable
 
     public function setMessage($message)
     {
-        Utilities::validateString($message, "message", null, false);
+        $this->utilities->validateString($message, "message", null, false);
         $this->message = $message;
         return $this;
     }
@@ -46,13 +46,13 @@ class ExceptionInfo implements \JsonSerializable
 
     public function setDescription($description)
     {
-        Utilities::validateString($description, "description");
+        $this->utilities->validateString($description, "description");
         $this->description = $description;
         return $this;
     }
 
     public function jsonSerialize()
     {
-        return Utilities::serializeForRollbar(get_object_vars($this));
+        return $this->utilities->serializeForRollbar(get_object_vars($this));
     }
 }

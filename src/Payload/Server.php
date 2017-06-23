@@ -1,7 +1,5 @@
 <?php namespace Rollbar\Payload;
 
-use Rollbar\Utilities;
-
 class Server implements \JsonSerializable
 {
     private $host;
@@ -9,6 +7,12 @@ class Server implements \JsonSerializable
     private $branch;
     private $codeVersion;
     private $extra = array();
+    private $utilities;
+
+    public function __construct()
+    {
+        $this->utilities = new \Rollbar\Utilities();
+    }
 
     public function getHost()
     {
@@ -17,7 +21,7 @@ class Server implements \JsonSerializable
 
     public function setHost($host)
     {
-        Utilities::validateString($host, "host");
+        $this->utilities->validateString($host, "host");
         $this->host = $host;
         return $this;
     }
@@ -29,7 +33,7 @@ class Server implements \JsonSerializable
 
     public function setRoot($root)
     {
-        Utilities::validateString($root, "root");
+        $this->utilities->validateString($root, "root");
         $this->root = $root;
         return $this;
     }
@@ -41,7 +45,7 @@ class Server implements \JsonSerializable
 
     public function setBranch($branch)
     {
-        Utilities::validateString($branch, "branch");
+        $this->utilities->validateString($branch, "branch");
         $this->branch = $branch;
         return $this;
     }
@@ -53,7 +57,7 @@ class Server implements \JsonSerializable
 
     public function setCodeVersion($codeVersion)
     {
-        Utilities::validateString($codeVersion, "codeVersion");
+        $this->utilities->validateString($codeVersion, "codeVersion");
         $this->codeVersion = $codeVersion;
         return $this;
     }
@@ -71,10 +75,11 @@ class Server implements \JsonSerializable
     public function jsonSerialize()
     {
         $result = get_object_vars($this);
+        unset($result['utilities']);
         unset($result['extra']);
         foreach ($this->extra as $key => $val) {
             $result[$key] = $val;
         }
-        return Utilities::serializeForRollbar($result, null, array_keys($this->extra));
+        return $this->utilities->serializeForRollbar($result, null, array_keys($this->extra));
     }
 }

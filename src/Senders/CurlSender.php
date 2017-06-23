@@ -7,10 +7,10 @@
 
 use Rollbar\Response;
 use Rollbar\Payload\Payload;
-use Rollbar\Utilities;
 
 class CurlSender implements SenderInterface
 {
+    private $utilities;
     private $endpoint = 'https://api.rollbar.com/api/1/item/';
     private $timeout = 3;
     private $proxy = null;
@@ -18,15 +18,16 @@ class CurlSender implements SenderInterface
 
     public function __construct($opts)
     {
+        $this->utilities = new \Rollbar\Utilities();
         if (isset($_ENV['ROLLBAR_ENDPOINT']) && !isset($opts['endpoint'])) {
             $opts['endpoint'] = $_ENV['ROLLBAR_ENDPOINT'];
         }
         if (array_key_exists('endpoint', $opts)) {
-            Utilities::validateString($opts['endpoint'], 'opts["endpoint"]', null, false);
+            $this->utilities->validateString($opts['endpoint'], 'opts["endpoint"]', null, false);
             $this->endpoint = $opts['endpoint'];
         }
         if (array_key_exists('timeout', $opts)) {
-            Utilities::validateInteger($opts['timeout'], 'opts["timeout"]', 0, null, false);
+            $this->utilities->validateInteger($opts['timeout'], 'opts["timeout"]', 0, null, false);
             $this->timeout = $opts['timeout'];
         }
         if (array_key_exists('proxy', $opts)) {
@@ -34,7 +35,7 @@ class CurlSender implements SenderInterface
         }
 
         if (array_key_exists('verifyPeer', $opts)) {
-            Utilities::validateBoolean($opts['verifyPeer'], 'opts["verifyPeer"]', false);
+            $this->utilities->validateBoolean($opts['verifyPeer'], 'opts["verifyPeer"]', false);
             $this->verifyPeer = $opts['verifyPeer'];
         }
     }
