@@ -4,16 +4,19 @@ use Psr\Log\AbstractLogger;
 use Rollbar\Payload\Payload;
 use Rollbar\Payload\Level;
 use Rollbar\Utilities;
+use Rollbar\Truncation\Truncation;
 
 class RollbarLogger extends AbstractLogger
 {
     private $config;
     private $levelFactory;
+    private $truncation;
 
     public function __construct(array $config)
     {
         $this->config = new Config($config);
         $this->levelFactory = new LevelFactory();
+        $this->truncation = new Truncation();
     }
 
     public function configure(array $config)
@@ -95,6 +98,6 @@ class RollbarLogger extends AbstractLogger
      */
     protected function truncate(array $payload)
     {
-        return $this->config->getDataBuilder()->truncate($payload);
+        return $this->truncation->truncate($payload);
     }
 }

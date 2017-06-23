@@ -4,7 +4,6 @@ namespace Rollbar;
 
 use Rollbar\Payload\Level;
 use Rollbar\TestHelpers\MockPhpStream;
-use Rollbar\Truncation\FramesStrategy;
 
 class DataBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -1071,37 +1070,6 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         }
         
         stream_wrapper_restore("php");
-    }
-    
-    /**
-     * @dataProvider truncateProvider
-     */
-    public function testTruncate($data)
-    {
-        $result = $this->dataBuilder->truncate($data);
-        
-        $size = strlen(json_encode($result));
-        
-        $this->assertTrue(
-            $size <= DataBuilder::MAX_PAYLOAD_SIZE,
-            "Truncation failed. Payload size exceeds MAX_PAYLOAD_SIZE."
-        );
-    }
-    
-    public function truncateProvider()
-    {
-        
-        $stringsTest = new Truncation\StringsStrategyTest();
-        $framesTest = new Truncation\FramesStrategyTest();
-        $minBodyTest = new Truncation\MinBodyStrategyTest();
-        
-        $data = array_merge(
-            $stringsTest->executeProvider(),
-            $framesTest->executeProvider(),
-            $minBodyTest->executeProvider()
-        );
-        
-        return $data;
     }
     
     public function testGenerateErrorWrapper()

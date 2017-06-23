@@ -2,10 +2,6 @@
 
 namespace Rollbar\Truncation;
 
-use Rollbar\DataBuilder;
-use Rollbar\LevelFactory;
-use Rollbar\Utilities;
-
 class StringsStrategyTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -13,14 +9,9 @@ class StringsStrategyTest extends \PHPUnit_Framework_TestCase
      */
     public function testExecute($data, $expected)
     {
-        $dataBuilder = new DataBuilder(array(
-            'accessToken' => 'abcd1234efef5678abcd1234567890be',
-            'environment' => 'tests',
-            'levelFactory' => new LevelFactory,
-            'utilities' => new Utilities
-        ));
-                    
-        $strategy = new StringsStrategy($dataBuilder);
+        $truncation = new Truncation();
+
+        $strategy = new StringsStrategy($truncation);
         $result = $strategy->execute($data);
         
         $this->assertEquals($expected, $result);
@@ -50,7 +41,7 @@ class StringsStrategyTest extends \PHPUnit_Framework_TestCase
         $payload = $this->payloadStructureProvider(array());
         $expected = $this->payloadStructureProvider(array());
         
-        while (strlen(json_encode($payload)) < DataBuilder::MAX_PAYLOAD_SIZE) {
+        while (strlen(json_encode($payload)) < Truncation::MAX_PAYLOAD_SIZE) {
             $payload['data']['body']['message']['body']['value'] []=
                 str_repeat('A', $stringLengthToTrim);
                 
