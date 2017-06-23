@@ -23,7 +23,6 @@ class DataBuilder implements DataBuilderInterface
     protected $messageLevel;
     protected $exceptionLevel;
     protected $psrLevels;
-    protected $scrubFields;
     protected $errorLevels;
     protected $codeVersion;
     protected $platform;
@@ -74,7 +73,6 @@ class DataBuilder implements DataBuilderInterface
         $this->setDefaultMessageLevel($config);
         $this->setDefaultExceptionLevel($config);
         $this->setDefaultPsrLevels($config);
-        $this->setScrubFields($config);
         $this->setErrorLevels($config);
         $this->setCodeVersion($config);
         $this->setPlatform($config);
@@ -136,15 +134,6 @@ class DataBuilder implements DataBuilderInterface
     {
         $fromConfig = $this->tryGet($config, 'psrLevels');
         $this->psrLevels = self::$defaults->psrLevels($fromConfig);
-    }
-
-    protected function setScrubFields($config)
-    {
-        $fromConfig = $this->tryGet($config, 'scrubFields');
-        if (!isset($fromConfig)) {
-            $fromConfig = $this->tryGet($config, 'scrub_fields');
-        }
-        $this->scrubFields = self::$defaults->scrubFields($fromConfig);
     }
 
     protected function setErrorLevels($config)
@@ -919,71 +908,6 @@ class DataBuilder implements DataBuilderInterface
     protected function getBaseException()
     {
         return $this->baseException;
-    }
-
-    public function getScrubFields()
-    {
-        return $this->scrubFields;
-    }
-    
-    /**
-     * Scrub a data structure including arrays and query strings.
-     *
-     * @param mixed $data Data to be scrubbed.
-     * @param array $fields Sequence of field names to scrub.
-     * @param string $replacement Character used for scrubbing.
-     */
-    public function scrub(&$data, $replacement = '*')
-    {
-        $fields = $this->getScrubFields();
-        
-        if (!$fields || !$data) {
-            return $data;
-        }
-        
-        if (is_array($data)) { // scrub arrays
-            $data = $this->scrubArray($data, $replacement);
-        } elseif (is_string($data)) { // scrub URLs and query strings
-            $query = parse_url($data, PHP_URL_QUERY);
-            if ($query) {
-                $data = str_replace(
-                    $query,
-                    $this->scrubQueryString($query),
-                    $data
-                );
-            }
-        }
-        return $data;
-    }
-
-    protected function scrubArray(&$arr, $replacement = '*')
-    {
-        $fields = $this->getScrubFields();
-        
-        if (!$fields || !$arr) {
-            return $arr;
-        }
-        
-        $dataBuilder = $this;
-
-        $scrubber = function (&$val, $key) use ($fields, $replacement, &$scrubber, $dataBuilder) {
-            if (in_array($key, $fields, true)) {
-                $val = str_repeat($replacement, 8);
-            } else {
-                $val = $dataBuilder->scrub($val, $replacement);
-            }
-        };
-
-        array_walk($arr, $scrubber);
-
-        return $arr;
-    }
-
-    protected function scrubQueryString($query, $replacement = 'x')
-    {
-        parse_str($query, $parsed);
-        $scrubbed = $this->scrub($parsed, $replacement);
-        return http_build_query($scrubbed);
     }
 
     // from http://www.php.net/manual/en/function.uniqid.php#94959

@@ -88,7 +88,7 @@ class RollbarLogger extends AbstractLogger
     protected function scrub(Payload $payload)
     {
         $serialized = $payload->jsonSerialize();
-        $serialized['data'] = $this->config->getDataBuilder()->scrub($serialized['data']);
+        $serialized['data'] = $this->config->getScrubber()->scrub($serialized['data']);
         return $serialized;
     }
     

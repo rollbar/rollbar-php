@@ -48,6 +48,10 @@ class Config
     private $sender;
     private $reportSuppressed;
     /**
+     * @var Scrubber
+     */
+    private $scrubber;
+    /**
      * @var callable
      */
     private $checkIgnore;
@@ -116,6 +120,7 @@ class Config
         $this->setReportSuppressed($config);
         $this->setFilters($config);
         $this->setSender($config);
+        $this->setScrubber($config);
         $this->setResponseHandler($config);
         $this->setCheckIgnoreFunction($config);
         $this->setSendMessageTrace($config);
@@ -199,6 +204,13 @@ class Config
         $default = $this->setFluentSenderOptions($config, $default);
 
         $this->setupWithOptions($config, "sender", $expected, $default);
+    }
+
+    private function setScrubber($config)
+    {
+        $exp = "Rollbar\ScrubberInterface";
+        $def = "Rollbar\Scrubber";
+        $this->setupWithOptions($config, "scrubber", $exp, $def, true);
     }
 
     private function setTransportOptions(&$config)
@@ -358,6 +370,11 @@ class Config
     public function getSender()
     {
         return $this->sender;
+    }
+
+    public function getScrubber()
+    {
+        return $this->scrubber;
     }
 
     /**
