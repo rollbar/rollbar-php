@@ -8,7 +8,7 @@ class TruncationTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-      $this->truncate = new Truncation();
+        $this->truncate = new Truncation();
     }
 
     /**

@@ -78,7 +78,7 @@ class Scrubber implements ScrubberInterface
             }
         };
 
-        array_walk($arr, $scrubber);
+        array_walk($arr, $scrubberFn);
 
         return $arr;
     }
