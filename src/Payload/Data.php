@@ -241,6 +241,8 @@ class Data implements \JsonSerializable
 
     public function jsonSerialize()
     {
-        return $this->utilities->serializeForRollbar(get_object_vars($this));
+        $result = get_object_vars($this);
+        unset($result['utilities']);
+        return $this->utilities->serializeForRollbar($result);
     }
 }

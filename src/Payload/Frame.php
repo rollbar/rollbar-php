@@ -1,7 +1,5 @@
 <?php namespace Rollbar\Payload;
 
-use Rollbar\Utilities;
-
 class Frame implements \JsonSerializable
 {
     private $filename;
@@ -12,9 +10,11 @@ class Frame implements \JsonSerializable
     private $context;
     private $args;
     private $kwargs;
+    private $utilities;
 
     public function __construct($filename)
     {
+        $this->utilities = new \Rollbar\Utilities();
         $this->setFilename($filename);
     }
 
@@ -25,7 +25,7 @@ class Frame implements \JsonSerializable
 
     public function setFilename($filename)
     {
-        Utilities::validateString($filename, "filename", null, false);
+        $this->utilities->validateString($filename, "filename", null, false);
         $this->filename = $filename;
         return $this;
     }
@@ -37,7 +37,7 @@ class Frame implements \JsonSerializable
 
     public function setLineno($lineno)
     {
-        Utilities::validateInteger($lineno, "lineno");
+        $this->utilities->validateInteger($lineno, "lineno");
         $this->lineno = $lineno;
         return $this;
     }
@@ -49,7 +49,7 @@ class Frame implements \JsonSerializable
 
     public function setColno($colno)
     {
-        Utilities::validateInteger($colno, "colno");
+        $this->utilities->validateInteger($colno, "colno");
         $this->colno = $colno;
         return $this;
     }
@@ -61,7 +61,7 @@ class Frame implements \JsonSerializable
 
     public function setMethod($method)
     {
-        Utilities::validateString($method, "method");
+        $this->utilities->validateString($method, "method");
         $this->method = $method;
         return $this;
     }
@@ -73,7 +73,7 @@ class Frame implements \JsonSerializable
 
     public function setCode($code)
     {
-        Utilities::validateString($code, "code");
+        $this->utilities->validateString($code, "code");
         $this->code = $code;
         return $this;
     }
@@ -114,6 +114,8 @@ class Frame implements \JsonSerializable
 
     public function jsonSerialize()
     {
-        return Utilities::serializeForRollbar(get_object_vars($this));
+        $result = get_object_vars($this);
+        unset($result['utilities']);
+        return $this->utilities->serializeForRollbar($result);
     }
 }

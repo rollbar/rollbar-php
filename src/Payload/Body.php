@@ -1,16 +1,16 @@
 <?php namespace Rollbar\Payload;
 
-use Rollbar\Utilities;
-
 class Body implements \JsonSerializable
 {
     /**
      * @var ContentInterface
      */
     private $value;
+    private $utilities;
 
     public function __construct(ContentInterface $value)
     {
+        $this->utilities = new \Rollbar\Utilities();
         $this->setValue($value);
     }
 
@@ -31,6 +31,7 @@ class Body implements \JsonSerializable
             "value" => $this->value->getKey()
         );
         $obj = get_object_vars($this);
-        return Utilities::serializeForRollbar($obj, $overrideNames);
+        unset($obj['utilities']);
+        return $this->utilities->serializeForRollbar($obj, $overrideNames);
     }
 }
