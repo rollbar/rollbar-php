@@ -450,7 +450,6 @@ class DataBuilder implements DataBuilderInterface
 
             $frames[] = $frame;
         }
-        array_reverse($frames);
 
         if ($this->shiftFunction && count($frames) > 0) {
             for ($i = count($frames) - 1; $i > 0; $i--) {
@@ -458,6 +457,8 @@ class DataBuilder implements DataBuilderInterface
             }
             $frames[0]->setMethod('<main>');
         }
+        
+        $frames = array_reverse($frames);
 
         return $frames;
     }

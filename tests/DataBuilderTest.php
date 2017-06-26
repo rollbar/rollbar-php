@@ -430,7 +430,10 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         ));
         $ex = $this->exceptionTraceArgsHelper('trace args message');
         $frames = $dataBuilder->getExceptionTrace($ex)->getFrames();
-        $this->assertNull($frames[0]->getArgs(), "Frames arguments available in trace when they should not be.");
+        $this->assertNull(
+            $frames[count($frames)-1]->getArgs(),
+            "Frames arguments available in trace when they should not be."
+        );
         
         // Positive test
         $dataBuilder = new DataBuilder(array(
@@ -443,9 +446,13 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $expected = 'trace args message';
         $ex = $this->exceptionTraceArgsHelper($expected);
         $frames = $dataBuilder->getExceptionTrace($ex)->getFrames();
-        $args = $frames[0]->getArgs();
+        $args = $frames[count($frames)-1]->getArgs();
         
-        $this->assertEquals($expected, $args[0], "Frames arguments NOT available in trace when they should be.");
+        $this->assertEquals(
+            $expected,
+            $args[0],
+            "Frames arguments NOT available in trace when they should be."
+        );
     }
     
     private function exceptionTraceArgsHelper($message)
@@ -489,7 +496,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
             'utilities' => new Utilities
         ));
         $output = $dataBuilder->getExceptionTrace(new \Exception())->getFrames();
-        $this->assertNotEmpty($output[1]->getContext());
+        $this->assertNotEmpty($output[count($output)-2]->getContext());
     }
 
     public function testFramesWithoutContext()
@@ -583,7 +590,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
                 $utilities
             )
         )->getFrames();
-        $pre = $output[0]->getContext()->getPre();
+        $pre = $output[1]->getContext()->getPre();
 
         $expected = array();
         $fileContent = file($backTrace[0]['file']);
@@ -778,6 +785,20 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $frames = $result->getBody()->getValue()->getFrames();
         
         $this->assertEquals($expected, count($frames) === 0);
+    }
+    
+    public function testFramesOrder()
+    {
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'environment' => 'tests',
+            'include_exception_code_context' => true,
+            'levelFactory' => new LevelFactory,
+            'utilities' => new Utilities
+        ));
+        $frames = $dataBuilder->makeFrames(new \Exception(), false);
+        $this->assertEquals('<main>', $frames[count($frames)-1]->getMethod());
+        $this->assertEquals('testFramesOrder', $frames[count($frames)-2]->getMethod());
     }
     
     /**
