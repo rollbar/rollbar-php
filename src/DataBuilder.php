@@ -17,22 +17,12 @@ use Rollbar\Exceptions\PersonFuncException;
 
 class DataBuilder implements DataBuilderInterface
 {
-    const MAX_PAYLOAD_SIZE = 524288; // 512 * 1024
-    
-    protected static $truncationStrategies = array(
-        "Rollbar\Truncation\RawStrategy",
-        "Rollbar\Truncation\FramesStrategy",
-        "Rollbar\Truncation\StringsStrategy",
-        "Rollbar\Truncation\MinBodyStrategy"
-    );
-    
     protected static $defaults;
 
     protected $environment;
     protected $messageLevel;
     protected $exceptionLevel;
     protected $psrLevels;
-    protected $scrubFields;
     protected $errorLevels;
     protected $codeVersion;
     protected $platform;
@@ -83,7 +73,6 @@ class DataBuilder implements DataBuilderInterface
         $this->setDefaultMessageLevel($config);
         $this->setDefaultExceptionLevel($config);
         $this->setDefaultPsrLevels($config);
-        $this->setScrubFields($config);
         $this->setErrorLevels($config);
         $this->setCodeVersion($config);
         $this->setPlatform($config);
@@ -147,15 +136,6 @@ class DataBuilder implements DataBuilderInterface
         $this->psrLevels = self::$defaults->psrLevels($fromConfig);
     }
 
-    protected function setScrubFields($config)
-    {
-        $fromConfig = $this->tryGet($config, 'scrubFields');
-        if (!isset($fromConfig)) {
-            $fromConfig = $this->tryGet($config, 'scrub_fields');
-        }
-        $this->scrubFields = self::$defaults->scrubFields($fromConfig);
-    }
-
     protected function setErrorLevels($config)
     {
         $fromConfig = $this->tryGet($config, 'errorLevels');
@@ -216,6 +196,9 @@ class DataBuilder implements DataBuilderInterface
         $this->requestParams = $this->tryGet($config, 'requestParams');
     }
 
+    /*
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
     protected function setRequestBody($config)
     {
         
@@ -571,6 +554,9 @@ class DataBuilder implements DataBuilderInterface
         return $this->context;
     }
 
+    /*
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
     protected function getRequest()
     {
         $request = new Request();
@@ -655,6 +641,9 @@ class DataBuilder implements DataBuilderInterface
         return $result;
     }
     
+    /*
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
     public function getUrlProto()
     {
         $proto = '';
@@ -677,6 +666,9 @@ class DataBuilder implements DataBuilderInterface
         return $proto;
     }
     
+    /*
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
     public function getUrlHost()
     {
         $host = '';
@@ -701,6 +693,9 @@ class DataBuilder implements DataBuilderInterface
         return $host;
     }
     
+    /*
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
     public function getUrlPort($proto)
     {
         $port = '';
@@ -718,6 +713,9 @@ class DataBuilder implements DataBuilderInterface
         return $port;
     }
 
+    /*
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
     public function getUrl()
     {
         $proto = $this->getUrlProto();
@@ -742,6 +740,9 @@ class DataBuilder implements DataBuilderInterface
         return $url;
     }
 
+    /*
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
     protected function getHeaders()
     {
         $headers = array();
@@ -777,6 +778,9 @@ class DataBuilder implements DataBuilderInterface
         return $this->requestBody;
     }
 
+    /*
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
     protected function getUserIp()
     {
         if (!isset($_SERVER)) {
@@ -835,6 +839,9 @@ class DataBuilder implements DataBuilderInterface
         return new Person($identifier, $username, $email, $personData);
     }
 
+    /*
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
     protected function getServer()
     {
         $server = new Server();
@@ -917,7 +924,7 @@ class DataBuilder implements DataBuilderInterface
 
     protected function getUuid()
     {
-        return self::uuid4();
+        return $this->utilities->uuid4();
     }
 
     protected function getNotifier()
@@ -928,133 +935,6 @@ class DataBuilder implements DataBuilderInterface
     protected function getBaseException()
     {
         return $this->baseException;
-    }
-
-    public function getScrubFields()
-    {
-        return $this->scrubFields;
-    }
-    
-    /**
-     * Scrub a data structure including arrays and query strings.
-     *
-     * @param mixed $data Data to be scrubbed.
-     * @param array $fields Sequence of field names to scrub.
-     * @param string $replacement Character used for scrubbing.
-     */
-    public function scrub(&$data, $replacement = '*')
-    {
-        $fields = $this->getScrubFields();
-        
-        if (!$fields || !$data) {
-            return $data;
-        }
-        
-        if (is_array($data)) { // scrub arrays
-            $data = $this->scrubArray($data, $replacement);
-        } elseif (is_string($data)) { // scrub URLs and query strings
-            $query = parse_url($data, PHP_URL_QUERY);
-            if ($query) {
-                $data = str_replace(
-                    $query,
-                    $this->scrubQueryString($query),
-                    $data
-                );
-            }
-        }
-        return $data;
-    }
-
-    protected function scrubArray(&$arr, $replacement = '*')
-    {
-        $fields = $this->getScrubFields();
-        
-        if (!$fields || !$arr) {
-            return $arr;
-        }
-        
-        $dataBuilder = $this;
-
-        $scrubber = function (&$val, $key) use ($fields, $replacement, &$scrubber, $dataBuilder) {
-            if (in_array($key, $fields, true)) {
-                $val = str_repeat($replacement, 8);
-            } else {
-                $val = $dataBuilder->scrub($val, $replacement);
-            }
-        };
-
-        array_walk($arr, $scrubber);
-
-        return $arr;
-    }
-
-    protected function scrubQueryString($query, $replacement = 'x')
-    {
-        parse_str($query, $parsed);
-        $scrubbed = $this->scrub($parsed, $replacement);
-        return http_build_query($scrubbed);
-    }
-
-    // from http://www.php.net/manual/en/function.uniqid.php#94959
-    protected static function uuid4()
-    {
-        mt_srand();
-        return sprintf(
-            '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-            // 32 bits for "time_low"
-            mt_rand(0, 0xffff),
-            mt_rand(0, 0xffff),
-            // 16 bits for "time_mid"
-            mt_rand(0, 0xffff),
-            // 16 bits for "time_hi_and_version",
-            // four most significant bits holds version number 4
-            mt_rand(0, 0x0fff) | 0x4000,
-            // 16 bits, 8 bits for "clk_seq_hi_res",
-            // 8 bits for "clk_seq_low",
-            // two most significant bits holds zero and one for variant DCE1.1
-            mt_rand(0, 0x3fff) | 0x8000,
-            // 48 bits for "node"
-            mt_rand(0, 0xffff),
-            mt_rand(0, 0xffff),
-            mt_rand(0, 0xffff)
-        );
-    }
-    
-    /**
-     * Applies truncation strategies in order to keep the payload size under
-     * configured limit.
-     *
-     * @param array $payload
-     * @param string $strategy
-     *
-     * @return array
-     */
-    public function truncate(array $payload)
-    {
-        
-        foreach (static::$truncationStrategies as $strategy) {
-            if (!$this->needsTruncating($payload)) {
-                break;
-            }
-            
-            $strategy = new $strategy($this);
-            
-            $payload = $strategy->execute($payload);
-        }
-        
-        return $payload;
-    }
-    
-    /**
-     * Check if the payload is too big to be sent
-     *
-     * @param array $payload
-     *
-     * @return boolean
-     */
-    public function needsTruncating(array $payload)
-    {
-        return strlen(json_encode($payload)) > self::MAX_PAYLOAD_SIZE;
     }
 
     /**

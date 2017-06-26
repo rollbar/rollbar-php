@@ -1,14 +1,14 @@
 <?php namespace Rollbar\Payload;
 
-use Rollbar\Utilities;
-
 class Context implements \JsonSerializable
 {
     private $pre;
     private $post;
+    private $utilities;
 
     public function __construct($pre, $post)
     {
+        $this->utilities = new \Rollbar\Utilities();
         $this->setPre($pre);
         $this->setPost($post);
     }
@@ -39,7 +39,9 @@ class Context implements \JsonSerializable
 
     public function jsonSerialize()
     {
-        return Utilities::serializeForRollbar(get_object_vars($this));
+        $result = get_object_vars($this);
+        unset($result['utilities']);
+        return $this->utilities->serializeForRollbar($result);
     }
 
     private function validateAllString($arr, $arg)

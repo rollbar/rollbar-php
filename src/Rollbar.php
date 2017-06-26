@@ -58,9 +58,8 @@ class Rollbar
     {
         if (is_null(self::$logger)) {
             return new RollbarLogger($config);
-        } else {
-            return self::$logger->scope($config);
         }
+        return self::$logger->scope($config);
     }
 
     public static function setupExceptionHandling()

@@ -48,6 +48,10 @@ class Config
     private $sender;
     private $reportSuppressed;
     /**
+     * @var Scrubber
+     */
+    private $scrubber;
+    /**
      * @var callable
      */
     private $checkIgnore;
@@ -116,6 +120,7 @@ class Config
         $this->setReportSuppressed($config);
         $this->setFilters($config);
         $this->setSender($config);
+        $this->setScrubber($config);
         $this->setResponseHandler($config);
         $this->setCheckIgnoreFunction($config);
         $this->setSendMessageTrace($config);
@@ -161,6 +166,7 @@ class Config
 
     private function setMinimumLevel($config)
     {
+        $this->minimumLevel = 0;
         if (empty($config['minimumLevel'])) {
             $this->minimumLevel = 0;
         } elseif ($config['minimumLevel'] instanceof Level) {
@@ -172,8 +178,6 @@ class Config
             }
         } elseif (is_int($config['minimumLevel'])) {
             $this->minimumLevel = $config['minimumLevel'];
-        } else {
-            $this->minimumLevel = 0;
         }
     }
 
@@ -195,6 +199,22 @@ class Config
         $expected = "Rollbar\Senders\SenderInterface";
         $default = "Rollbar\Senders\CurlSender";
 
+        $this->setTransportOptions($config);
+        $default = $this->setAgentSenderOptions($config, $default);
+        $default = $this->setFluentSenderOptions($config, $default);
+
+        $this->setupWithOptions($config, "sender", $expected, $default);
+    }
+
+    private function setScrubber($config)
+    {
+        $exp = "Rollbar\ScrubberInterface";
+        $def = "Rollbar\Scrubber";
+        $this->setupWithOptions($config, "scrubber", $exp, $def, true);
+    }
+
+    private function setTransportOptions(&$config)
+    {
         if (array_key_exists('base_api_url', $config)) {
             $config['senderOptions']['endpoint'] = $config['base_api_url'] . 'item/';
         }
@@ -210,34 +230,42 @@ class Config
         if (array_key_exists('proxy', $config)) {
             $config['senderOptions']['proxy'] = $config['proxy'];
         }
+    }
 
-        if (array_key_exists('handler', $config) && $config['handler'] == 'agent') {
-            $default = "Rollbar\Senders\AgentSender";
-            if (array_key_exists('agent_log_location', $config)) {
-                $config['senderOptions'] = array(
-                    'agentLogLocation' => $config['agent_log_location']
-                );
-            }
+    private function setAgentSenderOptions(&$config, $default)
+    {
+        if (!array_key_exists('handler', $config) || $config['handler'] != 'agent') {
+            return $default;
+        }
+        $default = "Rollbar\Senders\AgentSender";
+        if (array_key_exists('agent_log_location', $config)) {
+            $config['senderOptions'] = array(
+                'agentLogLocation' => $config['agent_log_location']
+            );
+        }
+        return $default;
+    }
+
+    private function setFluentSenderOptions(&$config, $default)
+    {
+        if (!isset($config['handler']) || $config['handler'] != 'fluent') {
+            return $default;
+        }
+        $default = "Rollbar\Senders\FluentSender";
+
+        if (isset($config['fluent_host'])) {
+            $config['senderOptions']['fluentHost'] = $config['fluent_host'];
         }
 
-        // set options for fluent sender
-        if (isset($config['handler']) && $config['handler'] == 'fluent') {
-            $default = "Rollbar\Senders\FluentSender";
-
-            if (isset($config['fluent_host'])) {
-                $config['senderOptions']['fluentHost'] = $config['fluent_host'];
-            }
-
-            if (isset($config['fluent_port'])) {
-                $config['senderOptions']['fluentPort'] = $config['fluent_port'];
-            }
-
-            if (isset($config['fluent_tag'])) {
-                $config['senderOptions']['fluentTag'] = $config['fluent_tag'];
-            }
+        if (isset($config['fluent_port'])) {
+            $config['senderOptions']['fluentPort'] = $config['fluent_port'];
         }
 
-        $this->setupWithOptions($config, "sender", $expected, $default);
+        if (isset($config['fluent_tag'])) {
+            $config['senderOptions']['fluentTag'] = $config['fluent_tag'];
+        }
+
+        return $default;
     }
 
     private function setResponseHandler($config)
@@ -342,6 +370,11 @@ class Config
     public function getSender()
     {
         return $this->sender;
+    }
+
+    public function getScrubber()
+    {
+        return $this->scrubber;
     }
 
     /**

@@ -34,7 +34,7 @@ class MinBodyStrategy extends AbstractStrategy
         /**
          * Limit trace frames
          */
-        $framesStrategy = new FramesStrategy($this->dataBuilder);
+        $framesStrategy = new FramesStrategy($this->truncation);
         $traceData['frames'] = $framesStrategy->selectFrames(
             $traceData['frames'],
             static::EXCEPTION_FRAMES_RANGE

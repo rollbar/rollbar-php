@@ -1,7 +1,5 @@
 <?php namespace Rollbar\Payload;
 
-use Rollbar\Utilities;
-
 class Request implements \JsonSerializable
 {
     private $url;
@@ -14,6 +12,12 @@ class Request implements \JsonSerializable
     private $body;
     private $userIp;
     private $extra = array();
+    private $utilities;
+
+    public function __construct()
+    {
+        $this->utilities = new \Rollbar\Utilities();
+    }
 
     public function getUrl()
     {
@@ -22,7 +26,7 @@ class Request implements \JsonSerializable
 
     public function setUrl($url)
     {
-        Utilities::validateString($url, "url");
+        $this->utilities->validateString($url, "url");
         $this->url = $url;
         return $this;
     }
@@ -34,7 +38,7 @@ class Request implements \JsonSerializable
 
     public function setMethod($method)
     {
-        Utilities::validateString($method, "method");
+        $this->utilities->validateString($method, "method");
         $this->method = $method;
         return $this;
     }
@@ -79,7 +83,7 @@ class Request implements \JsonSerializable
 
     public function setQueryString($queryString)
     {
-        Utilities::validateString($queryString, "queryString");
+        $this->utilities->validateString($queryString, "queryString");
         $this->queryString = $queryString;
         return $this;
     }
@@ -102,7 +106,7 @@ class Request implements \JsonSerializable
 
     public function setBody($body)
     {
-        Utilities::validateString($body, "body");
+        $this->utilities->validateString($body, "body");
         $this->body = $body;
         return $this;
     }
@@ -114,7 +118,7 @@ class Request implements \JsonSerializable
 
     public function setUserIp($userIp)
     {
-        Utilities::validateString($userIp, "userIp");
+        $this->utilities->validateString($userIp, "userIp");
         $this->userIp = $userIp;
         return $this;
     }
@@ -133,6 +137,7 @@ class Request implements \JsonSerializable
     {
         $result = get_object_vars($this);
         unset($result['extra']);
+        unset($result['utilities']);
         foreach ($this->extra as $key => $val) {
             $result[$key] = $val;
         }
@@ -140,6 +145,6 @@ class Request implements \JsonSerializable
             "get" => "GET",
             "post" => "POST"
         );
-        return Utilities::serializeForRollbar($result, $overrideNames, array_keys($this->extra));
+        return $this->utilities->serializeForRollbar($result, $overrideNames, array_keys($this->extra));
     }
 }

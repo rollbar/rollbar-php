@@ -3,17 +3,18 @@
 namespace Rollbar\Senders;
 
 use Rollbar\Payload\Payload;
-use Rollbar\Utilities;
 
 class AgentSender implements SenderInterface
 {
+    private $utilities;
     private $agentLog;
     private $agentLogLocation = '/var/tmp';
 
     public function __construct($opts)
     {
+        $this->utilities = new \Rollbar\Utilities();
         if (array_key_exists('agentLogLocation', $opts)) {
-            Utilities::validateString($opts['agentLogLocation'], 'opts["agentLogLocation"]', null, false);
+            $this->utilities->validateString($opts['agentLogLocation'], 'opts["agentLogLocation"]', null, false);
             $this->agentLogLocation = $opts['agentLogLocation'];
         }
     }

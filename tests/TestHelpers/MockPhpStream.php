@@ -17,7 +17,7 @@ class MockPhpStream
     
     // @codingStandardsIgnoreStart
     
-    public function stream_open($path, $mode, $options, &$opened_path)
+    public function stream_open()
     {
         return true;
     }

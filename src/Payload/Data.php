@@ -1,7 +1,6 @@
 <?php namespace Rollbar\Payload;
 
 use Rollbar\Defaults;
-use Rollbar\Utilities;
 
 class Data implements \JsonSerializable
 {
@@ -22,9 +21,11 @@ class Data implements \JsonSerializable
     private $title;
     private $uuid;
     private $notifier;
+    private $utilities;
 
     public function __construct($environment, Body $body)
     {
+        $this->utilities = new \Rollbar\Utilities();
         $this->setEnvironment($environment);
         $this->setBody($body);
     }
@@ -36,7 +37,7 @@ class Data implements \JsonSerializable
 
     public function setEnvironment($environment)
     {
-        Utilities::validateString($environment, "environment", null, false);
+        $this->utilities->validateString($environment, "environment", null, false);
         $this->environment = $environment;
         return $this;
     }
@@ -73,7 +74,7 @@ class Data implements \JsonSerializable
 
     public function setTimestamp($timestamp)
     {
-        Utilities::validateInteger($timestamp, "timestamp");
+        $this->utilities->validateInteger($timestamp, "timestamp");
         $this->timestamp = $timestamp;
         return $this;
     }
@@ -85,7 +86,7 @@ class Data implements \JsonSerializable
 
     public function setCodeVersion($codeVersion)
     {
-        Utilities::validateString($codeVersion, "codeVersion");
+        $this->utilities->validateString($codeVersion, "codeVersion");
         $this->codeVersion = $codeVersion;
         return $this;
     }
@@ -97,7 +98,7 @@ class Data implements \JsonSerializable
 
     public function setPlatform($platform)
     {
-        Utilities::validateString($platform, "platform");
+        $this->utilities->validateString($platform, "platform");
         $this->platform = $platform;
         return $this;
     }
@@ -109,7 +110,7 @@ class Data implements \JsonSerializable
 
     public function setLanguage($language)
     {
-        Utilities::validateString($language, "language");
+        $this->utilities->validateString($language, "language");
         $this->language = $language;
         return $this;
     }
@@ -121,7 +122,7 @@ class Data implements \JsonSerializable
 
     public function setFramework($framework)
     {
-        Utilities::validateString($framework, "framework");
+        $this->utilities->validateString($framework, "framework");
         $this->framework = $framework;
         return $this;
     }
@@ -133,7 +134,7 @@ class Data implements \JsonSerializable
 
     public function setContext($context)
     {
-        Utilities::validateString($context, "context");
+        $this->utilities->validateString($context, "context");
         $this->context = $context;
         return $this;
     }
@@ -198,7 +199,7 @@ class Data implements \JsonSerializable
 
     public function setFingerprint($fingerprint)
     {
-        Utilities::validateString($fingerprint, "fingerprint");
+        $this->utilities->validateString($fingerprint, "fingerprint");
         $this->fingerprint = $fingerprint;
         return $this;
     }
@@ -210,7 +211,7 @@ class Data implements \JsonSerializable
 
     public function setTitle($title)
     {
-        Utilities::validateString($title, "title");
+        $this->utilities->validateString($title, "title");
         $this->title = $title;
         return $this;
     }
@@ -222,7 +223,7 @@ class Data implements \JsonSerializable
 
     public function setUuid($uuid)
     {
-        Utilities::validateString($uuid, "uuid");
+        $this->utilities->validateString($uuid, "uuid");
         $this->uuid = $uuid;
         return $this;
     }
@@ -240,6 +241,8 @@ class Data implements \JsonSerializable
 
     public function jsonSerialize()
     {
-        return Utilities::serializeForRollbar(get_object_vars($this));
+        $result = get_object_vars($this);
+        unset($result['utilities']);
+        return $this->utilities->serializeForRollbar($result);
     }
 }

@@ -2,10 +2,6 @@
 
 namespace Rollbar\Truncation;
 
-use Rollbar\DataBuilder;
-use Rollbar\LevelFactory;
-use Rollbar\Utilities;
-
 class FramesStrategyTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -13,14 +9,9 @@ class FramesStrategyTest extends \PHPUnit_Framework_TestCase
      */
     public function testExecute($data, $expected)
     {
-        $dataBuilder = new DataBuilder(array(
-            'accessToken' => 'abcd1234efef5678abcd1234567890be',
-            'environment' => 'tests',
-            'levelFactory' => new LevelFactory,
-            'utilities' => new Utilities
-        ));
+        $truncation = new Truncation();
                     
-        $strategy = new FramesStrategy($dataBuilder);
+        $strategy = new FramesStrategy($truncation);
         $result = $strategy->execute($data);
         
         $this->assertEquals($expected, $result);

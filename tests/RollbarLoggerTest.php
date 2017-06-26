@@ -105,8 +105,9 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
         $payload = new Payload($data, $config->getAccessToken());
 
         $scrubbed = $payload->jsonSerialize();
+        $scrubber = $config->getScrubber();
 
-        $result = $dataBuilder->scrub($scrubbed);
+        $result = $scrubber->scrub($scrubbed);
         
         return $result;
     }

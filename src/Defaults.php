@@ -91,10 +91,10 @@ class Defaults
         return $sendMessageTrace !== null ? $sendMessageTrace : $this->defaultSendMessageTrace;
     }
     
-    public function captureErrorStacktraces($captureErrorStracktraces = null)
+    public function captureErrorStacktraces($capture = null)
     {
-        return $captureErrorStracktraces !== null ?
-            $captureErrorStracktraces :
+        return $capture !== null ?
+            $capture :
             $this->defaultCaptureErrorStacktraces;
     }
     

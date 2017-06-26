@@ -77,7 +77,7 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
             ->shouldReceive('jsonSerialize')
             ->andReturn(new \ArrayObject())
             ->mock();
-        $dataBuilder = m::mock('Rollbar\DataBuilder')
+        m::mock('Rollbar\DataBuilder')
             ->shouldReceive('getScrubFields')
             ->andReturn(array())
             ->shouldReceive('scrub')
