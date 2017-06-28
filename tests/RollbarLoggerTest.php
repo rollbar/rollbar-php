@@ -127,7 +127,6 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
         $replacement = '*'
     ) {
     
-        
         $this->assertEquals(
             str_repeat($replacement, 8),
             $result[$scrubField],
@@ -251,6 +250,34 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
         $this->scrubTestAssert(
             "Custom",
             $result['data']['custom']
+        );
+    }
+    
+    /**
+     * @dataProvider scrubDataProvider
+     */
+    public function testMakeDataScrubPerson($testData)
+    {
+        $testData['id'] = '123';
+        $result = $this->scrubTestHelper(
+            array(
+                'person' => $testData,
+                'scrub_whitelist' => array(
+                    'data.person.recursive.sensitive'
+                )
+            )
+        );
+        
+        $this->assertEquals(
+            str_repeat('*', 8),
+            $result['data']['person']['sensitive'],
+            "Person did not get scrubbed."
+        );
+        
+        $this->assertNotEquals(
+            str_repeat('*', 8),
+            $result['data']['person']['recursive']['sensitive'],
+            "Person recursive.sensitive DID get scrubbed even though it's whitelisted."
         );
     }
     
