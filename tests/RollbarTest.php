@@ -101,14 +101,26 @@ class RollbarTest extends \PHPUnit_Framework_TestCase
     public function testLogExtraData()
     {
         Rollbar::init(self::$simpleConfig);
-
-        Rollbar::log(
-            Level::INFO,
-            'testing extra data',
-            array("some_key" => "some value") // key-value additional data
+        
+        $logger = Rollbar::logger();
+        $reflection = new \ReflectionClass(get_class($logger));
+        $method = $reflection->getMethod('getPayload');
+        $method->setAccessible(true);
+        
+        $payload = $method->invokeArgs(
+            $logger,
+            array(
+                self::$simpleConfig['access_token'],
+                Level::INFO,
+                'testing extra data',
+                array("some_key" => "some value") // key-value additional data
+            )
         );
         
-        $this->assertTrue(true);
+        $this->assertEquals(
+            "some value",
+            $payload->getData()->getBody()->getValue()->some_key
+        );
     }
 
     /**
