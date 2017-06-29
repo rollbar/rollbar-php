@@ -85,6 +85,7 @@ class Scrubber implements ScrubberInterface
             return $arr;
         }
 
+        $fields = array_flip($fields);
         $scrubber = $this;
 
         $scrubberFn = function (
@@ -104,7 +105,7 @@ class Scrubber implements ScrubberInterface
                 return;
             }
 
-            if (in_array($key, $fields, true)) {
+            if (isset($fields[$key])) {
                 $val = str_repeat($replacement, 8);
             } else {
                 $val = $scrubber->scrub($val, $replacement, $current);
