@@ -31,6 +31,7 @@ class Rollbar
             if ($handleFatal) {
                 self::setupFatalHandling();
             }
+            self::setupBatchHandling();
         }
     }
 
@@ -176,6 +177,19 @@ class Rollbar
         return new Response(0, "Rollbar Not Initialized");
     }
     
+    public static function setupBatchHandling()
+    {
+        register_shutdown_function('Rollbar\Rollbar::flush');
+    }
+
+    public static function flush()
+    {
+        if (is_null(self::$logger)) {
+            return;
+        }
+        self::$logger->flush();
+    }
+    
     // @codingStandardsIgnoreStart
     
     /**
@@ -249,15 +263,5 @@ class Rollbar
         return false;
     }
 
-    /**
-     * Do nothing silently to not cause backwards compatibility issues.
-     *
-     * @deprecated 1.0.0
-     */
-    public static function flush()
-    {
-        return;
-    }
-    
     // @codingStandardsIgnoreEnd
 }

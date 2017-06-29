@@ -27,6 +27,16 @@ class AgentSender implements SenderInterface
         fwrite($this->agentLog, json_encode($scrubbedPayload) . "\n");
     }
 
+    public function sendBatch($batch, $accessToken)
+    {
+        if (empty($this->agentLog)) {
+            $this->loadAgentFile();
+        }
+        foreach ($batch as $payload) {
+            fwrite($this->agentLog, json_encode($payload) . "\n");
+        }
+    }
+
     private function loadAgentFile()
     {
         $filename = $this->agentLogLocation . '/rollbar-relay.' . getmypid() . '.' . microtime(true) . '.rollbar';

@@ -11,12 +11,14 @@ class RollbarLogger extends AbstractLogger
     private $config;
     private $levelFactory;
     private $truncation;
+    private $queue;
 
     public function __construct(array $config)
     {
         $this->config = new Config($config);
         $this->levelFactory = new LevelFactory();
         $this->truncation = new Truncation();
+        $this->queue = array();
     }
 
     public function configure(array $config)
@@ -52,12 +54,40 @@ class RollbarLogger extends AbstractLogger
         } else {
             $toSend = $this->scrub($payload);
             $toSend = $this->truncate($toSend);
-            $response = $this->config->send($toSend, $accessToken);
+            $response = $this->send($toSend, $accessToken);
         }
         
         $this->handleResponse($payload, $response);
         return $response;
     }
+
+    public function flush()
+    {
+        if ($this->getQueueSize() > 0) {
+            $batch = $this->queue;
+            $this->queue = array();
+            return $this->config->sendBatch($batch, $this->getAccessToken());
+        }
+        return new Response(0, "Queue empty");
+    }
+
+    public function getQueueSize()
+    {
+        return count($this->queue);
+    }
+
+    protected function send($toSend, $accessToken)
+    {
+        if ($this->config->getBatched()) {
+            $response = new Response(0, "Pending");
+            if ($this->getQueueSize() >= $this->config->getBatchSize()) {
+                $response = $this->flush();
+            }
+            $this->queue[] = $toSend;
+            return $response;
+        }
+        return $this->config->send($toSend, $accessToken);
+    } 
 
     protected function getPayload($accessToken, $level, $toLog, $context)
     {

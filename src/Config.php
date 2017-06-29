@@ -51,6 +51,9 @@ class Config
      * @var Scrubber
      */
     private $scrubber;
+
+    private $batched = false;
+    private $batch_size = 50;
     /**
      * @var callable
      */
@@ -126,6 +129,8 @@ class Config
         $this->setFilters($config);
         $this->setSender($config);
         $this->setScrubber($config);
+        $this->setBatched($config);
+        $this->setBatchSize($config);
         $this->setResponseHandler($config);
         $this->setCheckIgnoreFunction($config);
         $this->setSendMessageTrace($config);
@@ -216,6 +221,20 @@ class Config
         $exp = "Rollbar\ScrubberInterface";
         $def = "Rollbar\Scrubber";
         $this->setupWithOptions($config, "scrubber", $exp, $def, true);
+    }
+
+    private function setBatched($config)
+    {
+        if (array_key_exists('batched', $config)) {
+            $this->batched = $config['batched'];
+        }
+    }
+
+    private function setBatchSize($config)
+    {
+        if (array_key_exists('batch_size', $config)) {
+            $this->batch_size = $config['batch_size'];
+        }
     }
 
     private function setTransportOptions(&$config)
@@ -380,6 +399,16 @@ class Config
     public function getScrubber()
     {
         return $this->scrubber;
+    }
+
+    public function getBatched()
+    {
+        return $this->batched;
+    }
+
+    public function getBatchSize()
+    {
+        return $this->batch_size;
     }
 
     /**
@@ -549,6 +578,11 @@ class Config
     public function send(&$scrubbedPayload, $accessToken)
     {
         return $this->sender->send($scrubbedPayload, $accessToken);
+    }
+
+    public function sendBatch(&$batch, $accessToken)
+    {
+        return $this->sender->sendBatch($batch, $accessToken);
     }
 
     public function handleResponse($payload, $response)
