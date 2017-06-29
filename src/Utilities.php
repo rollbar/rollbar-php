@@ -95,17 +95,21 @@ final class Utilities
         array $customKeys = null
     ) {
         $returnVal = array();
-        $overrideNames = $overrideNames == null ? array() : $overrideNames;
-        $customKeys = $customKeys == null ? array() : $customKeys;
 
         foreach ($obj as $key => $val) {
             if ($val instanceof \JsonSerializable) {
                 $val = $val->jsonSerialize();
             }
-            $newKey = array_key_exists($key, $overrideNames)
-                ? $overrideNames[$key]
-                : self::pascalToCamel($key);
-            if (in_array($key, $customKeys)) {
+            $newKey = null;
+            if ($overrideNames !== null) {
+                if (isset($overrideNames[$key]) || array_key_exists($key, $overrideNames)) {
+                    $newKey = $overrideNames[$key];
+                }
+            }
+            if ($newKey == null) {
+                $newKey = self::pascalToCamel($key);
+            }
+            if ($customKeys !== null && in_array($key, $customKeys)) {
                 $returnVal[$key] = $val;
             } elseif (!is_null($val)) {
                 $returnVal[$newKey] = $val;
