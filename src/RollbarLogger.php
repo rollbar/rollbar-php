@@ -87,7 +87,7 @@ class RollbarLogger extends AbstractLogger
             return $response;
         }
         return $this->config->send($toSend, $accessToken);
-    } 
+    }
 
     protected function getPayload($accessToken, $level, $toLog, $context)
     {

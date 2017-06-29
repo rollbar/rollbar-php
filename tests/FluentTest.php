@@ -23,6 +23,7 @@ class FluentTest extends BaseRollbarTest
             'environment' => 'testing'
         ), false, false, false);
         $logger = Rollbar::scope(array(
+            'batched' => false,
             'fluent_host' => $address,
             'fluent_port' => $port,
             'handler' => 'fluent'
