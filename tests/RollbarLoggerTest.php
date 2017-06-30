@@ -3,7 +3,7 @@
 use Rollbar\Payload\Level;
 use Rollbar\Payload\Payload;
 
-class SilentExceptionSampleRate extends \Exception {}
+class SilentExceptionSampleRate2 extends \Exception {}
 
 class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
 {
@@ -74,10 +74,10 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
             "access_token" => "ad865e76e7fb496fab096ac07b1dbabb",
             "environment" => "testing-php",
             "exception_sample_rates" => array(
-                'Rollbar\SilentExceptionSampleRate' => 0.0
+                'Rollbar\SilentExceptionSampleRate2' => 0.0
             )
         ));
-        $response = $l->log(Level::ERROR, new SilentExceptionSampleRate);
+        $response = $l->log(Level::ERROR, new SilentExceptionSampleRate2);
         
         $this->assertEquals(0, $response->getStatus());
         
