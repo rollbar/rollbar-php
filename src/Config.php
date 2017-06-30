@@ -433,15 +433,11 @@ class Config
         }
 
         if ($toLog instanceof ErrorWrapper) {
-            
             return $this->shouldIgnoreError($toLog);
-            
         }
         
         if ($toLog instanceof \Exception) {
-            
             return $this->shouldIgnoreException($toLog);
-            
         }
         
         return false;
@@ -450,9 +446,9 @@ class Config
     /**
      * Check if the error should be ignored due to `included_errno` config,
      * `use_error_reporting` config or `error_sample_rates` config.
-     * 
+     *
      * @param \Rollbar\ErrorWrapper $toLog
-     * 
+     *
      * @return bool
      */
     protected function shouldIgnoreError(ErrorWrapper $toLog)
@@ -485,9 +481,9 @@ class Config
     /**
      * Check if the exception should be ignored due to configured exception
      * sample rates.
-     * 
+     *
      * @param \Exception $toLog
-     * 
+     *
      * @return bool
      */
     protected function shouldIgnoreException(\Exception $toLog)
@@ -506,9 +502,9 @@ class Config
     /**
      * Calculate what's the chance of logging this exception according to
      * exception sampling.
-     * 
+     *
      * @param \Exception $toLog
-     * 
+     *
      * @return float
      */
     public function exceptionSampleRate(\Exception $toLog)

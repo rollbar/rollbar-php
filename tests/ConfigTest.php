@@ -9,17 +9,11 @@ use Rollbar\Payload\Message;
 use Rollbar\Payload\Payload;
 use Rollbar\RollbarLogger;
 
-class MidExceptionSampleRate extends \Exception {}
-
-class SilentExceptionSampleRate extends MidExceptionSampleRate {}
-
-class FiftyFityExceptionSampleRate extends MidExceptionSampleRate {}
-
-class FiftyFityChildExceptionSampleRate extends FiftyFityExceptionSampleRate {}
-
-class QuarterExceptionSampleRate extends FiftyFityExceptionSampleRate {}
-
-class VerboseExceptionSampleRate extends MidExceptionSampleRate {}
+use Rollbar\TestHelpers\Exceptions\SilentExceptionSampleRate;
+use Rollbar\TestHelpers\Exceptions\FiftyFiftyExceptionSampleRate;
+use Rollbar\TestHelpers\Exceptions\FiftyFityChildExceptionSampleRate;
+use Rollbar\TestHelpers\Exceptions\QuarterExceptionSampleRate;
+use Rollbar\TestHelpers\Exceptions\VerboseExceptionSampleRate;
 
 class ConfigTest extends \PHPUnit_Framework_TestCase
 {
@@ -481,7 +475,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                 0.0
             ),
             array(
-                new FiftyFityExceptionSampleRate,
+                new FiftyFiftyExceptionSampleRate,
                 0.5
             ),
             array(
