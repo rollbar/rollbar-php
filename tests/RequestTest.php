@@ -117,7 +117,8 @@ class RequestTest extends BaseRollbarTest
     {
         $request = new Request();
         $request->setExtras(array("test" => "testing"));
-        $this->assertEquals("testing", $request->getExtras()["test"]);
+        $extras = $request->getExtras();
+        $this->assertEquals("testing", $extras["test"]);
     }
 
     public function testEncode()

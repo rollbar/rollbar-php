@@ -52,7 +52,8 @@ class ServerTest extends BaseRollbarTest
     {
         $server = new Server();
         $server->setExtras(array("test" => "testing"));
-        $this->assertEquals("testing", $server->getExtras()["test"]);
+        $extras = $server->getExtras();
+        $this->assertEquals("testing", $extras["test"]);
     }
 
     public function testEncode()
