@@ -62,14 +62,19 @@ class Server implements \JsonSerializable
         return $this;
     }
 
-    public function __get($key)
+    public function setExtras($extras)
     {
-        return isset($this->extra[$key]) ? $this->extra[$key] : null;
+        $this->extra = $extras;
     }
 
-    public function __set($key, $val)
+    public function getExtras()
     {
-        $this->extra[$key] = $val;
+        return $this->extra;
+    }
+
+    public function setArgv($argv)
+    {
+        $this->extra['argv'] = $argv;
     }
 
     public function jsonSerialize()

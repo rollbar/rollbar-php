@@ -859,11 +859,9 @@ class DataBuilder implements DataBuilderInterface
             $extras = array();
         }
 
-        foreach ($extras as $key => $val) {
-            $server->$key = $val;
-        }
+        $server->setExtras($extras);
         if (isset($_SERVER) && array_key_exists('argv', $_SERVER)) {
-            $server->argv = $_SERVER['argv'];
+            $server->setArgv = $_SERVER['argv'];
         }
         return $server;
     }
