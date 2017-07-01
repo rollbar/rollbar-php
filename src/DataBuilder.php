@@ -746,7 +746,7 @@ class DataBuilder implements DataBuilderInterface
     /*
      * @SuppressWarnings(PHPMD.Superglobals)
      */
-    protected function getHeaders()
+    public function getHeaders()
     {
         $headers = array();
         if (isset($_SERVER)) {
@@ -754,11 +754,7 @@ class DataBuilder implements DataBuilderInterface
                 if (substr($key, 0, 5) == 'HTTP_') {
                     // convert HTTP_CONTENT_TYPE to Content-Type, HTTP_HOST to Host, etc.
                     $name = strtolower(substr($key, 5));
-                    if (strpos($name, '_') != -1) {
-                        $name = preg_replace('/ /', '-', ucwords(preg_replace('/_/', ' ', $name)));
-                    } else {
-                        $name = ucfirst($name);
-                    }
+                    $name = ucwords(str_replace('_', '-', $name), '-');
                     $headers[$name] = $val;
                 }
             }
