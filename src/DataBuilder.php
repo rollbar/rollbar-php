@@ -588,12 +588,10 @@ class DataBuilder implements DataBuilderInterface
             $extras = array();
         }
 
-        foreach ($extras as $key => $val) {
-            $request->$key = $val;
-        }
+        $request->setExtras($extras);
         
         if (isset($_SESSION) && is_array($_SESSION) && count($_SESSION) > 0) {
-            $request->session = $_SESSION;
+            $request->setSession($_SESSION);
         }
         return $request;
     }
@@ -861,7 +859,7 @@ class DataBuilder implements DataBuilderInterface
 
         $server->setExtras($extras);
         if (isset($_SERVER) && array_key_exists('argv', $_SERVER)) {
-            $server->setArgv = $_SERVER['argv'];
+            $server->setArgv($_SERVER['argv']);
         }
         return $server;
     }

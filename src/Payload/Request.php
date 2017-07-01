@@ -123,14 +123,19 @@ class Request implements \JsonSerializable
         return $this;
     }
 
-    public function __get($key)
+    public function getExtras()
     {
-        return isset($this->extra[$key]) ? $this->extra[$key] : null;
+        return $this->extra;
     }
 
-    public function __set($key, $val)
+    public function setExtras($extras)
     {
-        $this->extra[$key] = $val;
+        $this->extra = $extras;
+    }
+
+    public function setSession($session)
+    {
+        $this->extra['session'] = $session;
     }
 
     public function jsonSerialize()

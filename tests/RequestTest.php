@@ -116,8 +116,8 @@ class RequestTest extends BaseRollbarTest
     public function testExtra()
     {
         $request = new Request();
-        $request->test = "testing";
-        $this->assertEquals("testing", $request->test);
+        $request->setExtras(array("test" => "testing"));
+        $this->assertEquals("testing", $request->getExtras()["test"]);
     }
 
     public function testEncode()
@@ -140,7 +140,7 @@ class RequestTest extends BaseRollbarTest
             ->setQueryString("?fetch_account=true&error_level=11")
             ->setUserIp("170.16.58.0");
 
-        $request->test = "testing";
+        $request->setExtras(array("test" => "testing"));
 
         $expected = '{' .
             '"url":"www.rollbar.com\\/account\\/project",' .
