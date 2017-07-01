@@ -105,7 +105,7 @@ class CurlSender implements SenderInterface
         }
         $idx = 0;
         $len = count($this->batchRequests);
-        for (; $idx < $len && $idx < $max; $i++) {
+        for (; $idx < $len && $idx < $max; $idx++) {
             $payload = $this->batchRequests[$idx];
             $handle = curl_init();
             $this->setCurlOptions($handle, $payload, $accessToken);
