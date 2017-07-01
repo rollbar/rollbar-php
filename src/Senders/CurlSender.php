@@ -51,7 +51,6 @@ class CurlSender implements SenderInterface
 
     public function send($scrubbedPayload, $accessToken)
     {
-
         $handle = curl_init();
 
         $this->setCurlOptions($handle, $scrubbedPayload, $accessToken);
@@ -72,7 +71,7 @@ class CurlSender implements SenderInterface
     public function sendBatch($batch, $accessToken)
     {
         if ($this->multiHandle === null) {
-            $multiHandle = curl_multi_init();
+            $this->multiHandle = curl_multi_init();
         }
 
         if ($this->maxBatchRequests > 0) {
@@ -104,17 +103,17 @@ class CurlSender implements SenderInterface
         if ($max <= 0) {
             return;
         }
-        $i = 0;
+        $idx = 0;
         $len = count($this->batchRequests);
-        for (; $i < $len && $i < $max; $i++) {
-            $payload = $this->batchRequests[$i];
+        for (; $idx < $len && $idx < $max; $i++) {
+            $payload = $this->batchRequests[$idx];
             $handle = curl_init();
             $this->setCurlOptions($handle, $payload, $accessToken);
             curl_multi_add_handle($this->multiHandle, $handle);
             $handleArrayKey = (int)$handle;
             $this->inflightRequests[$handleArrayKey] = true;
         }
-        $this->batchRequests = array_slice($this->batchRequests, $i);
+        $this->batchRequests = array_slice($this->batchRequests, $idx);
     }
 
     public function setCurlOptions($handle, $scrubbedPayload, $accessToken)

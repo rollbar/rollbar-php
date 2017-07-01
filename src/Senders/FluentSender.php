@@ -84,7 +84,7 @@ class FluentSender implements SenderInterface
     {
         $responses = array();
         foreach ($batch as $payload) {
-            $response[] = $this->send($payload, $accessToken);
+            $responses[] = $this->send($payload, $accessToken);
         }
         return $responses;
     }
