@@ -1,6 +1,6 @@
 <?php namespace Rollbar\Payload;
 
-class Trace extends ContentInterface
+class Trace implements ContentInterface
 {
     private $frames;
     private $exception;
@@ -11,6 +11,11 @@ class Trace extends ContentInterface
         $this->utilities = new \Rollbar\Utilities();
         $this->setFrames($frames);
         $this->setException($exception);
+    }
+
+    public function getKey()
+    {
+        return 'trace';
     }
 
     public function getFrames()
@@ -42,8 +47,10 @@ class Trace extends ContentInterface
 
     public function jsonSerialize()
     {
-        $result = get_object_vars($this);
-        unset($result['utilities']);
+        $result = array(
+            "frames" => $this->frames,
+            "exception" => $this->exception,
+        );
         return $this->utilities->serializeForRollbar($result);
     }
 }

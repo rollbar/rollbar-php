@@ -39,8 +39,10 @@ class Context implements \JsonSerializable
 
     public function jsonSerialize()
     {
-        $result = get_object_vars($this);
-        unset($result['utilities']);
+        $result = array(
+            "pre" => $this->pre,
+            "post" => $this->post,
+        );
         return $this->utilities->serializeForRollbar($result);
     }
 

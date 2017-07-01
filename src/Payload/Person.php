@@ -71,12 +71,14 @@ class Person implements \JsonSerializable
 
     public function jsonSerialize()
     {
-        $result = get_object_vars($this);
-        unset($result['extra']);
-        unset($result['utilities']);
+        $result = array(
+            "id" => $this->id,
+            "username" => $this->username,
+            "email" => $this->email,
+        );
         foreach ($this->extra as $key => $val) {
             $result[$key] = $val;
         }
-        return $this->utilities->serializeForRollbar($result, null, array_keys($this->extra));
+        return $this->utilities->serializeForRollbar($result, array_keys($this->extra));
     }
 }

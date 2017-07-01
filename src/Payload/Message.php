@@ -1,6 +1,6 @@
 <?php namespace Rollbar\Payload;
 
-class Message extends ContentInterface
+class Message implements ContentInterface
 {
     private $body;
     private $extra;
@@ -16,6 +16,11 @@ class Message extends ContentInterface
         $this->setBody($body);
         $this->setBacktrace($backtrace);
         $this->extra = $extra == null ? array() : $extra;
+    }
+
+    public function getKey()
+    {
+        return 'message';
     }
 
     public function getBody()
@@ -59,6 +64,6 @@ class Message extends ContentInterface
         foreach ($this->extra as $key => $value) {
             $toSerialize[$key] = $value;
         }
-        return $this->utilities->serializeForRollbar($toSerialize, null, array_keys($this->extra));
+        return $this->utilities->serializeForRollbar($toSerialize, array_keys($this->extra));
     }
 }

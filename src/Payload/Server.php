@@ -74,12 +74,15 @@ class Server implements \JsonSerializable
 
     public function jsonSerialize()
     {
-        $result = get_object_vars($this);
-        unset($result['utilities']);
-        unset($result['extra']);
+        $result = array(
+            "host" => $this->host,
+            "root" => $this->root,
+            "branch" => $this->branch,
+            "code_version" => $this->codeVersion,
+        );
         foreach ($this->extra as $key => $val) {
             $result[$key] = $val;
         }
-        return $this->utilities->serializeForRollbar($result, null, array_keys($this->extra));
+        return $this->utilities->serializeForRollbar($result, array_keys($this->extra));
     }
 }

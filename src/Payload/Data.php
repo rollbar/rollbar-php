@@ -241,8 +241,25 @@ class Data implements \JsonSerializable
 
     public function jsonSerialize()
     {
-        $result = get_object_vars($this);
-        unset($result['utilities']);
+        $result = array(
+            "environment" => $this->environment,
+            "body" => $this->body,
+            "level" => $this->level,
+            "timestamp" => $this->timestamp,
+            "code_version" => $this->codeVersion,
+            "platform" => $this->platform,
+            "language" => $this->language,
+            "framework" => $this->framework,
+            "context" => $this->context,
+            "request" => $this->request,
+            "person" => $this->person,
+            "server" => $this->server,
+            "custom" => $this->custom,
+            "fingerprint" => $this->fingerprint,
+            "title" => $this->title,
+            "uuid" => $this->uuid,
+            "notifier" => $this->notifier,
+        );
         return $this->utilities->serializeForRollbar($result);
     }
 }

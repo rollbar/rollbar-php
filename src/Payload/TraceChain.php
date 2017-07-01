@@ -1,12 +1,17 @@
 <?php namespace Rollbar\Payload;
 
-class TraceChain extends ContentInterface
+class TraceChain implements ContentInterface
 {
     private $traces;
 
     public function __construct(array $traces)
     {
         $this->setTraces($traces);
+    }
+
+    public function getKey()
+    {
+        return 'trace_chain';
     }
 
     public function getTraces()

@@ -135,16 +135,20 @@ class Request implements \JsonSerializable
 
     public function jsonSerialize()
     {
-        $result = get_object_vars($this);
-        unset($result['extra']);
-        unset($result['utilities']);
+        $result = array(
+            "url" => $this->url,
+            "method" => $this->method,
+            "headers" => $this->headers,
+            "params" => $this->params,
+            "GET" => $this->get,
+            "query_string" => $this->queryString,
+            "POST" => $this->post,
+            "body" => $this->body,
+            "user_ip" => $this->userIp,
+        );
         foreach ($this->extra as $key => $val) {
             $result[$key] = $val;
         }
-        $overrideNames = array(
-            "get" => "GET",
-            "post" => "POST"
-        );
-        return $this->utilities->serializeForRollbar($result, $overrideNames, array_keys($this->extra));
+        return $this->utilities->serializeForRollbar($result, array_keys($this->extra));
     }
 }
