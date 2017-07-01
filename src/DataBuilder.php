@@ -754,7 +754,7 @@ class DataBuilder implements DataBuilderInterface
                 if (substr($key, 0, 5) == 'HTTP_') {
                     // convert HTTP_CONTENT_TYPE to Content-Type, HTTP_HOST to Host, etc.
                     $name = strtolower(substr($key, 5));
-                    $name = ucwords(str_replace('_', '-', $name), '-');
+                    $name = str_replace(' ', '-', ucwords(str_replace('_', ' ', $name)));
                     $headers[$name] = $val;
                 }
             }
