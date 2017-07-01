@@ -19,6 +19,9 @@ class AgentSender implements SenderInterface
         }
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function send($scrubbedPayload, $accessToken)
     {
         if (empty($this->agentLog)) {
@@ -27,6 +30,9 @@ class AgentSender implements SenderInterface
         fwrite($this->agentLog, json_encode($scrubbedPayload) . "\n");
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function sendBatch($batch, $accessToken)
     {
         if (empty($this->agentLog)) {
@@ -35,6 +41,14 @@ class AgentSender implements SenderInterface
         foreach ($batch as $payload) {
             fwrite($this->agentLog, json_encode($payload) . "\n");
         }
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    public function wait($accessToken, $max)
+    {
+        return;
     }
 
     private function loadAgentFile()

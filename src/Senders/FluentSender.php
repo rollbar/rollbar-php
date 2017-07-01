@@ -79,7 +79,6 @@ class FluentSender implements SenderInterface
         return new Response($status, $info, $uuid);
     }
 
-
     public function sendBatch($batch, $accessToken)
     {
         $responses = array();
@@ -89,6 +88,13 @@ class FluentSender implements SenderInterface
         return $responses;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    public function wait($accessToken, $max)
+    {
+        return;
+    }
 
     /**
      * Loads the fluent logger

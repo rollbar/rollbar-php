@@ -71,6 +71,12 @@ class RollbarLogger extends AbstractLogger
         return new Response(0, "Queue empty");
     }
 
+    public function flushAndWait()
+    {
+        $this->flush();
+        $this->config->wait($this->getAccessToken());
+    }
+
     public function getQueueSize()
     {
         return count($this->queue);

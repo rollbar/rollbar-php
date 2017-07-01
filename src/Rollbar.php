@@ -179,7 +179,7 @@ class Rollbar
     
     public static function setupBatchHandling()
     {
-        register_shutdown_function('Rollbar\Rollbar::flush');
+        register_shutdown_function('Rollbar\Rollbar::flushAndWait');
     }
 
     public static function flush()
@@ -188,6 +188,14 @@ class Rollbar
             return;
         }
         self::$logger->flush();
+    }
+
+    public static function flushAndWait()
+    {
+        if (is_null(self::$logger)) {
+            return;
+        }
+        self::$logger->flushAndWait();
     }
     
     // @codingStandardsIgnoreStart
