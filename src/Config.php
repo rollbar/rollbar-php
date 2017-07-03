@@ -510,6 +510,9 @@ class Config
     public function exceptionSampleRate(\Exception $toLog)
     {
         $sampleRate = 1.0;
+        if (count($this->exception_sample_rates) == 0) {
+            return $sampleRate;
+        }
         
         $exceptionClasses = array();
         
