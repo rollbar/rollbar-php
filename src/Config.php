@@ -56,6 +56,7 @@ class Config
      */
     private $checkIgnore;
     private $error_sample_rates = array();
+    private $exception_sample_rates = array();
     private $mt_randmax;
 
     private $included_errno = ROLLBAR_INCLUDED_ERRNO_BITMASK;
@@ -76,6 +77,10 @@ class Config
 
         if (isset($configArray['error_sample_rates'])) {
             $this->error_sample_rates = $configArray['error_sample_rates'];
+        }
+        
+        if (isset($configArray['exception_sample_rates'])) {
+            $this->exception_sample_rates = $configArray['exception_sample_rates'];
         }
 
         $levels = array(E_WARNING, E_NOTICE, E_USER_ERROR, E_USER_WARNING,
@@ -407,6 +412,7 @@ class Config
         if ($this->shouldSuppress()) {
             return true;
         }
+        
         if (isset($this->checkIgnore)) {
             try {
                 if (call_user_func($this->checkIgnore, $isUncaught, $toLog, $payload)) {
@@ -417,37 +423,113 @@ class Config
                 $this->checkIgnore = null;
             }
         }
+        
         if ($this->levelTooLow($payload)) {
             return true;
         }
+        
         if (!is_null($this->filter)) {
             return $this->filter->shouldSend($payload, $accessToken);
         }
 
         if ($toLog instanceof ErrorWrapper) {
-            $errno = $toLog->errorLevel;
+            return $this->shouldIgnoreError($toLog);
+        }
+        
+        if ($toLog instanceof \Exception) {
+            return $this->shouldIgnoreException($toLog);
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Check if the error should be ignored due to `included_errno` config,
+     * `use_error_reporting` config or `error_sample_rates` config.
+     *
+     * @param \Rollbar\ErrorWrapper $toLog
+     *
+     * @return bool
+     */
+    protected function shouldIgnoreError(ErrorWrapper $toLog)
+    {
+        $errno = $toLog->errorLevel;
 
-            if ($this->included_errno != -1 && ($errno & $this->included_errno) != $errno) {
-                // ignore
+        if ($this->included_errno != -1 && ($errno & $this->included_errno) != $errno) {
+            // ignore
+            return true;
+        }
+
+        if ($this->use_error_reporting && ($errno & error_reporting()) != $errno) {
+            // ignore due to error_reporting level
+            return true;
+        }
+
+        if (isset($this->error_sample_rates[$errno])) {
+            // get a float in the range [0, 1)
+            // mt_rand() is inclusive, so add 1 to mt_randmax
+            $float_rand = mt_rand() / ($this->mt_randmax + 1);
+            if ($float_rand > $this->error_sample_rates[$errno]) {
+                // skip
                 return true;
-            }
-
-            if ($this->use_error_reporting && ($errno & error_reporting()) != $errno) {
-                // ignore due to error_reporting level
-                return true;
-            }
-
-            if (isset($this->error_sample_rates[$errno])) {
-                // get a float in the range [0, 1)
-                // mt_rand() is inclusive, so add 1 to mt_randmax
-                $float_rand = mt_rand() / ($this->mt_randmax + 1);
-                if ($float_rand > $this->error_sample_rates[$errno]) {
-                    // skip
-                    return true;
-                }
             }
         }
+        
         return false;
+    }
+    
+    /**
+     * Check if the exception should be ignored due to configured exception
+     * sample rates.
+     *
+     * @param \Exception $toLog
+     *
+     * @return bool
+     */
+    protected function shouldIgnoreException(\Exception $toLog)
+    {
+        // get a float in the range [0, 1)
+        // mt_rand() is inclusive, so add 1 to mt_randmax
+        $floatRand = mt_rand() / ($this->mt_randmax + 1);
+        if ($floatRand > $this->exceptionSampleRate($toLog)) {
+            // skip
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Calculate what's the chance of logging this exception according to
+     * exception sampling.
+     *
+     * @param \Exception $toLog
+     *
+     * @return float
+     */
+    public function exceptionSampleRate(\Exception $toLog)
+    {
+        $sampleRate = 1.0;
+        if (count($this->exception_sample_rates) == 0) {
+            return $sampleRate;
+        }
+        
+        $exceptionClasses = array();
+        
+        $class = get_class($toLog);
+        while ($class) {
+            $exceptionClasses []= $class;
+            $class = get_parent_class($class);
+        }
+        $exceptionClasses = array_reverse($exceptionClasses);
+        
+        foreach ($exceptionClasses as $exceptionClass) {
+            if (isset($this->exception_sample_rates["$exceptionClass"])) {
+                $sampleRate = $this->exception_sample_rates["$exceptionClass"];
+            }
+        }
+        
+        return $sampleRate;
     }
 
     /**

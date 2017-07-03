@@ -9,6 +9,12 @@ use Rollbar\Payload\Message;
 use Rollbar\Payload\Payload;
 use Rollbar\RollbarLogger;
 
+use Rollbar\TestHelpers\Exceptions\SilentExceptionSampleRate;
+use Rollbar\TestHelpers\Exceptions\FiftyFiftyExceptionSampleRate;
+use Rollbar\TestHelpers\Exceptions\FiftyFityChildExceptionSampleRate;
+use Rollbar\TestHelpers\Exceptions\QuarterExceptionSampleRate;
+use Rollbar\TestHelpers\Exceptions\VerboseExceptionSampleRate;
+
 class ConfigTest extends \PHPUnit_Framework_TestCase
 {
     private $error;
@@ -436,6 +442,54 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                 E_ERROR, // "error_reporting"
                 false
             )
+        );
+    }
+    
+    /**
+     * @dataProvider providerExceptionSampleRate
+     */
+    public function testExceptionSampleRate($exception, $expected)
+    {
+        $config = new Config(array(
+            "access_token" => "ad865e76e7fb496fab096ac07b1dbabb",
+            "environment" => "testing-php",
+            "exception_sample_rates" => array(
+                get_class($exception) => $expected
+            )
+        ));
+        
+        $sampleRate = $config->exceptionSampleRate($exception);
+        
+        $this->assertEquals($expected, $sampleRate);
+    }
+    
+    public function providerExceptionSampleRate()
+    {
+        return array(
+            array(
+                new \Exception,
+                1.0
+            ),
+            array(
+                new SilentExceptionSampleRate,
+                0.0
+            ),
+            array(
+                new FiftyFiftyExceptionSampleRate,
+                0.5
+            ),
+            array(
+                new FiftyFityChildExceptionSampleRate,
+                0.5
+            ),
+            array(
+                new QuarterExceptionSampleRate,
+                0.25
+            ),
+            array(
+                new VerboseExceptionSampleRate,
+                1.0
+            ),
         );
     }
 }
