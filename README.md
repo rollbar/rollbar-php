@@ -406,7 +406,7 @@ Default: empty array, meaning all errors are reported.
 
 <dt>exception_sample_rates
 </dt>
-<dd>Associative array mapping exception classes to sample rates. Sample rates are ratio out of 1, e.g. 0 is "never report", 1 is "always report", and 0.1 is "report 10% of the time". Sampling is done on a per-exception basis. It also respects class inheritance meaning if Exception is at 1.0 then ExceptionSublcass is also at 1.0, unless explicitly configured otherwise. If ExceptionSubclass is set to 0.5, but Exception is at 1.0 then Exception and all its' subclasses run at 1.0, except for ExceptionSubclass and its' subclasses which run at 0.5. Names of exception classes should NOT be followed with additional `\` for global namespace, i.e. Rollbar\SampleException and NOT \Rollbar\SampleException.
+<dd>Associative array mapping exception classes to sample rates. Sample rates are ratio out of 1, e.g. 0 is "never report", 1 is "always report", and 0.1 is "report 10% of the time". Sampling is done on a per-exception basis. It also respects class inheritance meaning if Exception is at 1.0 then ExceptionSublcass is also at 1.0, unless explicitly configured otherwise. If ExceptionSubclass is set to 0.5, but Exception is at 1.0 then Exception and all its' subclasses run at 1.0, except for ExceptionSubclass and its' subclasses which run at 0.5. Names of exception classes should NOT be prefixed with additional `\` for global namespace, i.e. Rollbar\SampleException and NOT \Rollbar\SampleException.
 
 Default: empty array, meaning all exceptions are reported.
 </dd>
