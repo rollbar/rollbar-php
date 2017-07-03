@@ -3,7 +3,9 @@
 use \Mockery as m;
 use Rollbar\Payload\TraceChain;
 
-class TraceChainTest extends \PHPUnit_Framework_TestCase
+use Rollbar;
+
+class TraceChainTest extends Rollbar\BaseRollbarTest
 {
     private $trace1;
     private $trace2;

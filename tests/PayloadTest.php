@@ -4,7 +4,7 @@ use \Mockery as m;
 use Rollbar\Payload\Payload;
 use Rollbar\Payload\Level;
 
-class PayloadTest extends \PHPUnit_Framework_TestCase
+class PayloadTest extends BaseRollbarTest
 {
     public function testPayloadData()
     {
@@ -72,7 +72,7 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
 
     public function testEncode()
     {
-        $accessToken = '012345678901234567890123456789ab';
+        $accessToken = $this->getTestAccessToken();
         $data = m::mock('Rollbar\Payload\Data, \JsonSerializable')
             ->shouldReceive('jsonSerialize')
             ->andReturn(new \ArrayObject())

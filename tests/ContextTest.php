@@ -3,7 +3,7 @@
 use \Mockery as m;
 use Rollbar\Payload\Context;
 
-class ContextTest extends \PHPUnit_Framework_TestCase
+class ContextTest extends BaseRollbarTest
 {
     public function testContextPre()
     {

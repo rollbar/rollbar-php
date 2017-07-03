@@ -1,6 +1,8 @@
 <?php namespace Rollbar\Payload;
 
-class ExceptionInfoTest extends \PHPUnit_Framework_TestCase
+use Rollbar;
+
+class ExceptionInfoTest extends Rollbar\BaseRollbarTest
 {
     public function testClass()
     {

@@ -3,7 +3,7 @@
 use \Mockery as m;
 use Rollbar\Payload\Request;
 
-class RequestTest extends \PHPUnit_Framework_TestCase
+class RequestTest extends BaseRollbarTest
 {
     public function testUrl()
     {
@@ -86,7 +86,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             "data" => array(
                 "Data" => "Parameters"
             ),
-            "access_token" => "123abc"
+            "access_token" => $this->getTestAccessToken()
         );
         $this->assertEquals($post2, $request->setPost($post2)->getPost());
     }

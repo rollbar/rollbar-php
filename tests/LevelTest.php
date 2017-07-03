@@ -3,7 +3,7 @@
 use \Mockery as m;
 use Rollbar\Payload\Level;
 
-class LevelTest extends \PHPUnit_Framework_TestCase
+class LevelTest extends BaseRollbarTest
 {
     /**
      * @expectedException \Exception

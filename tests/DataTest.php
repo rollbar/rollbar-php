@@ -4,7 +4,7 @@ use \Mockery as m;
 use Rollbar\Payload\Data;
 use Rollbar\Payload\Level;
 
-class DataTest extends \PHPUnit_Framework_TestCase
+class DataTest extends BaseRollbarTest
 {
     private $body;
     private $data;

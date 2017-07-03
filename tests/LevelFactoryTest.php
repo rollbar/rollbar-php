@@ -2,7 +2,7 @@
 
 use Rollbar\Payload\Level;
 
-class LevelFactoryTest extends \PHPUnit_Framework_TestCase
+class LevelFactoryTest extends BaseRollbarTest
 {
     private $levelFactory;
     

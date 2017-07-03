@@ -9,7 +9,7 @@ use Rollbar\Payload\Message;
 use Rollbar\Payload\Payload;
 use Rollbar\RollbarLogger;
 
-class ConfigTest extends \PHPUnit_Framework_TestCase
+class ConfigTest extends BaseRollbarTest
 {
     private $error;
 
@@ -29,32 +29,31 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     {
         m::close();
     }
-
-    private $token = "abcd1234efef5678abcd1234567890be";
+    
     private $env = "rollbar-php-testing";
 
     public function testAccessToken()
     {
         $config = new Config(array(
-            'access_token' => $this->token,
+            'access_token' => $this->getTestAccessToken(),
             'environment' => $this->env
         ));
-        $this->assertEquals($this->token, $config->getAccessToken());
+        $this->assertEquals($this->getTestAccessToken(), $config->getAccessToken());
     }
 
     public function testAccessTokenFromEnvironment()
     {
-        $_ENV['ROLLBAR_ACCESS_TOKEN'] = $this->token;
+        $_ENV['ROLLBAR_ACCESS_TOKEN'] = $this->getTestAccessToken();
         $config = new Config(array(
             'environment' => 'testing'
         ));
-        $this->assertEquals($this->token, $config->getAccessToken());
+        $this->assertEquals($this->getTestAccessToken(), $config->getAccessToken());
     }
 
     public function testDataBuilder()
     {
         $arr = array(
-            "access_token" => $this->token,
+            "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env
         );
         $config = new Config($arr);
@@ -64,13 +63,13 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function testExtend()
     {
         $arr = array(
-            "access_token" => $this->token,
+            "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env
         );
         $config = new Config($arr);
         $extended = $config->extend(array("one" => 1, "arr" => array()));
         $expected = array(
-            "access_token" => $this->token,
+            "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env,
             "one" => 1,
             "arr" => array()
@@ -81,13 +80,13 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function testConfigure()
     {
         $arr = array(
-            "access_token" => $this->token,
+            "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env
         );
         $config = new Config($arr);
         $config->configure(array("one" => 1, "arr" => array()));
         $expected = array(
-            "access_token" => $this->token,
+            "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env,
             "one" => 1,
             "arr" => array()
@@ -99,7 +98,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     {
         $fdb = new FakeDataBuilder(array());
         $arr = array(
-            "access_token" => $this->token,
+            "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env,
             "dataBuilder" => $fdb
         );
@@ -120,7 +119,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             ->andReturn($pPrime)
             ->mock();
         $config = new Config(array(
-            "access_token" => $this->token,
+            "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env,
             "transformer" => $transformer
         ));
@@ -130,7 +129,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function testMinimumLevel()
     {
         $c = new Config(array(
-            "access_token" => $this->token,
+            "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env,
             "minimumLevel" => "warning"
         ));
@@ -189,7 +188,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             ->andReturn(true, false)
             ->mock();
         $c = new Config(array(
-            "access_token" => $this->token,
+            "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env,
             "filter" => $filter
         ));
@@ -202,21 +201,21 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $p = m::mock("Rollbar\Payload\Payload");
         $sender = m::mock("Rollbar\Senders\SenderInterface")
             ->shouldReceive("send")
-            ->with($p, $this->token)
+            ->with($p, $this->getTestAccessToken())
             ->once()
             ->mock();
         $c = new Config(array(
-            "access_token" => $this->token,
+            "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env,
             "sender" => $sender
         ));
-        $c->send($p, $this->token);
+        $c->send($p, $this->getTestAccessToken());
     }
     
     public function testEndpoint()
     {
         $config = new Config(array(
-            "access_token" => $this->token,
+            "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env,
             "endpoint" => "http://localhost/api/1/"
         ));
@@ -230,7 +229,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function testEndpointDefault()
     {
         $config = new Config(array(
-            "access_token" => $this->token,
+            "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env
         ));
         
@@ -243,7 +242,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function testBaseApiUrl()
     {
         $config = new Config(array(
-            "access_token" => $this->token,
+            "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env,
             "base_api_url" => "http://localhost/api/1/"
         ));
@@ -257,7 +256,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function testBaseApiUrlDefault()
     {
         $config = new Config(array(
-            "access_token" => $this->token,
+            "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env
         ));
         
@@ -270,7 +269,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function testSendMessageTrace()
     {
         $c = new Config(array(
-            "access_token" => $this->token,
+            "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env,
             "send_message_trace" => true
         ));
@@ -278,7 +277,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($c->getSendMessageTrace());
         
         $c = new Config(array(
-            "access_token" => $this->token,
+            "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env
         ));
         
@@ -289,7 +288,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     {
         $called = false;
         $config = new Config(array(
-            "access_token" => $this->token,
+            "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env,
             "checkIgnore" => function () use (&$called) {
                 $called = true;
@@ -305,7 +304,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                 $data,
                 $config->getAccessToken()
             ),
-            $this->token,
+            $this->getTestAccessToken(),
             $this->error,
             false
         );
@@ -320,7 +319,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $errorPassed = null;
         
         $config = new Config(array(
-            "access_token" => $this->token,
+            "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env,
             "checkIgnore" => function (
                 $isUncaught,
@@ -346,7 +345,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                 $data,
                 $config->getAccessToken()
             ),
-            $this->token,
+            $this->getTestAccessToken(),
             $this->error,
             true
         );
@@ -359,7 +358,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function testCaptureErrorStacktraces()
     {
         $logger = new RollbarLogger(array(
-            "access_token" => $this->token,
+            "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env,
             "capture_error_stacktraces" => false
         ));
@@ -383,7 +382,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $called = false;
         
         $config = new Config(array(
-            "access_token" => $this->token,
+            "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env,
             "checkIgnore" => function () use (&$called) {
                 $called = true;
@@ -406,7 +405,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                 $data,
                 $config->getAccessToken()
             ),
-            $this->token,
+            $this->getTestAccessToken(),
             $this->error,
             false
         );

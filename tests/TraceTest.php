@@ -4,7 +4,7 @@ use \Mockery as m;
 use Rollbar\Payload\Trace;
 use Rollbar\Payload\Frame;
 
-class TraceTest extends \PHPUnit_Framework_TestCase
+class TraceTest extends BaseRollbarTest
 {
     public function testTraceConstructor()
     {
