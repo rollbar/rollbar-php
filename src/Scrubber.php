@@ -26,12 +26,12 @@ class Scrubber implements ScrubberInterface
         }
         $this->scrubFields = self::$defaults->scrubFields($fromConfig);
     }
-    
+
     public function getScrubFields()
     {
         return $this->scrubFields;
     }
-    
+
     protected function setWhitelist($config)
     {
         $fromConfig = $this->tryGet($config, 'scrubWhitelist');
@@ -40,12 +40,12 @@ class Scrubber implements ScrubberInterface
         }
         $this->whitelist = $fromConfig ? $fromConfig : array();
     }
-    
+
     public function getWhitelist()
     {
         return $this->whitelist;
     }
-    
+
     /**
      * Scrub a data structure including arrays and query strings.
      *
@@ -57,11 +57,11 @@ class Scrubber implements ScrubberInterface
     public function scrub(&$data, $replacement = '*', $path = '')
     {
         $fields = $this->getScrubFields();
-        
+
         if (!$fields || !$data) {
             return $data;
         }
-        
+
         if (is_array($data)) { // scrub arrays
             $data = $this->scrubArray($data, $replacement, $path);
         } elseif (is_string($data)) { // scrub URLs and query strings
@@ -80,11 +80,11 @@ class Scrubber implements ScrubberInterface
     protected function scrubArray(&$arr, $replacement = '*', $path = '')
     {
         $fields = $this->getScrubFields();
-        
+
         if (!$fields || !$arr) {
             return $arr;
         }
-        
+
         $scrubber = $this;
 
         $scrubberFn = function (
@@ -97,20 +97,20 @@ class Scrubber implements ScrubberInterface
             $scrubber,
             &$path
 ) {
-        
+
             $parent = $path;
             $current = !$path ? $key : $path . '.' . $key;
-            
+
             if (in_array($current, $scrubber->getWhitelist())) {
                 return;
             }
-            
+
             if (in_array($key, $fields, true)) {
                 $val = str_repeat($replacement, 8);
             } else {
                 $val = $scrubber->scrub($val, $replacement, $current);
             }
-            
+
             $current = $parent;
         };
 
