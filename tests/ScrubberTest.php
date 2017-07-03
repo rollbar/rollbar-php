@@ -24,6 +24,67 @@ class ScrubberTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
+     * @dataProvider scrubWhitelistProvider
+     */
+    public function testScrubWhitelist($testData, $scrubFields, $whitelist, $expected)
+    {
+        $scrubber = new Scrubber(array(
+            'scrubFields' => $scrubFields,
+            'scrubWhitelist' => $whitelist
+        ));
+        $result = $scrubber->scrub($testData);
+        $this->assertEquals(
+            $expected,
+            $result,
+            "Looks like whitelisting is not working correctly."
+        );
+    }
+    
+    public function scrubWhitelistProvider()
+    {
+        return array(
+            array(
+                array(
+                    'toScrub' => 'some value 1',
+                    'firstLevelArray' => array(
+                        'secondLevelArray' => array(
+                            'thirdLevelProp' => 'some value 3',
+                            'toScrub' => 'some value 3',
+                            'thirdLevelArray' => array(
+                                'toScrub' => 'some value 4'
+                            )
+                        ),
+                        'secondLevelProp' => 'some value 2',
+                        'toScrub' => 'some value 2'
+                    )
+                ),
+                
+                array('toScrub'),
+                
+                array(
+                    'firstLevelArray.secondLevelArray.toScrub',
+                    'firstLevelArray.secondLevelArray.thirdLevelArray.toScrub'
+                ),
+                
+                array(
+                    'toScrub' => '********',
+                    'firstLevelArray' => array(
+                        'secondLevelArray' => array(
+                            'thirdLevelProp' => 'some value 3',
+                            'toScrub' => 'some value 3',
+                            'thirdLevelArray' => array(
+                                'toScrub' => 'some value 4'
+                            )
+                        ),
+                        'secondLevelProp' => 'some value 2',
+                        'toScrub' => '********'
+                    )
+                ),
+            )
+        );
+    }
+    
+    /**
      * @dataProvider scrubDataProvider
      */
     public function testScrub($testData, $scrubFields, $expected)
