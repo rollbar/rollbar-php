@@ -2,6 +2,7 @@
 
 use Rollbar\Payload\Level;
 use Rollbar\Payload\Payload;
+use Rollbar\TestHelpers\Exceptions\SilentExceptionSampleRate;
 
 class RollbarLoggerTest extends BaseRollbarTest
 {
@@ -66,6 +67,24 @@ class RollbarLoggerTest extends BaseRollbarTest
         $this->assertEquals(0, $response->getStatus());
     }
 
+    public function testExceptionSampleRates()
+    {
+        $l = new RollbarLogger(array(
+            "access_token" => "ad865e76e7fb496fab096ac07b1dbabb",
+            "environment" => "testing-php",
+            "exception_sample_rates" => array(
+                'Rollbar\TestHelpers\Exceptions\SilentExceptionSampleRate' => 0.0
+            )
+        ));
+        $response = $l->log(Level::ERROR, new SilentExceptionSampleRate);
+        
+        $this->assertEquals(0, $response->getStatus());
+        
+        $response = $l->log(Level::ERROR, new \Exception);
+        
+        $this->assertEquals(200, $response->getStatus());
+    }
+
     public function testIncludedErrNo()
     {
         $l = new RollbarLogger(array(
@@ -127,7 +146,6 @@ class RollbarLoggerTest extends BaseRollbarTest
         $replacement = '*'
     ) {
     
-        
         $this->assertEquals(
             str_repeat($replacement, 8),
             $result[$scrubField],
@@ -251,6 +269,34 @@ class RollbarLoggerTest extends BaseRollbarTest
         $this->scrubTestAssert(
             "Custom",
             $result['data']['custom']
+        );
+    }
+    
+    /**
+     * @dataProvider scrubDataProvider
+     */
+    public function testMakeDataScrubPerson($testData)
+    {
+        $testData['id'] = '123';
+        $result = $this->scrubTestHelper(
+            array(
+                'person' => $testData,
+                'scrub_whitelist' => array(
+                    'data.person.recursive.sensitive'
+                )
+            )
+        );
+        
+        $this->assertEquals(
+            str_repeat('*', 8),
+            $result['data']['person']['sensitive'],
+            "Person did not get scrubbed."
+        );
+        
+        $this->assertNotEquals(
+            str_repeat('*', 8),
+            $result['data']['person']['recursive']['sensitive'],
+            "Person recursive.sensitive DID get scrubbed even though it's whitelisted."
         );
     }
     

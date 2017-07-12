@@ -1,5 +1,30 @@
 # Changelog
 
+## 1.2.0
+
+- No longer ignore the native PHP error handler:
+  [#175](https://github.com/rollbar/rollbar-php/pull/175)
+- Fix for when `HTTP_X_FORWARDED_PROTO` includes multiple values: [#179](https://github.com/rollbar/rollbar-php/pull/179)
+- Add the `use_error_reporting` option back: [#182](https://github.com/rollbar/rollbar-php/pull/182)
+- Fix a backwards compatibility bug with `base_api_url` which has since been deprecated in favor of
+  `endpoint`: [#189](https://github.com/rollbar/rollbar-php/pull/189)
+- Add a helper method to inject the javascript snippet into views:
+  [#186](https://github.com/rollbar/rollbar-php/pull/186)
+- Add option to include some local variables to stack traces:
+  [#192](https://github.com/rollbar/rollbar-php/pull/192)
+- Address an issue reading from php://input for PHP < 5.6 and provide a workaround:
+  [#181](https://github.com/rollbar/rollbar-php/pull/181)
+- Add static helper methods for Level: [#210](https://github.com/rollbar/rollbar-php/pull/210)
+- Correctly reverse frames in a stacktrace: [#211](https://github.com/rollbar/rollbar-php/pull/211).
+  NOTE: this behaviour is consistent with this library for versions less than 1.0, we consider it a
+  bug that the frames were in the wrong order for versions 1.0.0 to 1.1.1. However, this change will
+  cause the fingerprints of errors to change and therefore may result in some errors showing up as
+  new when in fact they already existed with the stack trace in the opposite order.
+- Allow sampling for exceptions: [#215](https://github.com/rollbar/rollbar-php/pull/215)
+- Add a whitelist to prevent scrubbing of specific fields:
+  [#216](https://github.com/rollbar/rollbar-php/pull/216)
+- Various refactorings and cleanup
+
 ## 1.1.1
 
 - Forgot to bump the version number in the README and in the Notifier configuration.

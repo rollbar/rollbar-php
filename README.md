@@ -6,6 +6,9 @@ This library detects errors and exceptions in your application and reports them 
 
 Supported PHP versions: 5.3, 5.4, 5.5, 5.6, 7, and HHVM (currently tested on 3.6.6).
 
+The documentation for the latest release can be found [here](https://github.com/rollbar/rollbar-php/tree/v1.1.1). The README that is
+available on master is updated as code is changed prior to making a release.
+
 <!-- Sub:[TOC] -->
 
 ## Quick start
@@ -404,6 +407,13 @@ Default: `'production'`
 Default: empty array, meaning all errors are reported.
 </dd>
 
+<dt>exception_sample_rates
+</dt>
+<dd>Associative array mapping exception classes to sample rates. Sample rates are ratio out of 1, e.g. 0 is "never report", 1 is "always report", and 0.1 is "report 10% of the time". Sampling is done on a per-exception basis. It also respects class inheritance meaning if Exception is at 1.0 then ExceptionSublcass is also at 1.0, unless explicitly configured otherwise. If ExceptionSubclass is set to 0.5, but Exception is at 1.0 then Exception and all its' subclasses run at 1.0, except for ExceptionSubclass and its' subclasses which run at 0.5. Names of exception classes should NOT be prefixed with additional `\` for global namespace, i.e. Rollbar\SampleException and NOT \Rollbar\SampleException.
+
+Default: empty array, meaning all exceptions are reported.
+</dd>
+
 <dt>fluent_host</dt>
 <dd>Either an `IPv4`, `IPv6`, or a `unix socket`.
 
@@ -484,6 +494,11 @@ Default: `(E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOV
 <dd>Array of field names to scrub out of \_POST and \_SESSION. Values will be replaced with asterisks. If overriding, make sure to list all fields you want to scrub, not just fields you want to add to the default. Param names are converted to lowercase before comparing against the scrub list.
 
 Default: `('passwd', 'password', 'secret', 'confirm_password', 'password_confirmation', 'auth_token', 'csrf_token')`
+</dd>
+
+<dt>scrub_whitelist
+</dt>
+<dd>Array of fields that you do NOT to be scrubbed even if they match entries in scrub_fields. Entries should be provided in associative array dot notation, i.e. `data.person.username`.
 </dd>
 
 <dt>shift_function
@@ -575,6 +590,19 @@ $config['error_sample_rates'] = array(
     // E_USER_WARNING will take the same value, 0.5
     E_USER_NOTICE => 0.1,
     // E_STRICT and beyond will all be 0.1
+);
+?>
+```
+
+Example use of exception_sample_rates:
+
+```php
+<?php
+$config['exception_sample_rates'] = array(
+    // Exception omitted, so defaults to 1
+    
+    // SometimesException set at 0.1 so only reported 10% of the time
+    'SometimesException' => 0.1,
 );
 ?>
 ```
