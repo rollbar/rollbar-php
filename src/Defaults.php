@@ -165,8 +165,8 @@ class Defaults
             E_DEPRECATED => "info",
             E_USER_DEPRECATED => "info"
         );
-        $this->defaultGitHash = self::getGitHash();
-        $this->defaultGitBranch = self::getGitBranch();
+        $this->defaultGitHash = null;
+        $this->defaultGitBranch = null;
         $this->defaultServerRoot = self::getServerRoot();
         $this->defaultPlatform = self::getPlatform();
         $this->defaultNotifier = self::getNotifier();
@@ -211,14 +211,26 @@ class Defaults
         );
     }
 
-    public function gitHash($gitHash = null)
+    public function gitHash($gitHash = null, $allowExec = true)
     {
-        return $this->utilities->coalesce($gitHash, $this->defaultGitHash);
+        if ($gitHash) {
+            return $gitHash;
+        }
+        if (!isset($this->defaultGitHash) && $allowExec) {
+            $this->defaultGitHash = self::getGitHash();
+        }
+        return $this->defaultGitHash;
     }
 
-    public function gitBranch($gitBranch = null)
+    public function gitBranch($gitBranch = null, $allowExec = true)
     {
-        return $this->utilities->coalesce($gitBranch, $this->defaultGitBranch);
+        if ($gitBranch) {
+            return $gitBranch;
+        }
+        if (!isset($this->defaultGitBranch) && $allowExec) {
+            $this->defaultGitBranch = self::getGitBranch();
+        }
+        return $this->defaultGitBranch;
     }
 
     public function serverRoot($serverRoot = null)

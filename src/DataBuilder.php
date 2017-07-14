@@ -242,7 +242,11 @@ class DataBuilder implements DataBuilderInterface
         if (!isset($fromConfig)) {
             $fromConfig = $this->tryGet($config, 'branch');
         }
-        $this->serverBranch = self::$defaults->gitBranch($fromConfig);
+        $allowExec = $this->tryGet($config, 'allow_exec');
+        if (!isset($allowExec)) {
+            $allowExec = true;
+        }
+        $this->serverBranch = self::$defaults->gitBranch($fromConfig, $allowExec);
     }
 
     protected function setServerCodeVersion($config)
