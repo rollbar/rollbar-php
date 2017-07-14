@@ -165,12 +165,14 @@ In case you want to report your JavaScript errors using [Rollbar.js](https://git
 ```php
 $rollbarJs = Rollbar\RollbarJsHelper::buildJs(
     array(
-        "accessToken" => "POST_CLIENT_ITEM_ACCESS_TOKEN",
-        "captureUncaught" => true,
-        "payload" => array(
-            "environment" => "production"
-        ),
-        /* other configuration you want to pass to RollbarJS */
+        'options' => array(
+            "accessToken" => "POST_CLIENT_ITEM_ACCESS_TOKEN",
+            "captureUncaught" => true,
+            "payload" => array(
+                "environment" => "production"
+            ),
+            /* other configuration you want to pass to RollbarJS */
+        )
     )
 );
 ```
@@ -179,12 +181,14 @@ Or if you are using Content-Security-Policy: script-src 'unsafe-inline'
 ```php
 $rollbarJs = Rollbar\RollbarJsHelper::buildJs(
     array(
-        "accessToken" => "POST_CLIENT_ITEM_ACCESS_TOKEN",
-        "captureUncaught" => true,
-        "payload" => array(
-            "environment" => "production"
+        'options' => array(
+            "accessToken" => "POST_CLIENT_ITEM_ACCESS_TOKEN",
+            "captureUncaught" => true,
+            "payload" => array(
+                "environment" => "production"
+            ),
+            /* other configuration you want to pass to RollbarJS */
         ),
-        /* other configuration you want to pass to RollbarJS */
     ),
     headers_list(),
     $yourNonceString
