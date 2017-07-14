@@ -56,8 +56,7 @@ class RollbarJsHelper
      */
     public function configJsTag()
     {
-        $config = isset($this->config['options']) ? $this->config['options'] : new \stdClass();
-        return "var _rollbarConfig = " . json_encode($config) . ";";
+        return "var _rollbarConfig = " . json_encode($this->config, JSON_FORCE_OBJECT) . ";";
     }
     
     /**
