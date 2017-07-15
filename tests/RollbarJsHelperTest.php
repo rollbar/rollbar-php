@@ -229,12 +229,10 @@ class JsHelperTest extends \PHPUnit_Framework_TestCase
     public function testConfigJsTag()
     {
         $config = array(
-            'options' => array(
-                'config1' => 'value 1'
-            )
+            'config1' => 'value 1'
         );
         
-        $expectedJson = json_encode($config['options']);
+        $expectedJson = json_encode($config);
         $expected = "var _rollbarConfig = $expectedJson;";
         
         $helper = new RollbarJsHelper($config);
@@ -281,9 +279,7 @@ class JsHelperTest extends \PHPUnit_Framework_TestCase
             ),
             array(
                 array(
-                    'options' => array(
-                        'foo' => 'bar'
-                    )
+                    'foo' => 'bar'
                 ),
                 array(),
                 null,
