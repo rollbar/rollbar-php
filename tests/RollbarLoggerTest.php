@@ -4,7 +4,7 @@ use Rollbar\Payload\Level;
 use Rollbar\Payload\Payload;
 use Rollbar\TestHelpers\Exceptions\SilentExceptionSampleRate;
 
-class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
+class RollbarLoggerTest extends BaseRollbarTest
 {
     
     public function setUp()
@@ -15,7 +15,7 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
     public function testConfigure()
     {
         $l = new RollbarLogger(array(
-            "access_token" => "accessaccesstokentokentokentoken",
+            "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php"
         ));
         $l->configure(array("extraData" => 15));
@@ -26,7 +26,7 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
     public function testLog()
     {
         $l = new RollbarLogger(array(
-            "access_token" => "ad865e76e7fb496fab096ac07b1dbabb",
+            "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php"
         ));
         $response = $l->log(Level::WARNING, "Testing PHP Notifier", array());
@@ -36,7 +36,7 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
     public function testLogStaticLevel()
     {
         $l = new RollbarLogger(array(
-            "access_token" => "ad865e76e7fb496fab096ac07b1dbabb",
+            "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php"
         ));
         $response = $l->log(Level::warning(), "Testing PHP Notifier", array());
@@ -46,7 +46,7 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
     public function testErrorSampleRates()
     {
         $l = new RollbarLogger(array(
-            "access_token" => "ad865e76e7fb496fab096ac07b1dbabb",
+            "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php",
             "error_sample_rates" => array(
                 E_ERROR => 0
@@ -88,7 +88,7 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
     public function testIncludedErrNo()
     {
         $l = new RollbarLogger(array(
-            "access_token" => "ad865e76e7fb496fab096ac07b1dbabb",
+            "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php",
             "included_errno" => E_ERROR | E_WARNING
         ));
@@ -112,7 +112,7 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
         $scrubFields = array('sensitive');
         
         $defaultConfig = array(
-            'access_token' => 'abcd1234efef5678abcd1234567890be',
+            'access_token' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'scrub_fields' => $scrubFields
         );
@@ -375,7 +375,7 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
     public function testPsr3Emergency()
     {
         $l = new RollbarLogger(array(
-            "access_token" => "ad865e76e7fb496fab096ac07b1dbabb",
+            "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php"
         ));
 
@@ -386,7 +386,7 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
     public function testPsr3Alert()
     {
         $l = new RollbarLogger(array(
-            "access_token" => "ad865e76e7fb496fab096ac07b1dbabb",
+            "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php"
         ));
 
@@ -397,7 +397,7 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
     public function testPsr3Critical()
     {
         $l = new RollbarLogger(array(
-            "access_token" => "ad865e76e7fb496fab096ac07b1dbabb",
+            "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php"
         ));
 
@@ -408,7 +408,7 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
     public function testPsr3Error()
     {
         $l = new RollbarLogger(array(
-            "access_token" => "ad865e76e7fb496fab096ac07b1dbabb",
+            "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php"
         ));
 
@@ -419,7 +419,7 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
     public function testPsr3Warning()
     {
         $l = new RollbarLogger(array(
-            "access_token" => "ad865e76e7fb496fab096ac07b1dbabb",
+            "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php"
         ));
 
@@ -430,7 +430,7 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
     public function testPsr3Notice()
     {
         $l = new RollbarLogger(array(
-            "access_token" => "ad865e76e7fb496fab096ac07b1dbabb",
+            "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php"
         ));
 
@@ -441,7 +441,7 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
     public function testPsr3Info()
     {
         $l = new RollbarLogger(array(
-            "access_token" => "ad865e76e7fb496fab096ac07b1dbabb",
+            "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php"
         ));
 
@@ -452,7 +452,7 @@ class RollbarLoggerTest extends \PHPUnit_Framework_TestCase
     public function testPsr3Debug()
     {
         $l = new RollbarLogger(array(
-            "access_token" => "ad865e76e7fb496fab096ac07b1dbabb",
+            "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php"
         ));
 

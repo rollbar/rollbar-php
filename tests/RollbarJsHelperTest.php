@@ -1,6 +1,6 @@
 <?php namespace Rollbar;
 
-class JsHelperTest extends \PHPUnit_Framework_TestCase
+class JsHelperTest extends BaseRollbarTest
 {
     protected $jsHelper;
     protected $testSnippetPath;

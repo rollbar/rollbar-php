@@ -5,7 +5,7 @@ namespace Rollbar;
 use Rollbar\Payload\Level;
 use Rollbar\TestHelpers\MockPhpStream;
 
-class ScrubberTest extends \PHPUnit_Framework_TestCase
+class ScrubberTest extends BaseRollbarTest
 {
     public function scrubUrlDataProvider()
     {

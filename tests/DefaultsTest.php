@@ -5,7 +5,7 @@ use Rollbar\Payload\Level;
 use Rollbar\Payload\Notifier;
 use Psr\Log\LogLevel;
 
-class DefaultsTest extends \PHPUnit_Framework_TestCase
+class DefaultsTest extends BaseRollbarTest
 {
     /**
      * @var Defaults

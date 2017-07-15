@@ -2,7 +2,7 @@
 
 use Rollbar\ErrorWrapper;
 
-class ErrorWrapperTest extends \PHPUnit_Framework_TestCase
+class ErrorWrapperTest extends BaseRollbarTest
 {
     public function testBacktrace()
     {

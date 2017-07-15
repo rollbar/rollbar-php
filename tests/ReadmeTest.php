@@ -1,10 +1,5 @@
 <?php namespace Rollbar;
 
-if (!defined('ROLLBAR_TEST_TOKEN')) {
-    define('ROLLBAR_TEST_TOKEN', 'ad865e76e7fb496fab096ac07b1dbabb');
-}
-
-
 use Rollbar\Rollbar;
 use Rollbar\Payload\Level;
 use Monolog\Logger;
@@ -15,7 +10,7 @@ function do_something()
     throw new \Exception();
 }
 
-class ReadmeTest extends \PHPUnit_Framework_TestCase
+class ReadmeTest extends BaseRollbarTest
 {
 
     /**
@@ -26,7 +21,7 @@ class ReadmeTest extends \PHPUnit_Framework_TestCase
         // installs global error and exception handlers
         Rollbar::init(
             array(
-                'access_token' => ROLLBAR_TEST_TOKEN,
+                'access_token' => $this->getTestAccessToken(),
                 'environment' => 'production'
             )
         );
@@ -64,7 +59,7 @@ class ReadmeTest extends \PHPUnit_Framework_TestCase
     {
         $config = array(
             // required
-            'access_token' => ROLLBAR_TEST_TOKEN,
+            'access_token' => $this->getTestAccessToken(),
             // optional - environment name. any string will do.
             'environment' => 'production',
             // optional - path to directory your code is in. used for linking stack traces.
@@ -79,7 +74,7 @@ class ReadmeTest extends \PHPUnit_Framework_TestCase
     {
         $config = array(
             // required
-            'access_token' => ROLLBAR_TEST_TOKEN,
+            'access_token' => $this->getTestAccessToken(),
             // optional - environment name. any string will do.
             'environment' => 'production',
             // optional - path to directory your code is in. used for linking stack traces.
@@ -116,7 +111,7 @@ class ReadmeTest extends \PHPUnit_Framework_TestCase
 
     public function testMonolog()
     {
-        $config = array('access_token' => ROLLBAR_TEST_TOKEN, 'environment' => 'testing');
+        $config = array('access_token' => $this->getTestAccessToken(), 'environment' => 'testing');
 
         // installs global error and exception handlers
         Rollbar::init($config);

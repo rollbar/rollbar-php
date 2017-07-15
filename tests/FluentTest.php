@@ -4,7 +4,7 @@ namespace Rollbar;
 
 use Rollbar\Payload\Level;
 
-class FluentTest extends \PHPUnit_Framework_TestCase
+class FluentTest extends BaseRollbarTest
 {
 
     public function testFluent()

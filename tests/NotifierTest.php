@@ -3,7 +3,7 @@
 use \Mockery as m;
 use Rollbar\Payload\Notifier;
 
-class NotifierTest extends \PHPUnit_Framework_TestCase
+class NotifierTest extends BaseRollbarTest
 {
     public function testName()
     {

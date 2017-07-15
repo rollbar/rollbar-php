@@ -5,7 +5,7 @@ namespace Rollbar;
 use Rollbar\Payload\Level;
 use Rollbar\TestHelpers\MockPhpStream;
 
-class DataBuilderTest extends \PHPUnit_Framework_TestCase
+class DataBuilderTest extends BaseRollbarTest
 {
 
     /**
@@ -18,7 +18,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $_SESSION = array();
         
         $this->dataBuilder = new DataBuilder(array(
-            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'levelFactory' => new LevelFactory,
             'utilities' => new Utilities
@@ -315,7 +315,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     public function testBranchKey()
     {
         $dataBuilder = new DataBuilder(array(
-            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'branch' => 'test-branch',
             'levelFactory' => new LevelFactory,
@@ -329,7 +329,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     public function testCodeVersion()
     {
         $dataBuilder = new DataBuilder(array(
-            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'code_version' => '3.4.1',
             'levelFactory' => new LevelFactory,
@@ -342,7 +342,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     public function testHost()
     {
         $dataBuilder = new DataBuilder(array(
-            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'host' => 'my host',
             'levelFactory' => new LevelFactory,
@@ -355,7 +355,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     public function testGetMessage()
     {
         $dataBuilder = new DataBuilder(array(
-            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'levelFactory' => new LevelFactory,
             'utilities' => new Utilities
@@ -369,7 +369,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     {
         
         $dataBuilder = new DataBuilder(array(
-            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'send_message_trace' => true,
             'levelFactory' => new LevelFactory,
@@ -384,7 +384,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     {
         // Negative test
         $c = new Config(array(
-            'access_token' => 'abcd1234efef5678abcd1234567890be',
+            'access_token' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'send_message_trace' => true
         ));
@@ -401,7 +401,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         
         // Positive test
         $c = new Config(array(
-            'access_token' => 'abcd1234efef5678abcd1234567890be',
+            'access_token' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'send_message_trace' => true,
             'local_vars_dump' => true
@@ -423,7 +423,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     {
         // Negative test
         $dataBuilder = new DataBuilder(array(
-            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'levelFactory' => new LevelFactory,
             'utilities' => new Utilities
@@ -437,7 +437,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         
         // Positive test
         $dataBuilder = new DataBuilder(array(
-            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'local_vars_dump' => true,
             'levelFactory' => new LevelFactory,
@@ -463,7 +463,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     public function testExceptionFramesWithoutContext()
     {
         $dataBuilder = new DataBuilder(array(
-            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'include_error_code_context' => true,
             'include_exception_code_context' => false,
@@ -477,7 +477,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     public function testExceptionFramesWithoutContextDefault()
     {
         $dataBuilder = new DataBuilder(array(
-            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'levelFactory' => new LevelFactory,
             'utilities' => new Utilities
@@ -489,7 +489,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     public function testExceptionFramesWithContext()
     {
         $dataBuilder = new DataBuilder(array(
-            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'include_exception_code_context' => true,
             'levelFactory' => new LevelFactory,
@@ -504,7 +504,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $utilities = new Utilities;
         
         $dataBuilder = new DataBuilder(array(
-            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'include_error_code_context' => false,
             'include_exception_code_context' => true,
@@ -545,7 +545,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $testFilePath = __DIR__ . '/DataBuilderTest.php';
 
         $dataBuilder = new DataBuilder(array(
-            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'include_error_code_context' => true,
             'include_exception_code_context' => false,
@@ -612,7 +612,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         $utilities = new Utilities;
 
         $dataBuilder = new DataBuilder(array(
-            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'levelFactory' => new LevelFactory,
             'utilities' => $utilities
@@ -661,7 +661,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     public function testPerson()
     {
         $dataBuilder = new DataBuilder(array(
-            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'person' => array(
                 'id' => '123',
@@ -677,7 +677,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     public function testPersonFunc()
     {
         $dataBuilder = new DataBuilder(array(
-            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'person_fn' => function () {
                 return array(
@@ -695,7 +695,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     public function testPersonFuncException()
     {
         \Rollbar\Rollbar::init(array(
-            'access_token' => 'abcd1234efef5678abcd1234567890be',
+            'access_token' => $this->getTestAccessToken(),
             'environment' => 'tests'
         ));
         $logger = \Rollbar\Rollbar::scope(array(
@@ -715,7 +715,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     public function testRoot()
     {
         $dataBuilder = new DataBuilder(array(
-            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'root' => '/var/www/app',
             'levelFactory' => new LevelFactory,
@@ -737,7 +737,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
         file_put_contents('php://input', $streamInput);
         
         $dataBuilder = new DataBuilder(array(
-            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'levelFactory' => new LevelFactory,
             'utilities' => new Utilities,
@@ -770,7 +770,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     ) {
     
         $dataBuilder = new DataBuilder(array(
-            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'capture_error_stacktraces' => $captureErrorStacktraces,
             'levelFactory' => new LevelFactory,
@@ -790,7 +790,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     public function testFramesOrder()
     {
         $dataBuilder = new DataBuilder(array(
-            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'include_exception_code_context' => true,
             'levelFactory' => new LevelFactory,
@@ -810,7 +810,7 @@ class DataBuilderTest extends \PHPUnit_Framework_TestCase
     ) {
     
         $dataBuilder = new DataBuilder(array(
-            'accessToken' => 'abcd1234efef5678abcd1234567890be',
+            'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'capture_error_stacktraces' => $captureErrorStacktraces,
             'levelFactory' => new LevelFactory,

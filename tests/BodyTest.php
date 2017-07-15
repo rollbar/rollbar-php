@@ -3,7 +3,7 @@
 use \Mockery as m;
 use Rollbar\Payload\Body;
 
-class BodyTest extends \PHPUnit_Framework_TestCase
+class BodyTest extends BaseRollbarTest
 {
     public function testBodyValue()
     {

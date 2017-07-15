@@ -1,6 +1,8 @@
 <?php namespace Rollbar\Payload;
 
-class MessageTest extends \PHPUnit_Framework_TestCase
+use Rollbar;
+
+class MessageTest extends Rollbar\BaseRollbarTest
 {
     public function testBacktrace()
     {

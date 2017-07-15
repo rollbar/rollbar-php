@@ -1,9 +1,5 @@
 <?php namespace Rollbar;
 
-if (!defined('ROLLBAR_TEST_TOKEN')) {
-    define('ROLLBAR_TEST_TOKEN', 'ad865e76e7fb496fab096ac07b1dbabb');
-}
-
 use Rollbar\Rollbar;
 use Rollbar\Payload\Level;
 
@@ -12,13 +8,18 @@ use Rollbar\Payload\Level;
  *
  * @SuppressWarnings(PHPMD.StaticAccess)
  */
-class RollbarTest extends \PHPUnit_Framework_TestCase
+class RollbarTest extends BaseRollbarTest
 {
+    
+    public function __construct()
+    {
+        self::$simpleConfig['access_token'] = $this->getTestAccessToken();
+        self::$simpleConfig['environment'] = 'test';
+        
+        parent::__construct();
+    }
 
-    private static $simpleConfig = array(
-        'access_token' => ROLLBAR_TEST_TOKEN,
-        'environment' => 'test'
-    );
+    private static $simpleConfig = array();
 
     private static function clearLogger()
     {
