@@ -322,6 +322,16 @@ All of the following options can be passed as keys in the `$config` array.
 Default: `/var/www`
 </dd>
 
+<dt>allow_exec
+</dt>
+<dd>If the branch option is not set, we will attempt to call out to git to discover the branch name
+via the php `exec` function call. If you do not want to allow `exec` to be called, and therefore
+possibly to not gather this context if you do not otherwise provide it via the separate
+configuration option, then set this option to false.
+
+Default: true
+</dd>
+
 <dt>endpoint
 </dt>
 <dd>The API URL to post to. Note: the URL has to end with a trailing slash.
