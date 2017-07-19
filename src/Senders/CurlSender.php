@@ -54,10 +54,17 @@ class CurlSender implements SenderInterface
         $result = curl_exec($handle);
         $statusCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
 
+        if ($result === false) {
+            $result = curl_error($handle);
+        } else {
+            $result = json_decode($result, true);
+        }
+        
         curl_close($handle);
 
         $uuid = $scrubbedPayload['data']['uuid'];
-        return new Response($statusCode, json_decode($result, true), $uuid);
+        
+        return new Response($statusCode, $result, $uuid);
     }
 
     public function setCurlOptions($handle, $scrubbedPayload, $accessToken)
