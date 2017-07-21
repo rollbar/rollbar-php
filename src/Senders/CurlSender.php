@@ -53,12 +53,10 @@ class CurlSender implements SenderInterface
         $this->setCurlOptions($handle, $scrubbedPayload, $accessToken);
         $result = curl_exec($handle);
         $statusCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
-
-        if ($result === false) {
-            $result = curl_error($handle);
-        } else {
-            $result = json_decode($result, true);
-        }
+        
+        $result = $result === false ?
+                    curl_error($handle) :
+                    json_decode($result, true);
         
         curl_close($handle);
 
