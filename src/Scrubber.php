@@ -96,8 +96,7 @@ class Scrubber implements ScrubberInterface
             &$scrubberFn,
             $scrubber,
             &$path
-) {
-
+        ) {
             $parent = $path;
             $current = !$path ? $key : $path . '.' . $key;
 
