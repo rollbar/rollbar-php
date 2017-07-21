@@ -1,7 +1,7 @@
 <?php namespace Rollbar\Senders;
 
 /**
- * A lot of this class is ripped off from Segment:
+ * Adapted from:
  * https://github.com/segmentio/analytics-php/blob/master/lib/Segment/Consumer/Socket.php
  */
 
@@ -53,11 +53,16 @@ class CurlSender implements SenderInterface
         $this->setCurlOptions($handle, $scrubbedPayload, $accessToken);
         $result = curl_exec($handle);
         $statusCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
-
+        
+        $result = $result === false ?
+                    curl_error($handle) :
+                    json_decode($result, true);
+        
         curl_close($handle);
 
         $uuid = $scrubbedPayload['data']['uuid'];
-        return new Response($statusCode, json_decode($result, true), $uuid);
+        
+        return new Response($statusCode, $result, $uuid);
     }
 
     public function setCurlOptions($handle, $scrubbedPayload, $accessToken)
