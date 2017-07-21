@@ -1,7 +1,7 @@
 <?php namespace Rollbar\Senders;
 
 /**
- * A lot of this class is ripped off from Segment:
+ * Adapted from:
  * https://github.com/segmentio/analytics-php/blob/master/lib/Segment/Consumer/Socket.php
  */
 
