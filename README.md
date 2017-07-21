@@ -304,6 +304,8 @@ $config = array(
 ?>
 ```
 
+Also you will have to install a suggested package `fluent/logger`.
+
 
 ### Configuration reference
 
@@ -444,7 +446,7 @@ Default: `'rollbar'`
 
 <dt>handler
 </dt>
-<dd>Either `'blocking'`, `'agent'`, or `'fluent'`. `'blocking'` uses curl to send requests immediately; `'agent'` writes a relay log to be consumed by [rollbar-agent](https://github.com/rollbar/rollbar-agent); `'fluent'` send the requests to a [fluentd](https://www.fluentd.org/) instance.
+<dd>Either `'blocking'`, `'agent'`, or `'fluent'`. `'blocking'` uses curl to send requests immediately; `'agent'` writes a relay log to be consumed by [rollbar-agent](https://github.com/rollbar/rollbar-agent); `'fluent'` send the requests to a [fluentd](https://www.fluentd.org/) instance and requires the suggested package `fluent/logger`.
 
 Default: `'blocking'`
 </dd>
