@@ -9,6 +9,12 @@ class FluentTest extends BaseRollbarTest
 
     public function testFluent()
     {
+        if (!class_exists('Fluent\Logger\FluentLogger')) {
+            $this->markTestSkipped(
+                'Suggested package fluent/logger not installed, skip FluentTest'
+            );
+        }
+        
         $socket = socket_create_listen(null);
         socket_getsockname($socket, $address, $port);
 

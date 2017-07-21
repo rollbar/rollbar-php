@@ -48,7 +48,8 @@
   },
 
   "suggest": {
-    "packfire/php5.3-compat": "for backward compatibility with PHP 5.3"
+    "packfire/php5.3-compat": "for backward compatibility with PHP 5.3",
+    "fluent/logger": "Needed to use the 'fluent' handler for fluentd support"
   },
 
   "scripts": {
