@@ -19,12 +19,36 @@ class AgentSender implements SenderInterface
         }
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function send($scrubbedPayload, $accessToken)
     {
         if (empty($this->agentLog)) {
             $this->loadAgentFile();
         }
         fwrite($this->agentLog, json_encode($scrubbedPayload) . "\n");
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    public function sendBatch($batch, $accessToken)
+    {
+        if (empty($this->agentLog)) {
+            $this->loadAgentFile();
+        }
+        foreach ($batch as $payload) {
+            fwrite($this->agentLog, json_encode($payload) . "\n");
+        }
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    public function wait($accessToken, $max)
+    {
+        return;
     }
 
     private function loadAgentFile()

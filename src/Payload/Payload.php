@@ -44,8 +44,10 @@ class Payload implements \JsonSerializable
 
     public function jsonSerialize()
     {
-        $result = get_object_vars($this);
-        unset($result['utilities']);
+        $result = array(
+            "data" => $this->data,
+            "access_token" => $this->accessToken,
+        );
         return $this->utilities->serializeForRollbar($result);
     }
 }

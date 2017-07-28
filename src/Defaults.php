@@ -128,7 +128,7 @@ class Defaults
     private $defaultCaptureErrorStacktraces;
     private $utilities;
 
-    public function __construct($utilties)
+    public function __construct($utilities)
     {
         $this->defaultPsrLevels = array(
             LogLevel::EMERGENCY => "critical",
@@ -180,7 +180,7 @@ class Defaults
         $this->defaultLocalVarsDump = false;
         $this->defaultCaptureErrorStacktraces = true;
         
-        $this->utilities = $utilties;
+        $this->utilities = $utilities;
     }
 
     public function messageLevel($level = null)

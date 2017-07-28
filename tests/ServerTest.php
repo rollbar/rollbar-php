@@ -51,8 +51,9 @@ class ServerTest extends BaseRollbarTest
     public function testExtra()
     {
         $server = new Server();
-        $server->test = "testing";
-        $this->assertEquals("testing", $server->test);
+        $server->setExtras(array("test" => "testing"));
+        $extras = $server->getExtras();
+        $this->assertEquals("testing", $extras["test"]);
     }
 
     public function testEncode()
@@ -62,7 +63,8 @@ class ServerTest extends BaseRollbarTest
             ->setRoot("/home/app/testingRollbar")
             ->setBranch("master")
             ->setCodeVersion("#dca015");
-        $server->test = array(1, 2, "3", array());
+        $extras = array("test" => array(1, 2, "3", array()));
+        $server->setExtras($extras);
         $expected = '{' .
             '"host":"server2-ec-us",' .
             '"root":"\\/home\\/app\\/testingRollbar",' .

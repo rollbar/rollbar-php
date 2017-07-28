@@ -114,8 +114,16 @@ class Frame implements \JsonSerializable
 
     public function jsonSerialize()
     {
-        $result = get_object_vars($this);
-        unset($result['utilities']);
+        $result = array(
+            "filename" => $this->filename,
+            "lineno" => $this->lineno,
+            "colno" => $this->colno,
+            "method" => $this->method,
+            "code" => $this->code,
+            "context" => $this->context,
+            "args" => $this->args,
+            "kwargs" => $this->kwargs,
+        );
         return $this->utilities->serializeForRollbar($result);
     }
 }

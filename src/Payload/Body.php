@@ -27,11 +27,8 @@ class Body implements \JsonSerializable
 
     public function jsonSerialize()
     {
-        $overrideNames = array(
-            "value" => $this->value->getKey()
-        );
-        $obj = get_object_vars($this);
-        unset($obj['utilities']);
-        return $this->utilities->serializeForRollbar($obj, $overrideNames);
+        $result = array();
+        $result[$this->value->getKey()] = $this->value;
+        return $this->utilities->serializeForRollbar($result);
     }
 }

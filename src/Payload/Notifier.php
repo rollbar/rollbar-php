@@ -47,8 +47,10 @@ class Notifier implements \JsonSerializable
 
     public function jsonSerialize()
     {
-        $result = get_object_vars($this);
-        unset($result['utilities']);
+        $result = array(
+            "name" => $this->name,
+            "version" => $this->version,
+        );
         return $this->utilities->serializeForRollbar($result);
     }
 }

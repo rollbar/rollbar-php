@@ -53,8 +53,11 @@ class ExceptionInfo implements \JsonSerializable
 
     public function jsonSerialize()
     {
-        $result = get_object_vars($this);
-        unset($result['utilities']);
+        $result = array(
+            "class" => $this->class,
+            "message" => $this->message,
+            "description" => $this->description,
+        );
         return $this->utilities->serializeForRollbar($result);
     }
 }

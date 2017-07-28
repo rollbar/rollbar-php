@@ -266,6 +266,23 @@ class DataBuilderTest extends BaseRollbarTest
             ),
         );
     }
+
+    public function testGetHeaders()
+    {
+        $pre_SERVER = $_SERVER;
+        $_SERVER = array(
+            'HTTP_ACCEPT' => 'blah/blah',
+            'HTTP_USER_AGENT' => 'fake 2.0',
+            'REMOTE_USER' => 'bob',
+        );
+        $expected = array(
+            'Accept' => 'blah/blah',
+            'User-Agent' => 'fake 2.0',
+        );
+        $output = $this->dataBuilder->getHeaders();
+        $_SERVER = $pre_SERVER;
+        $this->assertEquals($expected, $output);
+    }
     
     /**
      * @dataProvider getUrlPortProvider

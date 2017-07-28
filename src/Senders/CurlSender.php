@@ -15,6 +15,10 @@ class CurlSender implements SenderInterface
     private $timeout = 3;
     private $proxy = null;
     private $verifyPeer = true;
+    private $multiHandle = null;
+    private $maxBatchRequests = 75;
+    private $batchRequests = array();
+    private $inflightRequests = array();
 
     public function __construct($opts)
     {
@@ -47,7 +51,6 @@ class CurlSender implements SenderInterface
 
     public function send($scrubbedPayload, $accessToken)
     {
-
         $handle = curl_init();
 
         $this->setCurlOptions($handle, $scrubbedPayload, $accessToken);
@@ -63,6 +66,54 @@ class CurlSender implements SenderInterface
         $uuid = $scrubbedPayload['data']['uuid'];
         
         return new Response($statusCode, $result, $uuid);
+    }
+
+    public function sendBatch($batch, $accessToken)
+    {
+        if ($this->multiHandle === null) {
+            $this->multiHandle = curl_multi_init();
+        }
+
+        if ($this->maxBatchRequests > 0) {
+            $this->wait($accessToken, $this->maxBatchRequests);
+        }
+
+        $this->batchRequests = array_merge($this->batchRequests, $batch);
+        $this->maybeSendMoreBatchRequests($accessToken);
+        $this->checkForCompletedRequests($accessToken);
+    }
+
+    public function wait($accessToken, $max = 0)
+    {
+        if (count($this->inflightRequests) <= $max) {
+            return;
+        }
+        while (1) {
+            $this->checkForCompletedRequests($accessToken);
+            if (count($this->inflightRequests) <= $max) {
+                break;
+            }
+            curl_multi_select($this->multiHandle); // or do: usleep(10000);
+        }
+    }
+
+    private function maybeSendMoreBatchRequests($accessToken)
+    {
+        $max = $this->maxBatchRequests - count($this->inflightRequests);
+        if ($max <= 0) {
+            return;
+        }
+        $idx = 0;
+        $len = count($this->batchRequests);
+        for (; $idx < $len && $idx < $max; $idx++) {
+            $payload = $this->batchRequests[$idx];
+            $handle = curl_init();
+            $this->setCurlOptions($handle, $payload, $accessToken);
+            curl_multi_add_handle($this->multiHandle, $handle);
+            $handleArrayKey = (int)$handle;
+            $this->inflightRequests[$handleArrayKey] = true;
+        }
+        $this->batchRequests = array_slice($this->batchRequests, $idx);
     }
 
     public function setCurlOptions($handle, $scrubbedPayload, $accessToken)
@@ -88,5 +139,36 @@ class CurlSender implements SenderInterface
                 curl_setopt($handle, CURLOPT_PROXYUSERPWD, $proxy['username'] . ':' . $proxy['password']);
             }
         }
+    }
+
+    private function checkForCompletedRequests($accessToken)
+    {
+        do {
+            $curlResponse = curl_multi_exec($this->multiHandle, $active);
+        } while ($curlResponse == CURLM_CALL_MULTI_PERFORM);
+        while ($active && $curlResponse == CURLM_OK) {
+            if (curl_multi_select($this->multiHandle, 0.01) == -1) {
+                $this->maybeSendMoreBatchRequests($accessToken);
+                return;
+            }
+            do {
+                $curlResponse = curl_multi_exec($this->multiHandle, $active);
+            } while ($curlResponse == CURLM_CALL_MULTI_PERFORM);
+        }
+        $this->removeFinishedRequests($accessToken);
+    }
+
+    private function removeFinishedRequests($accessToken)
+    {
+        while ($info = curl_multi_info_read($this->multiHandle)) {
+            $handle = $info['handle'];
+            $handleArrayKey = (int)$handle;
+            if (isset($this->inflightRequests[$handleArrayKey])) {
+                unset($this->inflightRequests[$handleArrayKey]);
+                curl_multi_remove_handle($this->multiHandle, $handle);
+            }
+            curl_close($handle);
+        }
+        $this->maybeSendMoreBatchRequests($accessToken);
     }
 }

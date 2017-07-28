@@ -10,18 +10,6 @@ class UtilitiesTest extends BaseRollbarTest
         $this->assertEquals(5, $utilities->coalesce(false, false, 5));
     }
 
-    public function testPascaleToCamel()
-    {
-        $toTest = array(
-            array("TestMe", "test_me"),
-            array("USA", "usa"),
-            array("PHPUnit_Framework_TestCase", "php_unit_framework_test_case"),
-        );
-        foreach ($toTest as $vals) {
-            $this->assertEquals($vals[1], Utilities::pascalToCamel($vals[0]));
-        }
-    }
-
     public function testValidateString()
     {
         Utilities::validateString("");
@@ -101,18 +89,17 @@ class UtilitiesTest extends BaseRollbarTest
     public function testSerializeForRollbar()
     {
         $obj = array(
-            "OneTwo" => array(1, 2),
-            "klass" => "Numbers",
-            "PHPUnitTest" => "testSerializeForRollbar",
+            "one_two" => array(1, 2),
+            "class" => "Numbers",
+            "php_unit_test" => "testSerializeForRollbar",
             "myCustomKey" => null,
             "myNullValue" => null,
         );
-        $result = Utilities::serializeForRollbar($obj, array("klass" => "class"), array("myCustomKey"));
+        $result = Utilities::serializeForRollbar($obj, array("myCustomKey"));
 
         $this->assertArrayNotHasKey("OneTwo", $result);
         $this->assertArrayHasKey("one_two", $result);
 
-        $this->assertArrayNotHasKey("klass", $result);
         $this->assertArrayHasKey("class", $result);
 
         $this->assertArrayNotHasKey("PHPUnitTest", $result);
