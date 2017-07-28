@@ -283,7 +283,7 @@ class JsHelperTest extends BaseRollbarTest
                 null,   // 'nonce'
                 "\n<script type=\"text/javascript\">" .
                 "var _rollbarConfig = {};" .
-                $expectedJs .
+                $expectedJs . ";" .
                 "var customJs = true;" .
                 "</script>"
             ),
@@ -295,7 +295,7 @@ class JsHelperTest extends BaseRollbarTest
                 null,
                 "\n<script type=\"text/javascript\">" .
                 "var _rollbarConfig = {\"foo\":\"bar\"};" .
-                $expectedJs .
+                $expectedJs . ";" .
                 "var customJs = true;" .
                 "</script>"
             ),
@@ -307,7 +307,7 @@ class JsHelperTest extends BaseRollbarTest
                 'stub-nonce',
                 "\n<script type=\"text/javascript\" nonce=\"stub-nonce\">" .
                 "var _rollbarConfig = {};" .
-                $expectedJs .
+                $expectedJs . ";" .
                 "var customJs = true;" .
                 "</script>"
             ),

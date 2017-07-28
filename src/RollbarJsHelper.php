@@ -50,7 +50,7 @@ class RollbarJsHelper
     public function addJs($headers = null, $nonce = null, $customJs = "")
     {
         return $this->scriptTag(
-            $this->configJsTag() .$this->jsSnippet() . $customJs,
+            $this->configJsTag() . $this->jsSnippet() . ";" . $customJs,
             $headers,
             $nonce
         );
