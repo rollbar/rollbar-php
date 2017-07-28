@@ -2,6 +2,7 @@
 
 namespace Rollbar\Senders;
 
+use Rollbar\Response;
 use Rollbar\Payload\Payload;
 
 class AgentSender implements SenderInterface
@@ -28,6 +29,9 @@ class AgentSender implements SenderInterface
             $this->loadAgentFile();
         }
         fwrite($this->agentLog, json_encode($scrubbedPayload) . "\n");
+
+        $uuid = $scrubbedPayload['data']['uuid'];
+        return new Response(0, "Written to agent file", $uuid);
     }
 
     /**
