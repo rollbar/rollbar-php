@@ -20,13 +20,18 @@ class RollbarJsHelper
      *
      * @param array $config @see addJs()
      * @param string $nonce @see addJs()
+     * @param string $customJs @see addJs()
      *
      * @return string
      */
-    public static function buildJs($config, $headers = null, $nonce = null)
-    {
+    public static function buildJs(
+        $config,
+        $headers = null,
+        $nonce = null,
+        $customJs = ""
+    ) {
         $helper = new self($config);
-        return $helper->addJs($headers, $nonce);
+        return $helper->addJs($headers, $nonce, $customJs);
     }
     
     /**
@@ -37,13 +42,15 @@ class RollbarJsHelper
      * headers_list() used to verify if nonce should be added to script
      * tags based on Content-Security-Policy
      * @param string $nonce Content-Security-Policy nonce string if exists
+     * @param strong $customJs Additional JavaScript to add at the end of
+     * RollbarJs snippet
      *
      * @return string
      */
-    public function addJs($headers = null, $nonce = null)
+    public function addJs($headers = null, $nonce = null, $customJs = "")
     {
         return $this->scriptTag(
-            $this->configJsTag() .$this->jsSnippet(),
+            $this->configJsTag() .$this->jsSnippet() . $customJs,
             $headers,
             $nonce
         );

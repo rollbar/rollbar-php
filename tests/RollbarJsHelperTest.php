@@ -246,7 +246,12 @@ class JsHelperTest extends BaseRollbarTest
      */
     public function testBuildJs($config, $headers, $nonce, $expected)
     {
-        $result = RollbarJsHelper::buildJs($config, $headers, $nonce);
+        $result = RollbarJsHelper::buildJs(
+            $config,
+            $headers,
+            $nonce,
+            "var customJs = true;"
+        );
         
         $this->assertEquals($expected, $result);
     }
@@ -258,7 +263,11 @@ class JsHelperTest extends BaseRollbarTest
     {
         $helper = new RollbarJsHelper($config);
         
-        $result = $helper->addJs($headers, $nonce);
+        $result = $helper->addJs(
+            $headers,
+            $nonce,
+            "var customJs = true;"
+        );
         
         $this->assertEquals($expected, $result);
     }
@@ -275,6 +284,7 @@ class JsHelperTest extends BaseRollbarTest
                 "\n<script type=\"text/javascript\">" .
                 "var _rollbarConfig = {};" .
                 $expectedJs .
+                "var customJs = true;" .
                 "</script>"
             ),
             array(
@@ -286,6 +296,7 @@ class JsHelperTest extends BaseRollbarTest
                 "\n<script type=\"text/javascript\">" .
                 "var _rollbarConfig = {\"foo\":\"bar\"};" .
                 $expectedJs .
+                "var customJs = true;" .
                 "</script>"
             ),
             array(
@@ -297,6 +308,7 @@ class JsHelperTest extends BaseRollbarTest
                 "\n<script type=\"text/javascript\" nonce=\"stub-nonce\">" .
                 "var _rollbarConfig = {};" .
                 $expectedJs .
+                "var customJs = true;" .
                 "</script>"
             ),
         );
