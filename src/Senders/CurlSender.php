@@ -99,7 +99,7 @@ class CurlSender implements SenderInterface
 
     private function maybeSendMoreBatchRequests($accessToken)
     {
-        $max = $this->maxBatchRequests-count($this->inflightRequests);
+        $max = $this->maxBatchRequests - count($this->inflightRequests);
         if ($max <= 0) {
             return;
         }
@@ -155,19 +155,18 @@ class CurlSender implements SenderInterface
                 $curlResponse = curl_multi_exec($this->multiHandle, $active);
             } while ($curlResponse == CURLM_CALL_MULTI_PERFORM);
         }
- 
+        $this->removeFinishedRequests($accessToken);
+    }
+
+    private function removeFinishedRequests($accessToken)
+    {
         while ($info = curl_multi_info_read($this->multiHandle)) {
             $handle = $info['handle'];
             $handleArrayKey = (int)$handle;
-            if (!isset($this->inflightRequests[$handleArrayKey])) {
-                // This should never happen, probably should fatal,
-                // but play it safe
-                curl_close($handle);
-                $this->maybeSendMoreBatchRequests($accessToken);
-                return;
+            if (isset($this->inflightRequests[$handleArrayKey])) {
+                unset($this->inflightRequests[$handleArrayKey]);
+                curl_multi_remove_handle($this->multiHandle, $handle);
             }
-            unset($this->inflightRequests[$handleArrayKey]);
-            curl_multi_remove_handle($this->multiHandle, $handle);
             curl_close($handle);
         }
         $this->maybeSendMoreBatchRequests($accessToken);
