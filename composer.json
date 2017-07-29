@@ -32,7 +32,9 @@
 
   "require": {
     "ext-curl": "*",
-    "psr/log": "~1.0.2"
+    "psr/log": "~1.0.2",
+    "fluent/logger": "^1.0",
+    "rollbar/rollbar-js": "v2.1.0"
   },
 
   "require-dev": {
@@ -61,5 +63,20 @@
   
   "config": {
     "process-timeout": 600
-  }
+  },
+  
+  "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "rollbar/rollbar-js",
+                "version": "v2.1.0",
+                "source": {
+                    "url": "https://github.com/rollbar/rollbar.js",
+                    "type": "git",
+                    "reference": "v2.1.0"
+                }
+            }
+        }
+    ]
 }

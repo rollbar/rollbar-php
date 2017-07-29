@@ -8,7 +8,7 @@ class JsHelperTest extends BaseRollbarTest
     public function setUp()
     {
         $this->jsHelper = new RollbarJsHelper(array());
-        $this->testSnippetPath = realpath(__DIR__ . "/../data/rollbar.snippet.js");
+        $this->testSnippetPath = realpath(__DIR__ . "/../vendor/rollbar/rollbar-js/dist/rollbar.snippet.js");
     }
     
     public function testSnippetPath()
