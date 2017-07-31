@@ -1,5 +1,30 @@
 # Changelog
 
+## 1.3.0
+
+- all of the senders should return a response
+[#239](https://github.com/rollbar/rollbar-php/pull/239)
+- add an explicit semicolon between snippet and custom js
+[#238](https://github.com/rollbar/rollbar-php/pull/238)
+- GitHub Issue #225: Allow custom JS addition in RollbarJsHelper
+[#235](https://github.com/rollbar/rollbar-php/pull/235)
+- Minor spacing and indentation on Scrubber
+[#234](https://github.com/rollbar/rollbar-php/pull/234)
+- GitHub Issue #227: Add curl_error() to check for log submission failures
+[#231](https://github.com/rollbar/rollbar-php/pull/231)
+- GitHub Issue 229: Make fluentd a suggest requirement rather than mandatory
+[#230](https://github.com/rollbar/rollbar-php/pull/230)
+- Github Issue 226: Update rollbar.js code snippet
+[#228](https://github.com/rollbar/rollbar-php/pull/228)
+- configuration option to disallow calling exec to get git information
+[#223](https://github.com/rollbar/rollbar-php/pull/223)
+- use the configuration array directly, don't nest it under options
+[#222](https://github.com/rollbar/rollbar-php/pull/222)
+- GitHub Issue #144: allow passing ROLLBAR_TEST_TOKEN in phpunit arguments
+[#219](https://github.com/rollbar/rollbar-php/pull/219)
+- Performance fixes
+[#217](https://github.com/rollbar/rollbar-php/pull/217)
+
 ## 1.2.0
 
 - No longer ignore the native PHP error handler:
