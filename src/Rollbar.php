@@ -167,8 +167,8 @@ class Rollbar
             !is_null($last_error) &&
             in_array($last_error['type'], self::$fatalErrors, true) &&
             // don't log uncaught exceptions as they were handled by exceptionHandler()
-            isset($last_error['message']) &&
-            strpos($last_error['message'], 'Uncaught exception') !== 0;
+            !(isset($last_error['message']) &&
+              strpos($last_error['message'], 'Uncaught exception') === 0);
     }
 
     private static function generateErrorWrapper($errno, $errstr, $errfile, $errline)
