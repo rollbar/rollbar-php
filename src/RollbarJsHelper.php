@@ -83,7 +83,7 @@ class RollbarJsHelper
      */
     public function snippetPath()
     {
-        return realpath(__DIR__ . "/../vendor/rollbar/rollbar-js/dist/rollbar.snippet.js");
+        return realpath(__DIR__ . "/../data/rollbar.snippet.js");
     }
     
     /**

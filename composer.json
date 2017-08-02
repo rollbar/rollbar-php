@@ -33,8 +33,7 @@
   "require": {
     "ext-curl": "*",
     "psr/log": "~1.0.2",
-    "fluent/logger": "^1.0",
-    "rollbar/rollbar-js": "v2.1.0"
+    "fluent/logger": "^1.0"
   },
 
   "require-dev": {
@@ -57,26 +56,11 @@
       "phpunit --coverage-clover build/logs/clover.xml",
       "phpcs --standard=PSR1,PSR2 src tests"
     ],
-    "fix": "phpcbf --standard=PSR1,PSR2 src tests"
-
+    "fix": "phpcbf --standard=PSR1,PSR2 src tests",
+    "get-js-snippet": "curl -X GET https://raw.githubusercontent.com/rollbar/rollbar.js/v2.1.1/dist/rollbar.snippet.js > data/rollbar.snippet.js"
   },
   
   "config": {
     "process-timeout": 600
-  },
-  
-  "repositories": [
-        {
-            "type": "package",
-            "package": {
-                "name": "rollbar/rollbar-js",
-                "version": "v2.1.0",
-                "source": {
-                    "url": "https://github.com/rollbar/rollbar.js",
-                    "type": "git",
-                    "reference": "v2.1.0"
-                }
-            }
-        }
-    ]
+  }
 }
