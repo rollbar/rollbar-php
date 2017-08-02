@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.1
+- Remove dependency on rollbar.js through composer
+- Actually change the notifier version number constant
+- Stop duplicate logging some errors [#240](https://github.com/rollbar/rollbar-php/pull/240)
+
 ## 1.3.0
 
 - all of the senders should return a response
