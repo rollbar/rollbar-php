@@ -438,6 +438,9 @@ class DataBuilder implements DataBuilderInterface
             $filename = $this->utilities->coalesce($this->tryGet($frameInfo, 'file'), '<internal>');
             $lineno = $this->utilities->coalesce($this->tryGet($frameInfo, 'line'), 0);
             $method = $frameInfo['function'];
+            if (isset($frameInfo['class'])) {
+                $method = $frameInfo['class'] . "::" . $method;
+            }
             $args = $this->utilities->coalesce($this->tryGet($frameInfo, 'args'), null);
 
             $frame = new Frame($filename);

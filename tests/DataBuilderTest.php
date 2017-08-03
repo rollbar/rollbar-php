@@ -815,7 +815,7 @@ class DataBuilderTest extends BaseRollbarTest
         ));
         $frames = $dataBuilder->makeFrames(new \Exception(), false);
         $this->assertEquals('<main>', $frames[count($frames)-1]->getMethod());
-        $this->assertEquals('testFramesOrder', $frames[count($frames)-2]->getMethod());
+        $this->assertEquals('Rollbar\DataBuilderTest::testFramesOrder', $frames[count($frames)-2]->getMethod());
     }
     
     /**
