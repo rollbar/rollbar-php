@@ -158,6 +158,39 @@ Rollbar::init(array(
 ?>
 ```
 
+### For Symfony Users with Monolog
+
+
+Setup the handler in your `config.yml` and `services.yml`
+
+```
+parameters:
+
+    rollbar:
+        access_token: "POST_SERVER_ITEM_ACCESS_TOKEN"
+        environment: "%kernel.environment%"
+        minimum_level: DEBUG
+
+
+services:
+
+    rollbar_handler:
+        factory: 'Rollbar\RollbarHandlerFactory:create'
+        arguments: [@rollbar]
+
+```
+
+Now configure Monolog to use the handler in your application `config.yml`
+
+```
+monolog:
+    handlers:
+        ...
+        rollbar:
+            type: service
+            id: rollbar_handler
+```
+
 ## Integration with Rollbar.js
 
 In case you want to report your JavaScript errors using [Rollbar.js](https://github.com/rollbar/rollbar.js), you can configure the SDK to enable Rollbar.js on your site. Example:
