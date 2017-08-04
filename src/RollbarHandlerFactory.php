@@ -16,6 +16,7 @@ class RollbarHandlerFactory
      * @param array $config
      *
      * @return PsrHandler
+     * @SuppressWarnings(PHPMD.StaticAccess) Static access intended.
      */
     public static function create(array $config)
     {
