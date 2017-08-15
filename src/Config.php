@@ -54,6 +54,8 @@ class Config
 
     private $batched = false;
     private $batch_size = 50;
+
+    private $custom = array();
     /**
      * @var callable
      */
@@ -131,6 +133,7 @@ class Config
         $this->setScrubber($config);
         $this->setBatched($config);
         $this->setBatchSize($config);
+        $this->setCustom($config);
         $this->setResponseHandler($config);
         $this->setCheckIgnoreFunction($config);
         $this->setSendMessageTrace($config);
@@ -234,6 +237,13 @@ class Config
     {
         if (array_key_exists('batch_size', $config)) {
             $this->batch_size = $config['batch_size'];
+        }
+    }
+
+    private function setCustom($config)
+    {
+        if (array_key_exists('custom', $config)) {
+            $this->custom = $config['custom'];
         }
     }
 
@@ -420,6 +430,13 @@ class Config
      */
     public function transform($payload, $level, $toLog, $context)
     {
+        if (count($this->custom) > 0) {
+            $data = $payload->getData();
+            $custom = $data->getCustom();
+            $custom = array_merge(array(), $this->custom, (array)$custom);
+            $data->setCustom($custom);
+            $payload->setData($data);
+        }
         if (is_null($this->transformer)) {
             return $payload;
         }
