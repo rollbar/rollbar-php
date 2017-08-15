@@ -412,6 +412,14 @@ Default: `true`
 Default: `'production'`
 </dd>
 
+<dt>custom
+</dt>
+<dd>An array of key/value pairs which will be merged with the custom data in the final payload of
+all items sent to Rollbar. This allows for custom data to be added globally to all payloads. Any key
+in this array which is also present in the custom data passed to a log/debug/error/... call will
+have the value of the latter.
+</dd>
+
 <dt>error_sample_rates
 </dt>
 <dd>Associative array mapping error numbers to sample rates. Sample rates are ratio out of 1, e.g. 0 is "never report", 1 is "always report", and 0.1 is "report 10% of the time". Sampling is done on a per-error basis.
