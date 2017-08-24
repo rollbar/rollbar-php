@@ -57,7 +57,7 @@
       "phpcs --standard=PSR1,PSR2 src tests"
     ],
     "fix": "phpcbf --standard=PSR1,PSR2 src tests",
-    "get-js-snippet": "curl -X GET https://raw.githubusercontent.com/rollbar/rollbar.js/v2.1.1/dist/rollbar.snippet.js > data/rollbar.snippet.js"
+    "get-js-snippet": "curl -X GET https://raw.githubusercontent.com/rollbar/rollbar.js/v2.2.3/dist/rollbar.snippet.js > data/rollbar.snippet.js"
   },
   
   "config": {
