@@ -41,6 +41,9 @@ class RollbarLogger extends AbstractLogger
         if (!$this->levelFactory->isValidLevel($level)) {
             throw new \Psr\Log\InvalidArgumentException("Invalid log level '$level'.");
         }
+        if ($this->config->internalCheckIgnored($level, $toLog)) {
+            return new Response(0, "Ignored");
+        }
         $isUncaught = false;
         if (array_key_exists(Utilities::IS_UNCAUGHT_KEY, $context) && $context[Utilities::IS_UNCAUGHT_KEY]) {
             $isUncaught = true;

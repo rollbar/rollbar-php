@@ -455,10 +455,6 @@ class Config
 
     public function checkIgnored($payload, $accessToken, $toLog, $isUncaught)
     {
-        if ($this->shouldSuppress()) {
-            return true;
-        }
-        
         if (isset($this->checkIgnore)) {
             try {
                 if (call_user_func($this->checkIgnore, $isUncaught, $toLog, $payload)) {
@@ -470,12 +466,25 @@ class Config
             }
         }
         
-        if ($this->levelTooLow($payload)) {
+        if ($this->payloadLevelTooLow($payload)) {
             return true;
         }
-        
+
         if (!is_null($this->filter)) {
             return $this->filter->shouldSend($payload, $accessToken);
+        }
+
+        return false;
+    }
+
+    public function internalCheckIgnored($level, $toLog)
+    {
+        if ($this->shouldSuppress()) {
+            return true;
+        }
+
+        if ($this->levelTooLow($this->levelFactory->fromName($level))) {
+            return true;
         }
 
         if ($toLog instanceof ErrorWrapper) {
@@ -501,13 +510,13 @@ class Config
     {
         $errno = $toLog->errorLevel;
 
-        if ($this->included_errno != -1 && ($errno & $this->included_errno) != $errno) {
-            // ignore
+        if ($this->use_error_reporting && ($errno & error_reporting()) === 0) {
+            // ignore due to error_reporting level
             return true;
         }
 
-        if ($this->use_error_reporting && ($errno & error_reporting()) != $errno) {
-            // ignore due to error_reporting level
+        if ($this->included_errno != -1 && ($errno & $this->included_errno) != $errno) {
+            // ignore
             return true;
         }
 
@@ -582,9 +591,18 @@ class Config
      * @param Payload $payload
      * @return bool
      */
-    private function levelTooLow($payload)
+    private function payloadLevelTooLow($payload)
     {
-        return $payload->getData()->getLevel()->toInt() < $this->minimumLevel;
+        return $this->levelTooLow($payload->getData()->getLevel());
+    }
+
+    /**
+     * @param Level $level
+     * @return bool
+     */
+    private function levelTooLow($level)
+    {
+        return $level->toInt() < $this->minimumLevel;
     }
 
     private function shouldSuppress()
