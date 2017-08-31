@@ -455,10 +455,6 @@ class Config
 
     public function checkIgnored($payload, $accessToken, $toLog, $isUncaught)
     {
-        if ($this->shouldSuppress()) {
-            return true;
-        }
-        
         if (isset($this->checkIgnore)) {
             try {
                 if (call_user_func($this->checkIgnore, $isUncaught, $toLog, $payload)) {
@@ -470,16 +466,29 @@ class Config
             }
         }
         
-        if ($this->levelTooLow($payload)) {
+        if ($this->payloadLevelTooLow($payload)) {
             return true;
         }
-        
+
         if (!is_null($this->filter)) {
             return $this->filter->shouldSend($payload, $accessToken);
         }
 
+        return false;
+    }
+
+    public function internalCheckIgnored($level, $toLog)
+    {
+        if ($this->shouldSuppress()) {
+            return true;
+        }
+
+        if ($this->levelTooLow($this->levelFactory->fromName($level))) {
+            return true;
+        }
+
         if ($toLog instanceof ErrorWrapper) {
-            return $this->shouldIgnoreError($toLog);
+            return $this->shouldIgnoreErrorWrapper($toLog);
         }
         
         if ($toLog instanceof \Exception) {
@@ -488,26 +497,24 @@ class Config
         
         return false;
     }
-    
+
     /**
      * Check if the error should be ignored due to `included_errno` config,
      * `use_error_reporting` config or `error_sample_rates` config.
      *
-     * @param \Rollbar\ErrorWrapper $toLog
+     * @param errno
      *
      * @return bool
      */
-    protected function shouldIgnoreError(ErrorWrapper $toLog)
+    public function shouldIgnoreError($errno)
     {
-        $errno = $toLog->errorLevel;
-
-        if ($this->included_errno != -1 && ($errno & $this->included_errno) != $errno) {
-            // ignore
+        if ($this->use_error_reporting && ($errno & error_reporting()) === 0) {
+            // ignore due to error_reporting level
             return true;
         }
 
-        if ($this->use_error_reporting && ($errno & error_reporting()) != $errno) {
-            // ignore due to error_reporting level
+        if ($this->included_errno != -1 && ($errno & $this->included_errno) != $errno) {
+            // ignore
             return true;
         }
 
@@ -522,6 +529,19 @@ class Config
         }
         
         return false;
+    }
+
+    /**
+     * Check if the error should be ignored due to `included_errno` config,
+     * `use_error_reporting` config or `error_sample_rates` config.
+     *
+     * @param \Rollbar\ErrorWrapper $toLog
+     *
+     * @return bool
+     */
+    protected function shouldIgnoreErrorWrapper(ErrorWrapper $toLog)
+    {
+        return $this->shouldIgnoreError($toLog->errorLevel);
     }
     
     /**
@@ -582,9 +602,18 @@ class Config
      * @param Payload $payload
      * @return bool
      */
-    private function levelTooLow($payload)
+    private function payloadLevelTooLow($payload)
     {
-        return $payload->getData()->getLevel()->toInt() < $this->minimumLevel;
+        return $this->levelTooLow($payload->getData()->getLevel());
+    }
+
+    /**
+     * @param Level $level
+     * @return bool
+     */
+    private function levelTooLow($level)
+    {
+        return $level->toInt() < $this->minimumLevel;
     }
 
     private function shouldSuppress()

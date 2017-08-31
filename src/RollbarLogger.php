@@ -3,7 +3,6 @@
 use Psr\Log\AbstractLogger;
 use Rollbar\Payload\Payload;
 use Rollbar\Payload\Level;
-use Rollbar\Utilities;
 use Rollbar\Truncation\Truncation;
 
 class RollbarLogger extends AbstractLogger
@@ -36,15 +35,13 @@ class RollbarLogger extends AbstractLogger
         return $this->config->extend($config);
     }
 
-    public function log($level, $toLog, array $context = array())
+    public function log($level, $toLog, array $context = array(), $isUncaught = false)
     {
         if (!$this->levelFactory->isValidLevel($level)) {
             throw new \Psr\Log\InvalidArgumentException("Invalid log level '$level'.");
         }
-        $isUncaught = false;
-        if (array_key_exists(Utilities::IS_UNCAUGHT_KEY, $context) && $context[Utilities::IS_UNCAUGHT_KEY]) {
-            $isUncaught = true;
-            unset($context[Utilities::IS_UNCAUGHT_KEY]);
+        if ($this->config->internalCheckIgnored($level, $toLog)) {
+            return new Response(0, "Ignored");
         }
         $accessToken = $this->getAccessToken();
         $payload = $this->getPayload($accessToken, $level, $toLog, $context);
@@ -75,6 +72,11 @@ class RollbarLogger extends AbstractLogger
     {
         $this->flush();
         $this->config->wait($this->getAccessToken());
+    }
+
+    public function shouldIgnoreError($errno)
+    {
+        return $this->config->shouldIgnoreError($errno);
     }
 
     public function getQueueSize()

@@ -417,24 +417,14 @@ class ConfigTest extends BaseRollbarTest
             "use_error_reporting" => $use_error_reporting
         ));
         
-        $levelFactory = $config->getLevelFactory();
-        
-        $data = new Data($this->env, new Body(new Message("test")));
-        $data->setLevel($levelFactory->fromName(Level::ERROR));
-        
         if ($error_reporting !== null) {
             $errorReportingTemp = error_reporting();
             error_reporting($error_reporting);
         }
         
-        $result = $config->checkIgnored(
-            new Payload(
-                $data,
-                $config->getAccessToken()
-            ),
-            $this->getTestAccessToken(),
-            $this->error,
-            false
+        $result = $config->internalCheckIgnored(
+            Level::ERROR,
+            $this->error
         );
         
         $this->assertEquals($expected, $result);
