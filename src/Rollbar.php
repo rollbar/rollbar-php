@@ -133,6 +133,9 @@ class Rollbar
         if (is_null(self::$logger)) {
             return false;
         }
+        if (self::$logger->shouldIgnoreError($errno)) {
+            return false;
+        }
 
         $exception = self::generateErrorWrapper($errno, $errstr, $errfile, $errline);
         self::$logger->log(Level::ERROR, $exception, array(Utilities::IS_UNCAUGHT_KEY => true));

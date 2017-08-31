@@ -80,6 +80,11 @@ class RollbarLogger extends AbstractLogger
         $this->config->wait($this->getAccessToken());
     }
 
+    public function shouldIgnoreError($errno)
+    {
+        return $this->config->shouldIgnoreError($errno);
+    }
+
     public function getQueueSize()
     {
         return count($this->queue);

@@ -488,7 +488,7 @@ class Config
         }
 
         if ($toLog instanceof ErrorWrapper) {
-            return $this->shouldIgnoreError($toLog);
+            return $this->shouldIgnoreErrorWrapper($toLog);
         }
         
         if ($toLog instanceof \Exception) {
@@ -497,19 +497,17 @@ class Config
         
         return false;
     }
-    
+
     /**
      * Check if the error should be ignored due to `included_errno` config,
      * `use_error_reporting` config or `error_sample_rates` config.
      *
-     * @param \Rollbar\ErrorWrapper $toLog
+     * @param errno
      *
      * @return bool
      */
-    protected function shouldIgnoreError(ErrorWrapper $toLog)
+    public function shouldIgnoreError($errno)
     {
-        $errno = $toLog->errorLevel;
-
         if ($this->use_error_reporting && ($errno & error_reporting()) === 0) {
             // ignore due to error_reporting level
             return true;
@@ -531,6 +529,19 @@ class Config
         }
         
         return false;
+    }
+
+    /**
+     * Check if the error should be ignored due to `included_errno` config,
+     * `use_error_reporting` config or `error_sample_rates` config.
+     *
+     * @param \Rollbar\ErrorWrapper $toLog
+     *
+     * @return bool
+     */
+    protected function shouldIgnoreErrorWrapper(ErrorWrapper $toLog)
+    {
+        return $this->shouldIgnoreError($toLog->errorLevel);
     }
     
     /**
