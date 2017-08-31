@@ -1,7 +1,6 @@
 <?php namespace Rollbar;
 
 use Rollbar\Payload\Level;
-use Rollbar\Utilities;
 
 class Rollbar
 {
@@ -70,7 +69,7 @@ class Rollbar
     
     public static function exceptionHandler($exception)
     {
-        self::log(Level::ERROR, $exception, array(Utilities::IS_UNCAUGHT_KEY => true));
+        self::log(Level::ERROR, $exception, array(), true);
         restore_exception_handler();
         throw $exception;
     }
@@ -138,7 +137,7 @@ class Rollbar
         }
 
         $exception = self::generateErrorWrapper($errno, $errstr, $errfile, $errline);
-        self::$logger->log(Level::ERROR, $exception, array(Utilities::IS_UNCAUGHT_KEY => true));
+        self::$logger->log(Level::ERROR, $exception, array(), true);
         return false;
     }
 
@@ -160,8 +159,7 @@ class Rollbar
             $errfile = $last_error['file'];
             $errline = $last_error['line'];
             $exception = self::generateErrorWrapper($errno, $errstr, $errfile, $errline);
-            $extra = array(Utilities::IS_UNCAUGHT_KEY => true);
-            self::$logger->log(Level::CRITICAL, $exception, $extra);
+            self::$logger->log(Level::CRITICAL, $exception, array(), true);
         }
     }
     
