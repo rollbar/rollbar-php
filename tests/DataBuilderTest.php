@@ -815,8 +815,8 @@ class DataBuilderTest extends BaseRollbarTest
         ));
         $frames = $dataBuilder->makeFrames(new \Exception(), false);
         $this->assertEquals('<main>', $frames[count($frames)-1]->getMethod());
-        $this->assertEquals(
-            "/home/ubuntu/workspace/tests/DataBuilderTest.php",
+        $this->assertStringEndsWith(
+            'tests/DataBuilderTest.php',
             $frames[count($frames)-1]->getFilename()
         );
         $this->assertEquals(816, $frames[count($frames)-1]->getLineno());
