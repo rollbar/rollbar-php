@@ -2,21 +2,6 @@
 
 final class Utilities
 {
-    public function coalesce()
-    {
-        return self::coalesceArray(func_get_args());
-    }
-
-    public static function coalesceArray(array $values)
-    {
-        foreach ($values as $val) {
-            if ($val) {
-                return $val;
-            }
-        }
-        return null;
-    }
-
     public static function validateString(
         $input,
         $name = "?",

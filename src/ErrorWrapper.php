@@ -61,10 +61,7 @@ class ErrorWrapper extends \Exception
 
     public function getClassName()
     {
-        $constName = $this->utilities->coalesce(
-            self::getConstName($this->errorLevel),
-            "#$this->errorLevel"
-        );
+        $constName = self::getConstName($this->errorLevel) ?: "#$this->errorLevel";
         return "$constName: $this->errorMessage";
     }
 }

@@ -421,7 +421,7 @@ class DataBuilder implements DataBuilderInterface
         }
         
         $excInfo = new ExceptionInfo(
-            $this->utilities->coalesce($classOverride, get_class($exception)),
+            $classOverride ?: get_class($exception),
             $exception->getMessage()
         );
         return new Trace($frames, $excInfo);

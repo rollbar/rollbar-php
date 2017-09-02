@@ -185,30 +185,27 @@ class Defaults
 
     public function messageLevel($level = null)
     {
-        return $this->utilities->coalesce($level, $this->defaultMessageLevel);
+        return $level ?: $this->defaultMessageLevel;
     }
 
     public function exceptionLevel($level = null)
     {
-        return $this->utilities->coalesce($level, $this->defaultExceptionLevel);
+        return $level ?: $this->defaultExceptionLevel;
     }
 
     public function errorLevels($level = null)
     {
-        return $this->utilities->coalesce($level, $this->defaultErrorLevels);
+        return $level ?: $this->defaultErrorLevels;
     }
     
     public function psrLevels($level = null)
     {
-        return $this->utilities->coalesce($level, $this->defaultPsrLevels);
+        return $level ?: $this->defaultPsrLevels;
     }
 
     public function codeVersion($codeVersion = null)
     {
-        return $this->utilities->coalesce(
-            $codeVersion,
-            $this->defaultCodeVersion
-        );
+        return $codeVersion ?: $this->defaultCodeVersion;
     }
 
     public function gitHash($gitHash = null, $allowExec = true)
@@ -235,51 +232,36 @@ class Defaults
 
     public function serverRoot($serverRoot = null)
     {
-        return $this->utilities->coalesce(
-            $serverRoot,
-            $this->defaultServerRoot
-        );
+        return $serverRoot ?: $this->defaultServerRoot;
     }
 
     public function platform($platform = null)
     {
-        return $this->utilities->coalesce($platform, $this->defaultPlatform);
+        return $platform ?: $this->defaultPlatform;
     }
 
     public function notifier($notifier = null)
     {
-        return $this->utilities->coalesce($notifier, $this->defaultNotifier);
+        return $notifier ?: $this->defaultNotifier;
     }
 
     public function baseException($baseException = null)
     {
-        return $this->utilities->coalesce(
-            $baseException,
-            $this->defaultBaseException
-        );
+        return $baseException ?: $this->defaultBaseException;
     }
 
     public function scrubFields($scrubFields = null)
     {
-        return $this->utilities->coalesce(
-            $scrubFields,
-            $this->defaultScrubFields
-        );
+        return $scrubFields ?: $this->defaultScrubFields;
     }
 
     public function includeCodeContext($includeCodeContext = null)
     {
-        return $this->utilities->coalesce(
-            $includeCodeContext,
-            $this->defaultIncludeCodeContext
-        );
+        return $includeCodeContext ?: $this->defaultIncludeCodeContext;
     }
 
     public function includeExcCodeContext($includeExcCodeContext = null)
     {
-        return $this->utilities->coalesce(
-            $includeExcCodeContext,
-            $this->defaultIncludeExcCodeContext
-        );
+        return $includeExcCodeContext ?: $this->defaultIncludeExcCodeContext;
     }
 }
