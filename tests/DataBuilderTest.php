@@ -842,14 +842,14 @@ class DataBuilderTest extends BaseRollbarTest
         $result = $dataBuilder->generateErrorWrapper(E_ERROR, 'bork', null, null);
         $frames = $result->getBacktrace();
         
-        $this->assertEquals($expected, count($frames) === 0);
+        $this->assertEquals($expected, count($frames));
     }
     
     public function captureErrorStacktracesProvider()
     {
         return array(
-            array(false,true),
-            array(true, false)
+            array(false,0),
+            array(true, 12)
         );
     }
 }
