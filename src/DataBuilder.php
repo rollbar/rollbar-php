@@ -970,7 +970,7 @@ class DataBuilder implements DataBuilderInterface
     public function generateErrorWrapper($errno, $errstr, $errfile, $errline)
     {
         if ($this->captureErrorStacktraces) {
-            $backTrace = debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS));
+            $backTrace = debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS);
         } else {
             $backTrace = array();
         }
