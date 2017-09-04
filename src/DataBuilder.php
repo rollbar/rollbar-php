@@ -45,7 +45,6 @@ class DataBuilder implements DataBuilderInterface
     protected $baseException;
     protected $includeCodeContext;
     protected $includeExcCodeContext;
-    protected $shiftFunction;
     protected $sendMessageTrace;
     protected $rawRequestBody;
     protected $localVarsDump;
@@ -99,11 +98,6 @@ class DataBuilder implements DataBuilderInterface
         $this->setLocalVarsDump($config);
         $this->setCaptureErrorStacktraces($config);
         $this->setLevelFactory($config);
-
-        $this->shiftFunction = $this->tryGet($config, 'shift_function');
-        if (!isset($this->shiftFunction)) {
-            $this->shiftFunction = true;
-        }
     }
 
     protected function tryGet($array, $key)
@@ -462,13 +456,6 @@ class DataBuilder implements DataBuilderInterface
             }
 
             $frames[] = $frame;
-        }
-
-        if ($this->shiftFunction && count($frames) > 0) {
-            for ($i = count($frames) - 1; $i > 0; $i--) {
-                $frames[$i]->setMethod($frames[$i - 1]->getMethod());
-            }
-            $frames[0]->setMethod('<main>');
         }
         
         $frames = array_reverse($frames);
