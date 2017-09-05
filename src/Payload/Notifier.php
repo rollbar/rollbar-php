@@ -28,7 +28,6 @@ class Notifier implements \JsonSerializable
 
     public function setName($name)
     {
-        $this->utilities->validateString($name, "name", null, false);
         $this->name = $name;
         return $this;
     }
@@ -40,7 +39,6 @@ class Notifier implements \JsonSerializable
 
     public function setVersion($version)
     {
-        $this->utilities->validateString($version, "version", null, false);
         $this->version = $version;
         return $this;
     }

@@ -21,7 +21,6 @@ class Server implements \JsonSerializable
 
     public function setHost($host)
     {
-        $this->utilities->validateString($host, "host");
         $this->host = $host;
         return $this;
     }
@@ -33,7 +32,6 @@ class Server implements \JsonSerializable
 
     public function setRoot($root)
     {
-        $this->utilities->validateString($root, "root");
         $this->root = $root;
         return $this;
     }
@@ -45,7 +43,6 @@ class Server implements \JsonSerializable
 
     public function setBranch($branch)
     {
-        $this->utilities->validateString($branch, "branch");
         $this->branch = $branch;
         return $this;
     }
@@ -57,7 +54,6 @@ class Server implements \JsonSerializable
 
     public function setCodeVersion($codeVersion)
     {
-        $this->utilities->validateString($codeVersion, "codeVersion");
         $this->codeVersion = $codeVersion;
         return $this;
     }

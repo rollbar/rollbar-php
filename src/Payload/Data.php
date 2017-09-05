@@ -37,7 +37,6 @@ class Data implements \JsonSerializable
 
     public function setEnvironment($environment)
     {
-        $this->utilities->validateString($environment, "environment", null, false);
         $this->environment = $environment;
         return $this;
     }
@@ -74,7 +73,6 @@ class Data implements \JsonSerializable
 
     public function setTimestamp($timestamp)
     {
-        $this->utilities->validateInteger($timestamp, "timestamp");
         $this->timestamp = $timestamp;
         return $this;
     }
@@ -86,7 +84,6 @@ class Data implements \JsonSerializable
 
     public function setCodeVersion($codeVersion)
     {
-        $this->utilities->validateString($codeVersion, "codeVersion");
         $this->codeVersion = $codeVersion;
         return $this;
     }
@@ -98,7 +95,6 @@ class Data implements \JsonSerializable
 
     public function setPlatform($platform)
     {
-        $this->utilities->validateString($platform, "platform");
         $this->platform = $platform;
         return $this;
     }
@@ -110,7 +106,6 @@ class Data implements \JsonSerializable
 
     public function setLanguage($language)
     {
-        $this->utilities->validateString($language, "language");
         $this->language = $language;
         return $this;
     }
@@ -122,7 +117,6 @@ class Data implements \JsonSerializable
 
     public function setFramework($framework)
     {
-        $this->utilities->validateString($framework, "framework");
         $this->framework = $framework;
         return $this;
     }
@@ -134,7 +128,6 @@ class Data implements \JsonSerializable
 
     public function setContext($context)
     {
-        $this->utilities->validateString($context, "context");
         $this->context = $context;
         return $this;
     }
@@ -199,7 +192,6 @@ class Data implements \JsonSerializable
 
     public function setFingerprint($fingerprint)
     {
-        $this->utilities->validateString($fingerprint, "fingerprint");
         $this->fingerprint = $fingerprint;
         return $this;
     }
@@ -211,7 +203,6 @@ class Data implements \JsonSerializable
 
     public function setTitle($title)
     {
-        $this->utilities->validateString($title, "title");
         $this->title = $title;
         return $this;
     }
@@ -223,7 +214,6 @@ class Data implements \JsonSerializable
 
     public function setUuid($uuid)
     {
-        $this->utilities->validateString($uuid, "uuid");
         $this->uuid = $uuid;
         return $this;
     }
