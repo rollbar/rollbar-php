@@ -528,7 +528,8 @@ class DataBuilder implements DataBuilderInterface
                 $level = $this->messageLevel;
             }
         }
-        $level = isset($this->psrLevels[strtolower($level)]) ? $this->psrLevels[strtolower($level)] : null;
+        $level = strtolower($level)
+        $level = isset($this->psrLevels[$level]) ? $this->psrLevels[$level] : null;
         return $this->levelFactory->fromName($level);
     }
 
