@@ -30,7 +30,6 @@ class Person implements \JsonSerializable
 
     public function setId($id)
     {
-        $this->utilities->validateString($id, "id", null, false);
         $this->id = $id;
         return $this;
     }
@@ -42,7 +41,6 @@ class Person implements \JsonSerializable
 
     public function setUsername($username)
     {
-        $this->utilities->validateString($username, "username");
         $this->username = $username;
         return $this;
     }
@@ -54,7 +52,6 @@ class Person implements \JsonSerializable
 
     public function setEmail($email)
     {
-        $this->utilities->validateString($email, "email");
         $this->email = $email;
         return $this;
     }

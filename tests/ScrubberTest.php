@@ -376,7 +376,7 @@ class ScrubberTest extends BaseRollbarTest
             'scrubFields' => array('scrubit')
         ));
         
-        $result = $scrubber->scrub($testData, "@");
+        $result = $scrubber->scrub($testData, "@@@@@@@@");
 
         $this->assertEquals("@@@@@@@@", $result['scrubit']);
     }

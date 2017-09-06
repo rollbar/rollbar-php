@@ -100,94 +100,89 @@ class DataBuilder implements DataBuilderInterface
         $this->setLevelFactory($config);
     }
 
-    protected function tryGet($array, $key)
-    {
-        return isset($array[$key]) ? $array[$key] : null;
-    }
-
     protected function setEnvironment($config)
     {
-        $fromConfig = $this->tryGet($config, 'environment');
+        $fromConfig = isset($config['environment']) ? $config['environment'] : null;
         $this->utilities->validateString($fromConfig, "config['environment']", null, false);
         $this->environment = $fromConfig;
     }
 
     protected function setDefaultMessageLevel($config)
     {
-        $fromConfig = $this->tryGet($config, 'messageLevel');
+        $fromConfig = isset($config['messageLevel']) ? $config['messageLevel'] : null;
         $this->messageLevel = self::$defaults->messageLevel($fromConfig);
     }
 
     protected function setDefaultExceptionLevel($config)
     {
-        $fromConfig = $this->tryGet($config, 'exceptionLevel');
+        $fromConfig = isset($config['exceptionLevel']) ? $config['exceptionLevel'] : null;
         $this->exceptionLevel = self::$defaults->exceptionLevel($fromConfig);
     }
 
     protected function setDefaultPsrLevels($config)
     {
-        $fromConfig = $this->tryGet($config, 'psrLevels');
+        $fromConfig = isset($config['psrLevels']) ? $config['psrLevels'] : null;
         $this->psrLevels = self::$defaults->psrLevels($fromConfig);
     }
 
     protected function setErrorLevels($config)
     {
-        $fromConfig = $this->tryGet($config, 'errorLevels');
+        $fromConfig = isset($config['errorLevels']) ? $config['errorLevels'] : null;
         $this->errorLevels = self::$defaults->errorLevels($fromConfig);
     }
 
     protected function setSendMessageTrace($config)
     {
-        $fromConfig = $this->tryGet($config, 'send_message_trace');
+        $fromConfig = isset($config['send_message_trace']) ? $config['send_message_trace'] : null;
         $this->sendMessageTrace = self::$defaults->sendMessageTrace($fromConfig);
     }
     
     protected function setRawRequestBody($config)
     {
-        $fromConfig = $this->tryGet($config, 'include_raw_request_body');
+        $fromConfig = isset($config['include_raw_request_body']) ? $config['include_raw_request_body'] : null;
         $this->rawRequestBody = self::$defaults->rawRequestBody($fromConfig);
     }
 
     protected function setLocalVarsDump($config)
     {
-        $fromConfig = $this->tryGet($config, 'local_vars_dump');
+        $fromConfig = isset($config['local_vars_dump']) ? $config['local_vars_dump'] : null;
         $this->localVarsDump = self::$defaults->localVarsDump($fromConfig);
     }
     
     protected function setCaptureErrorStacktraces($config)
     {
-        $fromConfig = $this->tryGet($config, 'capture_error_stacktraces');
+        $fromConfig = isset($config['capture_error_stacktraces']) ? $config['capture_error_stacktraces'] : null;
         $this->captureErrorStacktraces = self::$defaults->captureErrorStacktraces($fromConfig);
     }
 
     protected function setCodeVersion($config)
     {
-        $fromConfig = $this->tryGet($config, 'codeVersion');
+        $fromConfig = isset($config['codeVersion']) ? $config['codeVersion'] : null;
         if (!isset($fromConfig)) {
-            $fromConfig = $this->tryGet($config, 'code_version');
+            $fromConfig = isset($config['code_version']) ? $config['code_version'] : null;
         }
         $this->codeVersion = self::$defaults->codeVersion($fromConfig);
     }
 
     protected function setPlatform($config)
     {
-        $fromConfig = $this->tryGet($config, 'platform');
+        $fromConfig = isset($config['platform']) ? $config['platform'] : null;
         $this->platform = self::$defaults->platform($fromConfig);
     }
 
     protected function setFramework($config)
     {
-        $this->framework = $this->tryGet($config, 'framework');
+        $this->framework = isset($config['framework']) ? $config['framework'] : null;
     }
 
     protected function setContext($config)
     {
-        $this->context = $this->tryGet($config, 'context');
+        $this->context = isset($config['context']) ? $config['context'] : null;
     }
 
     protected function setRequestParams($config)
     {
-        $this->requestParams = $this->tryGet($config, 'requestParams');
+        $this->requestParams = isset($config['requestParams']) ? $config['requestParams'] : null;
     }
 
     /*
@@ -196,7 +191,7 @@ class DataBuilder implements DataBuilderInterface
     protected function setRequestBody($config)
     {
         
-        $this->requestBody = $this->tryGet($config, 'requestBody');
+        $this->requestBody = isset($config['requestBody']) ? $config['requestBody'] : null;
         
         if (!$this->requestBody && $this->rawRequestBody) {
             $this->requestBody = file_get_contents("php://input");
@@ -208,35 +203,35 @@ class DataBuilder implements DataBuilderInterface
 
     protected function setRequestExtras($config)
     {
-        $this->requestExtras = $this->tryGet($config, "requestExtras");
+        $this->requestExtras = isset($config["requestExtras"]) ? $config["requestExtras"] : null;
     }
 
     protected function setPerson($config)
     {
-        $this->person = $this->tryGet($config, 'person');
+        $this->person = isset($config['person']) ? $config['person'] : null;
     }
 
     protected function setPersonFunc($config)
     {
-        $this->personFunc = $this->tryGet($config, 'person_fn');
+        $this->personFunc = isset($config['person_fn']) ? $config['person_fn'] : null;
     }
 
     protected function setServerRoot($config)
     {
-        $fromConfig = $this->tryGet($config, 'serverRoot');
+        $fromConfig = isset($config['serverRoot']) ? $config['serverRoot'] : null;
         if (!isset($fromConfig)) {
-            $fromConfig = $this->tryGet($config, 'root');
+            $fromConfig = isset($config['root']) ? $config['root'] : null;
         }
         $this->serverRoot = self::$defaults->serverRoot($fromConfig);
     }
 
     protected function setServerBranch($config)
     {
-        $fromConfig = $this->tryGet($config, 'serverBranch');
+        $fromConfig = isset($config['serverBranch']) ? $config['serverBranch'] : null;
         if (!isset($fromConfig)) {
-            $fromConfig = $this->tryGet($config, 'branch');
+            $fromConfig = isset($config['branch']) ? $config['branch'] : null;
         }
-        $allowExec = $this->tryGet($config, 'allow_exec');
+        $allowExec = isset($config['allow_exec']) ? $config['allow_exec'] : null;
         if (!isset($allowExec)) {
             $allowExec = true;
         }
@@ -245,22 +240,22 @@ class DataBuilder implements DataBuilderInterface
 
     protected function setServerCodeVersion($config)
     {
-        $this->serverCodeVersion = $this->tryGet($config, 'serverCodeVersion');
+        $this->serverCodeVersion = isset($config['serverCodeVersion']) ? $config['serverCodeVersion'] : null;
     }
 
     protected function setServerExtras($config)
     {
-        $this->serverExtras = $this->tryGet($config, 'serverExtras');
+        $this->serverExtras = isset($config['serverExtras']) ? $config['serverExtras'] : null;
     }
 
     protected function setCustom($config)
     {
-        $this->custom = $this->tryGet($config, 'custom');
+        $this->custom = isset($config['custom']) ? $config['custom'] : null;
     }
 
     protected function setFingerprint($config)
     {
-        $this->fingerprint = $this->tryGet($config, 'fingerprint');
+        $this->fingerprint = isset($config['fingerprint']) ? $config['fingerprint'] : null;
         if (!is_null($this->fingerprint) && !is_callable($this->fingerprint)) {
             $msg = "If set, config['fingerprint'] must be a callable that returns a uuid string";
             throw new \InvalidArgumentException($msg);
@@ -269,7 +264,7 @@ class DataBuilder implements DataBuilderInterface
 
     protected function setTitle($config)
     {
-        $this->title = $this->tryGet($config, 'title');
+        $this->title = isset($config['title']) ? $config['title'] : null;
         if (!is_null($this->title) && !is_callable($this->title)) {
             $msg = "If set, config['title'] must be a callable that returns a string";
             throw new \InvalidArgumentException($msg);
@@ -278,31 +273,32 @@ class DataBuilder implements DataBuilderInterface
 
     protected function setNotifier($config)
     {
-        $fromConfig = $this->tryGet($config, 'notifier');
+        $fromConfig = isset($config['notifier']) ? $config['notifier'] : null;
         $this->notifier = self::$defaults->notifier($fromConfig);
     }
 
     protected function setBaseException($config)
     {
-        $fromConfig = $this->tryGet($config, 'baseException');
+        $fromConfig = isset($config['baseException']) ? $config['baseException'] : null;
         $this->baseException = self::$defaults->baseException($fromConfig);
     }
 
     protected function setIncludeCodeContext($config)
     {
-        $fromConfig = $this->tryGet($config, 'include_error_code_context');
+        $fromConfig = isset($config['include_error_code_context']) ? $config['include_error_code_context'] : null;
         $this->includeCodeContext = self::$defaults->includeCodeContext($fromConfig);
     }
 
     protected function setIncludeExcCodeContext($config)
     {
-        $fromConfig = $this->tryGet($config, 'include_exception_code_context');
+        $fromConfig =
+            isset($config['include_exception_code_context']) ? $config['include_exception_code_context'] : null;
         $this->includeExcCodeContext = self::$defaults->includeExcCodeContext($fromConfig);
     }
     
     protected function setLevelFactory($config)
     {
-        $this->levelFactory = $this->tryGet($config, 'levelFactory');
+        $this->levelFactory = isset($config['levelFactory']) ? $config['levelFactory'] : null;
         if (!$this->levelFactory) {
             throw new \InvalidArgumentException(
                 'Missing dependency: LevelFactory not provided to the DataBuilder.'
@@ -312,7 +308,7 @@ class DataBuilder implements DataBuilderInterface
     
     protected function setUtilities($config)
     {
-        $this->utilities = $this->tryGet($config, 'utilities');
+        $this->utilities = isset($config['utilities']) ? $config['utilities'] : null;
         if (!$this->utilities) {
             throw new \InvalidArgumentException(
                 'Missing dependency: Utilities not provided to the DataBuilder.'
@@ -322,7 +318,7 @@ class DataBuilder implements DataBuilderInterface
 
     protected function setHost($config)
     {
-        $this->host = $this->tryGet($config, 'host');
+        $this->host = isset($config['host']) ? $config['host'] : null;
     }
 
     /**
@@ -419,7 +415,7 @@ class DataBuilder implements DataBuilderInterface
         }
         
         $excInfo = new ExceptionInfo(
-            $this->utilities->coalesce($classOverride, get_class($exception)),
+            $classOverride ?: get_class($exception),
             $exception->getMessage()
         );
         return new Trace($frames, $excInfo);
@@ -429,11 +425,11 @@ class DataBuilder implements DataBuilderInterface
     {
         $frames = array();
         foreach ($this->getTrace($exception) as $frameInfo) {
-            $filename = $this->tryGet($frameInfo, 'file');
+            $filename = isset($frameInfo['file']) ? $frameInfo['file'] : null;
             if ($filename === null) {
                 $filename = $exception->getFile() ?: '<internal>';
             }
-            $lineno = $this->tryGet($frameInfo, 'line');
+            $lineno = isset($frameInfo['line']) ? $frameInfo['line'] : null;
             if ($lineno === null) {
                 $lineno = $exception->getLine() ?: 0;
             }
@@ -441,7 +437,7 @@ class DataBuilder implements DataBuilderInterface
             if (isset($frameInfo['class'])) {
                 $method = $frameInfo['class'] . "::" . $method;
             }
-            $args = $this->utilities->coalesce($this->tryGet($frameInfo, 'args'), null);
+            $args = isset($frameInfo['args']) ? $frameInfo['args'] : null;
 
             $frame = new Frame($filename);
             $frame->setLineno($lineno)
@@ -512,14 +508,15 @@ class DataBuilder implements DataBuilderInterface
     {
         if (is_null($level)) {
             if ($toLog instanceof ErrorWrapper) {
-                $level = $this->tryGet($this->errorLevels, $toLog->errorLevel);
+                $level = isset($this->errorLevels[$toLog->errorLevel]) ? $this->errorLevels[$toLog->errorLevel] : null;
             } elseif ($toLog instanceof \Exception) {
                 $level = $this->exceptionLevel;
             } else {
                 $level = $this->messageLevel;
             }
         }
-        $level = $this->tryGet($this->psrLevels, strtolower($level));
+        $level = strtolower($level);
+        $level = isset($this->psrLevels[$level]) ? $this->psrLevels[$level] : null;
         return $this->levelFactory->fromName($level);
     }
 
@@ -569,8 +566,8 @@ class DataBuilder implements DataBuilderInterface
             ->setUserIp($this->getUserIp());
       
         if (isset($_SERVER)) {
-            $request->setMethod($this->tryGet($_SERVER, 'REQUEST_METHOD'))
-                ->setQueryString($this->tryGet($_SERVER, "QUERY_STRING"));
+            $request->setMethod(isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : null)
+                ->setQueryString(isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : null);
         }
       
         if (isset($_GET)) {
@@ -728,7 +725,7 @@ class DataBuilder implements DataBuilderInterface
         }
 
         if (isset($_SERVER)) {
-            $path = $this->utilities->coalesce($this->tryGet($_SERVER, 'REQUEST_URI'), '/');
+            $path = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '/';
             $url .= $path;
         }
 
@@ -781,17 +778,17 @@ class DataBuilder implements DataBuilderInterface
         if (!isset($_SERVER)) {
             return null;
         }
-        $forwardFor = $this->tryGet($_SERVER, 'HTTP_X_FORWARDED_FOR');
+        $forwardFor = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : null;
         if ($forwardFor) {
             // return everything until the first comma
             $parts = explode(',', $forwardFor);
             return $parts[0];
         }
-        $realIp = $this->tryGet($_SERVER, 'HTTP_X_REAL_IP');
+        $realIp = isset($_SERVER['HTTP_X_REAL_IP']) ? $_SERVER['HTTP_X_REAL_IP'] : null;
         if ($realIp) {
             return $realIp;
         }
-        return $this->tryGet($_SERVER, 'REMOTE_ADDR');
+        return isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
     }
 
     protected function getRequestExtras()

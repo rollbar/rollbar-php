@@ -9,7 +9,6 @@ class Frame implements \JsonSerializable
     private $code;
     private $context;
     private $args;
-    private $kwargs;
     private $utilities;
 
     public function __construct($filename)
@@ -25,7 +24,6 @@ class Frame implements \JsonSerializable
 
     public function setFilename($filename)
     {
-        $this->utilities->validateString($filename, "filename", null, false);
         $this->filename = $filename;
         return $this;
     }
@@ -37,7 +35,6 @@ class Frame implements \JsonSerializable
 
     public function setLineno($lineno)
     {
-        $this->utilities->validateInteger($lineno, "lineno");
         $this->lineno = $lineno;
         return $this;
     }
@@ -49,7 +46,6 @@ class Frame implements \JsonSerializable
 
     public function setColno($colno)
     {
-        $this->utilities->validateInteger($colno, "colno");
         $this->colno = $colno;
         return $this;
     }
@@ -61,7 +57,6 @@ class Frame implements \JsonSerializable
 
     public function setMethod($method)
     {
-        $this->utilities->validateString($method, "method");
         $this->method = $method;
         return $this;
     }
@@ -73,7 +68,6 @@ class Frame implements \JsonSerializable
 
     public function setCode($code)
     {
-        $this->utilities->validateString($code, "code");
         $this->code = $code;
         return $this;
     }
@@ -100,18 +94,6 @@ class Frame implements \JsonSerializable
         return $this;
     }
 
-    public function getKwargs()
-    {
-        return $this->kwargs;
-    }
-
-    public function setKwargs(array $kwargs)
-    {
-        $this->kwargs = $kwargs;
-        return $this;
-    }
-
-
     public function jsonSerialize()
     {
         $result = array(
@@ -122,7 +104,6 @@ class Frame implements \JsonSerializable
             "code" => $this->code,
             "context" => $this->context,
             "args" => $this->args,
-            "kwargs" => $this->kwargs,
         );
         return $this->utilities->serializeForRollbar($result);
     }

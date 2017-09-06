@@ -2,14 +2,6 @@
 
 class UtilitiesTest extends BaseRollbarTest
 {
-    public function testCoalesce()
-    {
-        $utilities = new Utilities;
-        $this->assertTrue($utilities->coalesce(false, false, true));
-        $this->assertNull($utilities->coalesce(false, false));
-        $this->assertEquals(5, $utilities->coalesce(false, false, 5));
-    }
-
     public function testValidateString()
     {
         Utilities::validateString("");

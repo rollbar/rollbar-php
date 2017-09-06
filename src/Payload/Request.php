@@ -26,7 +26,6 @@ class Request implements \JsonSerializable
 
     public function setUrl($url)
     {
-        $this->utilities->validateString($url, "url");
         $this->url = $url;
         return $this;
     }
@@ -38,7 +37,6 @@ class Request implements \JsonSerializable
 
     public function setMethod($method)
     {
-        $this->utilities->validateString($method, "method");
         $this->method = $method;
         return $this;
     }
@@ -83,7 +81,6 @@ class Request implements \JsonSerializable
 
     public function setQueryString($queryString)
     {
-        $this->utilities->validateString($queryString, "queryString");
         $this->queryString = $queryString;
         return $this;
     }
@@ -106,7 +103,6 @@ class Request implements \JsonSerializable
 
     public function setBody($body)
     {
-        $this->utilities->validateString($body, "body");
         $this->body = $body;
         return $this;
     }
@@ -118,7 +114,6 @@ class Request implements \JsonSerializable
 
     public function setUserIp($userIp)
     {
-        $this->utilities->validateString($userIp, "userIp");
         $this->userIp = $userIp;
         return $this;
     }

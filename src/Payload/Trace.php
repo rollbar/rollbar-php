@@ -25,11 +25,6 @@ class Trace implements ContentInterface
 
     public function setFrames(array $frames)
     {
-        foreach ($frames as $frame) {
-            if (!$frame instanceof Frame) {
-                throw new \InvalidArgumentException("\$frames must all be Rollbar\Payload\Frames");
-            }
-        }
         $this->frames = $frames;
         return $this;
     }

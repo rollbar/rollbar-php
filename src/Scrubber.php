@@ -13,16 +13,11 @@ class Scrubber implements ScrubberInterface
         $this->setWhitelist($config);
     }
 
-    protected function tryGet($array, $key)
-    {
-        return isset($array[$key]) ? $array[$key] : null;
-    }
-
     protected function setScrubFields($config)
     {
-        $fromConfig = $this->tryGet($config, 'scrubFields');
+        $fromConfig = isset($config['scrubFields']) ? $config['scrubFields'] : null;
         if (!isset($fromConfig)) {
-            $fromConfig = $this->tryGet($config, 'scrub_fields');
+            $fromConfig = isset($config['scrub_fields']) ? $config['scrub_fields'] : null;
         }
         $this->scrubFields = self::$defaults->scrubFields($fromConfig);
     }
@@ -34,9 +29,9 @@ class Scrubber implements ScrubberInterface
 
     protected function setWhitelist($config)
     {
-        $fromConfig = $this->tryGet($config, 'scrubWhitelist');
+        $fromConfig = isset($config['scrubWhitelist']) ? $config['scrubWhitelist'] : null;
         if (!isset($fromConfig)) {
-            $fromConfig = $this->tryGet($config, 'scrub_whitelist');
+            $fromConfig = isset($config['scrub_whitelist']) ? $config['scrub_whitelist'] : null;
         }
         $this->whitelist = $fromConfig ? $fromConfig : array();
     }
@@ -54,7 +49,7 @@ class Scrubber implements ScrubberInterface
      * @param string $replacement Character used for scrubbing.
      * @param string $path Path of traversal in the array
      */
-    public function scrub(&$data, $replacement = '*', $path = '')
+    public function scrub(&$data, $replacement = '********', $path = '')
     {
         $fields = $this->getScrubFields();
 
@@ -62,14 +57,21 @@ class Scrubber implements ScrubberInterface
             return $data;
         }
 
+        $fields = array_flip($fields);
+
+        return $this->internalScrub($data, $fields, $replacement, $path);
+    }
+
+    protected function internalScrub(&$data, $fields, $replacement, $path)
+    {
         if (is_array($data)) { // scrub arrays
-            $data = $this->scrubArray($data, $replacement, $path);
+            $data = $this->scrubArray($data, $fields, $replacement, $path);
         } elseif (is_string($data)) { // scrub URLs and query strings
             $query = parse_url($data, PHP_URL_QUERY);
             if ($query) {
                 $data = str_replace(
                     $query,
-                    $this->scrubQueryString($query),
+                    $this->scrubQueryString($query, $fields),
                     $data
                 );
             }
@@ -77,17 +79,13 @@ class Scrubber implements ScrubberInterface
         return $data;
     }
 
-    protected function scrubArray(&$arr, $replacement = '*', $path = '')
+    protected function scrubArray(&$arr, $fields, $replacement = '********', $path = '')
     {
-        $fields = $this->getScrubFields();
-
         if (!$fields || !$arr) {
             return $arr;
         }
 
-        $fields = array_flip($fields);
         $scrubber = $this;
-
         $scrubberFn = function (
             &$val,
             $key
@@ -106,9 +104,9 @@ class Scrubber implements ScrubberInterface
             }
 
             if (isset($fields[$key])) {
-                $val = str_repeat($replacement, 8);
+                $val = $replacement;
             } else {
-                $val = $scrubber->scrub($val, $replacement, $current);
+                $val = $scrubber->internalScrub($val, $fields, $replacement, $current);
             }
 
             $current = $parent;
@@ -119,10 +117,10 @@ class Scrubber implements ScrubberInterface
         return $arr;
     }
 
-    protected function scrubQueryString($query, $replacement = 'x')
+    protected function scrubQueryString($query, $fields, $replacement = 'xxxxxxxx')
     {
         parse_str($query, $parsed);
-        $scrubbed = $this->scrub($parsed, $replacement);
+        $scrubbed = $this->internalScrub($parsed, $fields, $replacement, '');
         return http_build_query($scrubbed);
     }
 }
