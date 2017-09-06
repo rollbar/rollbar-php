@@ -50,7 +50,6 @@ class BackwardsCompatibilityConfigTest extends BaseRollbarTest
             },
             'root' => '/Users/brian/www/app',
             'scrub_fields' => array('test'),
-            'shift_function' => false,
             'timeout' => 10,
             'report_suppressed' => true,
             'use_error_reporting' => true,

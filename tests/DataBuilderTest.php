@@ -814,13 +814,12 @@ class DataBuilderTest extends BaseRollbarTest
             'utilities' => new Utilities
         ));
         $frames = $dataBuilder->makeFrames(new \Exception(), false);
-        $this->assertEquals('<main>', $frames[count($frames)-1]->getMethod());
         $this->assertStringEndsWith(
             'tests/DataBuilderTest.php',
             $frames[count($frames)-1]->getFilename()
         );
         $this->assertEquals(816, $frames[count($frames)-1]->getLineno());
-        $this->assertEquals('Rollbar\DataBuilderTest::testFramesOrder', $frames[count($frames)-2]->getMethod());
+        $this->assertEquals('Rollbar\DataBuilderTest::testFramesOrder', $frames[count($frames)-1]->getMethod());
     }
     
     /**
@@ -842,14 +841,14 @@ class DataBuilderTest extends BaseRollbarTest
         $result = $dataBuilder->generateErrorWrapper(E_ERROR, 'bork', null, null);
         $frames = $result->getBacktrace();
         
-        $this->assertEquals($expected, count($frames) === 0);
+        $this->assertEquals($expected, count($frames) == 0);
     }
     
     public function captureErrorStacktracesProvider()
     {
         return array(
             array(false,true),
-            array(true, false)
+            array(true,false)
         );
     }
 }
