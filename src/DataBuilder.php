@@ -45,7 +45,6 @@ class DataBuilder implements DataBuilderInterface
     protected $baseException;
     protected $includeCodeContext;
     protected $includeExcCodeContext;
-    protected $shiftFunction;
     protected $sendMessageTrace;
     protected $rawRequestBody;
     protected $localVarsDump;
@@ -99,11 +98,6 @@ class DataBuilder implements DataBuilderInterface
         $this->setLocalVarsDump($config);
         $this->setCaptureErrorStacktraces($config);
         $this->setLevelFactory($config);
-
-        $this->shiftFunction = isset($config['shift_function']) ? $config['shift_function'] : null;
-        if (!isset($this->shiftFunction)) {
-            $this->shiftFunction = true;
-        }
     }
 
     protected function setEnvironment($config)
@@ -458,13 +452,6 @@ class DataBuilder implements DataBuilderInterface
             }
 
             $frames[] = $frame;
-        }
-
-        if ($this->shiftFunction && count($frames) > 0) {
-            for ($i = count($frames) - 1; $i > 0; $i--) {
-                $frames[$i]->setMethod($frames[$i - 1]->getMethod());
-            }
-            $frames[0]->setMethod('<main>');
         }
         
         $frames = array_reverse($frames);
@@ -980,10 +967,7 @@ class DataBuilder implements DataBuilderInterface
     public function generateErrorWrapper($errno, $errstr, $errfile, $errline)
     {
         if ($this->captureErrorStacktraces) {
-            $backTrace = array_slice(
-                debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS),
-                2
-            );
+            $backTrace = debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS);
         } else {
             $backTrace = array();
         }

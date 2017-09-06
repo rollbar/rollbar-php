@@ -521,13 +521,6 @@ Default: `('passwd', 'password', 'secret', 'confirm_password', 'password_confirm
 <dd>Array of fields that you do NOT to be scrubbed even if they match entries in scrub_fields. Entries should be provided in associative array dot notation, i.e. `data.person.username`.
 </dd>
 
-<dt>shift_function
-</dt>
-<dd>Whether to shift function names in stack traces down one frame, so that the function name correctly reflects the context of each frame.
-
-Default: `true`
-</dd>
-
 <dt>timeout
 </dt>
 <dd>Request timeout for posting to rollbar, in seconds.
