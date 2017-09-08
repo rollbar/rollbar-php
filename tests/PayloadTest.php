@@ -34,30 +34,6 @@ class PayloadTest extends BaseRollbarTest
         $payload = new Payload($data, $accessToken);
         $this->assertEquals($accessToken, $payload->getAccessToken());
 
-        $accessToken = "too_short";
-        $config = m::mock("Rollbar\Config")
-                    ->shouldReceive('getAccessToken')
-                    ->andReturn($accessToken)
-                    ->mock();
-        try {
-            new Payload($data, $accessToken);
-            $this->fail("Above should throw");
-        } catch (\InvalidArgumentException $e) {
-            $this->assertContains("32", $e->getMessage());
-        }
-
-        $accessToken = "too_longtoo_longtoo_longtoo_longtoo_longtoo_long";
-        $config = m::mock("Rollbar\Config")
-                    ->shouldReceive('getAccessToken')
-                    ->andReturn($accessToken)
-                    ->mock();
-        try {
-            new Payload($data, $accessToken);
-            $this->fail("Above should throw");
-        } catch (\InvalidArgumentException $e) {
-            $this->assertContains("32", $e->getMessage());
-        }
-
         $accessToken = "012345678901234567890123456789ab";
         $config = m::mock("Rollbar\Config")
                     ->shouldReceive('getAccessToken')

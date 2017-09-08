@@ -19,13 +19,6 @@ class TraceTest extends BaseRollbarTest
         $trace = new Trace($frames, $exc);
         $this->assertEquals($frames, $trace->getFrames());
         $this->assertEquals($exc, $trace->getException());
-
-        try {
-            $trace = new Trace($badFrames, $exc);
-            $this->fail("Above should throw");
-        } catch (\InvalidArgumentException $e) {
-            $this->assertEquals("\$frames must all be Rollbar\Payload\Frames", $e->getMessage());
-        }
     }
 
     public function testFrames()
