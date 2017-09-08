@@ -17,20 +17,6 @@ class DataTest extends BaseRollbarTest
 
     public function testEnvironmentMustBeString()
     {
-        try {
-            $data = new Data(1, $this->body);
-            $this->fail("Above should throw");
-        } catch (\InvalidArgumentException $e) {
-            $this->assertContains("must be a string", $e->getMessage());
-        }
-
-        try {
-            $data = new Data(null, $this->body);
-            $this->fail("Above should throw");
-        } catch (\InvalidArgumentException $e) {
-            $this->assertContains("must not be null", $e->getMessage());
-        }
-
         $data = new Data("env", $this->body);
         $this->assertEquals("env", $data->getEnvironment());
 
