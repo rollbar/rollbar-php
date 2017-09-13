@@ -62,7 +62,7 @@ class Scrubber implements ScrubberInterface
         return $this->internalScrub($data, $fields, $replacement, $path);
     }
 
-    protected function internalScrub(&$data, $fields, $replacement, $path)
+    public function internalScrub(&$data, $fields, $replacement, $path)
     {
         if (is_array($data)) { // scrub arrays
             $data = $this->scrubArray($data, $fields, $replacement, $path);
