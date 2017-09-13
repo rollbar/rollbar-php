@@ -87,8 +87,7 @@ class FrameTest extends BaseRollbarTest
                 '"method":"testEncode()",' .
                 '"code":"$frame->setFilename(\"rollbar.php\")",' .
                 '"context":"{CONTEXT}",' .
-                '"args":["hello","world"],' .
-                '"kwargs":{"whatever":"Faked"}' .
+                '"args":["hello","world"]' .
             '}';
 
         $this->assertEquals($expected, $actual);
