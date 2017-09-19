@@ -74,6 +74,11 @@ class Scrubber implements ScrubberInterface
                     $this->scrubQueryString($query, $fields),
                     $data
                 );
+            } else {
+                parse_str($data, $parsedData);
+                if (http_build_query($parsedData) === $data) {
+                    $data = $this->scrubQueryString($data, $fields);
+                }
             }
         }
         return $data;
