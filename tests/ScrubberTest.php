@@ -158,6 +158,7 @@ class ScrubberTest extends BaseRollbarTest
                 'non sensitive data 3' => '4&56',
                 'non sensitive data 4' => 'a=4&56',
                 'non sensitive data 6' => '?baz&foo=bar',
+                'non sensitive data 7' => 'a=stuff&foo=superSecret',
                 'sensitive data' => '456',
                 array(
                     'non sensitive data 3' => '789',
@@ -180,6 +181,7 @@ class ScrubberTest extends BaseRollbarTest
                 'non sensitive data 3' => '4&56',
                 'non sensitive data 4' => 'a=4&56',
                 'non sensitive data 6' => '?baz=&foo=xxxxxxxx',
+                'non sensitive data 7' => 'a=stuff&foo=xxxxxxxx',
                 'sensitive data' => '********',
                 array(
                     'non sensitive data 3' => '789',
