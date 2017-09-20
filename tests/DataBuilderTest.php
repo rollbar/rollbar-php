@@ -771,6 +771,39 @@ class DataBuilderTest extends BaseRollbarTest
         stream_wrapper_restore("php");
     }
     
+    public function testPostDataPutRequest()
+    {
+        $_SERVER['REQUEST_METHOD'] = 'PUT';
+        
+        $expected = 'val1';
+        $streamInput = http_build_query(array(
+            'arg1' => $expected
+        ));
+        
+        stream_wrapper_unregister("php");
+        stream_wrapper_register("php", "\Rollbar\TestHelpers\MockPhpStream");
+
+        file_put_contents('php://input', $streamInput);
+        
+        $config = array(
+            'accessToken' => $this->getTestAccessToken(),
+            'environment' => 'tests',
+            'levelFactory' => new LevelFactory,
+            'utilities' => new Utilities,
+            'include_raw_request_body' => true
+        );
+        
+        $dataBuilder = new DataBuilder($config);
+        
+        $data = $dataBuilder->makeData(Level::ERROR, "testing", array());
+        $post = $data->getRequest()->getPost();
+        
+        $this->assertEquals($expected, $post['arg1']);
+        
+        unset($_SERVER['REQUEST_METHOD']);
+        stream_wrapper_restore("php");
+    }
+    
     public function testGenerateErrorWrapper()
     {
         $result = $this->dataBuilder->generateErrorWrapper(E_ERROR, 'bork', null, null);
@@ -818,7 +851,7 @@ class DataBuilderTest extends BaseRollbarTest
             'tests/DataBuilderTest.php',
             $frames[count($frames)-1]->getFilename()
         );
-        $this->assertEquals(816, $frames[count($frames)-1]->getLineno());
+        $this->assertEquals(849, $frames[count($frames)-1]->getLineno());
         $this->assertEquals('Rollbar\DataBuilderTest::testFramesOrder', $frames[count($frames)-1]->getMethod());
     }
     

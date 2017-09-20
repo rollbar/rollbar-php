@@ -576,6 +576,13 @@ class DataBuilder implements DataBuilderInterface
         if (isset($_POST)) {
             $request->setPost($_POST);
         }
+        
+        if ($request->getMethod() === 'PUT') {
+            $postData = array();
+            parse_str($request->getBody(), $postData);
+            $request->setPost($postData);
+        }
+        
         $extras = $this->getRequestExtras();
         if (!$extras) {
             $extras = array();
