@@ -1,6 +1,12 @@
 # Changelog
 
+## 1.3.2
+
+- Performance improvments
+- Include request body for PUT requests if `include_raw_request_body` is true
+
 ## 1.3.1
+
 - Remove dependency on rollbar.js through composer
 - Actually change the notifier version number constant
 - Stop duplicate logging some errors [#240](https://github.com/rollbar/rollbar-php/pull/240)
