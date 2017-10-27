@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.3
+
+- Remove fluent/logger from the required section of composer.json
+
 ## 1.3.2
 
 - Performance improvments
