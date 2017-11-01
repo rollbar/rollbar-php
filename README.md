@@ -640,6 +640,8 @@ $config['person_fn'] = 'get_current_user';
 
 ## Related projects
 
+A Wordpress Plugin is available through Wordpress Admin Panel or through Wordpress Plugin directory: [Rollbar Wordpress](https://wordpress.org/plugins/rollbar/)
+
 A Laravel-specific package is available for integrating with Laravel: [Rollbar Laravel](https://github.com/rollbar/rollbar-php-laravel)
 
 A CakePHP-specific package is avaliable for integrating with CakePHP 2.x:
