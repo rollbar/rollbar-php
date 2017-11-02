@@ -269,6 +269,8 @@ try {
 }
 ```
 
+*Note:* Currently `PsrHandler` incorrectly reports exception objects logged with `log` method as strings instead of objects. This will cause your `log`-reported errors to be interpretted in Rollbar as message strings. The preferred way to use Rollbar with Monolog is through `RollbarHandler` class, however, at the moment, it's outdated. Pull request [Sync RollbarHandler with the latest changes rollbar/rollbar package](https://github.com/Seldaek/monolog/pull/1042) with a fix is awaiting merging into Monolog package. This issue has been originally brought up in [Log->error($e) has different info than throw the exception and let error_reporting handle it](https://github.com/rollbar/rollbar-php/issues/275).
+
 ## Configuration
 
 ### Asynchronous Reporting
@@ -639,6 +641,8 @@ $config['person_fn'] = 'get_current_user';
 ```
 
 ## Related projects
+
+A range of examples of using Rollbar PHP is available here: [Rollbar PHP Examples](https://github.com/rollbar/rollbar-php-examples).
 
 A Wordpress Plugin is available through Wordpress Admin Panel or through Wordpress Plugin directory: [Rollbar Wordpress](https://wordpress.org/plugins/rollbar/)
 
