@@ -216,6 +216,11 @@ class Rollbar
         self::$logger->flushAndWait();
     }
     
+    public static function addCustom($key, $value)
+    {
+        self::$logger->addCustom($key, $value);
+    }
+    
     // @codingStandardsIgnoreStart
     
     /**
