@@ -248,7 +248,7 @@ class DataBuilder implements DataBuilderInterface
         $this->serverExtras = isset($config['serverExtras']) ? $config['serverExtras'] : null;
     }
 
-    protected function setCustom($config)
+    public function setCustom($config)
     {
         $this->custom = isset($config['custom']) ? $config['custom'] : null;
     }
@@ -907,6 +907,21 @@ class DataBuilder implements DataBuilderInterface
         }
 
         return array_replace_recursive(array(), $context, $custom);
+    }
+    
+    public function addCustom($key, $data)
+    {
+        if ($this->custom === null) {
+            $this->custom = array();
+        }
+        
+        if (!is_array($this->custom)) {
+            throw new \Exception(
+                "Custom data configured in Rollbar::init() is not an array."
+            );
+        }
+        
+        $this->custom[$key] = $data;
     }
 
     protected function getFingerprint()

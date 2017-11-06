@@ -243,13 +243,18 @@ class ConfigTest extends BaseRollbarTest
                 "fuzz" => "buzz"
             )
         ));
-
-        $data = new Data("test", new Body(new Message("body")));
-        $data->setCustom(array("foo" => "baz"));
-        $payload = new Payload($data, $this->getTestAccessToken());
-        $result = $config->transform($payload, "level", "toLog", "context");
-        $custom = $result->getData()->getCustom();
-        $this->assertEquals("baz", $custom["foo"]);
+        
+        $dataBuilder = $config->getDataBuilder();
+        
+        $result = $dataBuilder->makeData(
+            Level::INFO,
+            "Test message with custom data added dynamically.",
+            array()
+        );
+        
+        $custom = $result->getCustom();
+        
+        $this->assertEquals("bar", $custom["foo"]);
         $this->assertEquals("buzz", $custom["fuzz"]);
     }
 

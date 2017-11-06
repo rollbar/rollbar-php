@@ -11,6 +11,48 @@ class RollbarLoggerTest extends BaseRollbarTest
     {
         $_SESSION = array();
     }
+    
+    public function testAddCustom()
+    {
+        $logger = new RollbarLogger(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => "testing-php"
+        ));
+        
+        $logger->addCustom("foo", "bar");
+        
+        $dataBuilder = $logger->getDataBuilder();
+        
+        $result = $dataBuilder->makeData(
+            Level::INFO,
+            "This test message should have custom data attached.",
+            array()
+        );
+        
+        $customData = $result->getCustom();
+        $this->assertEquals("bar", $customData["foo"]);
+        
+        $logger = new RollbarLogger(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => "testing-php",
+            "custom" => array(
+                "baz" => "xyz"
+            )
+        ));
+        
+        $logger->addCustom("foo", "bar");
+        
+        $dataBuilder = $logger->getDataBuilder();
+        
+        $result = $dataBuilder->makeData(
+            Level::INFO,
+            "This test message should have custom data attached.",
+            array()
+        );
+        
+        $customData = $result->getCustom();
+        $this->assertEquals("bar", $customData["foo"]);
+    }
 
     public function testConfigure()
     {
