@@ -34,6 +34,21 @@ class RollbarLogger extends AbstractLogger
     {
         return $this->config->extend($config);
     }
+    
+    public function addCustom($key, $data)
+    {
+        $this->config->addCustom($key, $data);
+    }
+    
+    public function removeCustom($key)
+    {
+        $this->config->removeCustom($key);
+    }
+    
+    public function getCustom()
+    {
+        return $this->config->getCustom();
+    }
 
     public function log($level, $toLog, array $context = array(), $isUncaught = false)
     {

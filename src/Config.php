@@ -240,11 +240,24 @@ class Config
         }
     }
 
-    private function setCustom($config)
+    public function setCustom($config)
     {
-        if (array_key_exists('custom', $config)) {
-            $this->custom = $config['custom'];
-        }
+        $this->dataBuilder->setCustom($config);
+    }
+    
+    public function addCustom($key, $data)
+    {
+        $this->dataBuilder->addCustom($key, $data);
+    }
+    
+    public function removeCustom($key)
+    {
+        $this->dataBuilder->removeCustom($key);
+    }
+    
+    public function getCustom()
+    {
+        return $this->dataBuilder->getCustom();
     }
 
     private function setTransportOptions(&$config)

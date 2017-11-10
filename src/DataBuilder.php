@@ -248,7 +248,7 @@ class DataBuilder implements DataBuilderInterface
         $this->serverExtras = isset($config['serverExtras']) ? $config['serverExtras'] : null;
     }
 
-    protected function setCustom($config)
+    public function setCustom($config)
     {
         $this->custom = isset($config['custom']) ? $config['custom'] : null;
     }
@@ -342,7 +342,7 @@ class DataBuilder implements DataBuilderInterface
             ->setRequest($this->getRequest())
             ->setPerson($this->getPerson())
             ->setServer($this->getServer())
-            ->setCustom($this->getCustom($toLog, $context))
+            ->setCustom($this->getCustomForPayload($toLog, $context))
             ->setFingerprint($this->getFingerprint())
             ->setTitle($this->getTitle())
             ->setUuid($this->getUuid())
@@ -887,10 +887,15 @@ class DataBuilder implements DataBuilderInterface
     {
         return $this->serverExtras;
     }
-
-    protected function getCustom($toLog, $context)
+    
+    public function getCustom()
     {
-        $custom = $this->custom;
+        return $this->custom;
+    }
+
+    protected function getCustomForPayload($toLog, $context)
+    {
+        $custom = $this->getCustom();
 
         // Make this an array if possible:
         if ($custom instanceof \JsonSerializable) {
@@ -907,6 +912,26 @@ class DataBuilder implements DataBuilderInterface
         }
 
         return array_replace_recursive(array(), $context, $custom);
+    }
+    
+    public function addCustom($key, $data)
+    {
+        if ($this->custom === null) {
+            $this->custom = array();
+        }
+        
+        if (!is_array($this->custom)) {
+            throw new \Exception(
+                "Custom data configured in Rollbar::init() is not an array."
+            );
+        }
+        
+        $this->custom[$key] = $data;
+    }
+    
+    public function removeCustom($key)
+    {
+        unset($this->custom[$key]);
     }
 
     protected function getFingerprint()

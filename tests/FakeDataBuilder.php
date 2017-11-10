@@ -16,4 +16,8 @@ class FakeDataBuilder implements DataBuilderInterface
     {
         self::$logged[] = array($level, $toLog, $context);
     }
+    
+    public function setCustom()
+    {
+    }
 }
