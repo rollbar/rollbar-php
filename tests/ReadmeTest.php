@@ -2,7 +2,6 @@
 
 use Rollbar\Rollbar;
 use Rollbar\Payload\Level;
-use Monolog\Logger;
 
 // used in testBasicUsage()
 function do_something()
@@ -116,7 +115,7 @@ class ReadmeTest extends BaseRollbarTest
         // installs global error and exception handlers
         Rollbar::init($config);
 
-        $log = new Logger('test');
+        $log = new \Monolog\Logger('test');
         $log->pushHandler(new \Monolog\Handler\PsrHandler(Rollbar::logger()));
 
         try {
