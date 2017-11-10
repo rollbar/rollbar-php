@@ -249,6 +249,16 @@ class Config
     {
         $this->dataBuilder->addCustom($key, $data);
     }
+    
+    public function removeCustom($key)
+    {
+        $this->dataBuilder->removeCustom($key);
+    }
+    
+    public function getCustom()
+    {
+        return $this->dataBuilder->getCustom();
+    }
 
     private function setTransportOptions(&$config)
     {

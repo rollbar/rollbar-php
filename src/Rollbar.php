@@ -221,6 +221,16 @@ class Rollbar
         self::$logger->addCustom($key, $value);
     }
     
+    public static function removeCustom($key)
+    {
+        self::$logger->removeCustom($key);
+    }
+    
+    public static function getCustom()
+    {
+        self::$logger->getCustom();
+    }
+    
     // @codingStandardsIgnoreStart
     
     /**

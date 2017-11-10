@@ -342,7 +342,7 @@ class DataBuilder implements DataBuilderInterface
             ->setRequest($this->getRequest())
             ->setPerson($this->getPerson())
             ->setServer($this->getServer())
-            ->setCustom($this->getCustom($toLog, $context))
+            ->setCustom($this->getCustomForPayload($toLog, $context))
             ->setFingerprint($this->getFingerprint())
             ->setTitle($this->getTitle())
             ->setUuid($this->getUuid())
@@ -887,10 +887,15 @@ class DataBuilder implements DataBuilderInterface
     {
         return $this->serverExtras;
     }
-
-    protected function getCustom($toLog, $context)
+    
+    public function getCustom()
     {
-        $custom = $this->custom;
+        return $this->custom;
+    }
+
+    protected function getCustomForPayload($toLog, $context)
+    {
+        $custom = $this->getCustom();
 
         // Make this an array if possible:
         if ($custom instanceof \JsonSerializable) {
@@ -922,6 +927,11 @@ class DataBuilder implements DataBuilderInterface
         }
         
         $this->custom[$key] = $data;
+    }
+    
+    public function removeCustom($key)
+    {
+        unset($this->custom[$key]);
     }
 
     protected function getFingerprint()
