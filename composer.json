@@ -32,7 +32,7 @@
 
   "require": {
     "ext-curl": "*",
-    "psr/log": "~1.0.2"
+    "psr/log": "^1.0.1"
   },
 
   "require-dev": {
@@ -40,7 +40,7 @@
     "mockery/mockery": "0.9.*",
     "squizlabs/php_codesniffer": "2.*",
     "codeclimate/php-test-reporter": "dev-master",
-    "monolog/monolog": "*",
+    "monolog/monolog": "^1.12.0",
     "packfire/php5.3-compat": "*",
     "phpmd/phpmd" : "@stable"
   },
