@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.5
+
+- Fix sending $context argument from the log() method with exception logs.
+
 ## 1.3.4
 
 - Increase the minimum version constraint for the monolog/monolog package to support composer --prefer-minimum
