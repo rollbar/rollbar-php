@@ -118,6 +118,22 @@ class RollbarLoggerTest extends BaseRollbarTest
         $this->assertEquals(200, $response->getStatus());
     }
     
+    public function testContext()
+    {
+        $l = new RollbarLogger(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => "testing-php"
+        ));
+        $response = $l->log(
+            Level::ERROR,
+            new \Exception("Testing PHP Notifier"),
+            array(
+                "foo" => "bar"
+            )
+        );
+        $this->assertEquals(200, $response->getStatus());
+    }
+    
     public function testLogStaticLevel()
     {
         $l = new RollbarLogger(array(

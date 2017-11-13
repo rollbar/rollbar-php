@@ -499,8 +499,8 @@ class DataBuilder implements DataBuilderInterface
             (string)$toLog,
             $context,
             $this->sendMessageTrace ?
-                debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS) :
-                null
+            debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS) :
+            null
         );
     }
 
@@ -901,14 +901,9 @@ class DataBuilder implements DataBuilderInterface
         if ($custom instanceof \JsonSerializable) {
             $custom = $custom->jsonSerialize();
         } elseif (is_null($custom)) {
-            return null;
+            $custom = array();
         } elseif (!is_array($custom)) {
             $custom = get_object_vars($custom);
-        }
-
-        $baseException = $this->getBaseException();
-        if (!$toLog instanceof $baseException) {
-            return array_replace_recursive(array(), $custom);
         }
 
         return array_replace_recursive(array(), $context, $custom);
