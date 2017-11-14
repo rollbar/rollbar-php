@@ -82,13 +82,13 @@ class DefaultsTest extends BaseRollbarTest
 
     public function testGitHash()
     {
-        $val = exec('git rev-parse --verify HEAD');
+        $val = rtrim(shell_exec('git rev-parse --verify HEAD'));
         $this->assertEquals($val, $this->defaults->gitHash());
     }
 
     public function testGitBranch()
     {
-        $val = exec('git rev-parse --abbrev-ref HEAD');
+        $val = rtrim(exec('git rev-parse --abbrev-ref HEAD'));
         $this->assertEquals($val, $this->defaults->gitBranch());
     }
 
