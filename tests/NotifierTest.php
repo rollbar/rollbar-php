@@ -29,6 +29,6 @@ class NotifierTest extends BaseRollbarTest
     {
         $notifier = Notifier::defaultNotifier();
         $encoded = json_encode($notifier->jsonSerialize());
-        $this->assertEquals('{"name":"rollbar-php","version":"1.3.3"}', $encoded);
+        $this->assertEquals('{"name":"rollbar-php","version":"1.3.5"}', $encoded);
     }
 }
