@@ -329,7 +329,7 @@ Default: `/var/www`
 <dt>allow_exec
 </dt>
 <dd>If the branch option is not set, we will attempt to call out to git to discover the branch name
-via the php `exec` function call. If you do not want to allow `exec` to be called, and therefore
+via the php `shell_exec` function call. If you do not want to allow `shell_exec` to be called, and therefore
 possibly to not gather this context if you do not otherwise provide it via the separate
 configuration option, then set this option to false.
 
