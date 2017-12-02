@@ -154,6 +154,7 @@ class Rollbar
 
     public static function fatalHandler()
     {
+        
         if (is_null(self::$logger)) {
             return;
         }
@@ -176,7 +177,7 @@ class Rollbar
             in_array($last_error['type'], self::$fatalErrors, true) &&
             // don't log uncaught exceptions as they were handled by exceptionHandler()
             !(isset($last_error['message']) &&
-              strpos($last_error['message'], 'Uncaught exception') === 0);
+              strpos($last_error['message'], 'Uncaught') === 0);
     }
 
     private static function generateErrorWrapper($errno, $errstr, $errfile, $errline)
