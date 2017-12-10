@@ -49,6 +49,26 @@ class Rollbar
 
         self::$logger = isset($logger) ? $logger : new RollbarLogger($configOrLogger);
     }
+    
+    public static function enable()
+    {
+        return self::logger()->enable();
+    }
+    
+    public static function disable()
+    {
+        return self::logger()->disable();
+    }
+    
+    public static function enabled()
+    {
+        return self::logger()->enabled();
+    }
+    
+    public static function disabled()
+    {
+        return self::logger()->disabled();
+    }
 
     public static function logger()
     {
@@ -230,6 +250,11 @@ class Rollbar
     public static function getCustom()
     {
         self::$logger->getCustom();
+    }
+    
+    public static function configure($config)
+    {
+        self::$logger->configure($config);
     }
     
     // @codingStandardsIgnoreStart
