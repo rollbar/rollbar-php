@@ -90,42 +90,42 @@ class Rollbar
     
     public static function debug($toLog, $extra = array())
     {
-        self::log(Level::DEBUG, $toLog, $extra);
+        return self::log(Level::DEBUG, $toLog, $extra);
     }
     
     public static function info($toLog, $extra = array())
     {
-        self::log(Level::INFO, $toLog, $extra);
+        return self::log(Level::INFO, $toLog, $extra);
     }
     
     public static function notice($toLog, $extra = array())
     {
-        self::log(Level::NOTICE, $toLog, $extra);
+        return self::log(Level::NOTICE, $toLog, $extra);
     }
     
     public static function warning($toLog, $extra = array())
     {
-        self::log(Level::WARNING, $toLog, $extra);
+        return self::log(Level::WARNING, $toLog, $extra);
     }
     
     public static function error($toLog, $extra = array())
     {
-        self::log(Level::ERROR, $toLog, $extra);
+        return self::log(Level::ERROR, $toLog, $extra);
     }
     
     public static function critical($toLog, $extra = array())
     {
-        self::log(Level::CRITICAL, $toLog, $extra);
+        return self::log(Level::CRITICAL, $toLog, $extra);
     }
     
     public static function alert($toLog, $extra = array())
     {
-        self::log(Level::ALERT, $toLog, $extra);
+        return self::log(Level::ALERT, $toLog, $extra);
     }
     
     public static function emergency($toLog, $extra = array())
     {
-        self::log(Level::EMERGENCY, $toLog, $extra);
+        return self::log(Level::EMERGENCY, $toLog, $extra);
     }
     
     public static function setupErrorHandling()

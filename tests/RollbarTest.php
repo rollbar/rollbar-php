@@ -123,6 +123,56 @@ class RollbarTest extends BaseRollbarTest
             $payload->getData()->getBody()->getValue()->some_key
         );
     }
+    
+    public function testDebug()
+    {
+        $this->shortcutMethodTestHelper(Level::DEBUG);
+    }
+    
+    public function testInfo()
+    {
+        $this->shortcutMethodTestHelper(Level::INFO);
+    }
+    
+    public function testNotice()
+    {
+        $this->shortcutMethodTestHelper(Level::NOTICE);
+    }
+    
+    public function testWarning()
+    {
+        $this->shortcutMethodTestHelper(Level::WARNING);
+    }
+    
+    public function testError()
+    {
+        $this->shortcutMethodTestHelper(Level::ERROR);
+    }
+    
+    public function testCritical()
+    {
+        $this->shortcutMethodTestHelper(Level::CRITICAL);
+    }
+    
+    public function testAlert()
+    {
+        $this->shortcutMethodTestHelper(Level::ALERT);
+    }
+    
+    public function testEmergency()
+    {
+        $this->shortcutMethodTestHelper(Level::EMERGENCY);
+    }
+    
+    protected function shortcutMethodTestHelper($level)
+    {
+        $message = "shortcutMethodTestHelper: $level";
+        
+        $result = Rollbar::$level($message);
+        $expected = Rollbar::log($level, $message);
+        
+        $this->assertEquals($expected, $result);
+    }
 
     /**
      * Below are backwards compatibility tests with v0.18.2
