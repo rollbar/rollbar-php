@@ -314,6 +314,14 @@ Also you will have to install a suggested package `fluent/logger`.
 All of the following options can be passed as keys in the `$config` array.
 
   <dl>
+
+<dt>enabled
+</dt>
+<dd>Enable or disable Rollbar in your project. This can be changed at runtime with `Rollbar::enable()` and `Rollbar::disable()` or through `Rollbar::configure()`.
+	
+Default: `true`
+</dd>
+	
 <dt>access_token
 </dt>
 <dd>Your project access token.
