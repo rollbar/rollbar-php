@@ -424,16 +424,11 @@ class DataBuilder implements DataBuilderInterface
     public function makeFrames($exception, $includeContext)
     {
         $frames = array();
+        
         foreach ($this->getTrace($exception) as $frameInfo) {
             $filename = isset($frameInfo['file']) ? $frameInfo['file'] : null;
-            if ($filename === null) {
-                $filename = $exception->getFile() ?: '<internal>';
-            }
             $lineno = isset($frameInfo['line']) ? $frameInfo['line'] : null;
-            if ($lineno === null) {
-                $lineno = $exception->getLine() ?: 0;
-            }
-            $method = $frameInfo['function'];
+            $method = isset($frameInfo['function']) ? $frameInfo['function'] : null;
             if (isset($frameInfo['class'])) {
                 $method = $frameInfo['class'] . "::" . $method;
             }
@@ -489,7 +484,13 @@ class DataBuilder implements DataBuilderInterface
         if ($exc instanceof ErrorWrapper) {
             return $exc->getBacktrace();
         } else {
-            return $exc->getTrace();
+            
+            $trace = $exc->getTrace();
+            
+            // Add the Exception's file and line as the last frame of the trace
+            array_unshift($trace,  array('file' => $exc->getFile(), 'line' => $exc->getLine()));
+            
+            return $trace;
         }
     }
 
@@ -994,10 +995,23 @@ class DataBuilder implements DataBuilderInterface
     public function generateErrorWrapper($errno, $errstr, $errfile, $errline)
     {
         if ($this->captureErrorStacktraces) {
-            $backTrace = debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS);
+            
+            if (function_exists('xdebug_get_function_stack')) {
+                $backTrace = \xdebug_get_function_stack();
+            } else {
+                $backTrace = debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS);
+            }
+            
+            // TODO: The last frame is not inserted in the right place. It's just
+            // added to the end right now. It should be added before the shutdown
+            // handler stack trace starts. (this is for Xdebug variation)
+            
+            $backTrace []= array('file' => $errfile, 'line' => $errline);
+            
         } else {
             $backTrace = array();
         }
+        
         return new ErrorWrapper(
             $errno,
             $errstr,
