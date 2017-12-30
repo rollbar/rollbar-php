@@ -233,6 +233,8 @@ class RollbarTest extends BaseRollbarTest
     
     public function testConfigure()
     {
+        $expected = 'expectedEnv';
+        
         Rollbar::init(self::$simpleConfig);
         
         // functionality under test
