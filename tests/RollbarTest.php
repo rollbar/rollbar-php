@@ -1,6 +1,7 @@
 <?php namespace Rollbar;
 
 use Rollbar\Rollbar;
+use Rollbar\Payload\Payload;
 use Rollbar\Payload\Level;
 
 /**
@@ -228,5 +229,48 @@ class RollbarTest extends BaseRollbarTest
         Rollbar::exceptionHandler(new \Exception());
         $handler = set_exception_handler('Rollbar\Rollbar::exceptionHandler');
         $this->assertEquals('testExceptionHandler', $handler[1]);
+    }
+    
+    public function testConfigure()
+    {
+        Rollbar::init(self::$simpleConfig);
+        
+        // functionality under test
+        Rollbar::configure(array(
+            'environment' => $expected
+        ));
+        
+        // assertion
+        $logger = Rollbar::logger();
+        $dataBuilder = $logger->getDataBuilder();
+        $data = $dataBuilder->makeData(Level::ERROR, "testing", array());
+        $payload = new Payload($data, self::$simpleConfig['access_token']);
+        
+        $this->assertEquals($expected, $payload->getData()->getEnvironment());
+        
+    }
+    
+    public function testEnable()
+    {
+        Rollbar::init(self::$simpleConfig);
+        $this->assertTrue(Rollbar::enabled());
+        
+        Rollbar::disable();
+        $this->assertTrue(Rollbar::disabled());
+        
+        Rollbar::enable();
+        $this->assertTrue(Rollbar::enabled());
+        
+        Rollbar::init(array_merge(
+            self::$simpleConfig,
+            array('enabled' => false)
+        ));
+        $this->assertTrue(Rollbar::disabled());
+        
+        Rollbar::configure(array('enabled' => true));
+        $this->assertTrue(Rollbar::enabled());
+        
+        Rollbar::configure(array('enabled' => false));
+        $this->assertTrue(Rollbar::disabled());
     }
 }

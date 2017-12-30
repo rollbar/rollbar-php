@@ -14,6 +14,10 @@ class Config
 {
     private $accessToken;
     /**
+     * @var string $enabled Enable / disable Rollbar SDK.
+     */
+    private $enabled = true;
+    /**
      * @var DataBuilder
      */
     private $dataBuilder;
@@ -123,6 +127,7 @@ class Config
     {
         $this->configArray = $config;
 
+        $this->setEnabled($config);
         $this->setAccessToken($config);
         $this->setDataBuilder($config);
         $this->setTransformer($config);
@@ -154,6 +159,25 @@ class Config
         }
         $this->utilities->validateString($config['access_token'], "config['access_token']", 32, false);
         $this->accessToken = $config['access_token'];
+    }
+
+    private function setEnabled($config)
+    {
+        if (array_key_exists('enabled', $config) && $config['enabled'] === false) {
+            $this->disable();
+        } else {
+            $this->enable();
+        }
+    }
+    
+    public function enable()
+    {
+        $this->enabled = true;
+    }
+    
+    public function disable()
+    {
+        $this->enabled = false;
     }
 
     private function setDataBuilder($config)
@@ -459,6 +483,16 @@ class Config
     public function getAccessToken()
     {
         return $this->accessToken;
+    }
+
+    public function enabled()
+    {
+        return $this->enabled === true;
+    }
+    
+    public function disabled()
+    {
+        return !$this->enabled();
     }
 
     public function getSendMessageTrace()
