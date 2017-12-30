@@ -249,7 +249,6 @@ class RollbarTest extends BaseRollbarTest
         $payload = new Payload($data, self::$simpleConfig['access_token']);
         
         $this->assertEquals($expected, $payload->getData()->getEnvironment());
-        
     }
     
     public function testEnable()
