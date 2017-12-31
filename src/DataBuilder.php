@@ -994,31 +994,71 @@ class DataBuilder implements DataBuilderInterface
      */
     public function generateErrorWrapper($errno, $errstr, $errfile, $errline)
     {
-        if ($this->captureErrorStacktraces) {
-            
-            if (function_exists('xdebug_get_function_stack')) {
-                $backTrace = \xdebug_get_function_stack();
-            } else {
-                $backTrace = debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS);
-            }
-            
-            // TODO: The last frame is not inserted in the right place. It's just
-            // added to the end right now. It should be added before the shutdown
-            // handler stack trace starts. (this is for Xdebug variation)
-            
-            $backTrace []= array('file' => $errfile, 'line' => $errline);
-            
-        } else {
-            $backTrace = array();
-        }
-        
         return new ErrorWrapper(
             $errno,
             $errstr,
             $errfile,
             $errline,
-            $backTrace,
+            $this->buildErrorTrace($errfile, $errline),
             $this->utilities
         );
+    }
+    
+    /**
+     * Fetches the stack trace for fatal and regular errors.
+     * 
+     * @var string $errfile
+     * @var string $errline
+     *
+     * @return Rollbar\ErrorWrapper
+     */
+    protected function buildErrorTrace($errfile, $errline)
+    {
+        if ($this->captureErrorStacktraces) {
+            
+            $backTrace = $this->fetchErrorTrace();
+            
+            $backTrace = $this->stripShutdownFrames($backTrace);
+            
+            // Add the final frame
+            array_unshift(
+                $backTrace,
+                array('file' => $errfile, 'line' => $errline)
+            );
+            
+        } else {
+            $backTrace = array();
+        }
+        
+        return $backTrace;
+    }
+    
+    private function fetchErrorTrace()
+    {
+        if (function_exists('xdebug_get_function_stack')) {
+            return array_reverse(\xdebug_get_function_stack());
+        } else {
+            return debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS);
+        }
+    }
+    
+    private function stripShutdownFrames($backTrace)
+    {
+        foreach ($backTrace as $index => $frame) {
+            
+            extract($frame);
+            
+            if ( (isset($method) && $method === 'Rollbar\\Rollbar::fatalHandler') ||
+                 (isset($class) && $class === 'Rollbar\\Rollbar' && isset($function) && $function === 'fatalHandler') ||
+                 (isset($method) && $method === 'Rollbar\\Rollbar::errorHandler') || 
+                 (isset($class) && $class === 'Rollbar\\Rollbar' && isset($function) && $function === 'errorHandler') ) {
+                     
+                return array_slice($backTrace, $index+1);
+                
+            }
+            
+        }
+        
+        return $backTrace;
     }
 }
