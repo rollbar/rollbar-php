@@ -28,10 +28,11 @@ abstract class AbstractHandler
     }
     
     public function handle(
-        $errno = null, 
-        $errstr = null, 
-        $errfile = null, 
-        $errline = null
+        $arg1 = null,
+        $arg2 = null,
+        $arg3 = null,
+        $arg4 = null,
+        $arg5 = null
     ) {
         if (!$this->registered()) {
             throw new \Exception(static::class . ' has not been set up.');
@@ -42,5 +43,4 @@ abstract class AbstractHandler
     {
         $this->registered = true;
     }
-    
 }

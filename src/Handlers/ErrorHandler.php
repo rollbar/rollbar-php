@@ -15,13 +15,19 @@ class ErrorHandler extends AbstractHandler
     }
     
     public function handle(
-        $errno = null, 
-        $errstr = null, 
-        $errfile = null, 
-        $errline = null
-    ) {   
+        $arg1 = null,
+        $arg2 = null,
+        $arg3 = null,
+        $arg4 = null,
+        $arg5 = null
+    ) {
         
-        parent::handle($errno, $errstr, $errfile, $errline);
+        parent::handle($arg1, $arg2, $arg3, $arg4, $arg5);
+        
+        $errno = $arg1;
+        $errstr = $arg2;
+        $errfile = $arg3;
+        $errline = $arg4;
         
         if (is_null($this->logger())) {
             return false;
@@ -30,7 +36,7 @@ class ErrorHandler extends AbstractHandler
             return false;
         }
 
-        $exception = $this->logger->
+        $exception = $this->logger()->
                             getDataBuilder()->
                             generateErrorWrapper($errno, $errstr, $errfile, $errline);
 
@@ -48,5 +54,4 @@ class ErrorHandler extends AbstractHandler
         
         return false;
     }
-    
 }

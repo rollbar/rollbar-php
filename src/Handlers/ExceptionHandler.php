@@ -15,15 +15,16 @@ class ExceptionHandler extends AbstractHandler
     }
     
     public function handle(
-        $errno = null, 
-        $errstr = null, 
-        $errfile = null, 
-        $errline = null
-    ) {   
+        $arg1 = null,
+        $arg2 = null,
+        $arg3 = null,
+        $arg4 = null,
+        $arg5 = null
+    ) {
         
-        parent::handle();
+        parent::handle($arg1, $arg2, $arg3, $arg4, $arg5);
         
-        $exception = $errno;
+        $exception = $arg1;
         
         $this->logger()->log(Level::ERROR, $exception, array(), true);
         if ($this->previousHandler) {
@@ -33,7 +34,5 @@ class ExceptionHandler extends AbstractHandler
         }
 
         throw $exception;
-        
     }
-    
 }
