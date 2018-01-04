@@ -258,7 +258,7 @@ class Rollbar
      */
     public static function report_fatal_error()
     {
-        self::fatalHandler();
+        self::$fatalHandler->handle($errno, $errstr, $errfile, $errline);
     }
 
 
@@ -269,7 +269,7 @@ class Rollbar
      */
     public static function report_php_error($errno, $errstr, $errfile, $errline)
     {
-        self::errorHandler($errno, $errstr, $errfile, $errline);
+        self::$errorHandler->handle($errno, $errstr, $errfile, $errline);
         return false;
     }
 
