@@ -1,6 +1,9 @@
 <?php namespace Rollbar;
 
 use Rollbar\Payload\Level;
+use Rollbar\Handlers\FatalHandler;
+use Rollbar\Handlers\ErrorHandler;
+use Rollbar\Handlers\ExceptionHandler;
 
 class Rollbar
 {
@@ -8,8 +11,10 @@ class Rollbar
      * @var RollbarLogger
      */
     private static $logger = null;
-    private static $previousExceptionHandler = null;
-    private static $fatalErrors = array(E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR);
+    
+    private static $fatalHandler = null;
+    private static $errorHandler = null;
+    private static $exceptionHandler = null;
 
     public static function init(
         $configOrLogger,
@@ -83,23 +88,6 @@ class Rollbar
         return self::$logger->scope($config);
     }
 
-    public static function setupExceptionHandling()
-    {
-        self::$previousExceptionHandler = set_exception_handler('Rollbar\Rollbar::exceptionHandler');
-    }
-    
-    public static function exceptionHandler($exception)
-    {
-        self::log(Level::ERROR, $exception, array(), true);
-        if (self::$previousExceptionHandler) {
-            restore_exception_handler();
-            call_user_func(self::$previousExceptionHandler, $exception);
-            return;
-        }
-
-        throw $exception;
-    }
-
     public static function log($level, $toLog, $extra = array())
     {
         if (is_null(self::$logger)) {
@@ -147,68 +135,23 @@ class Rollbar
     {
         return self::log(Level::EMERGENCY, $toLog, $extra);
     }
+
+    public static function setupExceptionHandling()
+    {
+        self::$exceptionHandler = new ExceptionHandler(self::$logger);
+        self::$exceptionHandler->register();
+    }
     
     public static function setupErrorHandling()
     {
-        set_error_handler('Rollbar\Rollbar::errorHandler');
-    }
-
-    public static function errorHandler($errno, $errstr, $errfile, $errline)
-    {
-        if (is_null(self::$logger)) {
-            return false;
-        }
-        if (self::$logger->shouldIgnoreError($errno)) {
-            return false;
-        }
-
-        $exception = self::generateErrorWrapper($errno, $errstr, $errfile, $errline);
-        self::$logger->log(Level::ERROR, $exception, array(), true);
-        return false;
+        self::$errorHandler = new ErrorHandler(self::$logger);
+        self::$errorHandler->register();
     }
 
     public static function setupFatalHandling()
     {
-        register_shutdown_function('Rollbar\Rollbar::fatalHandler');
-    }
-
-    public static function fatalHandler()
-    {
-        
-        if (is_null(self::$logger)) {
-            return;
-        }
-        $last_error = error_get_last();
-        
-        if (self::shouldLogFatal($last_error)) {
-            $errno = $last_error['type'];
-            $errstr = $last_error['message'];
-            $errfile = $last_error['file'];
-            $errline = $last_error['line'];
-            $exception = self::generateErrorWrapper($errno, $errstr, $errfile, $errline);
-            self::$logger->log(Level::CRITICAL, $exception, array(), true);
-        }
-    }
-    
-    protected static function shouldLogFatal($last_error)
-    {
-        return
-            !is_null($last_error) &&
-            in_array($last_error['type'], self::$fatalErrors, true) &&
-            // don't log uncaught exceptions as they were handled by exceptionHandler()
-            !(isset($last_error['message']) &&
-              strpos($last_error['message'], 'Uncaught') === 0);
-    }
-
-    private static function generateErrorWrapper($errno, $errstr, $errfile, $errline)
-    {
-        if (null === self::$logger) {
-            return;
-        }
-        
-        $dataBuilder = self::$logger->getDataBuilder();
-        
-        return $dataBuilder->generateErrorWrapper($errno, $errstr, $errfile, $errline);
+        self::$fatalHandler = new FatalHandler(self::$logger);
+        self::$fatalHandler->register();
     }
 
     private static function getNotInitializedResponse()
