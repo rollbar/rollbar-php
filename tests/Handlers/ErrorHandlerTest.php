@@ -21,10 +21,11 @@ class ErrorHandlerTest extends BaseRollbarTest
     {
         $testCase = $this;
         
-        set_error_handler(function() use ($testCase) {
+        set_error_handler(function () use ($testCase) {
             
             $testCase->assertTrue(true, "Previous error handler invoked.");
             
+            set_error_handler(null);
         });
         
         Rollbar::init(self::$simpleConfig);
@@ -45,7 +46,6 @@ class ErrorHandlerTest extends BaseRollbarTest
         $handler->register();
         
         trigger_error(E_USER_ERROR);
-        
     }
     
     public function testHandle()
