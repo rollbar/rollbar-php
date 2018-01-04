@@ -188,6 +188,9 @@ class RollbarTest extends BaseRollbarTest
     
     public function testBackwardsSimpleError()
     {
+        set_error_handler(function () {
+        }); // disable PHPUnit's error handler
+        
         Rollbar::init(self::$simpleConfig);
         
         $result = Rollbar::report_php_error(E_ERROR, "Runtime error", "the_file.php", 1);
@@ -215,20 +218,6 @@ class RollbarTest extends BaseRollbarTest
 
         Rollbar::flush();
         $this->assertTrue(true);
-    }
-
-    public function testExceptionHandler($exception = null)
-    {
-        if ($exception) {
-            $backtrace = debug_backtrace();
-            $this->assertEquals('exceptionHandler', $backtrace[2]['function']);
-            return;
-        }
-        set_exception_handler(array($this, 'testExceptionHandler'));
-        Rollbar::setupExceptionHandling();
-        Rollbar::exceptionHandler(new \Exception());
-        $handler = set_exception_handler('Rollbar\Rollbar::exceptionHandler');
-        $this->assertEquals('testExceptionHandler', $handler[1]);
     }
     
     public function testConfigure()
