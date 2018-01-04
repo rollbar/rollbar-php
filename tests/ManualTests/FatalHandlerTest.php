@@ -15,16 +15,7 @@ require __DIR__ . '/bootstrap.php';
 use \Rollbar\Rollbar;
 use \Rollbar\Payload\Level;
 
-/**
- * Uncomment one of the following test cases to run the test.
- */
- 
 $token = 'ad865e76e7fb496fab096ac07b1dbabb';
-
-/**
- * WARNING! Enabling this test might break other PHPUnit tests. When you're done,
- * make sure all of the below methods are commented out.
- */
 
 fatalError($token);
 
