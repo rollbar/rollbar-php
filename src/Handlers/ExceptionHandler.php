@@ -14,10 +14,16 @@ class ExceptionHandler extends AbstractHandler
         parent::register();
     }
     
-    public function handle($exception)
-    {   
+    public function handle(
+        $errno = null, 
+        $errstr = null, 
+        $errfile = null, 
+        $errline = null
+    ) {   
         
         parent::handle();
+        
+        $exception = $errno;
         
         $this->logger()->log(Level::ERROR, $exception, array(), true);
         if ($this->previousHandler) {
