@@ -521,7 +521,7 @@ class DataBuilderTest extends BaseRollbarTest
             'utilities' => new Utilities
         ));
         $output = $dataBuilder->getExceptionTrace(new \Exception())->getFrames();
-        $this->assertNotEmpty($output[count($output)-2]->getContext());
+        $this->assertNotEmpty($output[count($output)-1]->getContext());
     }
 
     public function testFramesWithoutContext()
