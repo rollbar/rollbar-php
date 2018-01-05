@@ -21,15 +21,10 @@ class FatalHandler extends AbstractHandler
         parent::register();
     }
     
-    public function handle(
-        $arg1 = null,
-        $arg2 = null,
-        $arg3 = null,
-        $arg4 = null,
-        $arg5 = null
-    ) {
+    public function handle()
+    {
         
-        parent::handle($arg1, $arg2, $arg3, $arg4, $arg5);
+        parent::handle();
         
         if (is_null($this->logger())) {
             return;
@@ -37,6 +32,7 @@ class FatalHandler extends AbstractHandler
         $lastError = error_get_last();
         
         if ($this->isFatal($lastError)) {
+            
             $errno = $lastError['type'];
             $errstr = $lastError['message'];
             $errfile = $lastError['file'];
@@ -48,13 +44,14 @@ class FatalHandler extends AbstractHandler
                                 
             $this->logger()->log(Level::CRITICAL, $exception, array(), true);
         }
+        
     }
     
     /**
      * Check if the error triggered is indeed a fatal error.
-     *
+     * 
      * @var array $lastError Information fetched from error_get_last().
-     *
+     * 
      * @return bool
      */
     protected function isFatal($lastError)
@@ -66,4 +63,5 @@ class FatalHandler extends AbstractHandler
             !(isset($lastError['message']) &&
               strpos($lastError['message'], 'Uncaught') === 0);
     }
+    
 }

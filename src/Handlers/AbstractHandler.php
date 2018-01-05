@@ -27,13 +27,8 @@ abstract class AbstractHandler
         return $this->registered;
     }
     
-    public function handle(
-        $arg1 = null,
-        $arg2 = null,
-        $arg3 = null,
-        $arg4 = null,
-        $arg5 = null
-    ) {
+    public function handle()
+    {
         if (!$this->registered()) {
             throw new \Exception(static::class . ' has not been set up.');
         }
@@ -43,4 +38,5 @@ abstract class AbstractHandler
     {
         $this->registered = true;
     }
+    
 }

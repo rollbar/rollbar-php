@@ -14,17 +14,21 @@ class ExceptionHandler extends AbstractHandler
         parent::register();
     }
     
-    public function handle(
-        $arg1 = null,
-        $arg2 = null,
-        $arg3 = null,
-        $arg4 = null,
-        $arg5 = null
-    ) {
+    public function handle()
+    {   
         
-        parent::handle($arg1, $arg2, $arg3, $arg4, $arg5);
+        parent::handle();
         
-        $exception = $arg1;
+        /**
+         * Overloading methods with different parameters is not supported in PHP
+         * through language structures. This hack allows to simulate that.
+         */
+        $args = func_get_args();
+        if (!isset($args[0])) {
+            throw new \Exception('No exception to be passed to the exception handler.');
+        } else {
+            $exception = $args[0];
+        }
         
         $this->logger()->log(Level::ERROR, $exception, array(), true);
         if ($this->previousHandler) {
@@ -34,5 +38,7 @@ class ExceptionHandler extends AbstractHandler
         }
 
         throw $exception;
+        
     }
+    
 }
