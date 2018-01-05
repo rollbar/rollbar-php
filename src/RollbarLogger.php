@@ -19,6 +19,26 @@ class RollbarLogger extends AbstractLogger
         $this->truncation = new Truncation();
         $this->queue = array();
     }
+    
+    public function enable()
+    {
+        return $this->config->enable();
+    }
+    
+    public function disable()
+    {
+        return $this->config->disable();
+    }
+    
+    public function enabled()
+    {
+        return $this->config->enabled();
+    }
+    
+    public function disabled()
+    {
+        return $this->config->disabled();
+    }
 
     public function configure(array $config)
     {

@@ -1,6 +1,7 @@
 <?php namespace Rollbar;
 
 use Rollbar\Rollbar;
+use Rollbar\Payload\Payload;
 use Rollbar\Payload\Level;
 
 /**
@@ -187,6 +188,9 @@ class RollbarTest extends BaseRollbarTest
     
     public function testBackwardsSimpleError()
     {
+        set_error_handler(function () {
+        }); // disable PHPUnit's error handler
+        
         Rollbar::init(self::$simpleConfig);
         
         $result = Rollbar::report_php_error(E_ERROR, "Runtime error", "the_file.php", 1);
@@ -215,18 +219,48 @@ class RollbarTest extends BaseRollbarTest
         Rollbar::flush();
         $this->assertTrue(true);
     }
-
-    public function testExceptionHandler($exception = null)
+    
+    public function testConfigure()
     {
-        if ($exception) {
-            $backtrace = debug_backtrace();
-            $this->assertEquals('exceptionHandler', $backtrace[2]['function']);
-            return;
-        }
-        set_exception_handler(array($this, 'testExceptionHandler'));
-        Rollbar::setupExceptionHandling();
-        Rollbar::exceptionHandler(new \Exception());
-        $handler = set_exception_handler('Rollbar\Rollbar::exceptionHandler');
-        $this->assertEquals('testExceptionHandler', $handler[1]);
+        $expected = 'expectedEnv';
+        
+        Rollbar::init(self::$simpleConfig);
+        
+        // functionality under test
+        Rollbar::configure(array(
+            'environment' => $expected
+        ));
+        
+        // assertion
+        $logger = Rollbar::logger();
+        $dataBuilder = $logger->getDataBuilder();
+        $data = $dataBuilder->makeData(Level::ERROR, "testing", array());
+        $payload = new Payload($data, self::$simpleConfig['access_token']);
+        
+        $this->assertEquals($expected, $payload->getData()->getEnvironment());
+    }
+    
+    public function testEnable()
+    {
+        Rollbar::init(self::$simpleConfig);
+        $this->assertTrue(Rollbar::enabled());
+        
+        Rollbar::disable();
+        $this->assertTrue(Rollbar::disabled());
+        
+        Rollbar::enable();
+        $this->assertTrue(Rollbar::enabled());
+        
+        Rollbar::init(array_merge(
+            self::$simpleConfig,
+            array('enabled' => false)
+        ));
+        $this->assertTrue(Rollbar::disabled());
+        
+        Rollbar::configure(array('enabled' => true));
+        $this->assertTrue(Rollbar::enabled());
+        
+        Rollbar::configure(array('enabled' => false));
+        $this->assertTrue(Rollbar::disabled());
     }
 }

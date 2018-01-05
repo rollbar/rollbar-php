@@ -65,7 +65,7 @@ Add `rollbar/rollbar` to your `composer.json`:
 ```json
 {
     "require": {
-        "rollbar/rollbar": "~1.1"
+        "rollbar/rollbar": "^1"
     }
 }
 ```
@@ -314,6 +314,7 @@ Also you will have to install a suggested package `fluent/logger`.
 All of the following options can be passed as keys in the `$config` array.
 
   <dl>
+	
 <dt>access_token
 </dt>
 <dd>Your project access token.
@@ -400,10 +401,25 @@ Rollbar::init($config);
 Default: `null`
 </dd>
 
+<dt>custom
+</dt>
+<dd>An array of key/value pairs which will be merged with the custom data in the final payload of
+all items sent to Rollbar. This allows for custom data to be added globally to all payloads. Any key
+in this array which is also present in the custom data passed to a log/debug/error/... call will
+have the value of the latter.
+</dd>
+
 <dt>enable_utf8_sanitization
 </dt>
 <dd>set to false, to disable running iconv on the payload, may be needed if there is invalid characters, and the payload is being destroyed
 
+Default: `true`
+</dd>
+
+<dt>enabled
+</dt>
+<dd>Enable or disable Rollbar in your project. This can be changed at runtime with `Rollbar::enable()` and `Rollbar::disable()` or through `Rollbar::configure()`.
+	
 Default: `true`
 </dd>
 
@@ -412,14 +428,6 @@ Default: `true`
 <dd>Environment name, e.g. `'production'` or `'development'`
 
 Default: `'production'`
-</dd>
-
-<dt>custom
-</dt>
-<dd>An array of key/value pairs which will be merged with the custom data in the final payload of
-all items sent to Rollbar. This allows for custom data to be added globally to all payloads. Any key
-in this array which is also present in the custom data passed to a log/debug/error/... call will
-have the value of the latter.
 </dd>
 
 <dt>error_sample_rates
