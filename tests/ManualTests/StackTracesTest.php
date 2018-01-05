@@ -3,10 +3,10 @@
 /**
  * The following test file is used to check how the stack frames are built
  * when reporting different scenarios with Rollbar.
- * 
+ *
  * This can not be a part of the PHPUnit test suite since PHPUnit doesn't
  * support testing shutdown functions and exceptions handlers well.
- * 
+ *
  * This is tightly related to https://github.com/rollbar/rollbar-php/issues/292.
  */
 
@@ -29,27 +29,27 @@ $token = 'ad865e76e7fb496fab096ac07b1dbabb';
 
 /**
  * Results
- * 
+ *
  * x - passing
  * o - failing
- * 
+ *
  * 5X - PHP 5 with Xdebug
  * 5noX - PHP 5 without Xdebug
  * 7X - PHP 7 with Xdebug
  * 7noX - PHP 7 without Xdebug
- * 
+ *
  *                  |5X |5noX   |7X |7noX
  * ---------------------------------------
  * nestedException  |x  |x      |x  |x
  * fatalError       |x  |x      |x  |x
  * warning          |x  |x      |x  |x
  * andrewsExample   |x  |x      |x  |x
- * 
+ *
  */
 
 /**
  * Andrew's example (https://github.com/rollbar/rollbar-php/issues/292)
- * 
+ *
  * This logs a double record in Rollbar dashboard. One triggered by errorHandler,
  * the other by fatalHandler.
  */
@@ -63,23 +63,25 @@ function andrewsExample($token)
         )
     );
     
-    function something() {
-      somethingElse();
+    function something()
+    {
+        somethingElse();
     }
     
-    function somethingElse() {
-      trigger_error("Oops!", E_USER_ERROR);
+    function somethingElse()
+    {
+        trigger_error("Oops!", E_USER_ERROR);
     }
     
     something();
 }
 
-/** 
+/**
  * Trigger a fatal error.
- * 
+ *
  * On PHP 7+ this is treated as an exception and thus handled by the exception
  * handler.
- * 
+ *
  * On PHP 5 this is treated as a fatal error and handled by the fatal handler.
  */
 function fatalError($token)
@@ -93,11 +95,13 @@ function fatalError($token)
     );
     
     
-    function something() {
-      somethingElse();
+    function something()
+    {
+        somethingElse();
     }
     
-    function somethingElse() {
+    function somethingElse()
+    {
         $null = null;
         $null->noMethod();
     }
@@ -119,11 +123,13 @@ function nestedException($token)
     );
     
     
-    function something() {
-      somethingElse();
+    function something()
+    {
+        somethingElse();
     }
     
-    function somethingElse() {
+    function somethingElse()
+    {
         throw new \Exception();
     }
     
@@ -145,14 +151,15 @@ function warning($token)
     );
     
     
-    function something() {
-      somethingElse();
+    function something()
+    {
+        somethingElse();
     }
     
-    function somethingElse() {
+    function somethingElse()
+    {
         require("No file");
     }
     
     something();
-    
 }

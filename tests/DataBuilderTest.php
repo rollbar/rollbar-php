@@ -475,9 +475,9 @@ class DataBuilderTest extends BaseRollbarTest
     /**
      * The purpose of this method is to provide a frame with an expected
      * argument in testExceptionTraceArguments.
-     * 
+     *
      * @param string $message Argument expected in the last frame of the trace
-     * 
+     *
      * @return \Exception
      */
     private function exceptionTraceArgsHelper($message)

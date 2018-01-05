@@ -484,11 +484,10 @@ class DataBuilder implements DataBuilderInterface
         if ($exc instanceof ErrorWrapper) {
             return $exc->getBacktrace();
         } else {
-            
             $trace = $exc->getTrace();
             
             // Add the Exception's file and line as the last frame of the trace
-            array_unshift($trace,  array('file' => $exc->getFile(), 'line' => $exc->getLine()));
+            array_unshift($trace, array('file' => $exc->getFile(), 'line' => $exc->getLine()));
             
             return $trace;
         }
@@ -1006,7 +1005,7 @@ class DataBuilder implements DataBuilderInterface
     
     /**
      * Fetches the stack trace for fatal and regular errors.
-     * 
+     *
      * @var string $errfile
      * @var string $errline
      *
@@ -1015,7 +1014,6 @@ class DataBuilder implements DataBuilderInterface
     protected function buildErrorTrace($errfile, $errline)
     {
         if ($this->captureErrorStacktraces) {
-            
             $backTrace = $this->fetchErrorTrace();
             
             $backTrace = $this->stripShutdownFrames($backTrace);
@@ -1025,7 +1023,6 @@ class DataBuilder implements DataBuilderInterface
                 $backTrace,
                 array('file' => $errfile, 'line' => $errline)
             );
-            
         } else {
             $backTrace = array();
         }
@@ -1045,18 +1042,14 @@ class DataBuilder implements DataBuilderInterface
     private function stripShutdownFrames($backTrace)
     {
         foreach ($backTrace as $index => $frame) {
-            
             extract($frame);
             
-            if ( (isset($method) && $method === 'Rollbar\\Rollbar::fatalHandler') ||
+            if ((isset($method) && $method === 'Rollbar\\Rollbar::fatalHandler') ||
                  (isset($class) && $class === 'Rollbar\\Rollbar' && isset($function) && $function === 'fatalHandler') ||
-                 (isset($method) && $method === 'Rollbar\\Rollbar::errorHandler') || 
+                 (isset($method) && $method === 'Rollbar\\Rollbar::errorHandler') ||
                  (isset($class) && $class === 'Rollbar\\Rollbar' && isset($function) && $function === 'errorHandler') ) {
-                     
                 return array_slice($backTrace, $index+1);
-                
             }
-            
         }
         
         return $backTrace;
