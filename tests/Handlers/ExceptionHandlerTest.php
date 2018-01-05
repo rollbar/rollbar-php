@@ -21,16 +21,17 @@ class ExceptionHandlerTest extends BaseRollbarTest
     /**
      * It's impossible to throw an uncaught exception with PHPUnit and thus
      * trigger the exception handler automatically. To overcome this limitation,
-     * this test invokes the handle() methd manually with an assertion in the
+     * this test invokes the handle() methd manually with an assertion in the 
      * previously set exception handler.
      */
     public function testPreviousExceptionHandler()
     {
         $testCase = $this;
         
-        set_exception_handler(function () use ($testCase) {
+        set_exception_handler(function() use ($testCase) {
             
             $testCase->assertTrue(true, "Previous exception handler invoked.");
+            
         });
         
         $handler = new ExceptionHandler(new RollbarLogger(self::$simpleConfig));
@@ -60,6 +61,7 @@ class ExceptionHandlerTest extends BaseRollbarTest
         $setExceptionHandler = set_exception_handler(null);
         
         $setExceptionHandler(null);
+        
     }
     
     /**
@@ -68,7 +70,7 @@ class ExceptionHandlerTest extends BaseRollbarTest
      * expected with an unhandled exception. Unfortunately, for some reason,
      * this doesn't happen when you run the full TestSuite. That's why
      * there is no expectedException here.
-     *
+     * 
      * @expectedException \Exception
      */
     public function testHandle()

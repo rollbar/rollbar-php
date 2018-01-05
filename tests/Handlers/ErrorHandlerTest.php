@@ -58,9 +58,20 @@ class ErrorHandlerTest extends BaseRollbarTest
         $logger->expects($this->once())
                 ->method('log');
         
+        /**
+         * Disable PHPUnit's error handler as it would get triggered as the
+         * previously set error handler. No need for that here.
+         */
+        $phpunitHandler = set_error_handler(null);
+        
         $handler = new ErrorHandler($logger);
         $handler->register();
         
-        $handler->handle();
+        $handler->handle(E_USER_ERROR, "", "", "");
+        
+        /**
+         * Clean up the error handler set up for this test.
+         */
+        set_error_handler($phpunitHandler);
     }
 }
