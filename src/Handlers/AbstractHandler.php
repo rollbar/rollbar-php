@@ -38,5 +38,4 @@ abstract class AbstractHandler
     {
         $this->registered = true;
     }
-    
 }

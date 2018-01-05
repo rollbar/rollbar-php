@@ -15,21 +15,21 @@ class ErrorHandler extends AbstractHandler
     }
     
     public function handle()
-    { 
+    {
         /**
          * Overloading methods with different parameters is not supported in PHP
          * through language structures. This hack allows to simulate that.
          */
         $args = func_get_args();
+        
         if (!isset($args[0]) || !isset($args[1])) {
             throw new \Exception('No $errno or $errstr to be passed to the error handler.');
-        } else {
-            $errno = $args[0];
-            $errstr = $args[1];
         }
+        
+        $errno = $args[0];
+        $errstr = $args[1];
         $errfile = isset($args[2]) ? $args[2] : null;
         $errline = isset($args[3]) ? $args[3] : null;
-        $errcontext = isset($args[4]) ? $args[4] : null;
         
         parent::handle();
         
@@ -58,5 +58,4 @@ class ErrorHandler extends AbstractHandler
         
         return false;
     }
-    
 }

@@ -15,7 +15,7 @@ class ExceptionHandler extends AbstractHandler
     }
     
     public function handle()
-    {   
+    {
         
         parent::handle();
         
@@ -24,11 +24,12 @@ class ExceptionHandler extends AbstractHandler
          * through language structures. This hack allows to simulate that.
          */
         $args = func_get_args();
+        
         if (!isset($args[0])) {
             throw new \Exception('No exception to be passed to the exception handler.');
-        } else {
-            $exception = $args[0];
         }
+        
+        $exception = $args[0];
         
         $this->logger()->log(Level::ERROR, $exception, array(), true);
         if ($this->previousHandler) {
@@ -38,7 +39,5 @@ class ExceptionHandler extends AbstractHandler
         }
 
         throw $exception;
-        
     }
-    
 }

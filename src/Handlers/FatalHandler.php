@@ -32,7 +32,6 @@ class FatalHandler extends AbstractHandler
         $lastError = error_get_last();
         
         if ($this->isFatal($lastError)) {
-            
             $errno = $lastError['type'];
             $errstr = $lastError['message'];
             $errfile = $lastError['file'];
@@ -44,14 +43,13 @@ class FatalHandler extends AbstractHandler
                                 
             $this->logger()->log(Level::CRITICAL, $exception, array(), true);
         }
-        
     }
     
     /**
      * Check if the error triggered is indeed a fatal error.
-     * 
+     *
      * @var array $lastError Information fetched from error_get_last().
-     * 
+     *
      * @return bool
      */
     protected function isFatal($lastError)
@@ -63,5 +61,4 @@ class FatalHandler extends AbstractHandler
             !(isset($lastError['message']) &&
               strpos($lastError['message'], 'Uncaught') === 0);
     }
-    
 }
