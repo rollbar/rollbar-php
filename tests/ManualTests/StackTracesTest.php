@@ -10,7 +10,7 @@
  * This is tightly related to https://github.com/rollbar/rollbar-php/issues/292.
  */
 
-require __DIR__ . '/vendor/autoload.php';
+require __DIR__ . '/../../vendor/autoload.php';
 error_reporting(E_ALL);
 
 use \Rollbar\Rollbar;
@@ -20,10 +20,10 @@ use \Rollbar\Payload\Level;
  * Uncomment one of the following test cases to run the test.
  */
  
-$token = 'ad865e76e7fb496fab096ac07b1dbabb';
+$token = 'eb2561a52efb4d4bba5a1d4b68be13e9';
  
 // nestedException($token);
-// fatalError($token);
+fatalError($token);
 // warning($token);
 // andrewsExample($token);
 
@@ -40,10 +40,10 @@ $token = 'ad865e76e7fb496fab096ac07b1dbabb';
  *
  *                  |5X |5noX   |7X |7noX
  * ---------------------------------------
- * nestedException  |x  |x      |x  |x
- * fatalError       |x  |x      |x  |x
- * warning          |x  |x      |x  |x
- * andrewsExample   |x  |x      |x  |x
+ * nestedException  |o  |o      |o  |o
+ * fatalError       |x  |o      |o  |o
+ * warning          |o  |o      |o  |o
+ * andrewsExample   |o  |o      |o  |o
  *
  */
 
