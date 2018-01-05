@@ -20,10 +20,10 @@ use \Rollbar\Payload\Level;
  * Uncomment one of the following test cases to run the test.
  */
  
-$token = 'eb2561a52efb4d4bba5a1d4b68be13e9';
+$token = 'ad865e76e7fb496fab096ac07b1dbabb';
  
 // nestedException($token);
-fatalError($token);
+// fatalError($token);
 // warning($token);
 // andrewsExample($token);
 
@@ -41,9 +41,9 @@ fatalError($token);
  *                  |5X |5noX   |7X |7noX
  * ---------------------------------------
  * nestedException  |o  |o      |o  |o
- * fatalError       |x  |o      |o  |o
- * warning          |o  |o      |o  |o
- * andrewsExample   |o  |o      |o  |o
+ * fatalError       |x  |x      |x  |x
+ * warning          |x  |x      |x  |x
+ * andrewsExample   |x  |x      |x  |x
  *
  */
 
