@@ -4,6 +4,10 @@ use \Rollbar\Rollbar;
 use \Rollbar\RollbarLogger;
 use \Rollbar\BaseRollbarTest;
 
+/**
+ * TODO: consider using $this->useErrorHandler to deal with stopping the
+ * PHPUnit's error handler instead of set_error_handler()
+ */
 class ErrorHandlerTest extends BaseRollbarTest
 {
     public function __construct()
@@ -62,7 +66,8 @@ class ErrorHandlerTest extends BaseRollbarTest
          * Disable PHPUnit's error handler as it would get triggered as the
          * previously set error handler. No need for that here.
          */
-        $phpunitHandler = set_error_handler(null);
+        $phpunitHandler = set_error_handler(function () {
+        });
         
         $handler = new ErrorHandler($logger);
         $handler->register();
