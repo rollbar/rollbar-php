@@ -30,7 +30,7 @@ abstract class AbstractHandler
     public function handle()
     {
         if (!$this->registered()) {
-            throw new \Exception(static::class . ' has not been set up.');
+            throw new \Exception(get_class($this) . ' has not been set up.');
         }
     }
     
