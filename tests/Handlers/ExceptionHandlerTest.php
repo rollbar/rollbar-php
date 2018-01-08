@@ -59,7 +59,7 @@ class ExceptionHandlerTest extends BaseRollbarTest
         
         $setExceptionHandler = set_exception_handler(null);
         
-        $setExceptionHandler(null);
+        call_user_func($setExceptionHandler, null);
     }
     
     /**
