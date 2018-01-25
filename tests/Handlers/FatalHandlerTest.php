@@ -39,7 +39,10 @@ class FatalHandlerTest extends BaseRollbarTest
                     "'Rollbar\ErrorWrapper' with message 'Call to a member ".
                     "function noMethod() on null'";
                     
-        $this->assertTrue(strpos($stdOut, $expected) !== false);
+        $this->assertTrue(
+            strpos($stdOut, $expected) !== false,
+            'Failed asserting that the fatal error has triggered a log entry.'
+        );
     }
     
     /**
