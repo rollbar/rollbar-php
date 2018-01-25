@@ -4,15 +4,19 @@ use \Rollbar\Rollbar;
 use \Rollbar\RollbarLogger;
 use \Rollbar\BaseRollbarTest;
 
+/**
+ * TODO: consider using $this->useErrorHandler to deal with stopping the
+ * PHPUnit's error handler instead of set_error_handler()
+ */
 class ErrorHandlerTest extends BaseRollbarTest
 {
-    public function __construct()
+    public function __construct($name = null, $data = array(), $dataName = null)
     {
         self::$simpleConfig['access_token'] = $this->getTestAccessToken();
         self::$simpleConfig['included_errno'] = E_ALL;
         self::$simpleConfig['environment'] = 'test';
         
-        parent::__construct();
+        parent::__construct($name, $data, $dataName);
     }
 
     private static $simpleConfig = array();
