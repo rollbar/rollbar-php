@@ -29,7 +29,8 @@ class FatalHandlerTest extends BaseRollbarTest
         
         $errors = $result->errors();
         
-        $stdOut = $errors[0]->thrownException()->getTrace()[0]['args'][2];
+        $trace = $errors[0]->thrownException()->getTrace();
+        $stdOut = $trace['args'][2];
         
         /**
          * Assert that the standard output contains the log message generated
@@ -67,7 +68,7 @@ class FatalHandlerTest extends BaseRollbarTest
      * testRegisterAndHandle test. This way we can verify that the fatal handler
      * triggers the log() method of the provider logger.
      */
-    public function testHandleInternalPHP5()
+    public function handleInternalPHP5()
     {
         $logger = new StdOutLogger(self::$simpleConfig);
         
