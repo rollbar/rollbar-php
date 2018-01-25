@@ -58,7 +58,7 @@ class FatalHandlerTest extends BaseRollbarTest
         // if (version_compare(PHP_VERSION, '7', '<')) {
         //     $this->handleInternalPHP5();
         // }
-        handleInternalPHP5();
+        $this->handleInternalPHP5();
     }
     
     /**
@@ -67,7 +67,7 @@ class FatalHandlerTest extends BaseRollbarTest
      * testRegisterAndHandle test. This way we can verify that the fatal handler
      * triggers the log() method of the provider logger.
      */
-    public function handleInternalPHP5()
+    public function testHandleInternalPHP5()
     {
         $logger = new StdOutLogger(self::$simpleConfig);
         
