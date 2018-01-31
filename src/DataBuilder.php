@@ -1044,10 +1044,26 @@ class DataBuilder implements DataBuilderInterface
         foreach ($backTrace as $index => $frame) {
             extract($frame);
             
-            if ((isset($method) && $method === 'Rollbar\\Handlers\\FatalHandler::handle') ||
-                 (isset($class) && $class === 'Rollbar\\Handlers\\FatalHandler' && isset($function) && $function === 'handle') ||
-                 (isset($method) && $method === 'Rollbar\\Handlers\\ErrorHandler::handle') ||
-                 (isset($class) && $class === 'Rollbar\\Handlers\\ErrorHandler' && isset($function) && $function === 'handle') ) {
+            $fatalHandlerMethod = (isset($method)
+                                    && $method === 'Rollbar\\Handlers\\FatalHandler::handle');
+                                    
+            $fatalHandlerClassAndFunction = (isset($class)
+                                                && $class === 'Rollbar\\Handlers\\FatalHandler'
+                                                && isset($function)
+                                                && $function === 'handle');
+            
+            $errorHandlerMethod = (isset($method)
+                                    && $method === 'Rollbar\\Handlers\\ErrorHandler::handle');
+                                    
+            $errorHandlerClassAndFunction = (isset($class)
+                                                && $class === 'Rollbar\\Handlers\\ErrorHandler'
+                                                && isset($function)
+                                                && $function === 'handle');
+            
+            if ($fatalHandlerMethod ||
+                 $fatalHandlerClassAndFunction ||
+                 $errorHandlerMethod ||
+                 $errorHandlerClassAndFunction ) {
                 return array_slice($backTrace, $index+1);
             }
         }
