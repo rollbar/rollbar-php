@@ -406,26 +406,8 @@ class DataBuilderTest extends BaseRollbarTest
             'send_message_trace' => true
         ));
         $dataBuilder = $c->getDataBuilder();
-    
-        $result = $dataBuilder->makeData(Level::ERROR, 'testing', array());
-        $frames = $result->getBody()->getValue()->getBacktrace();
-        
-        $this->assertArrayNotHasKey(
-            'args',
-            $frames[0],
-            "Arguments in stack frames included when they should have not been."
-        );
-        
-        // Positive test
-        $c = new Config(array(
-            'access_token' => $this->getTestAccessToken(),
-            'environment' => 'tests',
-            'send_message_trace' => true,
-            'local_vars_dump' => true
-        ));
-        $dataBuilder = $c->getDataBuilder();
-    
         $expected = 'testing';
+    
         $result = $dataBuilder->makeData(Level::ERROR, $expected, array());
         $frames = $result->getBody()->getValue()->getBacktrace();
         
@@ -433,6 +415,24 @@ class DataBuilderTest extends BaseRollbarTest
             $expected,
             $frames[0]['args'][0],
             "Arguments in stack frames NOT included when they should be."
+        );
+        
+        // Positive test
+        $c = new Config(array(
+            'access_token' => $this->getTestAccessToken(),
+            'environment' => 'tests',
+            'send_message_trace' => true,
+            'local_vars_dump' => false
+        ));
+        $dataBuilder = $c->getDataBuilder();
+    
+        $result = $dataBuilder->makeData(Level::ERROR, $expected, array());
+        $frames = $result->getBody()->getValue()->getBacktrace();
+        
+        $this->assertArrayNotHasKey(
+            'args',
+            $frames[0],
+            "Arguments in stack frames included when they should have not been."
         );
     }
     
