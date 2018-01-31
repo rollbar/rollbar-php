@@ -66,6 +66,9 @@ class ExceptionHandlerTest extends BaseRollbarTest
         $handler->$method();
     }
     
+    /**
+     * @expectedException \Exception
+     */
     public function testHandle()
     {
         set_exception_handler(null);
