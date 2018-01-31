@@ -177,7 +177,7 @@ class Defaults
         $this->defaultIncludeCodeContext = false;
         $this->defaultIncludeExcCodeContext = false;
         $this->defaultRawRequestBody = false;
-        $this->defaultLocalVarsDump = false;
+        $this->defaultLocalVarsDump = true;
         $this->defaultCaptureErrorStacktraces = true;
         
         $this->utilities = $utilities;

@@ -597,7 +597,7 @@ Default: `false`
 <dt>local_vars_dump</dt>
 <dd>Should backtraces include arguments passed to stack frames.
 
-Default: `false`
+Default: `true`
 </dd>
 
 </dl>
