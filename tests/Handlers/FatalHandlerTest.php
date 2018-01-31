@@ -18,8 +18,18 @@ class FatalHandlerTest extends BaseRollbarTest
 
     private static $simpleConfig = array();
     
+    /**
+     * This is only applicable to PHP < 7. Fatal errors are thrown as Error-type
+     * exceptions starting from PHP 7 and thus will be handled by the exception
+     * handler. For older PHP, fatal errors need to be handled through the
+     * shutdown functions - this tests is.
+     */
     public function testRegisterAndHandle()
     {
+        if (version_compare(PHP_VERSION, '7', '>=')) {
+            $this->markTestSkipped("Fatal Errors are not used on PHP 7+.");
+        }
+        
         $test = new FatalHandlerTest('FatalHandlerTest');
         $test->setName('handleInternal');
         $test->setRunTestInSeparateProcess(true);
@@ -30,8 +40,6 @@ class FatalHandlerTest extends BaseRollbarTest
         $errors = $result->errors();
         
         $trace = $errors[0]->thrownException()->getTrace();
-        
-        $stdOut = $trace[0]['args'][2];
         
         /**
          * Assert that the standard output contains the log message generated
@@ -48,28 +56,12 @@ class FatalHandlerTest extends BaseRollbarTest
     }
     
     /**
-     * This only works on PHP 5.6. PHP 7+ converts errors to exceptions which
-     * results in error_get_last() returning null and not triggering $logger's
-     * log() method.
-     *
-     * TODO: I have to investigate if this is going to be a problem only for
-     * PHPUnit or is this going to affect the Rollbar PHP SDK itself.
-     */
-    public function handleInternal()
-    {
-        // if (version_compare(PHP_VERSION, '7', '<')) {
-        //     $this->handleInternalPHP5();
-        // }
-        $this->handleInternalPHP5();
-    }
-    
-    /**
      * Perform the test with a special StdOutLogger helper. Rollbar messages
      * will be printed to std out and later picked up for an assertion in
      * testRegisterAndHandle test. This way we can verify that the fatal handler
      * triggers the log() method of the provider logger.
      */
-    public function handleInternalPHP5()
+    public function handleInternal()
     {
         $logger = new StdOutLogger(self::$simpleConfig);
         
