@@ -1,1 +1,0 @@
-There are tests that are not part of the PHPUnit test suite.
