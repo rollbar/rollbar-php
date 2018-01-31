@@ -41,6 +41,8 @@ class FatalHandlerTest extends BaseRollbarTest
         
         $trace = $errors[0]->thrownException()->getTrace();
         
+        $stdOut = $trace[0]['args'][2];
+        
         /**
          * Assert that the standard output contains the log message generated
          * by StdOutLogger test helper used in handleInternal.
