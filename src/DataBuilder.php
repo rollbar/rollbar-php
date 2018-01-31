@@ -424,16 +424,11 @@ class DataBuilder implements DataBuilderInterface
     public function makeFrames($exception, $includeContext)
     {
         $frames = array();
+        
         foreach ($this->getTrace($exception) as $frameInfo) {
             $filename = isset($frameInfo['file']) ? $frameInfo['file'] : null;
-            if ($filename === null) {
-                $filename = $exception->getFile() ?: '<internal>';
-            }
             $lineno = isset($frameInfo['line']) ? $frameInfo['line'] : null;
-            if ($lineno === null) {
-                $lineno = $exception->getLine() ?: 0;
-            }
-            $method = $frameInfo['function'];
+            $method = isset($frameInfo['function']) ? $frameInfo['function'] : null;
             if (isset($frameInfo['class'])) {
                 $method = $frameInfo['class'] . "::" . $method;
             }
@@ -489,7 +484,12 @@ class DataBuilder implements DataBuilderInterface
         if ($exc instanceof ErrorWrapper) {
             return $exc->getBacktrace();
         } else {
-            return $exc->getTrace();
+            $trace = $exc->getTrace();
+            
+            // Add the Exception's file and line as the last frame of the trace
+            array_unshift($trace, array('file' => $exc->getFile(), 'line' => $exc->getLine()));
+            
+            return $trace;
         }
     }
 
@@ -993,18 +993,81 @@ class DataBuilder implements DataBuilderInterface
      */
     public function generateErrorWrapper($errno, $errstr, $errfile, $errline)
     {
-        if ($this->captureErrorStacktraces) {
-            $backTrace = debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS);
-        } else {
-            $backTrace = array();
-        }
         return new ErrorWrapper(
             $errno,
             $errstr,
             $errfile,
             $errline,
-            $backTrace,
+            $this->buildErrorTrace($errfile, $errline),
             $this->utilities
         );
+    }
+    
+    /**
+     * Fetches the stack trace for fatal and regular errors.
+     *
+     * @var string $errfile
+     * @var string $errline
+     *
+     * @return Rollbar\ErrorWrapper
+     */
+    protected function buildErrorTrace($errfile, $errline)
+    {
+        if ($this->captureErrorStacktraces) {
+            $backTrace = $this->fetchErrorTrace();
+            
+            $backTrace = $this->stripShutdownFrames($backTrace);
+            
+            // Add the final frame
+            array_unshift(
+                $backTrace,
+                array('file' => $errfile, 'line' => $errline)
+            );
+        } else {
+            $backTrace = array();
+        }
+        
+        return $backTrace;
+    }
+    
+    private function fetchErrorTrace()
+    {
+        if (function_exists('xdebug_get_function_stack')) {
+            return array_reverse(\xdebug_get_function_stack());
+        } else {
+            return debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS);
+        }
+    }
+    
+    private function stripShutdownFrames($backTrace)
+    {
+        foreach ($backTrace as $index => $frame) {
+            extract($frame);
+            
+            $fatalHandlerMethod = (isset($method)
+                                    && $method === 'Rollbar\\Handlers\\FatalHandler::handle');
+                                    
+            $fatalHandlerClassAndFunction = (isset($class)
+                                                && $class === 'Rollbar\\Handlers\\FatalHandler'
+                                                && isset($function)
+                                                && $function === 'handle');
+            
+            $errorHandlerMethod = (isset($method)
+                                    && $method === 'Rollbar\\Handlers\\ErrorHandler::handle');
+                                    
+            $errorHandlerClassAndFunction = (isset($class)
+                                                && $class === 'Rollbar\\Handlers\\ErrorHandler'
+                                                && isset($function)
+                                                && $function === 'handle');
+            
+            if ($fatalHandlerMethod ||
+                 $fatalHandlerClassAndFunction ||
+                 $errorHandlerMethod ||
+                 $errorHandlerClassAndFunction ) {
+                return array_slice($backTrace, $index+1);
+            }
+        }
+        
+        return $backTrace;
     }
 }

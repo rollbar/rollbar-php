@@ -11,7 +11,6 @@ class Rollbar
      * @var RollbarLogger
      */
     private static $logger = null;
-    
     private static $fatalHandler = null;
     private static $errorHandler = null;
     private static $exceptionHandler = null;

@@ -7,13 +7,13 @@ use \Rollbar\Handlers\ExceptionHandler;
 
 class ExceptionHandlerTest extends BaseRollbarTest
 {
-    public function __construct()
+    public function __construct($name = null, $data = array(), $dataName = null)
     {
         self::$simpleConfig['access_token'] = $this->getTestAccessToken();
         self::$simpleConfig['included_errno'] = E_ALL;
         self::$simpleConfig['environment'] = 'test';
         
-        parent::__construct();
+        parent::__construct($name, $data, $dataName);
     }
 
     private static $simpleConfig = array();
@@ -60,11 +60,19 @@ class ExceptionHandlerTest extends BaseRollbarTest
         $setExceptionHandler = set_exception_handler(function () {
         });
         
-        call_user_func($setExceptionHandler);
+        $handler = $setExceptionHandler[0];
+        $method = $setExceptionHandler[1];
+        
+        $handler->$method();
     }
     
+    /**
+     * @expectedException \Exception
+     */
     public function testHandle()
     {
+        set_exception_handler(null);
+        
         $logger = $this->getMockBuilder('Rollbar\\RollbarLogger')
                         ->setConstructorArgs(array(self::$simpleConfig))
                         ->setMethods(array('log'))
@@ -77,5 +85,8 @@ class ExceptionHandlerTest extends BaseRollbarTest
         $handler->register();
         
         $handler->handle(new \Exception());
+        
+        set_exception_handler(function () {
+        });
     }
 }

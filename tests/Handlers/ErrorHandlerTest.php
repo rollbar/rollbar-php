@@ -10,13 +10,13 @@ use \Rollbar\BaseRollbarTest;
  */
 class ErrorHandlerTest extends BaseRollbarTest
 {
-    public function __construct()
+    public function __construct($name = null, $data = array(), $dataName = null)
     {
         self::$simpleConfig['access_token'] = $this->getTestAccessToken();
         self::$simpleConfig['included_errno'] = E_ALL;
         self::$simpleConfig['environment'] = 'test';
         
-        parent::__construct();
+        parent::__construct($name, $data, $dataName);
     }
 
     private static $simpleConfig = array();

@@ -445,8 +445,8 @@ class DataBuilderTest extends BaseRollbarTest
             'levelFactory' => new LevelFactory,
             'utilities' => new Utilities
         ));
-        $ex = $this->exceptionTraceArgsHelper('trace args message');
-        $frames = $dataBuilder->getExceptionTrace($ex)->getFrames();
+        $exception = $this->exceptionTraceArgsHelper('trace args message');
+        $frames = $dataBuilder->getExceptionTrace($exception)->getFrames();
         $this->assertNull(
             $frames[count($frames)-1]->getArgs(),
             "Frames arguments available in trace when they should not be."
@@ -461,9 +461,9 @@ class DataBuilderTest extends BaseRollbarTest
             'utilities' => new Utilities
         ));
         $expected = 'trace args message';
-        $ex = $this->exceptionTraceArgsHelper($expected);
-        $frames = $dataBuilder->getExceptionTrace($ex)->getFrames();
-        $args = $frames[count($frames)-1]->getArgs();
+        $exception = $this->exceptionTraceArgsHelper($expected);
+        $frames = $dataBuilder->getExceptionTrace($exception)->getFrames();
+        $args = $frames[count($frames)-2]->getArgs();
         
         $this->assertEquals(
             $expected,
@@ -472,6 +472,14 @@ class DataBuilderTest extends BaseRollbarTest
         );
     }
     
+    /**
+     * The purpose of this method is to provide a frame with an expected
+     * argument in testExceptionTraceArguments.
+     *
+     * @param string $message Argument expected in the last frame of the trace
+     *
+     * @return \Exception
+     */
     private function exceptionTraceArgsHelper($message)
     {
         return new \Exception($message);
@@ -513,7 +521,7 @@ class DataBuilderTest extends BaseRollbarTest
             'utilities' => new Utilities
         ));
         $output = $dataBuilder->getExceptionTrace(new \Exception())->getFrames();
-        $this->assertNotEmpty($output[count($output)-2]->getContext());
+        $this->assertNotEmpty($output[count($output)-1]->getContext());
     }
 
     public function testFramesWithoutContext()
@@ -851,8 +859,8 @@ class DataBuilderTest extends BaseRollbarTest
             'tests/DataBuilderTest.php',
             $frames[count($frames)-1]->getFilename()
         );
-        $this->assertEquals(849, $frames[count($frames)-1]->getLineno());
-        $this->assertEquals('Rollbar\DataBuilderTest::testFramesOrder', $frames[count($frames)-1]->getMethod());
+        $this->assertEquals(857, $frames[count($frames)-1]->getLineno());
+        $this->assertEquals('Rollbar\DataBuilderTest::testFramesOrder', $frames[count($frames)-2]->getMethod());
     }
     
     /**
