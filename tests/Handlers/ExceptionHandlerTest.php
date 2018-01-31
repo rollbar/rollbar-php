@@ -66,15 +66,6 @@ class ExceptionHandlerTest extends BaseRollbarTest
         $handler->$method();
     }
     
-    /**
-     * This error should have expectedException. If you run phpunit with
-     * --filter=testHandle and run this as a single test, the test fails as
-     * expected with an unhandled exception. Unfortunately, for some reason,
-     * this doesn't happen when you run the full TestSuite. That's why
-     * there is no expectedException here.
-     *
-     * @expectedException \Exception
-     */
     public function testHandle()
     {
         set_exception_handler(null);
