@@ -30,6 +30,10 @@ class FatalHandlerTest extends BaseRollbarTest
             $this->markTestSkipped("Fatal Errors are not used on PHP 7+.");
         }
         
+        if (defined('HHVM_VERSION')) {
+            $this->markTestSkipped("Fatal Errors are not used on HHVM.");
+        }
+        
         $test = new FatalHandlerTest('FatalHandlerTest');
         $test->setName('handleInternal');
         $test->setRunTestInSeparateProcess(true);
@@ -74,24 +78,4 @@ class FatalHandlerTest extends BaseRollbarTest
         $null = null;
         $null->noMethod();
     }
-    
-    /**
-     * TODO: This is just copy and paste from ErrorHandlerTest but this method
-     * needs to be implemented for FatalHandlerTest as well.
-     */
-    // public function testPreviousErrorHandler()
-    // {
-    //     $testCase = $this;
-        
-    //     set_error_handler(function () use ($testCase) {
-            
-    //         $testCase->assertTrue(true, "Previous error handler invoked.");
-            
-    //         set_error_handler(null);
-    //     });
-        
-    //     Rollbar::init(self::$simpleConfig);
-        
-    //     @trigger_error(E_USER_ERROR);
-    // }
 }
