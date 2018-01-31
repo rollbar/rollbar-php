@@ -57,7 +57,8 @@ class ExceptionHandlerTest extends BaseRollbarTest
                 
         $handler->register();
         
-        $setExceptionHandler = set_exception_handler(function() {});
+        $setExceptionHandler = set_exception_handler(function () {
+        });
         
         $setExceptionHandler();
     }
@@ -88,6 +89,7 @@ class ExceptionHandlerTest extends BaseRollbarTest
         
         $handler->handle(new \Exception());
         
-        set_exception_handler(function() {});
+        set_exception_handler(function () {
+        });
     }
 }

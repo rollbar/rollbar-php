@@ -66,7 +66,8 @@ class ErrorHandlerTest extends BaseRollbarTest
          * Disable PHPUnit's error handler as it would get triggered as the
          * previously set error handler. No need for that here.
          */
-        $phpunitHandler = set_error_handler(function() {});
+        $phpunitHandler = set_error_handler(function () {
+        });
         
         $handler = new ErrorHandler($logger);
         $handler->register();

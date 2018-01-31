@@ -30,7 +30,8 @@ class FatalHandlerTest extends BaseRollbarTest
         $errors = $result->errors();
         
         $trace = $errors[0]->thrownException()->getTrace();
-        $stdOut = $trace['args'][2];
+        
+        $stdOut = $trace[0]['args'][2];
         
         /**
          * Assert that the standard output contains the log message generated
@@ -38,7 +39,7 @@ class FatalHandlerTest extends BaseRollbarTest
          */
         $expected = "[Rollbar\TestHelpers\StdOutLogger: critical] exception ".
                     "'Rollbar\ErrorWrapper' with message 'Call to a member ".
-                    "function noMethod() on null'";
+                    "function noMethod()";
                     
         $this->assertTrue(
             strpos($stdOut, $expected) !== false,
