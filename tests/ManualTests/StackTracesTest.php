@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * TODO: This test needs to get transformed into PHPUnit tests if it has not been
+ * already.
+ */
+
+/**
  * The following test file is used to check how the stack frames are built
  * when reporting different scenarios with Rollbar.
  *
@@ -10,17 +15,17 @@
  * This is tightly related to https://github.com/rollbar/rollbar-php/issues/292.
  */
 
-require __DIR__ . '/../../vendor/autoload.php';
-error_reporting(E_ALL);
+// require __DIR__ . '/../../vendor/autoload.php';
+// error_reporting(E_ALL);
 
-use \Rollbar\Rollbar;
-use \Rollbar\Payload\Level;
+// use \Rollbar\Rollbar;
+// use \Rollbar\Payload\Level;
 
-/**
- * Uncomment one of the following test cases to run the test.
- */
+// /**
+//  * Uncomment one of the following test cases to run the test.
+//  */
  
-$token = 'ad865e76e7fb496fab096ac07b1dbabb';
+// $token = 'ad865e76e7fb496fab096ac07b1dbabb';
  
 // nestedException($token);
 // fatalError($token);
@@ -53,28 +58,28 @@ $token = 'ad865e76e7fb496fab096ac07b1dbabb';
  * This logs a double record in Rollbar dashboard. One triggered by errorHandler,
  * the other by fatalHandler.
  */
-function andrewsExample($token)
-{
-    Rollbar::init(
-        array(
-            'access_token' => $token,
-            'ignore_validation' => true,
-            'environment' => 'production'
-        )
-    );
+// function andrewsExample($token)
+// {
+//     Rollbar::init(
+//         array(
+//             'access_token' => $token,
+//             'ignore_validation' => true,
+//             'environment' => 'production'
+//         )
+//     );
     
-    function something()
-    {
-        somethingElse();
-    }
+//     function something()
+//     {
+//         somethingElse();
+//     }
     
-    function somethingElse()
-    {
-        trigger_error("Oops!", E_USER_ERROR);
-    }
+//     function somethingElse()
+//     {
+//         trigger_error("Oops!", E_USER_ERROR);
+//     }
     
-    something();
-}
+//     something();
+// }
 
 /**
  * Trigger a fatal error.
@@ -84,82 +89,82 @@ function andrewsExample($token)
  *
  * On PHP 5 this is treated as a fatal error and handled by the fatal handler.
  */
-function fatalError($token)
-{
-    Rollbar::init(
-        array(
-            'access_token' => $token,
-            'ignore_validation' => true,
-            'environment' => 'production'
-        )
-    );
+// function fatalError($token)
+// {
+//     Rollbar::init(
+//         array(
+//             'access_token' => $token,
+//             'ignore_validation' => true,
+//             'environment' => 'production'
+//         )
+//     );
     
     
-    function something()
-    {
-        somethingElse();
-    }
+//     function something()
+//     {
+//         somethingElse();
+//     }
     
-    function somethingElse()
-    {
-        $null = null;
-        $null->noMethod();
-    }
+//     function somethingElse()
+//     {
+//         $null = null;
+//         $null->noMethod();
+//     }
     
-    something();
-}
+//     something();
+// }
 
 /**
  * Trigger an exception
  */
-function nestedException($token)
-{
-    Rollbar::init(
-        array(
-            'access_token' => $token,
-            'ignore_validation' => true,
-            'environment' => 'production'
-        )
-    );
+// function nestedException($token)
+// {
+//     Rollbar::init(
+//         array(
+//             'access_token' => $token,
+//             'ignore_validation' => true,
+//             'environment' => 'production'
+//         )
+//     );
     
     
-    function something()
-    {
-        somethingElse();
-    }
+//     function something()
+//     {
+//         somethingElse();
+//     }
     
-    function somethingElse()
-    {
-        throw new \Exception();
-    }
+//     function somethingElse()
+//     {
+//         throw new \Exception();
+//     }
     
-    something();
-}
+//     something();
+// }
 
 /**
  * Trigger a non-fatal PHP error.
  */
-function warning($token)
-{
+// function warning($token)
+// {
     
-    Rollbar::init(
-        array(
-            'access_token' => $token,
-            'ignore_validation' => true,
-            'environment' => 'production'
-        )
-    );
+//     Rollbar::init(
+//         array(
+//             'access_token' => $token,
+//             'ignore_validation' => true,
+//             'environment' => 'production'
+//         )
+//     );
     
     
-    function something()
-    {
-        somethingElse();
-    }
+//     function something()
+//     {
+//         somethingElse();
+//     }
     
-    function somethingElse()
-    {
-        require("No file");
-    }
+//     function somethingElse()
+//     {
+//         require("No file");
+//     }
     
-    something();
-}
+//     something();
+// }
