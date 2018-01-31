@@ -57,9 +57,9 @@ class ExceptionHandlerTest extends BaseRollbarTest
                 
         $handler->register();
         
-        $setExceptionHandler = set_exception_handler(null);
+        $setExceptionHandler = set_exception_handler(function() {});
         
-        $setExceptionHandler(null);
+        $setExceptionHandler();
     }
     
     /**
@@ -73,6 +73,8 @@ class ExceptionHandlerTest extends BaseRollbarTest
      */
     public function testHandle()
     {
+        set_exception_handler(null);
+        
         $logger = $this->getMockBuilder('Rollbar\\RollbarLogger')
                         ->setConstructorArgs(array(self::$simpleConfig))
                         ->setMethods(array('log'))
@@ -85,5 +87,7 @@ class ExceptionHandlerTest extends BaseRollbarTest
         $handler->register();
         
         $handler->handle(new \Exception());
+        
+        set_exception_handler(function() {});
     }
 }
