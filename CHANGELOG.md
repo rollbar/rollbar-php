@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.4.0
+- Add internal SDK debugging with `verbosity` configuration option
+- `local_vars_dump` configuration option is now enabled by default
+- Update rollbar.js snippet to v2.3.6
+- Refactor error, fatal error and exception handling from the ground up
+- Exception traces will now include an additional frame with the file name and line
+  where the Exception was actually thrown
+- Fix a bug where `E_USER_ERROR` type errors were reported twice
+- Add enable / disable functionality to Rollbar class and `enabled` configuration option
+- `Rollbar`'s class proxy methods will now return the return value of the proxied method
+
 ## 1.3.6
 
 - Replace a leftover invocation to exec() with shell_exec()
