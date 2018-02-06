@@ -688,6 +688,8 @@ If you run into any issues, please email us at [support@rollbar.com](mailto:supp
 You can also find us in IRC: [#rollbar on chat.freenode.net](irc://chat.freenode.net/rollbar)
 
 For bug reports, please [open an issue on GitHub](https://github.com/rollbar/rollbar-php/issues/new).
+The best, configure your Rollbar with `verbosity` at level `\Psr\Log\LogLevel::DEBUG` and attach
+the contents of your `sys_get_temp_dir() . '/rollbar.debug.log'` (usually `/tmp/rollbar.debug.log`).
 
 
 ## Contributing
