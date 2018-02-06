@@ -16,7 +16,6 @@ class ExceptionHandler extends AbstractHandler
     
     public function handle()
     {
-        
         parent::handle();
         
         /**
@@ -32,11 +31,13 @@ class ExceptionHandler extends AbstractHandler
         $exception = $args[0];
         
         $this->logger()->log(Level::ERROR, $exception, array(), true);
+        
         if ($this->previousHandler) {
             restore_exception_handler();
             call_user_func($this->previousHandler, $exception);
             return;
         }
+
 
         throw $exception;
     }

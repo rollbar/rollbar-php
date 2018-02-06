@@ -171,4 +171,9 @@ class CurlSender implements SenderInterface
         }
         $this->maybeSendMoreBatchRequests($accessToken);
     }
+    
+    public function toString()
+    {
+        return "Rollbar API endpoint: " . $this->getEndpoint();
+    }
 }

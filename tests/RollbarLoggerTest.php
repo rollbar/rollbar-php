@@ -3,6 +3,7 @@
 use Rollbar\Payload\Level;
 use Rollbar\Payload\Payload;
 use Rollbar\TestHelpers\Exceptions\SilentExceptionSampleRate;
+use Psr\Log\LogLevel as PsrLogLevel;
 
 class RollbarLoggerTest extends BaseRollbarTest
 {
@@ -116,6 +117,102 @@ class RollbarLoggerTest extends BaseRollbarTest
         ));
         $response = $l->log(Level::WARNING, "Testing PHP Notifier", array());
         $this->assertEquals(200, $response->getStatus());
+    }
+    
+    /**
+     * @dataProvider debugLoggerProvider
+     */
+    public function testDebugLogger($expected, $verbosity)
+    {
+        $logger = new RollbarLogger(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => "testing-php",
+            "verbosity" => $verbosity
+        ));
+        
+        @\unlink($logger->getDebugLogFile());
+        
+        $response = $logger->log(Level::WARNING, "Testing PHP Notifier", array());
+        
+        $result = @\file_get_contents($logger->getDebugLogFile()) ?: "";
+        
+        if (isset($expected['regexp'])) {
+            foreach ($expected['regexp'] as $regexp) {
+                $this->assertRegExp($regexp, $result);
+            }
+        }
+        
+        if (isset($expected['notRegExp'])) {
+            foreach ($expected['notRegExp'] as $regexp) {
+                $this->assertNotRegExp($regexp, $result);
+            }
+        }
+        
+        @\unlink($logger->getDebugLogFile());
+    }
+    
+    public function debugLoggerProvider()
+    {
+        return array(
+            array(
+                array(
+                    'notRegExp' => array(
+                        
+                        '/'.
+                        '\[[0-9]*-[0-9]*-[0-9]* [0-9]*:[0-9]*:[0-9]*\] '.
+                        'RollbarDebugLogger.DEBUG:'.
+                        '/',
+                        
+                        '/'.
+                        '\[[0-9]*-[0-9]*-[0-9]* [0-9]*:[0-9]*:[0-9]*\] '.
+                        'RollbarDebugLogger.INFO:'.
+                        '/'
+                        
+                    )
+                ),
+                PsrLogLevel::ERROR // verbosity
+            ),
+            array(
+                array(
+                    'regexp' => array(
+                        '/'.
+                        '\[[0-9]*-[0-9]*-[0-9]* [0-9]*:[0-9]*:[0-9]*\] '.
+                        'RollbarDebugLogger.INFO: '.
+                        '.*'.
+                        '\[\] \[\]'.
+                        '/'
+                    ),
+                    'notRegExp' => array(
+                        '/'.
+                        '\[[0-9]*-[0-9]*-[0-9]* [0-9]*:[0-9]*:[0-9]*\] '.
+                        'RollbarDebugLogger.DEBUG:'.
+                        '/'
+                    )
+                ),
+                PsrLogLevel::INFO // verbosity
+            ),
+            array(
+                array(
+                    'regexp' => array(
+                        
+                        '/'.
+                        '\[[0-9]*-[0-9]*-[0-9]* [0-9]*:[0-9]*:[0-9]*\] '.
+                        'RollbarDebugLogger.INFO: '.
+                        '.*'.
+                        '\[\] \[\]'.
+                        '/',
+                        
+                        '/'.
+                        '\[[0-9]*-[0-9]*-[0-9]* [0-9]*:[0-9]*:[0-9]*\] '.
+                        'RollbarDebugLogger.DEBUG: '.
+                        '.*'.
+                        '\[\] \[\]'.
+                        '/'
+                    )
+                ),
+                PsrLogLevel::DEBUG // verbosity
+            )
+        );
     }
     
     public function testContext()

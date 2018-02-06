@@ -73,9 +73,17 @@ class Config
     
     /**
      * @var boolean Should debug_backtrace() data be sent with string messages
-     * sent through RollbarLogger::log()
+     * sent through RollbarLogger::log().
      */
     private $sendMessageTrace = false;
+    
+    /**
+     * @var string (One of the \Psr\Log\LogLevel constants) How much debugging
+     * info should be recorded in the Rollbar debug log file.
+     * ($rollbarLogger->getDebugLogFile() => commonly /tmp/rollbar.debug.log.
+     * Default: Psr\Log\LogLevel::ERROR
+     */
+    private $verbosity = \Psr\Log\LogLevel::ERROR;
 
     public function __construct(array $configArray)
     {
@@ -142,6 +150,7 @@ class Config
         $this->setResponseHandler($config);
         $this->setCheckIgnoreFunction($config);
         $this->setSendMessageTrace($config);
+        $this->setVerbosity($config);
 
         if (isset($config['included_errno'])) {
             $this->included_errno = $config['included_errno'];
@@ -360,6 +369,20 @@ class Config
         }
 
         $this->sendMessageTrace = $config['send_message_trace'];
+    }
+    
+    private function setVerbosity($config)
+    {
+        if (!isset($config['verbosity'])) {
+            return;
+        }
+
+        $this->verbosity = $config['verbosity'];
+    }
+    
+    public function getVerbosity()
+    {
+        return $this->verbosity;
     }
 
     /**
