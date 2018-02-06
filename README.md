@@ -600,6 +600,22 @@ Default: `false`
 Default: `true`
 </dd>
 
+<dt>verbosity</dt>
+<dd>This configuration option will make the SDK more verbose. It can be used to
+troubleshoot problems with the library. The supported values are the level
+constants of `\Psr\Log\LogLevel`. These internal logs are written to
+`sys_get_temp_dir() . '/rollbar.debug.log` (usually `/tmp/rollbar.debug.log`). 
+`\Psr\Log\LogLevel::INFO` results in some troubleshooting information. 
+`\Psr\Log\LogLevel::DEBUG` results in all available information, including 
+scrubbed payloads and responses from the API. If you are running into problems 
+with the SDK and would like to submit a GitHub issue, we highly recommend that 
+you set `verbosity` to `\Psr\Log\LogLevel::DEBUG` and include the contents of 
+your `rollbar.debug.log` (NOTE: remember to scrub your access token before
+posting online).
+
+Default: `\Psr\Log\LogLevel::ERROR` (no internal logging)
+</dd>
+
 </dl>
 
 Example use of error_sample_rates:
