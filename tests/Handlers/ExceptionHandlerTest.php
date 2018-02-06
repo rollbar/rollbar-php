@@ -66,12 +66,10 @@ class ExceptionHandlerTest extends BaseRollbarTest
         $handler->$method();
     }
     
-    /**
-     * @expectedException \Exception
-     */
     public function testHandle()
     {
-        set_exception_handler(null);
+        set_exception_handler(function () {
+        });
         
         $logger = $this->getMockBuilder('Rollbar\\RollbarLogger')
                         ->setConstructorArgs(array(self::$simpleConfig))

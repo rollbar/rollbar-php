@@ -78,9 +78,9 @@ class Config
     private $sendMessageTrace = false;
     
     /**
-     * @var string (One of the \Psr\Log\LogLevel constants) How much debugging 
+     * @var string (One of the \Psr\Log\LogLevel constants) How much debugging
      * info should be recorded in the Rollbar debug log file.
-     * ($rollbarLogger->getDebugLogFile() => commonly /tmp/rollbar.log.
+     * ($rollbarLogger->getDebugLogFile() => commonly /tmp/rollbar.debug.log.
      * Default: Psr\Log\LogLevel::ERROR
      */
     private $verbosity = \Psr\Log\LogLevel::ERROR;

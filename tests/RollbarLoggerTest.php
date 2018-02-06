@@ -149,7 +149,6 @@ class RollbarLoggerTest extends BaseRollbarTest
         }
         
         @\unlink($logger->getDebugLogFile());
-        
     }
     
     public function debugLoggerProvider()

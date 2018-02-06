@@ -23,10 +23,10 @@ class RollbarLogger extends AbstractLogger
         $this->truncation = new Truncation();
         $this->queue = array();
         
-        $this->debugLogFile = sys_get_temp_dir() . '/rollbar.log';
+        $this->debugLogFile = sys_get_temp_dir() . '/rollbar.debug.log';
         $this->debugLogger = new MonologLogger("RollbarDebugLogger");
         $this->debugLogger->pushHandler(new StreamHandler(
-            $this->debugLogFile, 
+            $this->debugLogFile,
             $this->config->getVerbosity()
         ));
     }
@@ -99,10 +99,10 @@ class RollbarLogger extends AbstractLogger
             $toSend = $this->truncate($toSend);
             
             $this->debugLogger->info(
-                "Payload scrubbed and ready to send to Rollbar API endpoint: ".
-                $this->config->getSender()->getEndpoint()
+                "Payload scrubbed and ready to send to ".
+                $this->config->getSender()->toString()
             );
-            $this->debugLogger->debug(print_r($toSend, true));
+            $this->debugLogger->debug(json_encode($toSend, true));
             
             $response = $this->send($toSend, $accessToken);
             
