@@ -4,6 +4,8 @@ use Psr\Log\AbstractLogger;
 use Rollbar\Payload\Payload;
 use Rollbar\Payload\Level;
 use Rollbar\Truncation\Truncation;
+use Monolog\Logger as MonologLogger;
+use Monolog\Handler\StreamHandler;
 
 class RollbarLogger extends AbstractLogger
 {
@@ -11,6 +13,8 @@ class RollbarLogger extends AbstractLogger
     private $levelFactory;
     private $truncation;
     private $queue;
+    private $debugLogger;
+    private $debugLogFile;
 
     public function __construct(array $config)
     {
@@ -18,6 +22,13 @@ class RollbarLogger extends AbstractLogger
         $this->levelFactory = new LevelFactory();
         $this->truncation = new Truncation();
         $this->queue = array();
+        
+        $this->debugLogFile = sys_get_temp_dir() . '/rollbar.log';
+        $this->debugLogger = new MonologLogger("RollbarDebugLogger");
+        $this->debugLogger->pushHandler(new StreamHandler(
+            $this->debugLogFile, 
+            $this->config->getVerbosity()
+        ));
     }
     
     public function enable()
@@ -86,10 +97,21 @@ class RollbarLogger extends AbstractLogger
         } else {
             $toSend = $this->scrub($payload);
             $toSend = $this->truncate($toSend);
+            
+            $this->debugLogger->info(
+                "Payload scrubbed and ready to send to Rollbar API endpoint: ".
+                $this->config->getSender()->getEndpoint()
+            );
+            $this->debugLogger->debug(print_r($toSend, true));
+            
             $response = $this->send($toSend, $accessToken);
+            
+            $this->debugLogger->info("Received response from Rollbar API.");
+            $this->debugLogger->debug(print_r($response, true));
         }
         
         $this->handleResponse($payload, $response);
+        
         return $response;
     }
 
@@ -147,6 +169,11 @@ class RollbarLogger extends AbstractLogger
     public function getDataBuilder()
     {
         return $this->config->getDataBuilder();
+    }
+    
+    public function getDebugLogFile()
+    {
+        return $this->debugLogFile;
     }
 
     protected function handleResponse($payload, $response)
