@@ -11,7 +11,6 @@
   <testsuites>
     <testsuite name="Rollbar Test Suite">
       <directory suffix=".php">./tests/</directory>
-      <exclude>./tests/ManualTests</exclude>
     </testsuite>
   </testsuites>
   <filter>
