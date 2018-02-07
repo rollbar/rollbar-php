@@ -124,6 +124,8 @@ class ReadmeTest extends BaseRollbarTest
             array('x' => 10, 'code' => 'blue')
         );
         
+        var_dump($result1);
+        
         $this->assertEquals(200, $result1->getStatus());
         $this->assertEquals(200, $result2->getStatus());
     }
