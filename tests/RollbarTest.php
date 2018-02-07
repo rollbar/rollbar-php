@@ -95,7 +95,9 @@ class RollbarTest extends BaseRollbarTest
     {
         Rollbar::init(self::$simpleConfig);
       
-        Rollbar::log(Level::INFO, 'testing info level');
+        $response = Rollbar::log(Level::INFO, 'testing info level');
+        
+        var_dump($response);
       
         $this->assertTrue(true);
     }
