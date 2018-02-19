@@ -7,15 +7,19 @@ class FramesStrategy extends AbstractStrategy
     
     public function execute(array $payload)
     {
-        $frames = array();
-        
+		$trace_or_chain = false;
+
         if (isset($payload['data']['body']['trace_chain']['frames'])) {
-            $frames = $payload['data']['body']['trace_chain']['frames'];
+			$trace_or_chain = 'trace_chain';
         } elseif (isset($payload['data']['body']['trace']['frames'])) {
-            $frames = $payload['data']['body']['trace']['frames'];
+			$trace_or_chain = 'trace';
         }
-        
-        return $this->selectFrames($frames);
+
+		if ($trace_or_chain) {
+			$payload['data']['body'][$trace_or_chain]['frames'] = $this->selectFrames($payload['data']['body'][$trace_or_chain]['frames']);
+		}
+
+		return $payload;
     }
     
     public function selectFrames($frames, $range = self::FRAMES_OPTIMIZATION_RANGE)
