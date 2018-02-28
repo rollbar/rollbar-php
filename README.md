@@ -4,7 +4,7 @@
 
 This library detects errors and exceptions in your application and reports them to [Rollbar](https://rollbar.com) for alerts, reporting, and analysis.
 
-Supported PHP versions: 5.3, 5.4, 5.5, 5.6, 7, and HHVM (currently tested on 3.6.6).
+Supported PHP versions: 5.3, 5.4, 5.5, 5.6, 7, 7.1, 7.2 and HHVM (currently tested on 3.6.6).
 
 The documentation for the latest release can be found [here](https://github.com/rollbar/rollbar-php/tree/v1.3.3). The README that is
 available on master is updated as code is changed prior to making a release.
