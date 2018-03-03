@@ -9,7 +9,7 @@ class MinBodyStrategy extends AbstractStrategy
     public function execute(array $payload)
     {
         
-        $traceData = null;
+        $traceData = array();
         
         if (isset($payload['data']['body']['trace'])) {
             $traceData = &$payload['data']['body']['trace'];
@@ -17,19 +17,21 @@ class MinBodyStrategy extends AbstractStrategy
             $traceData = &$payload['data']['body']['trace_chain'];
         }
         
-        /**
-         * Delete exception description
-         */
-        unset($traceData['exception']['description']);
-        
-        /**
-         * Truncate exception message
-         */
-        $traceData['exception']['message'] = substr(
-            $traceData['exception']['message'],
-            0,
-            static::EXCEPTION_MESSAGE_LIMIT
-        );
+        if (isset($traceData['exception'])) {
+            /**
+             * Delete exception description
+             */
+            unset($traceData['exception']['description']);
+            
+            /**
+             * Truncate exception message
+             */
+            $traceData['exception']['message'] = substr(
+                $traceData['exception']['message'],
+                0,
+                static::EXCEPTION_MESSAGE_LIMIT
+            );
+        }
         
         /**
          * Limit trace frames
