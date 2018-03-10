@@ -2,7 +2,7 @@
 
 class RawStrategy extends AbstractStrategy
 {
-    public function execute(array $payload)
+    public function execute(array &$payload)
     {
         return $payload;
     }

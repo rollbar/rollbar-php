@@ -6,7 +6,7 @@ class MinBodyStrategy extends AbstractStrategy
     const EXCEPTION_MESSAGE_LIMIT = 256;
     const EXCEPTION_FRAMES_RANGE = 1;
     
-    public function execute(array $payload)
+    public function execute(array &$payload)
     {
         
         $traceData = array();

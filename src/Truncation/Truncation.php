@@ -20,7 +20,7 @@ class Truncation
      *
      * @return array
      */
-    public function truncate(array $payload)
+    public function truncate(array &$payload)
     {
         foreach (static::$truncationStrategies as $strategy) {
             if (!$this->needsTruncating($payload)) {
@@ -42,7 +42,7 @@ class Truncation
      *
      * @return boolean
      */
-    public function needsTruncating(array $payload)
+    public function needsTruncating(array &$payload)
     {
         return strlen(json_encode($payload)) > self::MAX_PAYLOAD_SIZE;
     }

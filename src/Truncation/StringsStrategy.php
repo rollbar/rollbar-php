@@ -8,7 +8,7 @@ class StringsStrategy extends AbstractStrategy
         return array(1024, 512, 256);
     }
     
-    public function execute(array $payload)
+    public function execute(array &$payload)
     {
         foreach (static::getThresholds() as $threshold) {
             if (!$this->truncation->needsTruncating($payload)) {

@@ -196,7 +196,7 @@ class RollbarLogger extends AbstractLogger
      * @param array $payload
      * @return array
      */
-    protected function truncate(array $payload)
+    protected function truncate(array &$payload)
     {
         return $this->truncation->truncate($payload);
     }

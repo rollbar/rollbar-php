@@ -7,5 +7,5 @@ interface IStrategy
      * @param array $payload
      * @return array
      */
-    public function execute(array $payload);
+    public function execute(array &$payload);
 }

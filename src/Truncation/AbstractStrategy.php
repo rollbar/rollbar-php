@@ -9,7 +9,7 @@ class AbstractStrategy implements IStrategy
         $this->truncation = $truncation;
     }
     
-    public function execute(array $payload)
+    public function execute(array &$payload)
     {
         return $payload;
     }

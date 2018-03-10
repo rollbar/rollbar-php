@@ -5,7 +5,7 @@ class FramesStrategy extends AbstractStrategy
 
     const FRAMES_OPTIMIZATION_RANGE = 75;
 
-    public function execute(array $payload)
+    public function execute(array &$payload)
     {
         $key = false;
 
