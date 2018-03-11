@@ -11,7 +11,7 @@ class StringsStrategy extends AbstractStrategy
     public function execute(array &$payload)
     {
         foreach (static::getThresholds() as $threshold) {
-            if (!$this->truncation->needsTruncating($payload)) {
+            if (!$this->truncation->needsTruncating($payload, $this)) {
                 break;
             }
             
