@@ -59,11 +59,11 @@ class TruncationTest extends \PHPUnit_Framework_TestCase
         
         $stringsTest = new StringsStrategyTest();
         $framesTest = new FramesStrategyTest();
-        $minBodyTest = new MinBodyStrategyTest();
 
-        $stringValue = str_repeat('A', 1024 * 10);        
         $framesTestData = $framesTest->executeProvider();
         
+        // Fill up frames with data to go over the allowed payload size limit
+        $stringValue = str_repeat('A', 1024 * 10);  
         foreach ($framesTestData['truncate middle using trace key'][0]['data']['body']['trace']['frames'] as $key => $data) {
             $framesTestData['truncate middle using trace key'][0]['data']['body']['trace']['frames'][$key] = $stringValue;
         }
@@ -72,14 +72,9 @@ class TruncationTest extends \PHPUnit_Framework_TestCase
             $framesTestData['truncate middle using trace_chain key'][0]['data']['body']['trace_chain']['frames'][$key] = $stringValue;
         }
         
-        $minBodyTestData = $minBodyTest->executeProvider();
-        $minBodyTestData['trace data set'][0]['data']['body']['trace']['exception']['message'] = str_repeat('A', Truncation::MAX_PAYLOAD_SIZE+1);
-        $minBodyTestData['trace_chain data set'][0]['data']['body']['trace']['exception']['message'] = str_repeat('A', Truncation::MAX_PAYLOAD_SIZE+1);
-        
         $data = array_merge(
             $stringsTest->executeProvider(),
-            $framesTestData,
-            $minBodyTestData
+            $framesTestData
         );
         
         return $data;
