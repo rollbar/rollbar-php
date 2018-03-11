@@ -3,18 +3,7 @@
 namespace Rollbar\Truncation;
 
 class MassivePayloadTest extends \PHPUnit_Framework_TestCase
-{
-    
-    /**
-     * 
-     * == Optimization notes ==
-     * 
-     * = Before any work =
-     * Time: 5.06 seconds, Memory: 195.02MB
-     * 
-     */
-    
-    
+{   
     public function executeProvider()
     {
         $framesTest = new FramesStrategyTest();
@@ -33,7 +22,7 @@ class MassivePayloadTest extends \PHPUnit_Framework_TestCase
         return $data;
     }
     
-    private function generateStringData()
+    public function generateStringData()
     {
         $stringsTest = new StringsStrategyTest();
         
