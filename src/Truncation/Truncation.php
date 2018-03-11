@@ -7,9 +7,10 @@ class Truncation
     protected static $truncationStrategies = array(
         "Rollbar\Truncation\RawStrategy",
         "Rollbar\Truncation\FramesStrategy",
-        "Rollbar\Truncation\StringsStrategy"
+        "Rollbar\Truncation\StringsStrategy",
+        "Rollbar\Truncation\MinBodyStrategy"
     );
- 
+    
     /**
      * Applies truncation strategies in order to keep the payload size under
      * configured limit.
@@ -43,11 +44,11 @@ class Truncation
      */
     public function needsTruncating(array &$payload, $strategy)
     {
-        $size = strlen(self::encode($payload));
+        $size = strlen($this->encode($payload));
         return  $size > self::MAX_PAYLOAD_SIZE;
     }
     
-    public static function encode(array &$payload)
+    public function encode(array &$payload)
     {
         return json_encode($payload);
     }
