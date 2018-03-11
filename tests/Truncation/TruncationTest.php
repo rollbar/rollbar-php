@@ -73,6 +73,13 @@ class TruncationTest extends \PHPUnit_Framework_TestCase
      * Memory usage: 0 bytes = 0 MB
      * Execution time: 6.991943359375 ms
      * 
+     * === After adding applies() in strategies ===
+     * Payload size: 524330 bytes = 0.5 MB 
+     * Strategies used: Rollbar\Truncation\StringsStrategy
+     * Encoding triggered: 3
+     * Memory usage: 0 bytes = 0 MB
+     * Execution time: 6.03076171875 ms
+     * 
      * 
      * 
      * 
@@ -95,6 +102,13 @@ class TruncationTest extends \PHPUnit_Framework_TestCase
      * Memory usage: 0 bytes = 0 MB
      * Execution time: 0.0029296875 ms
      * 
+     * === After adding applies() in strategies ===
+     * Payload size: 52 bytes = 0 MB 
+     * Strategies used: 
+     * Encoding triggered: 1
+     * Memory usage: 0 bytes = 0 MB
+     * Execution time: 0.010986328125 ms
+     * 
      * 
      * 
      * 
@@ -116,6 +130,12 @@ class TruncationTest extends \PHPUnit_Framework_TestCase
      * Memory usage: 174063616 bytes = 166 MB
      * Execution time: 2074.6579589844 ms
      * 
+     * === After adding applies() in strategies ===
+     * Payload size: 79166622 bytes = 75.5 MB 
+     * Strategies used: Rollbar\Truncation\FramesStrategy, Rollbar\Truncation\StringsStrategy
+     * Encoding triggered: 5
+     * Memory usage: 174063616 bytes = 166 MB
+     * Execution time: 1998.2878417969 ms
      * 
      * 
      * 

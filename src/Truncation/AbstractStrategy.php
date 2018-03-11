@@ -13,4 +13,9 @@ class AbstractStrategy implements IStrategy
     {
         return $payload;
     }
+    
+    public function applies(array &$payload)
+    {
+        return true;
+    }
 }

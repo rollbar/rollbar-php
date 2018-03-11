@@ -21,11 +21,15 @@ class Truncation
     public function truncate(array &$payload)
     {   
         foreach (static::$truncationStrategies as $strategy) {
+            $strategy = new $strategy($this);
+            
+            if (!$strategy->applies($payload)) {
+                continue;
+            }
+            
             if (!$this->needsTruncating($payload, $strategy)) {
                 break;
             }
-            
-            $strategy = new $strategy($this);
             
             $payload = $strategy->execute($payload);
         }

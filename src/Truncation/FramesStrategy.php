@@ -33,4 +33,16 @@ class FramesStrategy extends AbstractStrategy
             array_splice($frames, -$range, $range)
         );
     }
+    
+    public function applies(array &$payload)
+    {
+        if (isset($payload['data']['body']['trace_chain']) || 
+            isset($payload['data']['body']['trace']['frames'])) {
+            
+            return true;
+                    
+        }
+        
+        return false;
+    }
 }
