@@ -7,8 +7,7 @@ class Truncation
     protected static $truncationStrategies = array(
         "Rollbar\Truncation\RawStrategy",
         "Rollbar\Truncation\FramesStrategy",
-        "Rollbar\Truncation\StringsStrategy",
-        "Rollbar\Truncation\MinBodyStrategy"
+        "Rollbar\Truncation\StringsStrategy"
     );
  
     /**
@@ -21,9 +20,9 @@ class Truncation
      * @return array
      */
     public function truncate(array &$payload)
-    {
+    {   
         foreach (static::$truncationStrategies as $strategy) {
-            if (!$this->needsTruncating($payload)) {
+            if (!$this->needsTruncating($payload, $strategy)) {
                 break;
             }
             
@@ -42,8 +41,14 @@ class Truncation
      *
      * @return boolean
      */
-    public function needsTruncating(array &$payload)
+    public function needsTruncating(array &$payload, $strategy)
     {
-        return strlen(json_encode($payload)) > self::MAX_PAYLOAD_SIZE;
+        $size = strlen(self::encode($payload));
+        return  $size > self::MAX_PAYLOAD_SIZE;
+    }
+    
+    public static function encode(array &$payload)
+    {
+        return json_encode($payload);
     }
 }
