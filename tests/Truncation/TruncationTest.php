@@ -2,37 +2,10 @@
 
 namespace Rollbar\Truncation;
 
+use Rollbar\TestHelpers\TruncationPerformance;
+
 class TruncationTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * 
-     * = Optimization notes =
-     * 
-     * == testTruncatePerformance for FramesStrategyTest - truncate middle using trace key ==
-     * 
-     * === Test data size (strlen of json_encode'd before transformations) ===
-     * 536 bytes = 0 MB
-     * 
-     * === Before any optimizations ===
-     * Truncation encoded 1 times.
-     * 
-     * Memory usage in truncate(): 0 MB
-     * 
-     * Execution time in truncate(): 0.01513671875 ms
-     * 
-     * == testTruncatePerformance for MassivePayloadTest ==
-     * 
-     * === Test data size (strlen of json_encode'd before transformations) ===
-     * 79166604 bytes = 75.50 MB
-     * 
-     * === Before any optimizations ===
-     * Truncation encoded 7 times.
-     * 
-     * Memory usage in truncate(): 174063616 bytes
-     * 
-     * Execution time in truncate(): 2460.9509277344 ms
-     * 
-     */
     
     public function setUp()
     {
@@ -81,31 +54,61 @@ class TruncationTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
+     * 
+     * = Optimization notes =
+     * 
+     * == testTruncatePerformance for StringsStrategyTest - truncate strings to 1024 ==
+     * 
+     * === Before any optimizations ===
+     * Payload size: 524330 bytes = 0.5 MB 
+     * Strategies used: Rollbar\Truncation\RawStrategy, Rollbar\Truncation\FramesStrategy, Rollbar\Truncation\StringsStrategy
+     * Encoding triggered: 6
+     * Memory usage: 0 bytes = 0 MB
+     * Execution time: 9.833740234375 ms
+     * 
+     * 
+     * 
+     * 
+     * 
+     * 
+     * 
+     * == testTruncatePerformance for FramesStrategyTest - nothing to truncate using trace key ==
+     * 
+     * === Before any optimizations ===
+     * Payload size: 52 bytes = 0 MB 
+     * Strategies used: 
+     * Encoding triggered: 1
+     * Memory usage: 0 bytes = 0 MB
+     * Execution time: 0.002685546875 ms
+     * 
+     * 
+     * 
+     * 
+     * 
+     * 
+     * 
+     * == testTruncatePerformance for MassivePayloadTest ==
+     * 
+     * === Before any optimizations ===
+     * Payload size: 79166622 bytes = 75.5 MB 
+     * Strategies used: Rollbar\Truncation\RawStrategy, Rollbar\Truncation\FramesStrategy, Rollbar\Truncation\StringsStrategy, Rollbar\Truncation\MinBodyStrategy
+     * Encoding triggered: 7
+     * Memory usage: 174063616 bytes = 166 MB
+     * Execution time: 2382.2009277344 ms
+     * 
+     */
+    
+    /**
      * @dataProvider truncatePerformanceProvider
      */
     public function testTruncatePerformance($dataName, $data)
     {
         echo "\n== testTruncatePerformance for $dataName ==\n";
         
-        echo "\n=== Test data size (strlen of json_encode'd before transformations) ===\n";
+        $truncation = new TruncationPerformance();
+        $result = $truncation->truncate($data);
         
-        $size = strlen(json_encode($data));
-        
-        echo "\n" . $size . " bytes = " . round($size / 1024 / 1024, 2) . " MB\n";
-        
-        $memUsageBefore = memory_get_usage(true);
-        $timeBefore = microtime(true) * 1000;
-        
-        $result = $this->truncate->truncate($data);
-        
-        $timeAfter = microtime(true) * 1000;
-        $memUsageAfter = memory_get_usage(true);
-        
-        $memoryUsage = $memUsageAfter - $memUsageBefore;
-        $timeUsage = $timeAfter - $timeBefore;
-        
-        echo "\nMemory usage in truncate(): " . $memoryUsage . " MB\n";
-        echo "\nExecution time in truncate(): " . $timeUsage . " ms\n";
+        echo $truncation->getLastRun();
     }
     
     public function truncatePerformanceProvider()
@@ -115,21 +118,25 @@ class TruncationTest extends \PHPUnit_Framework_TestCase
         $minBodyTest = new MinBodyStrategyTest();
         $massivePayloadTest = new MassivePayloadTest();
         
+        $stringsTestData = $stringsTest->executeProvider();
+        $stringsTestData = $stringsTestData['truncate strings to 1024'][0];
+        
         $framesTestData = $framesTest->executeProvider();
-        $framesTestData = $framesTestData['truncate middle using trace key'][0];
+        $framesTestData = $framesTestData['nothing to truncate using trace key'][0];
         
         $data = array(
-            // $stringsTest->executeProvider(),
-            // $framesTest->executeProvider()
-            // $minBodyTest->executeProvider(),
             array(
-                "FramesStrategyTest - truncate middle using trace key",
+                "StringsStrategyTest - truncate strings to 1024",
+                $stringsTestData
+            ),
+            array(
+                "FramesStrategyTest - nothing to truncate using trace key",
                 $framesTestData
             ),
-            // array(
-            //     "MassivePayloadTest",
-            //     $massivePayloadTest->executeProvider()
-            // )
+            array(
+                "MassivePayloadTest",
+                $massivePayloadTest->executeProvider()
+            )
         );
         
         return $data;
