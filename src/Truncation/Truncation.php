@@ -5,10 +5,8 @@ class Truncation
     const MAX_PAYLOAD_SIZE = 524288; // 512 * 1024
  
     protected static $truncationStrategies = array(
-        "Rollbar\Truncation\RawStrategy",
         "Rollbar\Truncation\FramesStrategy",
-        "Rollbar\Truncation\StringsStrategy",
-        "Rollbar\Truncation\MinBodyStrategy"
+        "Rollbar\Truncation\StringsStrategy"
     );
     
     /**
@@ -45,7 +43,7 @@ class Truncation
     public function needsTruncating(array &$payload, $strategy)
     {
         $size = strlen($this->encode($payload));
-        return  $size > self::MAX_PAYLOAD_SIZE;
+        return $size > self::MAX_PAYLOAD_SIZE;
     }
     
     public function encode(array &$payload)
