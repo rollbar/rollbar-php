@@ -34,7 +34,7 @@ class StringsStrategyTest extends \PHPUnit_Framework_TestCase
         return $data;
     }
     
-    protected function thresholdTestProvider($threshold)
+    public function thresholdTestProvider($threshold)
     {
         $stringLengthToTrim = $threshold+1;
         
