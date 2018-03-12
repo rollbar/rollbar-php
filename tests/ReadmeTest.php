@@ -106,7 +106,8 @@ class ReadmeTest extends BaseRollbarTest
             $result2 = Rollbar::log(Level::ERROR, $e, array("my" => "extra", "data" => 42));
         }
         
-        // $this->assertEquals(200, $result1->getStatus());
+        $this->assertEquals(200, $result1->getStatus());
+        $this->assertEquals(200, $result2->getStatus());
     }
 
     public function testBasicUsage2()
@@ -124,6 +125,9 @@ class ReadmeTest extends BaseRollbarTest
             'Here is a message with some additional data',
             array('x' => 10, 'code' => 'blue')
         );
+        
+        $this->assertEquals(200, $result1->getStatus());
+        $this->assertEquals(200, $result2->getStatus());
     }
 
     public function testMonolog()
