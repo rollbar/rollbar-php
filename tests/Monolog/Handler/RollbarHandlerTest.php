@@ -79,15 +79,15 @@ class RollbarHandlerTest extends TestCase
             });
     }
 
-    private function createHandler(): RollbarHandler
+    private function createHandler()
     {
         return new RollbarHandler($this->rollbarLogger, Logger::DEBUG);
     }
 
-    private function createExceptionRecord($level = Logger::DEBUG, $message = 'test', $exception = null): array
+    private function createExceptionRecord($level = Logger::DEBUG, $message = 'test', $exception = null)
     {
-        return $this->getRecord($level, $message, [
+        return $this->getRecord($level, $message, array(
             'exception' => $exception ?: new Exception(),
-        ]);
+        ));
     }
 }
