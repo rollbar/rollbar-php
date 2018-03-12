@@ -199,6 +199,15 @@ class Rollbar
         self::$logger->configure($config);
     }
     
+    /**
+     * Destroys the currently stored $logger allowing for a fresh configuration.
+     * This is especially used in testing scenarios.
+     */
+    public static function destroy()
+    {
+        self::$logger = null;
+    }
+    
     // @codingStandardsIgnoreStart
     
     /**
