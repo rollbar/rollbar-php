@@ -34,6 +34,7 @@ class ConfigTest extends BaseRollbarTest
 
     public function tearDown()
     {
+        parent::tearDown();
         m::close();
     }
     
