@@ -269,7 +269,7 @@ $log->pushHandler(new RollbarHandler(Rollbar::logger(), Logger::WARNING));
 $log->addWarning('Foo');
 ```
 
-*Note:* Currently there is an outstanding Pull Request [Sync RollbarHandler with the latest changes rollbar/rollbar package](https://github.com/Seldaek/monolog/pull/1042) in `Seldaek:monolog` repository with an update for our `Monolog\Handler\RollbarHandler`. Unfortunately, it has not been merged in by the maintainers. In meantime, we included the Monolog handler as part of our repository. We recommend using `Rollbar\Monolog\Handler\RollbarHandler` from `rollbar/rollbar-php` repo. Do *NOT* use `Monolog\Handler\RollbarHandler` from `Seldaek:monolog` repo as it is outdated.
+*Note:* Currently there is an outstanding Pull Request [Sync RollbarHandler with the latest changes rollbar/rollbar package](https://github.com/Seldaek/monolog/pull/1042) in `Seldaek:monolog` repository with an update for our `Monolog\Handler\RollbarHandler`. Unfortunately, it has not been merged in by the maintainers yet. In meantime, we included the Monolog handler as part of our repository. We recommend using `Rollbar\Monolog\Handler\RollbarHandler` from `rollbar/rollbar-php` repo. Do *NOT* use `Monolog\Handler\RollbarHandler` from `Seldaek:monolog` repo as it is outdated.
 
 ## Configuration
 
