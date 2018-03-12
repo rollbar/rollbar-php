@@ -129,10 +129,10 @@ class ReadmeTest extends BaseRollbarTest
     public function testMonolog()
     {
         Rollbar::init(
-        	array(
-        		'access_token' => $this->getTestAccessToken(),
-        		'environment' => 'development'
-        	)
+            array(
+                'access_token' => $this->getTestAccessToken(),
+                'environment' => 'development'
+            )
         );
         
         // create a log channel
