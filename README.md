@@ -250,26 +250,26 @@ Rollbar::init($logger);
 Here is an example of how to use Rollbar as a handler for Monolog:
 
 ```php
-use Monolog\Logger;
 use Rollbar\Rollbar;
-use Rollbar\Payload\Level;
+use Monolog\Logger;
+use Rollbar\Monolog\Handler\RollbarHandler;
 
-$config = array('access_token' => 'POST_SERVER_ITEM_ACCESS_TOKEN');
+Rollbar::init(
+	array(
+		'access_token' => 'xxx',
+		'environment' => 'development'
+	)
+);
 
-// installs global error and exception handlers
-Rollbar::init($config);
+// create a log channel
+$log = new Logger('RollbarHandler');
+$log->pushHandler(new RollbarHandler(Rollbar::logger(), Logger::WARNING));
 
-$log = new Logger('test');
-$log->pushHandler(new \Monolog\Handler\PsrHandler(Rollbar::logger()));
-
-try {
-    throw new \Exception('exception for monolog');
-} catch (\Exception $e) {
-    $log->error($e);
-}
+// add records to the log
+$log->addWarning('Foo');
 ```
 
-*Note:* Currently `PsrHandler` incorrectly reports exception objects logged with `log` method as strings instead of objects. This will cause your `log`-reported errors to be interpretted in Rollbar as message strings. The preferred way to use Rollbar with Monolog is through `RollbarHandler` class, however, at the moment, it's outdated. Pull request [Sync RollbarHandler with the latest changes rollbar/rollbar package](https://github.com/Seldaek/monolog/pull/1042) with a fix is awaiting merging into Monolog package. This issue has been originally brought up in [Log->error($e) has different info than throw the exception and let error_reporting handle it](https://github.com/rollbar/rollbar-php/issues/275).
+*Note:* Currently there is an outstanding Pull Request [Sync RollbarHandler with the latest changes rollbar/rollbar package](https://github.com/Seldaek/monolog/pull/1042) in `Seldaek:monolog` repository with an update for our `Monolog\Handler\RollbarHandler`. Unfortunately, it has not been merged in by the maintainers yet. In meantime, we included the Monolog handler as part of our repository. We recommend using `Rollbar\Monolog\Handler\RollbarHandler` from `rollbar/rollbar-php` repo. Do *NOT* use `Monolog\Handler\RollbarHandler` from `Seldaek:monolog` repo as it is outdated.
 
 ## Configuration
 
