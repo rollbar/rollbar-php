@@ -83,12 +83,12 @@ class RollbarHandler extends AbstractProcessingHandler
         }
 
         $context = $record['context'];
-        $context = array_merge($context, $record['extra'], [
+        $context = array_merge($context, $record['extra'], array(
             'level' => $this->levelMap[$record['level']],
             'monolog_level' => $record['level_name'],
             'channel' => $record['channel'],
             'datetime' => $record['datetime']->format('U'),
-        ]);
+        ));
 
         if (isset($context['exception']) && $context['exception'] instanceof Throwable) {
             $exception = $context['exception'];
