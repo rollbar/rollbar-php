@@ -35,8 +35,9 @@ class AgentTest extends Rollbar\BaseRollbarTest
         $this->assertContains('this is a test', $line);
     }
 
-    protected function tearDown()
+    public function tearDown()
     {
+        parent::tearDown();
         $this->rrmdir($this->path);
     }
 

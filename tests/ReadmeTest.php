@@ -2,6 +2,8 @@
 
 use Rollbar\Rollbar;
 use Rollbar\Payload\Level;
+use Monolog\Logger;
+use Rollbar\Monolog\Handler\RollbarHandler;
 
 // used in testBasicUsage()
 function do_something()
@@ -103,6 +105,9 @@ class ReadmeTest extends BaseRollbarTest
             // or
             $result2 = Rollbar::log(Level::ERROR, $e, array("my" => "extra", "data" => 42));
         }
+        
+        $this->assertEquals(200, $result1->getStatus());
+        $this->assertEquals(200, $result2->getStatus());
     }
 
     public function testBasicUsage2()
@@ -120,22 +125,25 @@ class ReadmeTest extends BaseRollbarTest
             'Here is a message with some additional data',
             array('x' => 10, 'code' => 'blue')
         );
+        
+        $this->assertEquals(200, $result1->getStatus());
+        $this->assertEquals(200, $result2->getStatus());
     }
 
     public function testMonolog()
     {
-        $config = array('access_token' => $this->getTestAccessToken(), 'environment' => 'testing');
-
-        // installs global error and exception handlers
-        Rollbar::init($config);
-
-        $log = new \Monolog\Logger('test');
-        $log->pushHandler(new \Monolog\Handler\PsrHandler(Rollbar::logger()));
-
-        try {
-            throw new \Exception('exception for monolog');
-        } catch (\Exception $e) {
-            $log->error($e);
-        }
+        Rollbar::init(
+            array(
+                'access_token' => $this->getTestAccessToken(),
+                'environment' => 'development'
+            )
+        );
+        
+        // create a log channel
+        $log = new Logger('RollbarHandler');
+        $log->pushHandler(new RollbarHandler(Rollbar::logger(), Logger::WARNING));
+        
+        // add records to the log
+        $log->addWarning('Foo');
     }
 }
