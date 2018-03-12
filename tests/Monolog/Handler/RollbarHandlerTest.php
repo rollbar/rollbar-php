@@ -66,7 +66,7 @@ class RollbarHandlerTest extends TestCase
             'environment' => 'test'
         );
         
-        $this->rollbarLogger = $this->getMockBuilder(RollbarLogger::class)
+        $this->rollbarLogger = $this->getMockBuilder('Rollbar\RollbarLogger')
             ->setConstructorArgs(array($config))
             ->setMethods(array('log'))
             ->getMock();
