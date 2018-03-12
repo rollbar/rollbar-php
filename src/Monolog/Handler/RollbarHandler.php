@@ -39,7 +39,7 @@ class RollbarHandler extends AbstractProcessingHandler
      */
     protected $rollbarLogger;
 
-    protected $levelMap = [
+    protected $levelMap = array(
         Logger::DEBUG     => 'debug',
         Logger::INFO      => 'info',
         Logger::NOTICE    => 'info',
@@ -48,7 +48,7 @@ class RollbarHandler extends AbstractProcessingHandler
         Logger::CRITICAL  => 'critical',
         Logger::ALERT     => 'critical',
         Logger::EMERGENCY => 'critical',
-    ];
+    );
 
     /**
      * Records whether any log records have been added since the last flush of the rollbar notifier
