@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+// @codingStandardsIgnoreFile
 
 /*
  * This file is part of the Monolog package.
