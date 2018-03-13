@@ -1,5 +1,7 @@
 <?php namespace Rollbar\Truncation;
 
+use \Rollbar\Payload\EncodedPayload;
+
 class Truncation
 {
     const MAX_PAYLOAD_SIZE = 524288; // 512 * 1024
@@ -13,12 +15,12 @@ class Truncation
      * Applies truncation strategies in order to keep the payload size under
      * configured limit.
      *
-     * @param array $payload
+     * @param \Rollbar\Payload\EncodedPayload $payload
      * @param string $strategy
      *
-     * @return array
+     * @return \Rollbar\Payload\EncodedPayload
      */
-    public function truncate(array &$payload)
+    public function truncate(EncodedPayload $payload)
     {   
         foreach (static::$truncationStrategies as $strategy) {
             $strategy = new $strategy($this);
@@ -44,14 +46,8 @@ class Truncation
      *
      * @return boolean
      */
-    public function needsTruncating(array &$payload, $strategy)
+    public function needsTruncating(EncodedPayload $payload, $strategy)
     {
-        $size = strlen($this->encode($payload));
-        return $size > self::MAX_PAYLOAD_SIZE;
-    }
-    
-    public function encode(array &$payload)
-    {
-        return json_encode($payload);
+        return $payload->size() > self::MAX_PAYLOAD_SIZE;
     }
 }

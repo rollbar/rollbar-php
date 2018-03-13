@@ -3,6 +3,7 @@
 namespace Rollbar\Truncation;
 
 use Rollbar\TestHelpers\TruncationPerformance;
+use Rollbar\Payload\EncodedPayload;
 
 class TruncationTest extends \PHPUnit_Framework_TestCase
 {
@@ -17,6 +18,10 @@ class TruncationTest extends \PHPUnit_Framework_TestCase
      */
     public function testTruncateNoPerformance($data)
     {
+        
+        $data = new EncodedPayload($data);
+        $data->encode();
+        
         $result = $this->truncate->truncate($data);
         
         $size = strlen(json_encode($result));
@@ -79,6 +84,7 @@ class TruncationTest extends \PHPUnit_Framework_TestCase
      * Encoding triggered: 3
      * Memory usage: 0 bytes = 0 MB
      * Execution time: 6.03076171875 ms
+     * 
      * 
      * 
      * 
@@ -149,6 +155,10 @@ class TruncationTest extends \PHPUnit_Framework_TestCase
         echo "\n== testTruncatePerformance for $dataName ==\n";
         
         $truncation = new TruncationPerformance();
+        
+        $data = new EncodedPayload($data);
+        $data->encode();
+        
         $result = $truncation->truncate($data);
         
         echo $truncation->getLastRun();
@@ -159,7 +169,7 @@ class TruncationTest extends \PHPUnit_Framework_TestCase
         $stringsTest = new StringsStrategyTest();
         $framesTest = new FramesStrategyTest();
         $minBodyTest = new MinBodyStrategyTest();
-        $massivePayloadTest = new MassivePayloadTest();
+        $massivePayloadTest = new MassivePayload();
         
         $stringsTestData = $stringsTest->executeProvider();
         $stringsTestData = $stringsTestData['truncate strings to 1024'][0];

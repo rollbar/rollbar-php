@@ -2,6 +2,8 @@
 
 namespace Rollbar\Truncation;
 
+use Rollbar\Payload\EncodedPayload;
+
 class FramesStrategyTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -12,9 +14,13 @@ class FramesStrategyTest extends \PHPUnit_Framework_TestCase
         $truncation = new Truncation();
                     
         $strategy = new FramesStrategy($truncation);
+        
+        $data = new EncodedPayload($data);
+        $data->encode();
+        
         $result = $strategy->execute($data);
         
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($expected, $result->data());
     }
     
     public function executeProvider()

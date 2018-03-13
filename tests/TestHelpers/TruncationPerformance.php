@@ -1,26 +1,26 @@
 <?php namespace Rollbar\TestHelpers;
 
 use Rollbar\Truncation\Truncation;
+use Rollbar\Payload\EncodedPayload;
 
 class TruncationPerformance extends Truncation
 {
-    protected $encodingCount = 0;
     protected $memoryUsage = 0;
     protected $timeUsage = 0;
     protected $payloadSize = 0;
     protected $lastRunOutput = "";
     protected $strategiesUsed = array();
     
-    public function truncate(array &$payload)
+    public function truncate(EncodedPayload $payload)
     {
         $this->strategiesUsed = array();
         
-        $this->encodingCount = 0;
-        
-        $this->payloadSize = strlen(json_encode($payload));
+        $this->payloadSize = $payload->size();
         
         $memUsageBefore = memory_get_usage(true);
         $timeBefore = microtime(true) * 1000;
+        
+        EncodedPayload::ResetEncodingCount();
         
         $result = parent::truncate($payload);
         
@@ -36,7 +36,7 @@ class TruncationPerformance extends Truncation
         return $result;
     }
     
-    public function needsTruncating(array &$payload, $strategy)
+    public function needsTruncating(EncodedPayload $payload, $strategy)
     {
         $result = parent::needsTruncating($payload, $strategy);
         
@@ -58,21 +58,10 @@ class TruncationPerformance extends Truncation
         
         $output .= "Payload size: " . $this->payloadSize . " bytes = " . round($this->payloadSize / 1024 / 1024, 2) . " MB \n";
         $output .= "Strategies used: " . join(", ", $this->strategiesUsed) . "\n";
-        $output .= "Encoding triggered: " . $this->encodingCount . "\n";
+        $output .= "Encoding triggered: " . EncodedPayload::GetEncodingCount() . "\n";
         $output .= "Memory usage: " . $this->memoryUsage . " bytes = " . round($this->memoryUsage / 1024 / 1024, 2) . " MB\n";
         $output .= "Execution time: " . $this->timeUsage . " ms\n";
         
         return $output;
-    }
-    
-    public function encode(array &$payload)
-    {
-        $this->encodingCount++;
-        return parent::encode($payload);
-    }
-    
-    public function getEncodingCount()
-    {
-        return $this->encodingCount;
     }
 }

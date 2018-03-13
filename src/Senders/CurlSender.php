@@ -7,6 +7,7 @@
 
 use Rollbar\Response;
 use Rollbar\Payload\Payload;
+use Rollbar\Payload\EncodedPayload;
 
 class CurlSender implements SenderInterface
 {
@@ -49,11 +50,11 @@ class CurlSender implements SenderInterface
         return $this->endpoint;
     }
 
-    public function send($scrubbedPayload, $accessToken)
+    public function send(EncodedPayload $payload, $accessToken)
     {
         $handle = curl_init();
 
-        $this->setCurlOptions($handle, $scrubbedPayload, $accessToken);
+        $this->setCurlOptions($handle, $payload, $accessToken);
         $result = curl_exec($handle);
         $statusCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
         
@@ -63,7 +64,8 @@ class CurlSender implements SenderInterface
         
         curl_close($handle);
 
-        $uuid = $scrubbedPayload['data']['uuid'];
+        $data = $payload->data();
+        $uuid = $data['data']['uuid'];
         
         return new Response($statusCode, $result, $uuid);
     }
@@ -116,12 +118,11 @@ class CurlSender implements SenderInterface
         $this->batchRequests = array_slice($this->batchRequests, $idx);
     }
 
-    public function setCurlOptions($handle, $scrubbedPayload, $accessToken)
+    public function setCurlOptions($handle, EncodedPayload $payload, $accessToken)
     {
         curl_setopt($handle, CURLOPT_URL, $this->endpoint);
         curl_setopt($handle, CURLOPT_POST, true);
-        $encoded = json_encode($scrubbedPayload);
-        curl_setopt($handle, CURLOPT_POSTFIELDS, $encoded);
+        curl_setopt($handle, CURLOPT_POSTFIELDS, $payload->encoded());
         curl_setopt($handle, CURLOPT_VERBOSE, false);
         curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);

@@ -2,7 +2,7 @@
 
 namespace Rollbar\Truncation;
 
-class MassivePayloadTest extends \PHPUnit_Framework_TestCase
+class MassivePayload
 {   
     public function executeProvider()
     {
