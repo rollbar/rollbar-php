@@ -96,19 +96,17 @@ class RollbarLogger extends AbstractLogger
         if ($this->config->checkIgnored($payload, $accessToken, $toLog, $isUncaught)) {
             $response = new Response(0, "Ignored");
         } else {
-            $toSend = $this->scrub($payload);
-            
-            $toSend = $this->encode($toSend);
-            
-            $toSend = $this->truncate($toSend);
+            $scrubbed = $this->scrub($payload);
+            $encoded = $this->encode($scrubbed);
+            $truncated = $this->truncate($encoded);
             
             $this->debugLogger->info(
                 "Payload scrubbed and ready to send to ".
                 $this->config->getSender()->toString()
             );
-            $this->debugLogger->debug($toSend);
+            $this->debugLogger->debug($truncated);
             
-            $response = $this->send($toSend, $accessToken);
+            $response = $this->send($truncated, $accessToken);
             
             $this->debugLogger->info("Received response from Rollbar API.");
             $this->debugLogger->debug(print_r($response, true));
