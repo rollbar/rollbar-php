@@ -53,11 +53,12 @@
 
   "scripts": {
     "test": [
-      "phpunit --coverage-clover build/logs/clover.xml",
+      "phpunit --coverage-clover build/logs/clover.xml --testsuite 'Rollbar Test Suite'",
       "phpcs --standard=PSR1,PSR2 src tests"
     ],
     "fix": "phpcbf --standard=PSR1,PSR2 src tests",
-    "get-js-snippet": "curl -X GET https://raw.githubusercontent.com/rollbar/rollbar.js/v2.3.6/dist/rollbar.snippet.js > data/rollbar.snippet.js"
+    "get-js-snippet": "curl -X GET https://raw.githubusercontent.com/rollbar/rollbar.js/v2.3.6/dist/rollbar.snippet.js > data/rollbar.snippet.js",
+    "performance": "phpunit --coverage-clover build/logs/clover.xml --testsuite 'Rollbar Performance Test Suite'"
   },
   
   "config": {

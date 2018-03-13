@@ -1,22 +1,28 @@
 <?php namespace Rollbar\Truncation;
 
+use \Rollbar\Payload\EncodedPayload;
+
 class FramesStrategy extends AbstractStrategy
 {
 
     const FRAMES_OPTIMIZATION_RANGE = 75;
 
-    public function execute(array $payload)
+    public function execute(EncodedPayload $payload)
     {
         $key = false;
+        $data = $payload->data();
 
-        if (isset($payload['data']['body']['trace_chain']['frames'])) {
+        if (isset($data['data']['body']['trace_chain']['frames'])) {
             $key = 'trace_chain';
-        } elseif (isset($payload['data']['body']['trace']['frames'])) {
+        } elseif (isset($data['data']['body']['trace']['frames'])) {
             $key = 'trace';
         }
-
+        
+        
+        
         if ($key) {
-            $payload['data']['body'][$key]['frames'] = $this->selectFrames($payload['data']['body'][$key]['frames']);
+            $data['data']['body'][$key]['frames'] = $this->selectFrames($data['data']['body'][$key]['frames']);
+            $payload->encode($data);
         }
 
         return $payload;
@@ -32,5 +38,17 @@ class FramesStrategy extends AbstractStrategy
             array_splice($frames, 0, $range),
             array_splice($frames, -$range, $range)
         );
+    }
+    
+    public function applies(EncodedPayload $payload)
+    {
+        $payload = $payload->data();
+        
+        if (isset($payload['data']['body']['trace_chain']) ||
+            isset($payload['data']['body']['trace']['frames'])) {
+            return true;
+        }
+        
+        return false;
     }
 }

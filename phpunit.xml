@@ -11,6 +11,10 @@
   <testsuites>
     <testsuite name="Rollbar Test Suite">
       <directory suffix=".php">./tests/</directory>
+      <exclude>./tests/Performance/</exclude>
+    </testsuite>
+    <testsuite name="Rollbar Performance Test Suite">
+      <directory suffix=".php">./tests/Performance/</directory>
     </testsuite>
   </testsuites>
   <filter>

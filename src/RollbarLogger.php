@@ -6,6 +6,7 @@ use Rollbar\Payload\Level;
 use Rollbar\Truncation\Truncation;
 use Monolog\Logger as MonologLogger;
 use Monolog\Handler\StreamHandler;
+use Rollbar\Payload\EncodedPayload;
 
 class RollbarLogger extends AbstractLogger
 {
@@ -95,16 +96,17 @@ class RollbarLogger extends AbstractLogger
         if ($this->config->checkIgnored($payload, $accessToken, $toLog, $isUncaught)) {
             $response = new Response(0, "Ignored");
         } else {
-            $toSend = $this->scrub($payload);
-            $toSend = $this->truncate($toSend);
+            $scrubbed = $this->scrub($payload);
+            $encoded = $this->encode($scrubbed);
+            $truncated = $this->truncate($encoded);
             
             $this->debugLogger->info(
                 "Payload scrubbed and ready to send to ".
                 $this->config->getSender()->toString()
             );
-            $this->debugLogger->debug(json_encode($toSend, true));
+            $this->debugLogger->debug($truncated);
             
-            $response = $this->send($toSend, $accessToken);
+            $response = $this->send($truncated, $accessToken);
             
             $this->debugLogger->info("Received response from Rollbar API.");
             $this->debugLogger->debug(print_r($response, true));
@@ -141,17 +143,17 @@ class RollbarLogger extends AbstractLogger
         return count($this->queue);
     }
 
-    protected function send($toSend, $accessToken)
+    protected function send(\Rollbar\Payload\EncodedPayload $payload, $accessToken)
     {
         if ($this->config->getBatched()) {
             $response = new Response(0, "Pending");
             if ($this->getQueueSize() >= $this->config->getBatchSize()) {
                 $response = $this->flush();
             }
-            $this->queue[] = $toSend;
+            $this->queue[] = $payload;
             return $response;
         }
-        return $this->config->send($toSend, $accessToken);
+        return $this->config->send($payload, $accessToken);
     }
 
     protected function getPayload($accessToken, $level, $toLog, $context)
@@ -193,11 +195,22 @@ class RollbarLogger extends AbstractLogger
     }
     
     /**
-     * @param array $payload
-     * @return array
+     * @param \Rollbar\Payload\EncodedPayload $payload
+     * @return \Rollbar\Payload\EncodedPayload
      */
-    protected function truncate(array $payload)
+    protected function truncate(\Rollbar\Payload\EncodedPayload &$payload)
     {
         return $this->truncation->truncate($payload);
+    }
+    
+    /**
+     * @param array &$payload
+     * @return \Rollbar\Payload\EncodedPayload
+     */
+    protected function encode(array &$payload)
+    {
+        $encoded = new EncodedPayload($payload);
+        $encoded->encode();
+        return $encoded;
     }
 }
