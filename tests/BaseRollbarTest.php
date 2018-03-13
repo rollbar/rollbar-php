@@ -7,6 +7,7 @@ abstract class BaseRollbarTest extends \PHPUnit_Framework_TestCase
     
     public function tearDown()
     {
+        \Rollbar\Payload\EncodedPayload::ResetEncodingCount();
         Rollbar::destroy();
     }
     
