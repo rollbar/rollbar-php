@@ -150,12 +150,12 @@ class TruncationTest extends \PHPUnit_Framework_TestCase
      */
     public function testTruncate($dataName, $data)
     {
-        echo "\n== testTruncate for $dataName ==\n";
+        echo "\n== \Rollbar\Performance\TruncationTest::testTruncate for $dataName ==\n";
         
-        $data = new EncodedPayload($data);
-        $data->encode();
+        $payload = new EncodedPayload($data);
+        $payload->encode();
         
-        $result = $this->truncate->truncate($data);
+        $result = $this->truncate->truncate($payload);
         
         echo $this->truncate->getLastRun();
     }
@@ -174,14 +174,14 @@ class TruncationTest extends \PHPUnit_Framework_TestCase
         $framesTestData = $framesTestData['nothing to truncate using trace key'][0];
         
         $data = array(
-            array(
-                "StringsStrategyTest - truncate strings to 1024",
-                $stringsTestData
-            ),
-            array(
-                "FramesStrategyTest - nothing to truncate using trace key",
-                $framesTestData
-            ),
+            // array(
+            //     "StringsStrategyTest - truncate strings to 1024",
+            //     $stringsTestData
+            // ),
+            // array(
+            //     "FramesStrategyTest - nothing to truncate using trace key",
+            //     $framesTestData
+            // ),
             array(
                 "MassivePayloadTest",
                 $massivePayloadTest->executeProvider()
