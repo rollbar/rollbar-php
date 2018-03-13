@@ -3,7 +3,8 @@
 namespace Rollbar\Truncation;
 
 class MassivePayload
-{   
+{
+
     public function executeProvider()
     {
         $framesTest = new FramesStrategyTest();
@@ -14,9 +15,7 @@ class MassivePayload
         $data = $framesTest->executeProvider();
         $data = $data['truncate middle using trace key'][0];
         foreach ($data['data']['body']['trace']['frames'] as $i => $frame) {
-            
             $data['data']['body']['trace']['frames'][$i] = $stringData;
-            
         }
         
         return $data;

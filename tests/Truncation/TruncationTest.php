@@ -41,13 +41,15 @@ class TruncationTest extends \PHPUnit_Framework_TestCase
         $framesTestData = $framesTest->executeProvider();
         
         // Fill up frames with data to go over the allowed payload size limit
-        $stringValue = str_repeat('A', 1024 * 10);  
-        foreach ($framesTestData['truncate middle using trace key'][0]['data']['body']['trace']['frames'] as $key => $data) {
-            $framesTestData['truncate middle using trace key'][0]['data']['body']['trace']['frames'][$key] = $stringValue;
+        $frames = &$framesTestData['truncate middle using trace key'][0]['data']['body']['trace']['frames'];
+        $stringValue = str_repeat('A', 1024 * 10);
+        foreach ($frames as $key => $data) {
+            $frames[$key] = $stringValue;
         }
         
-        foreach ($framesTestData['truncate middle using trace_chain key'][0]['data']['body']['trace_chain']['frames'] as $key => $data) {
-            $framesTestData['truncate middle using trace_chain key'][0]['data']['body']['trace_chain']['frames'][$key] = $stringValue;
+        $frames = &$framesTestData['truncate middle using trace_chain key'][0]['data']['body']['trace_chain']['frames'];
+        foreach ($frames as $key => $data) {
+            $frames[$key] = $stringValue;
         }
         
         $data = array_merge(
@@ -59,113 +61,130 @@ class TruncationTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
-     * 
+     *
      * = Optimization notes =
-     * 
+     *
      * == testTruncatePerformance for StringsStrategyTest - truncate strings to 1024 ==
-     * 
+     *
      * === Before any optimizations ===
-     * Payload size: 524330 bytes = 0.5 MB 
-     * Strategies used: Rollbar\Truncation\RawStrategy, Rollbar\Truncation\FramesStrategy, Rollbar\Truncation\StringsStrategy
+     * Payload size: 524330 bytes = 0.5 MB
+     * Strategies used:
+     * Rollbar\Truncation\RawStrategy,
+     * Rollbar\Truncation\FramesStrategy,
+     * Rollbar\Truncation\StringsStrategy
      * Encoding triggered: 6
      * Memory usage: 0 bytes = 0 MB
      * Execution time: 9.833740234375 ms
-     * 
+     *
      * === After removing RawStrategy and MinBodyStrategy ===
-     * Payload size: 524330 bytes = 0.5 MB 
-     * Strategies used: Rollbar\Truncation\FramesStrategy, Rollbar\Truncation\StringsStrategy
+     * Payload size: 524330 bytes = 0.5 MB
+     * Strategies used:
+     * Rollbar\Truncation\FramesStrategy,
+     * Rollbar\Truncation\StringsStrategy
      * Encoding triggered: 4
      * Memory usage: 0 bytes = 0 MB
      * Execution time: 6.991943359375 ms
-     * 
+     *
      * === After adding applies() in strategies ===
-     * Payload size: 524330 bytes = 0.5 MB 
-     * Strategies used: Rollbar\Truncation\StringsStrategy
+     * Payload size: 524330 bytes = 0.5 MB
+     * Strategies used:
+     * Rollbar\Truncation\StringsStrategy
      * Encoding triggered: 3
      * Memory usage: 0 bytes = 0 MB
      * Execution time: 6.03076171875 ms
-     * 
+     *
      * === After limiting json_encode invocations ===
-     * Payload size: 524330 bytes = 0.5 MB 
-     * Strategies used: Rollbar\Truncation\StringsStrategy
+     * Payload size: 524330 bytes = 0.5 MB
+     * Strategies used:
+     * Rollbar\Truncation\StringsStrategy
      * Encoding triggered: 1
      * Memory usage: 0 bytes = 0 MB
      * Execution time: 3.761962890625 ms
-     * 
-     * 
-     * 
-     * 
-     * 
-     * 
-     * 
-     * 
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
      * == testTruncatePerformance for FramesStrategyTest - nothing to truncate using trace key ==
-     * 
+     *
      * === Before any optimizations ===
-     * Payload size: 52 bytes = 0 MB 
-     * Strategies used: 
+     * Payload size: 52 bytes = 0 MB
+     * Strategies used:
      * Encoding triggered: 1
      * Memory usage: 0 bytes = 0 MB
      * Execution time: 0.002685546875 ms
-     * 
+     *
      * === After removing RawStrategy and MinBodyStrategy ===
-     * Payload size: 52 bytes = 0 MB 
-     * Strategies used: 
+     * Payload size: 52 bytes = 0 MB
+     * Strategies used:
      * Encoding triggered: 1
      * Memory usage: 0 bytes = 0 MB
      * Execution time: 0.0029296875 ms
-     * 
+     *
      * === After adding applies() in strategies ===
-     * Payload size: 52 bytes = 0 MB 
-     * Strategies used: 
+     * Payload size: 52 bytes = 0 MB
+     * Strategies used:
      * Encoding triggered: 1
      * Memory usage: 0 bytes = 0 MB
      * Execution time: 0.010986328125 ms
-     * 
+     *
      * === After limiting json_encode invocations ===
-     * Payload size: 52 bytes = 0 MB 
-     * Strategies used: 
+     * Payload size: 52 bytes = 0 MB
+     * Strategies used:
      * Encoding triggered: 0
      * Memory usage: 0 bytes = 0 MB
      * Execution time: 0.01513671875 ms
-     * 
-     * 
-     * 
-     * 
-     * 
-     * 
+     *
+     *
+     *
+     *
+     *
+     *
      * == testTruncatePerformance for MassivePayloadTest ==
-     * 
+     *
      * === Before any optimizations ===
-     * Payload size: 79166622 bytes = 75.5 MB 
-     * Strategies used: Rollbar\Truncation\RawStrategy, Rollbar\Truncation\FramesStrategy, Rollbar\Truncation\StringsStrategy, Rollbar\Truncation\MinBodyStrategy
+     * Payload size: 79166622 bytes = 75.5 MB
+     * Strategies used:
+     * Rollbar\Truncation\RawStrategy,
+     * Rollbar\Truncation\FramesStrategy,
+     * Rollbar\Truncation\StringsStrategy,
+     * Rollbar\Truncation\MinBodyStrategy
      * Encoding triggered: 7
      * Memory usage: 174063616 bytes = 166 MB
      * Execution time: 2382.2009277344 ms
-     * 
+     *
      * === After removing RawStrategy and MinBodyStrategy ===
-     * Payload size: 79166622 bytes = 75.5 MB 
-     * Strategies used: Rollbar\Truncation\FramesStrategy, Rollbar\Truncation\StringsStrategy
+     * Payload size: 79166622 bytes = 75.5 MB
+     * Strategies used:
+     * Rollbar\Truncation\FramesStrategy,
+     * Rollbar\Truncation\StringsStrategy
      * Encoding triggered: 5
      * Memory usage: 174063616 bytes = 166 MB
      * Execution time: 2074.6579589844 ms
-     * 
+     *
      * === After adding applies() in strategies ===
-     * Payload size: 79166622 bytes = 75.5 MB 
-     * Strategies used: Rollbar\Truncation\FramesStrategy, Rollbar\Truncation\StringsStrategy
+     * Payload size: 79166622 bytes = 75.5 MB
+     * Strategies used:
+     * Rollbar\Truncation\FramesStrategy,
+     * Rollbar\Truncation\StringsStrategy
      * Encoding triggered: 5
      * Memory usage: 174063616 bytes = 166 MB
      * Execution time: 1998.2878417969 ms
-     * 
+     *
      * === After limiting json_encode invocations ===
-     * Payload size: 79166622 bytes = 75.5 MB 
-     * Strategies used: Rollbar\Truncation\FramesStrategy, Rollbar\Truncation\StringsStrategy
+     * Payload size: 79166622 bytes = 75.5 MB
+     * Strategies used:
+     * Rollbar\Truncation\FramesStrategy,
+     * Rollbar\Truncation\StringsStrategy
      * Encoding triggered: 2
      * Memory usage: 181329920 bytes = 172.93 MB
      * Execution time: 1204.74609375 ms
-     * 
-     * 
-     * 
+     *
+     *
+     *
      */
     
     /**

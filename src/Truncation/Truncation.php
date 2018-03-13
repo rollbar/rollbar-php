@@ -21,7 +21,7 @@ class Truncation
      * @return \Rollbar\Payload\EncodedPayload
      */
     public function truncate(EncodedPayload $payload)
-    {   
+    {
         foreach (static::$truncationStrategies as $strategy) {
             $strategy = new $strategy($this);
             

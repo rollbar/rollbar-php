@@ -45,12 +45,12 @@ class EncodedPayload
         return $this->encoded;
     }
     
-    public static function GetEncodingCount()
+    public static function getEncodingCount()
     {
         return self::$encodingCount;
     }
     
-    public static function ResetEncodingCount()
+    public static function resetEncodingCount()
     {
         self::$encodingCount = 0;
     }

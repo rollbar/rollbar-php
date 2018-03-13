@@ -17,7 +17,6 @@ class StringsStrategy extends AbstractStrategy
         $modified = false;
         
         foreach (static::getThresholds() as $threshold) {
-            
             if (!$this->truncation->needsTruncating($payload, $this)) {
                 break;
             }

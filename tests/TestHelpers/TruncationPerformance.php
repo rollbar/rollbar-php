@@ -20,7 +20,7 @@ class TruncationPerformance extends Truncation
         $memUsageBefore = memory_get_usage(true);
         $timeBefore = microtime(true) * 1000;
         
-        EncodedPayload::ResetEncodingCount();
+        EncodedPayload::resetEncodingCount();
         
         $result = parent::truncate($payload);
         
@@ -56,10 +56,19 @@ class TruncationPerformance extends Truncation
     {
         $output = "\n";
         
-        $output .= "Payload size: " . $this->payloadSize . " bytes = " . round($this->payloadSize / 1024 / 1024, 2) . " MB \n";
-        $output .= "Strategies used: " . join(", ", $this->strategiesUsed) . "\n";
-        $output .= "Encoding triggered: " . EncodedPayload::GetEncodingCount() . "\n";
-        $output .= "Memory usage: " . $this->memoryUsage . " bytes = " . round($this->memoryUsage / 1024 / 1024, 2) . " MB\n";
+        $output .= "Payload size: " .
+                    $this->payloadSize . " bytes = " .
+                    round($this->payloadSize / 1024 / 1024, 2) . " MB \n";
+                
+        $output .= "Strategies used: \n" .
+                    (count($this->strategiesUsed) ? join(", \n", $this->strategiesUsed) : "none") . "\n";
+        
+        $output .= "Encoding triggered: " . EncodedPayload::getEncodingCount() . "\n";
+        
+        $output .= "Memory usage: " .
+                    $this->memoryUsage . " bytes = " .
+                    round($this->memoryUsage / 1024 / 1024, 2) . " MB\n";
+        
         $output .= "Execution time: " . $this->timeUsage . " ms\n";
         
         return $output;
