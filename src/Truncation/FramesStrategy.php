@@ -17,7 +17,9 @@ class FramesStrategy extends AbstractStrategy
         } elseif (isset($data['data']['body']['trace']['frames'])) {
             $key = 'trace';
         }
-
+        
+        
+        
         if ($key) {
             $data['data']['body'][$key]['frames'] = $this->selectFrames($data['data']['body'][$key]['frames']);
             $payload->encode($data);

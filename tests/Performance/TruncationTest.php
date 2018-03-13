@@ -198,24 +198,24 @@ class TruncationTest extends \PHPUnit_Framework_TestCase
         $framesTestData = $framesTestData['nothing to truncate using trace key'][0];
         
         $data = array(
-            // array(
-            //     "StringsStrategyTest - truncate strings to 1024",
-            //     $stringsTestData
-            // ),
-            // array(
-            //     "FramesStrategyTest - nothing to truncate using trace key",
-            //     $framesTestData
-            // ),
+            array(
+                "StringsStrategyTest - truncate strings to 1024",
+                $stringsTestData
+            ),
+            array(
+                "FramesStrategyTest - nothing to truncate using trace key",
+                $framesTestData
+            ),
             array(
                 "MassivePayloadTest",
                 $massivePayloadTest->executeProvider()
             ),
-            // array(
-            //     "OneLongString",
-            //     $stringsTest->payloadStructureProvider(
-            //         str_repeat("A", \Rollbar\Truncation\Truncation::MAX_PAYLOAD_SIZE+1)
-            //     )
-            // )
+            array(
+                "OneLongString",
+                $stringsTest->payloadStructureProvider(
+                    str_repeat("A", \Rollbar\Truncation\Truncation::MAX_PAYLOAD_SIZE+1)
+                )
+            )
         );
         
         return $data;

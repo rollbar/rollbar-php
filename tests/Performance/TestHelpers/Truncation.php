@@ -14,7 +14,7 @@ class Truncation extends \Rollbar\Truncation\Truncation
         
         $this->payloadSize = $payload->size();
         
-        $memUsageBefore = memory_get_usage(true);
+        $memUsageBefore = memory_get_peak_usage(true);
         $timeBefore = microtime(true) * 1000;
         
         \Rollbar\Performance\TestHelpers\EncodedPayload::resetEncodingCount();
@@ -22,7 +22,7 @@ class Truncation extends \Rollbar\Truncation\Truncation
         $result = parent::truncate($payload);
         
         $timeAfter = microtime(true) * 1000;
-        $memUsageAfter = memory_get_usage(true);
+        $memUsageAfter = memory_get_peak_usage(true);
         
         $this->memoryUsage = $memUsageAfter - $memUsageBefore;
         $this->timeUsage = $timeAfter - $timeBefore;
