@@ -158,13 +158,13 @@ class TruncationTest extends \PHPUnit_Framework_TestCase
      * Execution time: 1204.74609375 ms
      *
      * === After replacing array_walk_recurisve with traverse ===
-     * Payload size: 79166622 bytes = 75.5 MB
-     * Strategies used:
-     * Rollbar\Truncation\FramesStrategy,
+     * Payload size: 79166622 bytes = 75.5 MB 
+     * Strategies used: 
+     * Rollbar\Truncation\FramesStrategy, 
      * Rollbar\Truncation\StringsStrategy
      * Encoding triggered: 2
-     * Memory usage: -524288 bytes = -0.5 MB
-     * Execution time: 956.73901367188 ms
+     * Memory usage: 78643200 bytes = 75 MB
+     * Execution time: 838.8759765625 ms
      *
      *
      */
