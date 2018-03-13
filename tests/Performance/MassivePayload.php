@@ -1,6 +1,11 @@
 <?php
 
-namespace Rollbar\Truncation;
+namespace Rollbar\Performance;
+
+use \Rollbar\Truncation\StringsStrategyTest;
+use \Rollbar\Truncation\FramesStrategyTest;
+
+use \Rollbar\Truncation\StringsStrategy;
 
 class MassivePayload
 {
@@ -8,7 +13,6 @@ class MassivePayload
     public function executeProvider()
     {
         $framesTest = new FramesStrategyTest();
-        $minBodyTest = new MinBodyStrategyTest();
         
         $stringData = $this->generateStringData();
         

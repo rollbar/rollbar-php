@@ -1,4 +1,4 @@
-<?php namespace Rollbar\TestHelpers\Performance;
+<?php namespace Rollbar\Performance\TestHelpers;
 
 class Truncation extends \Rollbar\Truncation\Truncation
 {
@@ -17,7 +17,7 @@ class Truncation extends \Rollbar\Truncation\Truncation
         $memUsageBefore = memory_get_usage(true);
         $timeBefore = microtime(true) * 1000;
         
-        \Rollbar\TestHelpers\Performance\EncodedPayload::resetEncodingCount();
+        \Rollbar\Performance\TestHelpers\EncodedPayload::resetEncodingCount();
         
         $result = parent::truncate($payload);
         
@@ -61,7 +61,7 @@ class Truncation extends \Rollbar\Truncation\Truncation
                     (count($this->strategiesUsed) ? join(", \n", $this->strategiesUsed) : "none") . "\n";
         
         $output .= "Encoding triggered: " .
-                    \Rollbar\TestHelpers\Performance\EncodedPayload::getEncodingCount() . "\n";
+                    \Rollbar\Performance\TestHelpers\EncodedPayload::getEncodingCount() . "\n";
         
         $output .= "Memory usage: " .
                     $this->memoryUsage . " bytes = " .

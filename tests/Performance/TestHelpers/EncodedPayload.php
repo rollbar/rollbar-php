@@ -1,4 +1,4 @@
-<?php namespace Rollbar\TestHelpers\Performance;
+<?php namespace Rollbar\Performance\TestHelpers;
 
 class EncodedPayload extends \Rollbar\Payload\EncodedPayload
 {
