@@ -21,22 +21,10 @@ class RollbarTest extends BaseRollbarTest
     }
 
     private static $simpleConfig = array();
-
-    private static function clearLogger()
-    {
-        $reflLoggerProperty = new \ReflectionProperty('Rollbar\Rollbar', 'logger');
-        $reflLoggerProperty->setAccessible(true);
-        $reflLoggerProperty->setValue(null);
-    }
     
     public static function setupBeforeClass()
     {
-        self::clearLogger();
-    }
-
-    public function tearDown()
-    {
-        self::clearLogger();
+        Rollbar::destroy();
     }
     
     public function testInitWithConfig()
@@ -96,8 +84,6 @@ class RollbarTest extends BaseRollbarTest
         Rollbar::init(self::$simpleConfig);
       
         $response = Rollbar::log(Level::INFO, 'testing info level');
-        
-        var_dump($response);
       
         $this->assertTrue(true);
     }
