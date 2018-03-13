@@ -32,7 +32,7 @@ class Truncation
             if (!$this->needsTruncating($payload, $strategy)) {
                 break;
             }
-            
+    
             $payload = $strategy->execute($payload);
         }
         

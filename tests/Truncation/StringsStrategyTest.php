@@ -58,7 +58,7 @@ class StringsStrategyTest extends \PHPUnit_Framework_TestCase
         return array($payload,$expected);
     }
     
-    protected function payloadStructureProvider($message)
+    public function payloadStructureProvider($message)
     {
         return array(
             "data" => array(

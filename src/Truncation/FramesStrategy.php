@@ -10,7 +10,6 @@ class FramesStrategy extends AbstractStrategy
     public function execute(EncodedPayload $payload)
     {
         $key = false;
-        
         $data = $payload->data();
 
         if (isset($data['data']['body']['trace_chain']['frames'])) {
@@ -21,10 +20,7 @@ class FramesStrategy extends AbstractStrategy
 
         if ($key) {
             $data['data']['body'][$key]['frames'] = $this->selectFrames($data['data']['body'][$key]['frames']);
-            
-            $payloadClass = get_class($payload);
-            $payload = new $payloadClass($data);
-            $payload->encode();
+            $payload->encode($data);
         }
 
         return $payload;

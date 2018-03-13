@@ -59,6 +59,14 @@ class TruncationTest extends \PHPUnit_Framework_TestCase
      * Memory usage: 0 bytes = 0 MB
      * Execution time: 3.761962890625 ms
      *
+     * === After replacing array_walk_recurisve with traverse ===
+     * Payload size: 524330 bytes = 0.5 MB
+     * Strategies used:
+     * Rollbar\Truncation\StringsStrategy
+     * Encoding triggered: 1
+     * Memory usage: 0 bytes = 0 MB
+     * Execution time: 2.003173828125 ms
+     *
      *
      *
      *
@@ -95,6 +103,14 @@ class TruncationTest extends \PHPUnit_Framework_TestCase
      * Encoding triggered: 0
      * Memory usage: 0 bytes = 0 MB
      * Execution time: 0.01513671875 ms
+     *
+     * === After replacing array_walk_recurisve with traverse ===
+     * Payload size: 52 bytes = 0 MB
+     * Strategies used:
+     * none
+     * Encoding triggered: 0
+     * Memory usage: 0 bytes = 0 MB
+     * Execution time: 0.004150390625 ms
      *
      *
      *
@@ -141,6 +157,14 @@ class TruncationTest extends \PHPUnit_Framework_TestCase
      * Memory usage: 181329920 bytes = 172.93 MB
      * Execution time: 1204.74609375 ms
      *
+     * === After replacing array_walk_recurisve with traverse ===
+     * Payload size: 79166622 bytes = 75.5 MB
+     * Strategies used:
+     * Rollbar\Truncation\FramesStrategy,
+     * Rollbar\Truncation\StringsStrategy
+     * Encoding triggered: 2
+     * Memory usage: -524288 bytes = -0.5 MB
+     * Execution time: 956.73901367188 ms
      *
      *
      */
@@ -155,7 +179,7 @@ class TruncationTest extends \PHPUnit_Framework_TestCase
         $payload = new EncodedPayload($data);
         $payload->encode();
         
-        $result = $this->truncate->truncate($payload);
+        $payload = $this->truncate->truncate($payload);
         
         echo $this->truncate->getLastRun();
     }
@@ -185,7 +209,13 @@ class TruncationTest extends \PHPUnit_Framework_TestCase
             array(
                 "MassivePayloadTest",
                 $massivePayloadTest->executeProvider()
-            )
+            ),
+            // array(
+            //     "OneLongString",
+            //     $stringsTest->payloadStructureProvider(
+            //         str_repeat("A", \Rollbar\Truncation\Truncation::MAX_PAYLOAD_SIZE+1)
+            //     )
+            // )
         );
         
         return $data;

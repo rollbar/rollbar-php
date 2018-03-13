@@ -14,5 +14,10 @@ class EncodedPayloadTest extends \Rollbar\BaseRollbarTest
         $encoded->encode();
         
         $this->assertEquals($expected, $encoded);
+        
+        $expected = '{"new":"bar"}';
+        $encoded->encode(array("new" => "bar"));
+        
+        $this->assertEquals($expected, $encoded);
     }
 }

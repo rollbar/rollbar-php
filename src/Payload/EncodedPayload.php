@@ -26,8 +26,12 @@ class EncodedPayload
         $this->size =- $amount;
     }
     
-    public function encode()
+    public function encode($data = null)
     {
+        if ($data !== null) {
+            $this->data = $data;
+        }
+        
         $this->encoded = json_encode($this->data);
         $this->size = strlen($this->encoded);
     }
