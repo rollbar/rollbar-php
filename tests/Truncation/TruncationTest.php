@@ -85,6 +85,13 @@ class TruncationTest extends \PHPUnit_Framework_TestCase
      * Memory usage: 0 bytes = 0 MB
      * Execution time: 6.03076171875 ms
      * 
+     * === After limiting json_encode invocations ===
+     * Payload size: 524330 bytes = 0.5 MB 
+     * Strategies used: Rollbar\Truncation\StringsStrategy
+     * Encoding triggered: 1
+     * Memory usage: 0 bytes = 0 MB
+     * Execution time: 3.761962890625 ms
+     * 
      * 
      * 
      * 
@@ -115,6 +122,13 @@ class TruncationTest extends \PHPUnit_Framework_TestCase
      * Memory usage: 0 bytes = 0 MB
      * Execution time: 0.010986328125 ms
      * 
+     * === After limiting json_encode invocations ===
+     * Payload size: 52 bytes = 0 MB 
+     * Strategies used: 
+     * Encoding triggered: 0
+     * Memory usage: 0 bytes = 0 MB
+     * Execution time: 0.01513671875 ms
+     * 
      * 
      * 
      * 
@@ -142,6 +156,13 @@ class TruncationTest extends \PHPUnit_Framework_TestCase
      * Encoding triggered: 5
      * Memory usage: 174063616 bytes = 166 MB
      * Execution time: 1998.2878417969 ms
+     * 
+     * === After limiting json_encode invocations ===
+     * Payload size: 79166622 bytes = 75.5 MB 
+     * Strategies used: Rollbar\Truncation\FramesStrategy, Rollbar\Truncation\StringsStrategy
+     * Encoding triggered: 2
+     * Memory usage: 181329920 bytes = 172.93 MB
+     * Execution time: 1204.74609375 ms
      * 
      * 
      * 
