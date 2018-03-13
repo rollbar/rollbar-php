@@ -2,15 +2,12 @@
 
 namespace Rollbar\Truncation;
 
-use Rollbar\TestHelpers\TruncationPerformance;
-use Rollbar\Payload\EncodedPayload;
-
 class TruncationTest extends \PHPUnit_Framework_TestCase
 {
     
     public function setUp()
     {
-        $this->truncate = new Truncation();
+        $this->truncate = new \Rollbar\Truncation\Truncation();
     }
 
     /**
@@ -19,7 +16,7 @@ class TruncationTest extends \PHPUnit_Framework_TestCase
     public function testTruncateNoPerformance($data)
     {
         
-        $data = new EncodedPayload($data);
+        $data = new \Rollbar\Payload\EncodedPayload($data);
         $data->encode();
         
         $result = $this->truncate->truncate($data);
@@ -27,7 +24,7 @@ class TruncationTest extends \PHPUnit_Framework_TestCase
         $size = strlen(json_encode($result));
         
         $this->assertTrue(
-            $size <= Truncation::MAX_PAYLOAD_SIZE,
+            $size <= \Rollbar\Truncation\Truncation::MAX_PAYLOAD_SIZE,
             "Truncation failed. Payload size exceeds MAX_PAYLOAD_SIZE."
         );
     }
@@ -194,9 +191,9 @@ class TruncationTest extends \PHPUnit_Framework_TestCase
     {
         echo "\n== testTruncatePerformance for $dataName ==\n";
         
-        $truncation = new TruncationPerformance();
+        $truncation = new \Rollbar\TestHelpers\Performance\Truncation();
         
-        $data = new EncodedPayload($data);
+        $data = new \Rollbar\TestHelpers\Performance\EncodedPayload($data);
         $data->encode();
         
         $result = $truncation->truncate($data);

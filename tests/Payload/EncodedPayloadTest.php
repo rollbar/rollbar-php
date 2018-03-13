@@ -14,6 +14,5 @@ class EncodedPayloadTest extends \Rollbar\BaseRollbarTest
         $encoded->encode();
         
         $this->assertEquals($expected, $encoded);
-        $this->assertEquals(1, EncodedPayload::getEncodingCount());
     }
 }

@@ -54,7 +54,8 @@ class MinBodyStrategy extends AbstractStrategy
         }
         
         if ($modified) {
-            $payload = new EncodedPayload($data);
+            $payloadClass = get_class($payload);
+            $payload = new $payloadClass($data);
             $payload->encode();
         }
         

@@ -2,8 +2,6 @@
 
 class EncodedPayload
 {
-    protected static $encodingCount = 0;
-    
     protected $data = null;
     protected $encoded = null;
     protected $size = 0;
@@ -31,7 +29,6 @@ class EncodedPayload
     public function encode()
     {
         $this->encoded = json_encode($this->data);
-        self::$encodingCount++;
         $this->size = strlen($this->encoded);
     }
     
@@ -43,15 +40,5 @@ class EncodedPayload
     public function encoded()
     {
         return $this->encoded;
-    }
-    
-    public static function getEncodingCount()
-    {
-        return self::$encodingCount;
-    }
-    
-    public static function resetEncodingCount()
-    {
-        self::$encodingCount = 0;
     }
 }

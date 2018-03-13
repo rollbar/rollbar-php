@@ -21,7 +21,9 @@ class FramesStrategy extends AbstractStrategy
 
         if ($key) {
             $data['data']['body'][$key]['frames'] = $this->selectFrames($data['data']['body'][$key]['frames']);
-            $payload = new EncodedPayload($data);
+            
+            $payloadClass = get_class($payload);
+            $payload = new $payloadClass($data);
             $payload->encode();
         }
 

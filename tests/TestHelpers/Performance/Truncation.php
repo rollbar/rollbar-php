@@ -1,9 +1,6 @@
-<?php namespace Rollbar\TestHelpers;
+<?php namespace Rollbar\TestHelpers\Performance;
 
-use Rollbar\Truncation\Truncation;
-use Rollbar\Payload\EncodedPayload;
-
-class TruncationPerformance extends Truncation
+class Truncation extends \Rollbar\Truncation\Truncation
 {
     protected $memoryUsage = 0;
     protected $timeUsage = 0;
@@ -11,7 +8,7 @@ class TruncationPerformance extends Truncation
     protected $lastRunOutput = "";
     protected $strategiesUsed = array();
     
-    public function truncate(EncodedPayload $payload)
+    public function truncate(\Rollbar\Payload\EncodedPayload $payload)
     {
         $this->strategiesUsed = array();
         
@@ -20,7 +17,7 @@ class TruncationPerformance extends Truncation
         $memUsageBefore = memory_get_usage(true);
         $timeBefore = microtime(true) * 1000;
         
-        EncodedPayload::resetEncodingCount();
+        \Rollbar\TestHelpers\Performance\EncodedPayload::resetEncodingCount();
         
         $result = parent::truncate($payload);
         
@@ -36,7 +33,7 @@ class TruncationPerformance extends Truncation
         return $result;
     }
     
-    public function needsTruncating(EncodedPayload $payload, $strategy)
+    public function needsTruncating(\Rollbar\Payload\EncodedPayload $payload, $strategy)
     {
         $result = parent::needsTruncating($payload, $strategy);
         
@@ -63,7 +60,8 @@ class TruncationPerformance extends Truncation
         $output .= "Strategies used: \n" .
                     (count($this->strategiesUsed) ? join(", \n", $this->strategiesUsed) : "none") . "\n";
         
-        $output .= "Encoding triggered: " . EncodedPayload::getEncodingCount() . "\n";
+        $output .= "Encoding triggered: " .
+                    \Rollbar\TestHelpers\Performance\EncodedPayload::getEncodingCount() . "\n";
         
         $output .= "Memory usage: " .
                     $this->memoryUsage . " bytes = " .
