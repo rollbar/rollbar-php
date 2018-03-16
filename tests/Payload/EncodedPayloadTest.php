@@ -56,7 +56,7 @@ class EncodedPayloadTest extends \Rollbar\BaseRollbarTest
      */
     public function testEncodeMalformedDataPHP54()
     {
-        if (version_compare(phpversion(), "5.4", "=")) {
+        if (version_compare(phpversion(), "5.4")) {
             $this->markTestSkipped("PHP = 5.4");
         }
         
