@@ -43,7 +43,11 @@ class EncodedPayloadTest extends \Rollbar\BaseRollbarTest
         
         $result = json_decode($encoded->encoded(), true);
         
-        $this->assertNull($result['data']['body']['exception']['trace']['frames']);
+        if (defined('HHVM_VERSION')) {
+            $this->assertEmpty($result['data']['body']['exception']['trace']['frames']);
+        } else {
+            $this->assertNull($result['data']['body']['exception']['trace']['frames']);
+        }
     }
     
     /**
