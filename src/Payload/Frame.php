@@ -96,9 +96,6 @@ class Frame implements \JsonSerializable
 
     public function jsonSerialize()
     {
-        $args = $this->args;
-        if(json_encode($args) === false)
-            $args = array();
         $result = array(
             "filename" => $this->filename,
             "lineno" => $this->lineno,
@@ -106,7 +103,7 @@ class Frame implements \JsonSerializable
             "method" => $this->method,
             "code" => $this->code,
             "context" => $this->context,
-            "args" => $args,
+            "args" => $this->args
         );
         return $this->utilities->serializeForRollbar($result);
     }

@@ -32,7 +32,8 @@ class EncodedPayload
             $this->data = $data;
         }
         
-        $this->encoded = json_encode($this->data);
+        $this->encoded = json_encode($this->data, JSON_PARTIAL_OUTPUT_ON_ERROR);
+        
         $this->size = strlen($this->encoded);
     }
     
