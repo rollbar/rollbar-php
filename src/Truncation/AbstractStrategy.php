@@ -1,5 +1,7 @@
 <?php namespace Rollbar\Truncation;
 
+use \Rollbar\Payload\EncodedPayload;
+
 class AbstractStrategy implements IStrategy
 {
     protected $truncation;
@@ -9,8 +11,13 @@ class AbstractStrategy implements IStrategy
         $this->truncation = $truncation;
     }
     
-    public function execute(array $payload)
+    public function execute(EncodedPayload $payload)
     {
         return $payload;
+    }
+    
+    public function applies(EncodedPayload $payload)
+    {
+        return true;
     }
 }

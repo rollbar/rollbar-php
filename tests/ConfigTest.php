@@ -9,7 +9,6 @@ use Rollbar\Payload\Message;
 use Rollbar\Payload\Payload;
 use Rollbar\RollbarLogger;
 
-
 use Rollbar\TestHelpers\Exceptions\SilentExceptionSampleRate;
 use Rollbar\TestHelpers\Exceptions\FiftyFiftyExceptionSampleRate;
 use Rollbar\TestHelpers\Exceptions\FiftyFityChildExceptionSampleRate;
@@ -34,6 +33,7 @@ class ConfigTest extends BaseRollbarTest
 
     public function tearDown()
     {
+        parent::tearDown();
         m::close();
     }
     
@@ -221,7 +221,7 @@ class ConfigTest extends BaseRollbarTest
 
     public function testSender()
     {
-        $p = m::mock("Rollbar\Payload\Payload");
+        $p = m::mock("Rollbar\Payload\EncodedPayload");
         $sender = m::mock("Rollbar\Senders\SenderInterface")
             ->shouldReceive("send")
             ->with($p, $this->getTestAccessToken())

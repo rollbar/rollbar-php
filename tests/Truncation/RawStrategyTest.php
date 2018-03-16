@@ -2,6 +2,8 @@
 
 namespace Rollbar\Truncation;
 
+use Rollbar\Payload\EncodedPayload;
+
 class RawStrategyTest extends \PHPUnit_Framework_TestCase
 {
     public function testExecute()
@@ -11,11 +13,15 @@ class RawStrategyTest extends \PHPUnit_Framework_TestCase
         $truncation = new Truncation();
                     
         $strategy = new RawStrategy($truncation);
-        $result = $strategy->execute($payload);
+        
+        $data = new EncodedPayload($payload);
+        $data->encode();
+        
+        $result = $strategy->execute($data);
         
         $this->assertEquals(
             strlen(json_encode($payload)),
-            strlen(json_encode($result))
+            $result->size()
         );
     }
 }

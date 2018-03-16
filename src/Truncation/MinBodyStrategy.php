@@ -1,20 +1,25 @@
 <?php namespace Rollbar\Truncation;
 
+use \Rollbar\Payload\EncodedPayload;
+
 class MinBodyStrategy extends AbstractStrategy
 {
     
     const EXCEPTION_MESSAGE_LIMIT = 256;
     const EXCEPTION_FRAMES_RANGE = 1;
     
-    public function execute(array $payload)
+    public function execute(EncodedPayload $payload)
     {
+        $data = $payload->data();
+        
+        $modified = false;
         
         $traceData = array();
         
-        if (isset($payload['data']['body']['trace'])) {
-            $traceData = &$payload['data']['body']['trace'];
-        } elseif (isset($payload['data']['body']['trace_chain'])) {
-            $traceData = &$payload['data']['body']['trace_chain'];
+        if (isset($data['data']['body']['trace'])) {
+            $traceData = &$data['data']['body']['trace'];
+        } elseif (isset($data['data']['body']['trace_chain'])) {
+            $traceData = &$data['data']['body']['trace_chain'];
         }
         
         if (isset($traceData['exception'])) {
@@ -31,6 +36,8 @@ class MinBodyStrategy extends AbstractStrategy
                 0,
                 static::EXCEPTION_MESSAGE_LIMIT
             );
+            
+            $modified = true;
         }
         
         /**
@@ -42,6 +49,14 @@ class MinBodyStrategy extends AbstractStrategy
                 $traceData['frames'],
                 static::EXCEPTION_FRAMES_RANGE
             );
+            
+            $modified = true;
+        }
+        
+        if ($modified) {
+            $payloadClass = get_class($payload);
+            $payload = new $payloadClass($data);
+            $payload->encode();
         }
         
         return $payload;

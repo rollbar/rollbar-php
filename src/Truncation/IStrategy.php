@@ -1,11 +1,18 @@
 <?php namespace Rollbar\Truncation;
 
+use \Rollbar\Payload\EncodedPayload;
+
 interface IStrategy
 {
+    /**
+     * @param array $payload
+     * @return array
+     */
+    public function execute(EncodedPayload $payload);
     
     /**
      * @param array $payload
      * @return array
      */
-    public function execute(array $payload);
+    public function applies(EncodedPayload $payload);
 }

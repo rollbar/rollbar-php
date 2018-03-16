@@ -2,6 +2,7 @@
 
 use Rollbar\Payload\Level;
 use Rollbar\Payload\Payload;
+use \Rollbar\Payload\EncodedPayload;
 
 if (!defined('ROLLBAR_INCLUDED_ERRNO_BITMASK')) {
     define(
@@ -691,9 +692,9 @@ class Config
         return error_reporting() === 0 && !$this->reportSuppressed;
     }
 
-    public function send(&$scrubbedPayload, $accessToken)
+    public function send(EncodedPayload $payload, $accessToken)
     {
-        return $this->sender->send($scrubbedPayload, $accessToken);
+        return $this->sender->send($payload, $accessToken);
     }
 
     public function sendBatch(&$batch, $accessToken)
