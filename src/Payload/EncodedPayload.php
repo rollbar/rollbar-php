@@ -32,7 +32,14 @@ class EncodedPayload
             $this->data = $data;
         }
         
-        $this->encoded = json_encode($this->data, JSON_PARTIAL_OUTPUT_ON_ERROR);
+        $this->encoded = json_encode(
+            $this->data,
+            defined('JSON_PARTIAL_OUTPUT_ON_ERROR') ? JSON_PARTIAL_OUTPUT_ON_ERROR : 0
+        );
+        
+        if ($this->encoded === false) {
+            throw new \Exception("Payload data could not be encoded to JSON format.");
+        }
         
         $this->size = strlen($this->encoded);
     }
