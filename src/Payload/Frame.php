@@ -103,7 +103,7 @@ class Frame implements \JsonSerializable
             "method" => $this->method,
             "code" => $this->code,
             "context" => $this->context,
-            "args" => $this->args,
+            "args" => $this->args
         );
         return $this->utilities->serializeForRollbar($result);
     }

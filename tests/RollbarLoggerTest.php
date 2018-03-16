@@ -119,6 +119,24 @@ class RollbarLoggerTest extends BaseRollbarTest
         $this->assertEquals(200, $response->getStatus());
     }
     
+    public function testLogMalformedPayloadData()
+    {
+        $logger = new RollbarLogger(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => "testing-php",
+            "transformer" => '\Rollbar\TestHelpers\MalformedPayloadDataTransformer',
+            "verbosity" => \Psr\Log\LogLevel::DEBUG
+        ));
+        
+        $response = $logger->log(
+            Level::ERROR,
+            "Forced payload's data to false value.",
+            array()
+        );
+        
+        $this->assertEquals(400, $response->getStatus());
+    }
+    
     /**
      * @dataProvider debugLoggerProvider
      */
