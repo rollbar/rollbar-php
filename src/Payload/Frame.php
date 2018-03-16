@@ -98,7 +98,7 @@ class Frame implements \JsonSerializable
     {
         $args = $this->args;
         if(json_encode($args) === false)
-            $args = [];
+            $args = array();
         $result = array(
             "filename" => $this->filename,
             "lineno" => $this->lineno,
