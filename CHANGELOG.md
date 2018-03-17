@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.4.1
+- Temporarily add `\Rollbar\Monolog\Handler\MonologHandler` until `Seldaek:monolog` PR 1042 gets merged into their `master`
+- Refactor JSON encoding mechanis to limit calls to `json_encode` to minimum with `\Rollbar\Payload\EncodedPayload`
+- Optimize performance of `StringsStrategy` and `FramesStrategy` truncation strategies
+- Remove `RawStrategy` and `MinBodyStrategy` completely (they are not adding any value - the same results are achieved by the combination of other strategies)
+- Fix for non-encodable values in the payload data. This was occasionally causing `400` response codes from the API
+- Updat code examples in README.md
+- Lock Monolog dependency at `^1.23`. The implementation of `\Monolog\TestCase` class in their master is currently not stable
+- Add instructions on using Rollbar with Monolog after bringing the `MonologHandler` into this repo
+- Clean up `RollbarLogger` instances after each test in the testsuite so the configuration doesn't persist between test cases
+- Add `composer performance` command to run performance test suite
+
 ## 1.4.0
 - Add internal SDK debugging with `verbosity` configuration option
 - `local_vars_dump` configuration option is now enabled by default
