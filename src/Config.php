@@ -13,6 +13,46 @@ if (!defined('ROLLBAR_INCLUDED_ERRNO_BITMASK')) {
 
 class Config
 {
+    private static $options = array(
+        'access_token',
+        'agent_log_location',
+        'allow_exec',
+        'endpoint',
+        'base_api_url',
+        'branch',
+        'capture_error_stacktraces',
+        'checkIgnore',
+        'code_version',
+        'custom',
+        'enable_utf8_sanitization',
+        'enabled',
+        'environment',
+        'error_sample_rates',
+        'exception_sample_rates',
+        'fluent_host',
+        'fluent_port',
+        'fluent_tag',
+        'handler',
+        'host',
+        'include_error_code_context',
+        'include_exception_code_context',
+        'included_errno',
+        'logger',
+        'person',
+        'person_fn',
+        'root',
+        'scrub_fields',
+        'scrub_whitelist',
+        'timeout',
+        'report_suppressed',
+        'use_error_reporting',
+        'proxy',
+        'send_message_trace',
+        'include_raw_request_body',
+        'local_vars_dump',
+        'verbosity'
+    );
+    
     private $accessToken;
     /**
      * @var string $enabled Enable / disable Rollbar SDK.
@@ -115,6 +155,11 @@ class Config
             }
         }
         $this->mt_randmax = mt_getrandmax();
+    }
+    
+    public static function listOptions()
+    {
+        return self::$options;
     }
 
     public function configure($config)
