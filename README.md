@@ -416,9 +416,9 @@ Default: `true`
 
 <dt>environment
 </dt>
-<dd>Environment name, e.g. `'production'` or `'development'`
+<dd>Environment name, e.g. `production` or `development`
 
-Default: `'production'`
+Default: `production`
 </dd>
 
 <dt>error_sample_rates

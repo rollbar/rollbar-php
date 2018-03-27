@@ -117,6 +117,7 @@ class Defaults
     private $defaultCheckIgnore = null;
     private $defaultCustom = null;
     private $defaultEnabled = true;
+    private $defaultEnvironment = 'production';
     private $defaultPsrLevels;
     private $defaultCodeVersion;
     private $defaultErrorLevels;
@@ -216,6 +217,11 @@ class Defaults
     public function enabled($enabled = null)
     {
         return $enabled ?: $this->defaultEnabled;
+    }
+    
+    public function environment($environment = null)
+    {
+        return $environment ?: $this->defaultEnvironment;
     }
 
     public function messageLevel($level = null)

@@ -102,7 +102,7 @@ class DataBuilder implements DataBuilderInterface
 
     protected function setEnvironment($config)
     {
-        $fromConfig = isset($config['environment']) ? $config['environment'] : null;
+        $fromConfig = isset($config['environment']) ? $config['environment'] : \Rollbar\Defaults::get()->environment();
         $this->utilities->validateString($fromConfig, "config['environment']", null, false);
         $this->environment = $fromConfig;
     }

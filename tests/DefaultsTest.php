@@ -179,4 +179,9 @@ class DefaultsTest extends BaseRollbarTest
     {
         $this->assertTrue($this->defaults->enabled());
     }
+    
+    public function testEnvironment()
+    {
+        $this->assertEquals('production', $this->defaults->environment());
+    }
 }
