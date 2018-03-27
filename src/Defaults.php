@@ -113,6 +113,7 @@ class Defaults
     private $defaultMessageLevel = "warning";
     private $defaultExceptionLevel = "error";
     private $defaultEndpoint = 'https://api.rollbar.com/api/1/item/';
+    private $defaultCaptureErrorStacktraces = true;
     private $defaultPsrLevels;
     private $defaultCodeVersion;
     private $defaultErrorLevels;
@@ -128,7 +129,6 @@ class Defaults
     private $defaultIncludeExcCodeContext;
     private $defaultRawRequestBody;
     private $defaultLocalVarsDump;
-    private $defaultCaptureErrorStacktraces;
     private $utilities;
 
     public function __construct($utilities)
@@ -181,7 +181,6 @@ class Defaults
         $this->defaultIncludeExcCodeContext = false;
         $this->defaultRawRequestBody = false;
         $this->defaultLocalVarsDump = true;
-        $this->defaultCaptureErrorStacktraces = true;
         
         $this->utilities = $utilities;
     }

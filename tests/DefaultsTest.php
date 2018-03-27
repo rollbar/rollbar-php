@@ -154,4 +154,9 @@ class DefaultsTest extends BaseRollbarTest
     {
         $this->assertEquals('https://api.rollbar.com/api/1/item/', $this->defaults->endpoint());
     }
+    
+    public function testCaptureErrorStacktraces()
+    {
+        $this->assertTrue($this->defaults->captureErrorStacktraces());
+    }
 }
