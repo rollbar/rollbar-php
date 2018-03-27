@@ -250,7 +250,7 @@ class DataBuilder implements DataBuilderInterface
 
     public function setCustom($config)
     {
-        $this->custom = isset($config['custom']) ? $config['custom'] : null;
+        $this->custom = isset($config['custom']) ? $config['custom'] : \Rollbar\Defaults::get()->custom();
     }
 
     protected function setFingerprint($config)
