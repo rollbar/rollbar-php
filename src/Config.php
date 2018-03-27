@@ -105,7 +105,7 @@ class Config
      */
     private $check_ignore;
     private $error_sample_rates;
-    private $exception_sample_rates = array();
+    private $exception_sample_rates;
     private $mt_randmax;
 
     private $included_errno = ROLLBAR_INCLUDED_ERRNO_BITMASK;
@@ -137,6 +137,7 @@ class Config
             $this->error_sample_rates = $configArray['error_sample_rates'];
         }
         
+        $this->exception_sample_rates = \Rollbar\Defaults::get()->exceptionSampleRates();
         if (isset($configArray['exception_sample_rates'])) {
             $this->exception_sample_rates = $configArray['exception_sample_rates'];
         }

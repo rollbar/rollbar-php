@@ -189,4 +189,9 @@ class DefaultsTest extends BaseRollbarTest
     {
         $this->assertEmpty($this->defaults->errorSampleRates());
     }
+    
+    public function testExceptionSampleRates()
+    {
+        $this->assertEmpty($this->defaults->exceptionSampleRates());
+    }
 }
