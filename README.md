@@ -354,8 +354,6 @@ Default: `https://api.rollbar.com/api/1/`
 <dt>branch
 </dt>
 <dd>Name of the current branch.
-
-Default: `master`
 </dd>
 
 <dt>capture_error_stacktraces
