@@ -144,4 +144,9 @@ class DefaultsTest extends BaseRollbarTest
     {
         $this->assertEquals('/var/tmp', $this->defaults->agentLogLocation());
     }
+    
+    public function testAllowExec()
+    {
+        $this->assertEquals(true, $this->defaults->allowExec());
+    }
 }

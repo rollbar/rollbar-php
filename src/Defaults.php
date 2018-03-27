@@ -109,6 +109,7 @@ class Defaults
     }
 
     private $defaultAgentLogLocation = '/var/tmp';
+    private $defaultAllowExec = true;
     private $defaultMessageLevel = "warning";
     private $defaultExceptionLevel = "error";
     private $defaultPsrLevels;
@@ -187,6 +188,11 @@ class Defaults
     public function agentLogLocation($agentLogLocation = null)
     {
         return $agentLogLocation ?: $this->defaultAgentLogLocation;
+    }
+    
+    public function allowExec($allowExec = null)
+    {
+        return $allowExec ?: $this->defaultAllowExec;
     }
 
     public function messageLevel($level = null)
