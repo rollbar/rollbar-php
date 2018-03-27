@@ -149,4 +149,9 @@ class DefaultsTest extends BaseRollbarTest
     {
         $this->assertEquals(true, $this->defaults->allowExec());
     }
+    
+    public function testEndpoint()
+    {
+        $this->assertEquals('https://api.rollbar.com/api/1/item/', $this->defaults->endpoint());
+    }
 }
