@@ -407,13 +407,6 @@ in this array which is also present in the custom data passed to a log/debug/err
 have the value of the latter.
 </dd>
 
-<dt>enable_utf8_sanitization
-</dt>
-<dd>set to false, to disable running iconv on the payload, may be needed if there is invalid characters, and the payload is being destroyed
-
-Default: `true`
-</dd>
-
 <dt>enabled
 </dt>
 <dd>Enable or disable Rollbar in your project. This can be changed at runtime with `Rollbar::enable()` and `Rollbar::disable()` or through `Rollbar::configure()`.

@@ -24,7 +24,6 @@ class Config
         'check_ignore',
         'code_version',
         'custom',
-        'enable_utf8_sanitization',
         'enabled',
         'environment',
         'error_sample_rates',
