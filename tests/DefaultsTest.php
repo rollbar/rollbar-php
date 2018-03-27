@@ -184,4 +184,9 @@ class DefaultsTest extends BaseRollbarTest
     {
         $this->assertEquals('production', $this->defaults->environment());
     }
+    
+    public function testErrorSampleRates()
+    {
+        $this->assertEmpty($this->defaults->errorSampleRates());
+    }
 }

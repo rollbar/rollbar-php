@@ -118,6 +118,7 @@ class Defaults
     private $defaultCustom = null;
     private $defaultEnabled = true;
     private $defaultEnvironment = 'production';
+    private $defaultErrorSampleRates;
     private $defaultPsrLevels;
     private $defaultCodeVersion;
     private $defaultErrorLevels;
@@ -185,6 +186,7 @@ class Defaults
         $this->defaultIncludeExcCodeContext = false;
         $this->defaultRawRequestBody = false;
         $this->defaultLocalVarsDump = true;
+        $this->defaultErrorSampleRates = array();
         
         $this->utilities = $utilities;
     }
@@ -222,6 +224,11 @@ class Defaults
     public function environment($environment = null)
     {
         return $environment ?: $this->defaultEnvironment;
+    }
+    
+    public function errorSampleRates($errorSampleRates = null)
+    {
+        return $errorSampleRates ?: $this->defaultErrorSampleRates;
     }
 
     public function messageLevel($level = null)

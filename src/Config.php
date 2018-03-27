@@ -104,7 +104,7 @@ class Config
      * @var callable
      */
     private $check_ignore;
-    private $error_sample_rates = array();
+    private $error_sample_rates;
     private $exception_sample_rates = array();
     private $mt_randmax;
 
@@ -132,6 +132,7 @@ class Config
         
         $this->updateConfig($configArray);
 
+        $this->error_sample_rates = \Rollbar\Defaults::get()->errorSampleRates();
         if (isset($configArray['error_sample_rates'])) {
             $this->error_sample_rates = $configArray['error_sample_rates'];
         }
