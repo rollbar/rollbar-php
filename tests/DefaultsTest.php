@@ -159,4 +159,9 @@ class DefaultsTest extends BaseRollbarTest
     {
         $this->assertTrue($this->defaults->captureErrorStacktraces());
     }
+    
+    public function testCheckIgnore()
+    {
+        $this->assertNull($this->defaults->checkIgnore());
+    }
 }

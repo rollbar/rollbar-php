@@ -114,6 +114,7 @@ class Defaults
     private $defaultExceptionLevel = "error";
     private $defaultEndpoint = 'https://api.rollbar.com/api/1/item/';
     private $defaultCaptureErrorStacktraces = true;
+    private $defaultCheckIgnore = null;
     private $defaultPsrLevels;
     private $defaultCodeVersion;
     private $defaultErrorLevels;
@@ -198,6 +199,11 @@ class Defaults
     public function endpoint($endpoint = null)
     {
         return $endpoint ?: $this->defaultEndpoint;
+    }
+    
+    public function checkIgnore($checkIgnore = null)
+    {
+        return $checkIgnore ?: $this->defaultCheckIgnore;
     }
 
     public function messageLevel($level = null)
