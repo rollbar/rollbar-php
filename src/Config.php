@@ -21,7 +21,7 @@ class Config
         'base_api_url',
         'branch',
         'capture_error_stacktraces',
-        'checkIgnore',
+        'check_ignore',
         'code_version',
         'custom',
         'enable_utf8_sanitization',
@@ -104,7 +104,7 @@ class Config
     /**
      * @var callable
      */
-    private $checkIgnore;
+    private $check_ignore;
     private $error_sample_rates = array();
     private $exception_sample_rates = array();
     private $mt_randmax;
@@ -401,11 +401,14 @@ class Config
 
     private function setCheckIgnoreFunction($config)
     {
-        if (!isset($config['checkIgnore'])) {
-            return;
+        // Remain backwards compatible
+        if (isset($config['checkIgnore'])) {
+            $this->check_ignore = $config['checkIgnore'];
         }
-
-        $this->checkIgnore = $config['checkIgnore'];
+        
+        if (isset($config['check_ignore'])) {
+            $this->check_ignore = $config['check_ignore'];
+        }
     }
 
     private function setSendMessageTrace($config)
@@ -571,14 +574,14 @@ class Config
 
     public function checkIgnored($payload, $accessToken, $toLog, $isUncaught)
     {
-        if (isset($this->checkIgnore)) {
+        if (isset($this->check_ignore)) {
             try {
-                if (call_user_func($this->checkIgnore, $isUncaught, $toLog, $payload)) {
+                if (call_user_func($this->check_ignore, $isUncaught, $toLog, $payload)) {
                     return true;
                 }
             } catch (Exception $exception) {
                 // We should log that we are removing the custom checkIgnore
-                $this->checkIgnore = null;
+                $this->check_ignore = null;
             }
         }
         

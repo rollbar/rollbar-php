@@ -164,4 +164,9 @@ class DefaultsTest extends BaseRollbarTest
     {
         $this->assertNull($this->defaults->checkIgnore());
     }
+    
+    public function testCodeVersion()
+    {
+        $this->assertEquals("", $this->defaults->codeVersion());
+    }
 }

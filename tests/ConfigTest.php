@@ -351,7 +351,7 @@ class ConfigTest extends BaseRollbarTest
         $config = new Config(array(
             "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env,
-            "checkIgnore" => function () use (&$called) {
+            "check_ignore" => function () use (&$called) {
                 $called = true;
             }
         ));
@@ -382,7 +382,7 @@ class ConfigTest extends BaseRollbarTest
         $config = new Config(array(
             "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env,
-            "checkIgnore" => function (
+            "check_ignore" => function (
                 $isUncaught,
                 $exc
             ) use (
@@ -445,7 +445,7 @@ class ConfigTest extends BaseRollbarTest
         $config = new Config(array(
             "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env,
-            "checkIgnore" => function () use (&$called) {
+            "check_ignore" => function () use (&$called) {
                 $called = true;
             },
             "use_error_reporting" => $use_error_reporting

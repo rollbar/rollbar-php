@@ -363,7 +363,7 @@ Default: `https://api.rollbar.com/api/1/`
 Default: `true`
 </dd>
 
-<dt>checkIgnore
+<dt>check_ignore
 </dt>
 <dd>Function called before sending payload to Rollbar, return true to stop the error from being sent to Rollbar.
 
@@ -377,7 +377,7 @@ Parameters:
 ```php
 $config = array(
     'access_token' => '...',
-    'checkIgnore' => function ($isUncaught, $exception, $payload) {
+    'check_ignore' => function ($isUncaught, $exception, $payload) {
         if (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Baiduspider') !== false) {
           // ignore baidu spider
           return true;
@@ -396,7 +396,7 @@ Rollbar::init($config);
 </dt>
 <dd>The currently-deployed version of your code/application (e.g. a Git SHA). Should be a string.
 
-Default: `null`
+Default: empty string
 </dd>
 
 <dt>custom
