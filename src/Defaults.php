@@ -108,6 +108,7 @@ class Defaults
         return $rawRequestBody !== null ? $rawRequestBody : $this->defaultRawRequestBody;
     }
 
+    private $defaultAgentLogLocation = '/var/tmp';
     private $defaultMessageLevel = "warning";
     private $defaultExceptionLevel = "error";
     private $defaultPsrLevels;
@@ -181,6 +182,11 @@ class Defaults
         $this->defaultCaptureErrorStacktraces = true;
         
         $this->utilities = $utilities;
+    }
+    
+    public function agentLogLocation($agentLogLocation = null)
+    {
+        return $agentLogLocation ?: $this->defaultAgentLogLocation;
     }
 
     public function messageLevel($level = null)

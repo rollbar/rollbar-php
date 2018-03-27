@@ -139,4 +139,9 @@ class DefaultsTest extends BaseRollbarTest
     {
         $this->assertFalse($this->defaults->sendMessageTrace());
     }
+    
+    public function testAgentLogLocation()
+    {
+        $this->assertEquals('/var/tmp', $this->defaults->agentLogLocation());
+    }
 }
