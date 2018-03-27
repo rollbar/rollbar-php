@@ -174,4 +174,9 @@ class DefaultsTest extends BaseRollbarTest
     {
         $this->assertNull($this->defaults->custom());
     }
+    
+    public function testEnabled()
+    {
+        $this->assertTrue($this->defaults->enabled());
+    }
 }

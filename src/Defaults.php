@@ -116,6 +116,7 @@ class Defaults
     private $defaultCaptureErrorStacktraces = true;
     private $defaultCheckIgnore = null;
     private $defaultCustom = null;
+    private $defaultEnabled = true;
     private $defaultPsrLevels;
     private $defaultCodeVersion;
     private $defaultErrorLevels;
@@ -210,6 +211,11 @@ class Defaults
     public function custom($custom = null)
     {
         return $custom ?: $this->defaultCustom;
+    }
+    
+    public function enabled($enabled = null)
+    {
+        return $enabled ?: $this->defaultEnabled;
     }
 
     public function messageLevel($level = null)

@@ -220,7 +220,11 @@ class Config
         if (array_key_exists('enabled', $config) && $config['enabled'] === false) {
             $this->disable();
         } else {
-            $this->enable();
+            if (\Rollbar\Defaults::get()->enabled() === false) {
+                $this->disable();
+            } else {
+                $this->enable();
+            }
         }
     }
     
