@@ -112,6 +112,7 @@ class Defaults
     private $defaultAllowExec = true;
     private $defaultMessageLevel = "warning";
     private $defaultExceptionLevel = "error";
+    private $defaultEndpoint = 'https://api.rollbar.com/api/1/item/';
     private $defaultPsrLevels;
     private $defaultCodeVersion;
     private $defaultErrorLevels;
@@ -193,6 +194,11 @@ class Defaults
     public function allowExec($allowExec = null)
     {
         return $allowExec ?: $this->defaultAllowExec;
+    }
+    
+    public function endpoint($endpoint = null)
+    {
+        return $endpoint ?: $this->defaultEndpoint;
     }
 
     public function messageLevel($level = null)

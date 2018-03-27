@@ -12,7 +12,7 @@ use Rollbar\Payload\EncodedPayload;
 class CurlSender implements SenderInterface
 {
     private $utilities;
-    private $endpoint = 'https://api.rollbar.com/api/1/item/';
+    private $endpoint;
     private $timeout = 3;
     private $proxy = null;
     private $verifyPeer = true;
@@ -23,6 +23,7 @@ class CurlSender implements SenderInterface
 
     public function __construct($opts)
     {
+        $this->endpoint = \Rollbar\Defaults::get()->endpoint();
         $this->utilities = new \Rollbar\Utilities();
         if (isset($_ENV['ROLLBAR_ENDPOINT']) && !isset($opts['endpoint'])) {
             $opts['endpoint'] = $_ENV['ROLLBAR_ENDPOINT'];
