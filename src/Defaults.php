@@ -129,6 +129,7 @@ class Defaults
     private $defaultTimeout = 3;
     private $defaultReportSuppressed = false;
     private $defaultUseErrorReporting = false;
+    private $defaultVerbosity = \Psr\Log\LogLevel::ERROR;
     private $defaultPsrLevels;
     private $defaultCodeVersion;
     private $defaultErrorLevels;
@@ -291,6 +292,11 @@ class Defaults
     public function useErrorReporting($useErrorReporting = null)
     {
         return $useErrorReporting ?: $this->defaultUseErrorReporting;
+    }
+    
+    public function verbosity($verbosity = null)
+    {
+        return $verbosity ?: $this->defaultVerbosity;
     }
 
     public function messageLevel($level = null)

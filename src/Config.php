@@ -123,10 +123,11 @@ class Config
      * ($rollbarLogger->getDebugLogFile() => commonly /tmp/rollbar.debug.log.
      * Default: Psr\Log\LogLevel::ERROR
      */
-    private $verbosity = \Psr\Log\LogLevel::ERROR;
+    private $verbosity;
 
     public function __construct(array $configArray)
     {
+        $this->verbosity = \Rollbar\Defaults::get()->verbosity();
         $this->included_errno = \Rollbar\Defaults::get()->includedErrno();
         
         $this->levelFactory = new LevelFactory();
