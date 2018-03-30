@@ -127,6 +127,7 @@ class Defaults
     private $defaultHost = null;
     private $defaultIncludedErrno;
     private $defaultTimeout = 3;
+    private $defaultReportSuppressed = false;
     private $defaultPsrLevels;
     private $defaultCodeVersion;
     private $defaultErrorLevels;
@@ -279,6 +280,11 @@ class Defaults
     public function timeout($timeout = null)
     {
         return $timeout ?: $this->defaultTimeout;
+    }
+    
+    public function reportSuppressed($reportSuppressed = null)
+    {
+        return $reportSuppressed ?: $this->defaultReportSuppressed;
     }
 
     public function messageLevel($level = null)

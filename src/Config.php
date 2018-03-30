@@ -286,6 +286,10 @@ class Config
         if (!isset($this->reportSuppressed)) {
             $this->reportSuppressed = isset($config['report_suppressed']) && $config['report_suppressed'];
         }
+        
+        if (!isset($this->reportSuppressed)) {
+            $this->reportSuppressed = \Rollbar\Defaults::get()->reportSuppressed();
+        }
     }
 
     private function setFilters($config)

@@ -232,4 +232,9 @@ class DefaultsTest extends BaseRollbarTest
     {
         $this->assertEquals(3, $this->defaults->timeout());
     }
+    
+    public function testReportSuppressed()
+    {
+        $this->assertFalse($this->defaults->reportSuppressed());
+    }
 }
