@@ -13,7 +13,7 @@ class CurlSender implements SenderInterface
 {
     private $utilities;
     private $endpoint;
-    private $timeout = 3;
+    private $timeout;
     private $proxy = null;
     private $verifyPeer = true;
     private $multiHandle = null;
@@ -24,6 +24,8 @@ class CurlSender implements SenderInterface
     public function __construct($opts)
     {
         $this->endpoint = \Rollbar\Defaults::get()->endpoint();
+        $this->timeout = \Rollbar\Defaults::get()->timeout();
+        
         $this->utilities = new \Rollbar\Utilities();
         if (isset($_ENV['ROLLBAR_ENDPOINT']) && !isset($opts['endpoint'])) {
             $opts['endpoint'] = $_ENV['ROLLBAR_ENDPOINT'];

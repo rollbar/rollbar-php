@@ -217,6 +217,19 @@ class DefaultsTest extends BaseRollbarTest
     
     public function testHost()
     {
-        $this->assertEquals(null, $this->defaults->host());
+        $this->assertNull($this->defaults->host());
+    }
+    
+    public function testIncludedErrno()
+    {
+        $this->assertEquals(
+            ROLLBAR_INCLUDED_ERRNO_BITMASK,
+            $this->defaults->includedErrno()
+        );
+    }
+    
+    public function testTimeout()
+    {
+        $this->assertEquals(3, $this->defaults->timeout());
     }
 }

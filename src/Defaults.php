@@ -125,6 +125,8 @@ class Defaults
     private $defaultFluentTag = 'rollbar';
     private $defaultHandler = 'blocking';
     private $defaultHost = null;
+    private $defaultIncludedErrno;
+    private $defaultTimeout = 3;
     private $defaultPsrLevels;
     private $defaultCodeVersion;
     private $defaultErrorLevels;
@@ -194,6 +196,7 @@ class Defaults
         $this->defaultLocalVarsDump = true;
         $this->defaultErrorSampleRates = array();
         $this->defaultExceptionSampleRates = array();
+        $this->defaultIncludedErrno = ROLLBAR_INCLUDED_ERRNO_BITMASK;
         
         $this->utilities = $utilities;
     }
@@ -263,9 +266,19 @@ class Defaults
         return $handler ?: $this->defaultHandler;
     }
     
+    public function includedErrno($includedErrno = null)
+    {
+        return $includedErrno ?: $this->defaultIncludedErrno;
+    }
+    
     public function host($host = null)
     {
         return $host ?: $this->defaultHost;
+    }
+    
+    public function timeout($timeout = null)
+    {
+        return $timeout ?: $this->defaultTimeout;
     }
 
     public function messageLevel($level = null)

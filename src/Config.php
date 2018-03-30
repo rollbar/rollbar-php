@@ -108,7 +108,7 @@ class Config
     private $exception_sample_rates;
     private $mt_randmax;
 
-    private $included_errno = ROLLBAR_INCLUDED_ERRNO_BITMASK;
+    private $included_errno;
     private $use_error_reporting = false;
     
     /**
@@ -127,6 +127,8 @@ class Config
 
     public function __construct(array $configArray)
     {
+        $this->included_errno = \Rollbar\Defaults::get()->includedErrno();
+        
         $this->levelFactory = new LevelFactory();
         $this->utilities = new Utilities();
         
