@@ -120,6 +120,9 @@ class Defaults
     private $defaultEnvironment = 'production';
     private $defaultErrorSampleRates;
     private $defaultExceptionSampleRates;
+    private $defaultFluentHost = '127.0.0.1';
+    private $defaultFluentPort = 24224;
+    private $defaultFluentTag = 'rollbar';
     private $defaultPsrLevels;
     private $defaultCodeVersion;
     private $defaultErrorLevels;
@@ -236,6 +239,21 @@ class Defaults
     public function exceptionSampleRates($exceptionSampleRates = null)
     {
         return $exceptionSampleRates ?: $this->defaultExceptionSampleRates;
+    }
+    
+    public function fluentHost($fluentHost = null)
+    {
+        return $fluentHost ?: $this->defaultFluentHost;
+    }
+    
+    public function fluentPort($fluentPort = null)
+    {
+        return $fluentPort ?: $this->defaultFluentPort;
+    }
+    
+    public function fluentTag($fluentTag = null)
+    {
+        return $fluentTag ?: $this->defaultFluentTag;
     }
 
     public function messageLevel($level = null)

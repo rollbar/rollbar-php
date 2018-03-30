@@ -438,7 +438,7 @@ Default: empty array, meaning all exceptions are reported.
 <dt>fluent_host</dt>
 <dd>Either an `IPv4`, `IPv6`, or a `unix socket`.
 
-Default: `'127.0.0.1'`
+Default: `127.0.0.1`
 </dd>
 
 <dt>fluent_port</dt>
@@ -450,7 +450,7 @@ Default: `24224`
 <dt>fluent_tag</dt>
 <dd>The tag of your fluentd filter and match sections. It can be any string, please consult the [fluentd documentation](http://docs.fluentd.org/) for valid tags.
 
-Default: `'rollbar'`
+Default: `rollbar`
 </dd>
 
 <dt>handler

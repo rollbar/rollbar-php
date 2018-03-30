@@ -194,4 +194,19 @@ class DefaultsTest extends BaseRollbarTest
     {
         $this->assertEmpty($this->defaults->exceptionSampleRates());
     }
+    
+    public function testFluentHost()
+    {
+        $this->assertEquals('127.0.0.1', $this->defaults->fluentHost());
+    }
+    
+    public function testFluentPort()
+    {
+        $this->assertEquals(24224, $this->defaults->fluentPort());
+    }
+    
+    public function testFluentTag()
+    {
+        $this->assertEquals('rollbar', $this->defaults->fluentTag());
+    }
 }
