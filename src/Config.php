@@ -205,6 +205,7 @@ class Config
             $this->included_errno = $config['included_errno'];
         }
 
+        $this->use_error_reporting = \Rollbar\Defaults::get()->useErrorReporting();
         if (isset($config['use_error_reporting'])) {
             $this->use_error_reporting = $config['use_error_reporting'];
         }

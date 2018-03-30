@@ -237,4 +237,9 @@ class DefaultsTest extends BaseRollbarTest
     {
         $this->assertFalse($this->defaults->reportSuppressed());
     }
+    
+    public function testUseErrorReporting()
+    {
+        $this->assertFalse($this->defaults->useErrorReporting());
+    }
 }

@@ -128,6 +128,7 @@ class Defaults
     private $defaultIncludedErrno;
     private $defaultTimeout = 3;
     private $defaultReportSuppressed = false;
+    private $defaultUseErrorReporting = false;
     private $defaultPsrLevels;
     private $defaultCodeVersion;
     private $defaultErrorLevels;
@@ -285,6 +286,11 @@ class Defaults
     public function reportSuppressed($reportSuppressed = null)
     {
         return $reportSuppressed ?: $this->defaultReportSuppressed;
+    }
+    
+    public function useErrorReporting($useErrorReporting = null)
+    {
+        return $useErrorReporting ?: $this->defaultUseErrorReporting;
     }
 
     public function messageLevel($level = null)
