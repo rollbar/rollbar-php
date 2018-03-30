@@ -214,4 +214,9 @@ class DefaultsTest extends BaseRollbarTest
     {
         $this->assertEquals('blocking', $this->defaults->handler());
     }
+    
+    public function testHost()
+    {
+        $this->assertEquals(null, $this->defaults->host());
+    }
 }
