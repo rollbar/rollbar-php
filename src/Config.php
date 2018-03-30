@@ -294,6 +294,7 @@ class Config
     private function setSender($config)
     {
         $expected = "Rollbar\Senders\SenderInterface";
+        
         $default = "Rollbar\Senders\CurlSender";
 
         $this->setTransportOptions($config);

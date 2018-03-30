@@ -123,6 +123,7 @@ class Defaults
     private $defaultFluentHost = '127.0.0.1';
     private $defaultFluentPort = 24224;
     private $defaultFluentTag = 'rollbar';
+    private $defaultHandler = 'blocking';
     private $defaultPsrLevels;
     private $defaultCodeVersion;
     private $defaultErrorLevels;
@@ -254,6 +255,11 @@ class Defaults
     public function fluentTag($fluentTag = null)
     {
         return $fluentTag ?: $this->defaultFluentTag;
+    }
+    
+    public function handler($handler = null)
+    {
+        return $handler ?: $this->defaultHandler;
     }
 
     public function messageLevel($level = null)

@@ -209,4 +209,9 @@ class DefaultsTest extends BaseRollbarTest
     {
         $this->assertEquals('rollbar', $this->defaults->fluentTag());
     }
+    
+    public function testHandler()
+    {
+        $this->assertEquals('blocking', $this->defaults->handler());
+    }
 }
