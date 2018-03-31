@@ -102,7 +102,7 @@ class DataBuilder implements DataBuilderInterface
 
     protected function setEnvironment($config)
     {
-        $fromConfig = isset($config['environment']) ? $config['environment'] : null;
+        $fromConfig = isset($config['environment']) ? $config['environment'] : self::$defaults->get()->environment();
         $this->utilities->validateString($fromConfig, "config['environment']", null, false);
         $this->environment = $fromConfig;
     }
@@ -250,7 +250,7 @@ class DataBuilder implements DataBuilderInterface
 
     public function setCustom($config)
     {
-        $this->custom = isset($config['custom']) ? $config['custom'] : null;
+        $this->custom = isset($config['custom']) ? $config['custom'] : \Rollbar\Defaults::get()->custom();
     }
 
     protected function setFingerprint($config)
@@ -318,7 +318,7 @@ class DataBuilder implements DataBuilderInterface
 
     protected function setHost($config)
     {
-        $this->host = isset($config['host']) ? $config['host'] : null;
+        $this->host = isset($config['host']) ? $config['host'] : self::$defaults->host();
     }
 
     /**

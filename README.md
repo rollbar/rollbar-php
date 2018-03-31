@@ -354,8 +354,6 @@ Default: `https://api.rollbar.com/api/1/`
 <dt>branch
 </dt>
 <dd>Name of the current branch.
-
-Default: `master`
 </dd>
 
 <dt>capture_error_stacktraces
@@ -365,7 +363,7 @@ Default: `master`
 Default: `true`
 </dd>
 
-<dt>checkIgnore
+<dt>check_ignore
 </dt>
 <dd>Function called before sending payload to Rollbar, return true to stop the error from being sent to Rollbar.
 
@@ -379,7 +377,7 @@ Parameters:
 ```php
 $config = array(
     'access_token' => '...',
-    'checkIgnore' => function ($isUncaught, $exception, $payload) {
+    'check_ignore' => function ($isUncaught, $exception, $payload) {
         if (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Baiduspider') !== false) {
           // ignore baidu spider
           return true;
@@ -398,7 +396,7 @@ Rollbar::init($config);
 </dt>
 <dd>The currently-deployed version of your code/application (e.g. a Git SHA). Should be a string.
 
-Default: `null`
+Default: empty string
 </dd>
 
 <dt>custom
@@ -407,13 +405,6 @@ Default: `null`
 all items sent to Rollbar. This allows for custom data to be added globally to all payloads. Any key
 in this array which is also present in the custom data passed to a log/debug/error/... call will
 have the value of the latter.
-</dd>
-
-<dt>enable_utf8_sanitization
-</dt>
-<dd>set to false, to disable running iconv on the payload, may be needed if there is invalid characters, and the payload is being destroyed
-
-Default: `true`
 </dd>
 
 <dt>enabled
@@ -425,9 +416,9 @@ Default: `true`
 
 <dt>environment
 </dt>
-<dd>Environment name, e.g. `'production'` or `'development'`
+<dd>Environment name, e.g. `production` or `development`
 
-Default: `'production'`
+Default: `production`
 </dd>
 
 <dt>error_sample_rates
@@ -447,7 +438,7 @@ Default: empty array, meaning all exceptions are reported.
 <dt>fluent_host</dt>
 <dd>Either an `IPv4`, `IPv6`, or a `unix socket`.
 
-Default: `'127.0.0.1'`
+Default: `127.0.0.1`
 </dd>
 
 <dt>fluent_port</dt>
@@ -459,14 +450,14 @@ Default: `24224`
 <dt>fluent_tag</dt>
 <dd>The tag of your fluentd filter and match sections. It can be any string, please consult the [fluentd documentation](http://docs.fluentd.org/) for valid tags.
 
-Default: `'rollbar'`
+Default: `rollbar`
 </dd>
 
 <dt>handler
 </dt>
-<dd>Either `'blocking'`, `'agent'`, or `'fluent'`. `'blocking'` uses curl to send requests immediately; `'agent'` writes a relay log to be consumed by [rollbar-agent](https://github.com/rollbar/rollbar-agent); `'fluent'` send the requests to a [fluentd](https://www.fluentd.org/) instance and requires the suggested package `fluent/logger`.
+<dd>Either `blocking`, `agent`, or `fluent`. `blocking` uses curl to send requests immediately; `agent` writes a relay log to be consumed by [rollbar-agent](https://github.com/rollbar/rollbar-agent); `fluent` send the requests to a [fluentd](https://www.fluentd.org/) instance and requires the suggested package `fluent/logger`.
 
-Default: `'blocking'`
+Default: `blocking`
 </dd>
 
 <dt>host

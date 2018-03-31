@@ -108,8 +108,28 @@ class Defaults
         return $rawRequestBody !== null ? $rawRequestBody : $this->defaultRawRequestBody;
     }
 
+    private $defaultAgentLogLocation = '/var/tmp';
+    private $defaultAllowExec = true;
     private $defaultMessageLevel = "warning";
     private $defaultExceptionLevel = "error";
+    private $defaultEndpoint = 'https://api.rollbar.com/api/1/item/';
+    private $defaultCaptureErrorStacktraces = true;
+    private $defaultCheckIgnore = null;
+    private $defaultCustom = null;
+    private $defaultEnabled = true;
+    private $defaultEnvironment = 'production';
+    private $defaultErrorSampleRates;
+    private $defaultExceptionSampleRates;
+    private $defaultFluentHost = '127.0.0.1';
+    private $defaultFluentPort = 24224;
+    private $defaultFluentTag = 'rollbar';
+    private $defaultHandler = 'blocking';
+    private $defaultHost = null;
+    private $defaultIncludedErrno;
+    private $defaultTimeout = 3;
+    private $defaultReportSuppressed = false;
+    private $defaultUseErrorReporting = false;
+    private $defaultVerbosity = \Psr\Log\LogLevel::ERROR;
     private $defaultPsrLevels;
     private $defaultCodeVersion;
     private $defaultErrorLevels;
@@ -125,7 +145,6 @@ class Defaults
     private $defaultIncludeExcCodeContext;
     private $defaultRawRequestBody;
     private $defaultLocalVarsDump;
-    private $defaultCaptureErrorStacktraces;
     private $utilities;
 
     public function __construct($utilities)
@@ -178,9 +197,106 @@ class Defaults
         $this->defaultIncludeExcCodeContext = false;
         $this->defaultRawRequestBody = false;
         $this->defaultLocalVarsDump = true;
-        $this->defaultCaptureErrorStacktraces = true;
+        $this->defaultErrorSampleRates = array();
+        $this->defaultExceptionSampleRates = array();
+        $this->defaultIncludedErrno = ROLLBAR_INCLUDED_ERRNO_BITMASK;
         
         $this->utilities = $utilities;
+    }
+    
+    public function agentLogLocation($agentLogLocation = null)
+    {
+        return $agentLogLocation ?: $this->defaultAgentLogLocation;
+    }
+    
+    public function allowExec($allowExec = null)
+    {
+        return $allowExec ?: $this->defaultAllowExec;
+    }
+    
+    public function endpoint($endpoint = null)
+    {
+        return $endpoint ?: $this->defaultEndpoint;
+    }
+    
+    public function checkIgnore($checkIgnore = null)
+    {
+        return $checkIgnore ?: $this->defaultCheckIgnore;
+    }
+    
+    public function custom($custom = null)
+    {
+        return $custom ?: $this->defaultCustom;
+    }
+    
+    public function enabled($enabled = null)
+    {
+        return $enabled ?: $this->defaultEnabled;
+    }
+    
+    public function environment($environment = null)
+    {
+        return $environment ?: $this->defaultEnvironment;
+    }
+    
+    public function errorSampleRates($errorSampleRates = null)
+    {
+        return $errorSampleRates ?: $this->defaultErrorSampleRates;
+    }
+    
+    public function exceptionSampleRates($exceptionSampleRates = null)
+    {
+        return $exceptionSampleRates ?: $this->defaultExceptionSampleRates;
+    }
+    
+    public function fluentHost($fluentHost = null)
+    {
+        return $fluentHost ?: $this->defaultFluentHost;
+    }
+    
+    public function fluentPort($fluentPort = null)
+    {
+        return $fluentPort ?: $this->defaultFluentPort;
+    }
+    
+    public function fluentTag($fluentTag = null)
+    {
+        return $fluentTag ?: $this->defaultFluentTag;
+    }
+    
+    public function handler($handler = null)
+    {
+        return $handler ?: $this->defaultHandler;
+    }
+    
+    public function includedErrno($includedErrno = null)
+    {
+        return $includedErrno ?: $this->defaultIncludedErrno;
+    }
+    
+    public function host($host = null)
+    {
+        return $host ?: $this->defaultHost;
+    }
+    
+    public function timeout($timeout = null)
+    {
+        return $timeout ?: $this->defaultTimeout;
+    }
+    
+    public function reportSuppressed($reportSuppressed = null)
+    {
+        return $reportSuppressed ?: $this->defaultReportSuppressed;
+    }
+    
+    public function useErrorReporting($useErrorReporting = null)
+    {
+        return $useErrorReporting ?: $this->defaultUseErrorReporting;
+    }
+    
+    public function verbosity($verbosity = null)
+    {
+        return $verbosity ?: $this->defaultVerbosity;
     }
 
     public function messageLevel($level = null)

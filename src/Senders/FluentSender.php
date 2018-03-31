@@ -21,7 +21,7 @@ class FluentSender implements SenderInterface
     /**
      * @var string IP of the fluentd host
      */
-    private $fluentHost = FluentLogger::DEFAULT_ADDRESS;
+    private $fluentHost;
 
     /**
      * @var int Port of the fluentd instance listening on
@@ -40,6 +40,10 @@ class FluentSender implements SenderInterface
      */
     public function __construct($opts)
     {
+        $this->fluentHost = \Rollbar\Defaults::get()->fluentHost();
+        $this->fluentPort = \Rollbar\Defaults::get()->fluentPort();
+        $this->fluentTag = \Rollbar\Defaults::get()->fluentTag();
+        
         $this->utilities = new \Rollbar\Utilities();
         if (isset($opts['fluentHost'])) {
             $this->utilities->validateString($opts['fluentHost'], 'opts["fluentHost"]', null, false);
