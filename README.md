@@ -528,7 +528,7 @@ Default: `('passwd', 'password', 'secret', 'confirm_password', 'password_confirm
 
 <dt>scrub_whitelist
 </dt>
-<dd>Array of fields that you do NOT to be scrubbed even if they match entries in scrub_fields. Entries should be provided in associative array dot notation, i.e. `data.person.username`.
+<dd>Array of fields that you do NOT want to be scrubbed even if they match entries in scrub_fields. Entries should be provided in associative array dot notation, i.e. `data.person.username`.
 </dd>
 
 <dt>timeout
