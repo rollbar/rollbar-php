@@ -14,6 +14,7 @@ available on master is updated as code is changed prior to making a release.
 ## Quick start
 
 ```php
+
     use \Rollbar\Rollbar;
     use \Rollbar\Payload\Level;
     
@@ -52,6 +53,7 @@ available on master is updated as code is changed prior to making a release.
     
     // will be reported by the exception handler
     throw new \Exception('testing exception handler');
+    
 ```
 
 ## Installation
@@ -61,11 +63,13 @@ available on master is updated as code is changed prior to making a release.
 Add `rollbar/rollbar` to your `composer.json`:
 
 ```json
+
     {
         "require": {
             "rollbar/rollbar": "^1"
         }
     }
+    
 ```
 
 ### Manual installation if you are not using composer.json for your project
@@ -82,6 +86,7 @@ Keep in mind, that even if you're not using composer for your project (using com
 Add the following code at your application's entry point:
 
 ```php
+
     use \Rollbar\Rollbar;
     
     $config = array(
@@ -93,6 +98,7 @@ Add the following code at your application's entry point:
         'root' => '/Users/brian/www/myapp'
     );
     Rollbar::init($config);
+    
 ```
 <!-- RemoveNextIfProject -->
 Be sure to replace ```POST_SERVER_ITEM_ACCESS_TOKEN``` with your project's ```post_server_item``` access token, which you can find in the Rollbar.com interface.
@@ -100,9 +106,11 @@ Be sure to replace ```POST_SERVER_ITEM_ACCESS_TOKEN``` with your project's ```po
 This will install an exception handler (with `set_exception_handler`) and an error handler (with `set_error_handler`). If you'd rather not do that:
 
 ```php
+
     $set_exception_handler = false;
     $set_error_handler = false;
     Rollbar::init($config, $set_exception_handler, $set_error_handler);
+    
 ```
 
 ### For CodeIgniter Users
@@ -110,6 +118,7 @@ This will install an exception handler (with `set_exception_handler`) and an err
 If you are using CodeIgniter you can place `Rollbar::init` in either of the two places:
 * inside the Controller's constructor
 ```php
+
 	public function __construct()
 	{
 		Rollbar::init(array(
@@ -118,9 +127,11 @@ If you are using CodeIgniter you can place `Rollbar::init` in either of the two 
 		));
 		parent::__construct();
 	}
+	
 ```
 * `pre_system` hook
 ```php
+
     $hook['pre_system'] = function () {
         Rollbar::init([
             'access_token' => config_item('rollbar_access_token'),
@@ -128,6 +139,7 @@ If you are using CodeIgniter you can place `Rollbar::init` in either of the two 
             'root' => APPPATH . '../'
         ]);
     };
+    
 ```
 
 **Note: If you wish to log `E_NOTICE` errors make sure to pass `'included_errno' => E_ALL` to `Rollbar::init`.**
@@ -137,17 +149,19 @@ If you are using CodeIgniter you can place `Rollbar::init` in either of the two 
 First, add the addon:
 
 ```
-heroku addons:create rollbar:free
+    heroku addons:create rollbar:free
 ```
 
 The `access_token` and `root` config variables will be automatically detected, so the config is simply:
 
 ```php
+
     use Rollbar\Rollbar;
     
     Rollbar::init(array(
         'environment' => 'production'
     ));
+    
 ```
 
 ## Integration with Rollbar.js
@@ -155,6 +169,7 @@ The `access_token` and `root` config variables will be automatically detected, s
 In case you want to report your JavaScript errors using [Rollbar.js](https://github.com/rollbar/rollbar.js), you can configure the SDK to enable Rollbar.js on your site. Example:
 
 ```php
+
     $rollbarJs = Rollbar\RollbarJsHelper::buildJs(
         array(
             "accessToken" => "POST_CLIENT_ITEM_ACCESS_TOKEN",
@@ -165,10 +180,12 @@ In case you want to report your JavaScript errors using [Rollbar.js](https://git
             /* other configuration you want to pass to RollbarJS */
         )
     );
+    
 ```
 
 Or if you are using Content-Security-Policy: script-src 'unsafe-inline'
 ```php
+
     $rollbarJs = Rollbar\RollbarJsHelper::buildJs(
         array(
             "accessToken" => "POST_CLIENT_ITEM_ACCESS_TOKEN",
@@ -181,6 +198,7 @@ Or if you are using Content-Security-Policy: script-src 'unsafe-inline'
         headers_list(),
         $yourNonceString
     );
+    
 ```
 
 ## Basic Usage
@@ -190,6 +208,7 @@ That's it! Uncaught errors and exceptions will now be reported to Rollbar.
 If you'd like to report exceptions that you catch yourself:
 
 ```php
+
     use Rollbar\Rollbar;
     use Rollbar\Payload\Level;
     
@@ -200,11 +219,13 @@ If you'd like to report exceptions that you catch yourself:
         // or
         Rollbar::log(Level::ERROR, $e, array("my" => "extra", "data" => 42));
     }
+    
 ```
 
 You can also send Rollbar log-like messages:
 
 ```php
+
     use Rollbar\Rollbar;
     use Rollbar\Payload\Level;
     
@@ -214,6 +235,7 @@ You can also send Rollbar log-like messages:
         'Here is a message with some additional data',
         array('x' => 10, 'code' => 'blue')
     );
+    
 ```
 
 ## Using dependency injection
@@ -224,13 +246,15 @@ to initialize Rollbar error logging.
 It's up to the container to properly create and configure the logger.
 
 ```php
-use Rollbar\Rollbar;
-use Rollbar\RollbarLogger;
 
-$logger = $container->get(RollbarLogger::class);
+    use Rollbar\Rollbar;
+    use Rollbar\RollbarLogger;
+    
+    $logger = $container->get(RollbarLogger::class);
+    
+    // installs global error and exception handlers
+    Rollbar::init($logger);
 
-// installs global error and exception handlers
-Rollbar::init($logger);
 ```
 
 ## Using Monolog
@@ -238,23 +262,25 @@ Rollbar::init($logger);
 Here is an example of how to use Rollbar as a handler for Monolog:
 
 ```php
-use Rollbar\Rollbar;
-use Monolog\Logger;
-use Rollbar\Monolog\Handler\RollbarHandler;
 
-Rollbar::init(
-	array(
-		'access_token' => 'xxx',
-		'environment' => 'development'
-	)
-);
+    use Rollbar\Rollbar;
+    use Monolog\Logger;
+    use Rollbar\Monolog\Handler\RollbarHandler;
+    
+    Rollbar::init(
+    	array(
+    		'access_token' => 'xxx',
+    		'environment' => 'development'
+    	)
+    );
+    
+    // create a log channel
+    $log = new Logger('RollbarHandler');
+    $log->pushHandler(new RollbarHandler(Rollbar::logger(), Logger::WARNING));
+    
+    // add records to the log
+    $log->addWarning('Foo');
 
-// create a log channel
-$log = new Logger('RollbarHandler');
-$log->pushHandler(new RollbarHandler(Rollbar::logger(), Logger::WARNING));
-
-// add records to the log
-$log->addWarning('Foo');
 ```
 
 *Note:* Currently there is an outstanding Pull Request [Sync RollbarHandler with the latest changes rollbar/rollbar package](https://github.com/Seldaek/monolog/pull/1042) in `Seldaek:monolog` repository with an update for our `Monolog\Handler\RollbarHandler`. Unfortunately, it has not been merged in by the maintainers yet. In meantime, we included the Monolog handler as part of our repository. We recommend using `Rollbar\Monolog\Handler\RollbarHandler` from `rollbar/rollbar-php` repo. Do *NOT* use `Monolog\Handler\RollbarHandler` from `Seldaek:monolog` repo as it is outdated.
@@ -266,11 +292,13 @@ $log->addWarning('Foo');
 By default, payloads (batched or not) are sent as part of script execution. This is easy to configure but may negatively impact performance. With some additional setup, payloads can be written to a local relay file instead; that file will be consumed by [rollbar-agent](https://github.com/rollbar/rollbar-agent) asynchronously. To turn this on, set the following config params:
 
 ```php
+
     $config = array(
       // ... rest of current config
       'handler' => 'agent',
       'agent_log_location' => '/var/www'  // not including final slash. must be writeable by the user php runs as.
     );
+    
 ```
 
 You'll also need to run the agent. See the [rollbar-agent docs](https://github.com/rollbar/rollbar-agent) for setup instructions.
@@ -281,15 +309,15 @@ You'll also need to run the agent. See the [rollbar-agent docs](https://github.c
 If you have a [fluentd](https://www.fluentd.org/) instance running available you can forward payloads to this instance. To turn this on, set the following config params.
 
 ```php
-<?php
-$config = array(
-  // ... rest of current config
-  'handler' => 'fluent',
-  'fluent_host' => 'localhost',  // localhost is the default setting but any other host IP or a unix socket is possible
-  'fluent_port' => 24224, // 24224 is the default setting, please adapt it to your settings
-  'fluent_tag' => 'rollbar', // rollbar is the default setting, you can adjust it to your needs
-);
-?>
+
+    $config = array(
+      // ... rest of current config
+      'handler' => 'fluent',
+      'fluent_host' => 'localhost',  // localhost is the default setting but any other host IP or a unix socket is possible
+      'fluent_port' => 24224, // 24224 is the default setting, please adapt it to your settings
+      'fluent_tag' => 'rollbar', // rollbar is the default setting, you can adjust it to your needs
+    );
+
 ```
 
 Also you will have to install a suggested package `fluent/logger`.
@@ -361,7 +389,10 @@ Parameters:
 * *$exception*: a RollbarException instance that will allow you to get the message or exception
 * *$payload*: an array containing the payload as it will be sent to Rollbar. Payload schema can be found at https://rollbar.com/docs/api/items_post/
 
+Example::
+
 ```php
+
     $config = array(
         'access_token' => '...',
         'check_ignore' => function ($isUncaught, $exception, $payload) {
@@ -375,6 +406,7 @@ Parameters:
         };
     );
     Rollbar::init($config);
+    
 ```
 
 </dd>
@@ -534,17 +566,21 @@ Default: `false`
 E.g. Using a local proxy with no authentication
 
 ```php
+
     $config['proxy'] = "127.0.0.1:8080";
+    
 ```
 
 E.g. Using a local proxy with basic authentication
 
 ```php
+
     $config['proxy'] = array(
         'address' => '127.0.0.1:8080',
         'username' => 'my_user',
         'password' => 'my_password'
     );
+    
 ```
 
 Default: No proxy
@@ -595,6 +631,7 @@ Default: `\Psr\Log\LogLevel::ERROR` (no internal logging)
 Example use of error_sample_rates:
 
 ```php
+
     $config['error_sample_rates'] = array(
         // E_WARNING omitted, so defaults to 1
         E_NOTICE => 0.1,
@@ -603,22 +640,26 @@ Example use of error_sample_rates:
         E_USER_NOTICE => 0.1,
         // E_STRICT and beyond will all be 0.1
     );
+    
 ```
 
 Example use of exception_sample_rates:
 
 ```php
+
     $config['exception_sample_rates'] = array(
         // Exception omitted, so defaults to 1
         
         // SometimesException set at 0.1 so only reported 10% of the time
         'SometimesException' => 0.1,
     );
+    
 ```
 
 Example use of person_fn:
 
 ```php
+
     function get_current_user() {
         if ($_SESSION['user_id']) {
             return array(
@@ -630,6 +671,7 @@ Example use of person_fn:
         return null;
     }
     $config['person_fn'] = 'get_current_user';
+    
 ```
 
 ## Related projects
