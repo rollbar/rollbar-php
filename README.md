@@ -14,46 +14,44 @@ available on master is updated as code is changed prior to making a release.
 ## Quick start
 
 ```php
-<?php
-use \Rollbar\Rollbar;
-use \Rollbar\Payload\Level;
-
-// installs global error and exception handlers
-Rollbar::init(
-    array(
-        'access_token' => ROLLBAR_TEST_TOKEN,
-        'environment' => 'production'
-    )
-);
-
-try {
-    throw new \Exception('test exception');
-} catch (\Exception $e) {
-    Rollbar::log(Level::ERROR, $e);
-}
-
-// Message at level 'info'
-Rollbar::log(Level::INFO, 'testing info level');
-
-// With extra data (3rd arg) and custom payload options (4th arg)
-Rollbar::log(
-    Level::INFO,
-    'testing extra data',
-    array("some_key" => "some value") // key-value additional data
-);
-        
-// If you want to check if logging with Rollbar was successful
-$response = Rollbar::log(Level::INFO, 'testing wasSuccessful()');
-if (!$response->wasSuccessful()) {
-    throw new \Exception('logging with Rollbar failed');
-}
-
-// raises an E_NOTICE which will *not* be reported by the error handler
-$foo = $bar;
-
-// will be reported by the exception handler
-throw new \Exception('testing exception handler');
-?>
+    use \Rollbar\Rollbar;
+    use \Rollbar\Payload\Level;
+    
+    // installs global error and exception handlers
+    Rollbar::init(
+        array(
+            'access_token' => ROLLBAR_TEST_TOKEN,
+            'environment' => 'production'
+        )
+    );
+    
+    try {
+        throw new \Exception('test exception');
+    } catch (\Exception $e) {
+        Rollbar::log(Level::ERROR, $e);
+    }
+    
+    // Message at level 'info'
+    Rollbar::log(Level::INFO, 'testing info level');
+    
+    // With extra data (3rd arg) and custom payload options (4th arg)
+    Rollbar::log(
+        Level::INFO,
+        'testing extra data',
+        array("some_key" => "some value") // key-value additional data
+    );
+            
+    // If you want to check if logging with Rollbar was successful
+    $response = Rollbar::log(Level::INFO, 'testing wasSuccessful()');
+    if (!$response->wasSuccessful()) {
+        throw new \Exception('logging with Rollbar failed');
+    }
+    
+    // raises an E_NOTICE which will *not* be reported by the error handler
+    $foo = $bar;
+    
+    // will be reported by the exception handler
+    throw new \Exception('testing exception handler');
 ```
 
 ## Installation
@@ -63,11 +61,11 @@ throw new \Exception('testing exception handler');
 Add `rollbar/rollbar` to your `composer.json`:
 
 ```json
-{
-    "require": {
-        "rollbar/rollbar": "^1"
+    {
+        "require": {
+            "rollbar/rollbar": "^1"
+        }
     }
-}
 ```
 
 ### Manual installation if you are not using composer.json for your project
@@ -84,19 +82,17 @@ Keep in mind, that even if you're not using composer for your project (using com
 Add the following code at your application's entry point:
 
 ```php
-<?php
-use \Rollbar\Rollbar;
-
-$config = array(
-    // required
-    'access_token' => 'POST_SERVER_ITEM_ACCESS_TOKEN',
-    // optional - environment name. any string will do.
-    'environment' => 'production',
-    // optional - path to directory your code is in. used for linking stack traces.
-    'root' => '/Users/brian/www/myapp'
-);
-Rollbar::init($config);
-?>
+    use \Rollbar\Rollbar;
+    
+    $config = array(
+        // required
+        'access_token' => 'POST_SERVER_ITEM_ACCESS_TOKEN',
+        // optional - environment name. any string will do.
+        'environment' => 'production',
+        // optional - path to directory your code is in. used for linking stack traces.
+        'root' => '/Users/brian/www/myapp'
+    );
+    Rollbar::init($config);
 ```
 <!-- RemoveNextIfProject -->
 Be sure to replace ```POST_SERVER_ITEM_ACCESS_TOKEN``` with your project's ```post_server_item``` access token, which you can find in the Rollbar.com interface.
@@ -104,11 +100,9 @@ Be sure to replace ```POST_SERVER_ITEM_ACCESS_TOKEN``` with your project's ```po
 This will install an exception handler (with `set_exception_handler`) and an error handler (with `set_error_handler`). If you'd rather not do that:
 
 ```php
-<?php
-$set_exception_handler = false;
-$set_error_handler = false;
-Rollbar::init($config, $set_exception_handler, $set_error_handler);
-?>
+    $set_exception_handler = false;
+    $set_error_handler = false;
+    Rollbar::init($config, $set_exception_handler, $set_error_handler);
 ```
 
 ### For CodeIgniter Users
@@ -127,13 +121,13 @@ If you are using CodeIgniter you can place `Rollbar::init` in either of the two 
 ```
 * `pre_system` hook
 ```php
-$hook['pre_system'] = function () {
-    Rollbar::init([
-        'access_token' => config_item('rollbar_access_token'),
-        'environment' => ENVIRONMENT,
-        'root' => APPPATH . '../'
-    ]);
-};
+    $hook['pre_system'] = function () {
+        Rollbar::init([
+            'access_token' => config_item('rollbar_access_token'),
+            'environment' => ENVIRONMENT,
+            'root' => APPPATH . '../'
+        ]);
+    };
 ```
 
 **Note: If you wish to log `E_NOTICE` errors make sure to pass `'included_errno' => E_ALL` to `Rollbar::init`.**
@@ -149,13 +143,11 @@ heroku addons:create rollbar:free
 The `access_token` and `root` config variables will be automatically detected, so the config is simply:
 
 ```php
-<?php
-use Rollbar\Rollbar;
-
-Rollbar::init(array(
-    'environment' => 'production'
-));
-?>
+    use Rollbar\Rollbar;
+    
+    Rollbar::init(array(
+        'environment' => 'production'
+    ));
 ```
 
 ## Integration with Rollbar.js
@@ -163,32 +155,32 @@ Rollbar::init(array(
 In case you want to report your JavaScript errors using [Rollbar.js](https://github.com/rollbar/rollbar.js), you can configure the SDK to enable Rollbar.js on your site. Example:
 
 ```php
-$rollbarJs = Rollbar\RollbarJsHelper::buildJs(
-    array(
-        "accessToken" => "POST_CLIENT_ITEM_ACCESS_TOKEN",
-        "captureUncaught" => true,
-        "payload" => array(
-            "environment" => "production"
-        ),
-        /* other configuration you want to pass to RollbarJS */
-    )
-);
+    $rollbarJs = Rollbar\RollbarJsHelper::buildJs(
+        array(
+            "accessToken" => "POST_CLIENT_ITEM_ACCESS_TOKEN",
+            "captureUncaught" => true,
+            "payload" => array(
+                "environment" => "production"
+            ),
+            /* other configuration you want to pass to RollbarJS */
+        )
+    );
 ```
 
 Or if you are using Content-Security-Policy: script-src 'unsafe-inline'
 ```php
-$rollbarJs = Rollbar\RollbarJsHelper::buildJs(
-    array(
-        "accessToken" => "POST_CLIENT_ITEM_ACCESS_TOKEN",
-        "captureUncaught" => true,
-        "payload" => array(
-            "environment" => "production"
+    $rollbarJs = Rollbar\RollbarJsHelper::buildJs(
+        array(
+            "accessToken" => "POST_CLIENT_ITEM_ACCESS_TOKEN",
+            "captureUncaught" => true,
+            "payload" => array(
+                "environment" => "production"
+            ),
+            /* other configuration you want to pass to RollbarJS */
         ),
-        /* other configuration you want to pass to RollbarJS */
-    ),
-    headers_list(),
-    $yourNonceString
-);
+        headers_list(),
+        $yourNonceString
+    );
 ```
 
 ## Basic Usage
@@ -198,34 +190,30 @@ That's it! Uncaught errors and exceptions will now be reported to Rollbar.
 If you'd like to report exceptions that you catch yourself:
 
 ```php
-<?php
-use Rollbar\Rollbar;
-use Rollbar\Payload\Level;
-
-try {
-    do_something();
-} catch (\Exception $e) {
-    Rollbar::log(Level::ERROR, $e);
-    // or
-    Rollbar::log(Level::ERROR, $e, array("my" => "extra", "data" => 42));
-}
-?>
+    use Rollbar\Rollbar;
+    use Rollbar\Payload\Level;
+    
+    try {
+        do_something();
+    } catch (\Exception $e) {
+        Rollbar::log(Level::ERROR, $e);
+        // or
+        Rollbar::log(Level::ERROR, $e, array("my" => "extra", "data" => 42));
+    }
 ```
 
 You can also send Rollbar log-like messages:
 
 ```php
-<?php
-use Rollbar\Rollbar;
-use Rollbar\Payload\Level;
-
-Rollbar::log(Level::WARNING, 'could not connect to mysql server');
-Rollbar::log(
-    Level::INFO, 
-    'Here is a message with some additional data',
-    array('x' => 10, 'code' => 'blue')
-);
-?>
+    use Rollbar\Rollbar;
+    use Rollbar\Payload\Level;
+    
+    Rollbar::log(Level::WARNING, 'could not connect to mysql server');
+    Rollbar::log(
+        Level::INFO, 
+        'Here is a message with some additional data',
+        array('x' => 10, 'code' => 'blue')
+    );
 ```
 
 ## Using dependency injection
@@ -278,13 +266,11 @@ $log->addWarning('Foo');
 By default, payloads (batched or not) are sent as part of script execution. This is easy to configure but may negatively impact performance. With some additional setup, payloads can be written to a local relay file instead; that file will be consumed by [rollbar-agent](https://github.com/rollbar/rollbar-agent) asynchronously. To turn this on, set the following config params:
 
 ```php
-<?php
-$config = array(
-  // ... rest of current config
-  'handler' => 'agent',
-  'agent_log_location' => '/var/www'  // not including final slash. must be writeable by the user php runs as.
-);
-?>
+    $config = array(
+      // ... rest of current config
+      'handler' => 'agent',
+      'agent_log_location' => '/var/www'  // not including final slash. must be writeable by the user php runs as.
+    );
 ```
 
 You'll also need to run the agent. See the [rollbar-agent docs](https://github.com/rollbar/rollbar-agent) for setup instructions.
@@ -376,19 +362,19 @@ Parameters:
 * *$payload*: an array containing the payload as it will be sent to Rollbar. Payload schema can be found at https://rollbar.com/docs/api/items_post/
 
 ```php
-$config = array(
-    'access_token' => '...',
-    'check_ignore' => function ($isUncaught, $exception, $payload) {
-        if (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Baiduspider') !== false) {
-          // ignore baidu spider
-          return true;
-        }
-
-        // no other ignores
-        return false;
-    };
-);
-Rollbar::init($config);
+    $config = array(
+        'access_token' => '...',
+        'check_ignore' => function ($isUncaught, $exception, $payload) {
+            if (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Baiduspider') !== false) {
+              // ignore baidu spider
+              return true;
+            }
+    
+            // no other ignores
+            return false;
+        };
+    );
+    Rollbar::init($config);
 ```
 
 </dd>
@@ -548,21 +534,17 @@ Default: `false`
 E.g. Using a local proxy with no authentication
 
 ```php
-<?php
-$config['proxy'] = "127.0.0.1:8080";
-?>
+    $config['proxy'] = "127.0.0.1:8080";
 ```
 
 E.g. Using a local proxy with basic authentication
 
 ```php
-<?php
-$config['proxy'] = array(
-    'address' => '127.0.0.1:8080',
-    'username' => 'my_user',
-    'password' => 'my_password'
-);
-?>
+    $config['proxy'] = array(
+        'address' => '127.0.0.1:8080',
+        'username' => 'my_user',
+        'password' => 'my_password'
+    );
 ```
 
 Default: No proxy
@@ -613,47 +595,41 @@ Default: `\Psr\Log\LogLevel::ERROR` (no internal logging)
 Example use of error_sample_rates:
 
 ```php
-<?php
-$config['error_sample_rates'] = array(
-    // E_WARNING omitted, so defaults to 1
-    E_NOTICE => 0.1,
-    E_USER_ERROR => 0.5,
-    // E_USER_WARNING will take the same value, 0.5
-    E_USER_NOTICE => 0.1,
-    // E_STRICT and beyond will all be 0.1
-);
-?>
+    $config['error_sample_rates'] = array(
+        // E_WARNING omitted, so defaults to 1
+        E_NOTICE => 0.1,
+        E_USER_ERROR => 0.5,
+        // E_USER_WARNING will take the same value, 0.5
+        E_USER_NOTICE => 0.1,
+        // E_STRICT and beyond will all be 0.1
+    );
 ```
 
 Example use of exception_sample_rates:
 
 ```php
-<?php
-$config['exception_sample_rates'] = array(
-    // Exception omitted, so defaults to 1
-    
-    // SometimesException set at 0.1 so only reported 10% of the time
-    'SometimesException' => 0.1,
-);
-?>
+    $config['exception_sample_rates'] = array(
+        // Exception omitted, so defaults to 1
+        
+        // SometimesException set at 0.1 so only reported 10% of the time
+        'SometimesException' => 0.1,
+    );
 ```
 
 Example use of person_fn:
 
 ```php
-<?php
-function get_current_user() {
-    if ($_SESSION['user_id']) {
-        return array(
-            'id' => $_SESSION['user_id'], // required - value is a string
-            'username' => $_SESSION['username'], // optional - value is a string
-            'email' => $_SESSION['user_email'] // optional - value is a string
-        );
+    function get_current_user() {
+        if ($_SESSION['user_id']) {
+            return array(
+                'id' => $_SESSION['user_id'], // required - value is a string
+                'username' => $_SESSION['username'], // optional - value is a string
+                'email' => $_SESSION['user_email'] // optional - value is a string
+            );
+        }
+        return null;
     }
-    return null;
-}
-$config['person_fn'] = 'get_current_user';
-?>
+    $config['person_fn'] = 'get_current_user';
 ```
 
 ## Related projects
