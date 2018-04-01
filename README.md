@@ -371,9 +371,9 @@ Default: `null`
 
 Parameters:
 
-* $isUncaught: boolean value set to true if the error was an uncaught exception.
-* $exception: a RollbarException instance that will allow you to get the message or exception
-* $payload: an array containing the payload as it will be sent to Rollbar. Payload schema can be found at https://rollbar.com/docs/api/items_post/
+* *$isUncaught*: boolean value set to true if the error was an uncaught exception.
+* *$exception*: a RollbarException instance that will allow you to get the message or exception
+* *$payload*: an array containing the payload as it will be sent to Rollbar. Payload schema can be found at https://rollbar.com/docs/api/items_post/
 
 ```php
 $config = array(
