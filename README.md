@@ -334,7 +334,7 @@ via the php `shell_exec` function call. If you do not want to allow `shell_exec`
 possibly to not gather this context if you do not otherwise provide it via the separate
 configuration option, then set this option to false.
 
-Default: true
+Default: `true`
 </dd>
 
 <dt>endpoint
@@ -370,6 +370,7 @@ Default: `true`
 Default: `null`
 
 Parameters:
+
 * $isUncaught: boolean value set to true if the error was an uncaught exception.
 * $exception: a RollbarException instance that will allow you to get the message or exception
 * $payload: an array containing the payload as it will be sent to Rollbar. Payload schema can be found at https://rollbar.com/docs/api/items_post/
