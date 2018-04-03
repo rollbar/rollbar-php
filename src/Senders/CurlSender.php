@@ -23,7 +23,7 @@ class CurlSender implements SenderInterface
 
     public function __construct($opts)
     {
-        $this->endpoint = \Rollbar\Defaults::get()->endpoint();
+        $this->endpoint = \Rollbar\Defaults::get()->endpoint() . 'item/';
         $this->timeout = \Rollbar\Defaults::get()->timeout();
         
         $this->utilities = new \Rollbar\Utilities();

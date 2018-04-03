@@ -112,7 +112,7 @@ class Defaults
     private $defaultAllowExec = true;
     private $defaultMessageLevel = "warning";
     private $defaultExceptionLevel = "error";
-    private $defaultEndpoint = 'https://api.rollbar.com/api/1/item/';
+    private $defaultEndpoint = 'https://api.rollbar.com/api/1/';
     private $defaultCaptureErrorStacktraces = true;
     private $defaultCheckIgnore = null;
     private $defaultCustom = null;
