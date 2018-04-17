@@ -84,6 +84,10 @@ class RollbarLogger extends AbstractLogger
 
     public function log($level, $toLog, array $context = array(), $isUncaught = false)
     {
+        if ($this->disabled()) {
+            return new Response(0, "Disabled");
+        }
+        
         if (!$this->levelFactory->isValidLevel($level)) {
             throw new \Psr\Log\InvalidArgumentException("Invalid log level '$level'.");
         }
