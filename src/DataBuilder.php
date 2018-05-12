@@ -17,6 +17,8 @@ use Rollbar\Exceptions\PersonFuncException;
 
 class DataBuilder implements DataBuilderInterface
 {
+    const ANONYMIZE_IP = 'anonymize';
+    
     protected static $defaults;
 
     protected $environment;
@@ -790,20 +792,44 @@ class DataBuilder implements DataBuilderInterface
      */
     protected function getUserIp()
     {
-        if (!isset($_SERVER) || !$this->captureIP) {
+        if (!isset($_SERVER) || $this->captureIP === false) {
             return null;
         }
+        
+        $ip = null;
+        
         $forwardFor = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : null;
         if ($forwardFor) {
             // return everything until the first comma
             $parts = explode(',', $forwardFor);
-            return $parts[0];
+            $ip = $parts[0];
         }
         $realIp = isset($_SERVER['HTTP_X_REAL_IP']) ? $_SERVER['HTTP_X_REAL_IP'] : null;
         if ($realIp) {
-            return $realIp;
+            $ip = $realIp;
         }
-        return isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
+        $ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
+        
+        if ($this->captureIP === DataBuilder::ANONYMIZE_IP) {
+            
+            if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                
+                $parts = explode('.', $ip);
+                $ip = $parts[0] . '.' . $parts[1] . '.' . $parts[2] . '.0/24';
+                
+            } else if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+                
+                $parts = explode(':', $ip);
+                $ip = 
+                    $parts[0] . ':' . 
+                    $parts[1] . ':' . 
+                    $parts[2] . ':' .
+                    '0000:0000:0000:0000:0000';
+                    
+            }
+        }
+        
+        return $ip;
     }
 
     protected function getRequestExtras()
