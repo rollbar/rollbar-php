@@ -49,6 +49,8 @@ class DataBuilder implements DataBuilderInterface
     protected $rawRequestBody;
     protected $localVarsDump;
     protected $captureErrorStacktraces;
+    protected $captureEmail;
+    protected $captureUsername;
     
     /**
      * @var LevelFactory
@@ -98,6 +100,20 @@ class DataBuilder implements DataBuilderInterface
         $this->setLocalVarsDump($config);
         $this->setCaptureErrorStacktraces($config);
         $this->setLevelFactory($config);
+        $this->setCaptureEmail($config);
+        $this->setCaptureUsername($config);
+    }
+    
+    protected function setCaptureEmail($config)
+    {
+        $fromConfig = isset($config['capture_email']) ? $config['capture_email'] : null;
+        $this->captureEmail = self::$defaults->captureEmail($fromConfig);
+    }
+    
+    protected function setCaptureUsername($config)
+    {
+        $fromConfig = isset($config['capture_username']) ? $config['capture_username'] : null;
+        $this->captureUsername = self::$defaults->captureUsername($fromConfig);
     }
 
     protected function setEnvironment($config)
@@ -825,12 +841,12 @@ class DataBuilder implements DataBuilderInterface
         $identifier = $personData['id'];
 
         $email = null;
-        if (isset($personData['email'])) {
+        if ($this->captureEmail && isset($personData['email'])) {
             $email = $personData['email'];
         }
 
         $username = null;
-        if (isset($personData['username'])) {
+        if ($this->captureUsername && isset($personData['username'])) {
             $username = $personData['username'];
         }
 
