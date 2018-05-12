@@ -385,11 +385,11 @@ class Defaults
     
     public function captureEmail($captureEmail = null)
     {
-        return $captureEmail ?: $this->defaultCaptureEmail;
+        return $captureEmail !== null ? $captureEmail : $this->defaultCaptureEmail;
     }
     
     public function captureUsername($captureUsername = null)
     {
-        return $captureUsername ?: $this->defaultCaptureUsername;
+        return $captureUsername !== null ? $captureUsername : $this->defaultCaptureUsername;
     }
 }
