@@ -145,6 +145,7 @@ class Defaults
     private $defaultIncludeExcCodeContext;
     private $defaultRawRequestBody;
     private $defaultLocalVarsDump;
+    private $defaultCaptureIP = true;
     private $defaultCaptureEmail = false;
     private $defaultCaptureUsername = false;
     private $utilities;
@@ -382,7 +383,12 @@ class Defaults
     {
         return $includeExcCodeContext ?: $this->defaultIncludeExcCodeContext;
     }
-    
+   
+    public function captureIP($captureIP = null)
+    {
+        return $captureIP !== null ? $captureIP : $this->defaultCaptureIP;
+    }
+
     public function captureEmail($captureEmail = null)
     {
         return $captureEmail !== null ? $captureEmail : $this->defaultCaptureEmail;

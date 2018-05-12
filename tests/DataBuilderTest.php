@@ -917,4 +917,47 @@ class DataBuilderTest extends BaseRollbarTest
             array(true,false)
         );
     }
+    
+    /**
+     * @dataProvider getUserIpProvider
+     */
+    public function testGetUserIp($ipAddress, $expected, $captureIP)
+    {
+        $_SERVER['REMOTE_ADDR'] = $ipAddress;
+        
+        $config = array(
+            'access_token' => $this->getTestAccessToken(),
+            'environment' => 'tests'
+        );
+        
+        if ($captureIP !== null) {
+            $config['capture_ip'] = $captureIP;
+        }
+        
+        $config = new Config($config);
+        
+        $dataBuilder = $config->getDataBuilder();
+        $output = $dataBuilder->makeData(Level::ERROR, "testing", array());
+        
+        $this->assertEquals($expected, $output->getRequest()->getUserIp());
+    }
+    
+    public function getUserIpProvider()
+    {
+        return array(
+            array('127.0.0.1', '127.0.0.1', null),
+            array('127.0.0.1', null, false),
+            array('127.0.0.1', '127.0.0.0/24', DataBuilder::ANONYMIZE_IP),
+            array(
+                '2001:0db8:85a3:0000:0000:8a2e:0370:7334',
+                '2001:0db8:85a3:0000:0000:0000:0000:0000',
+                DataBuilder::ANONYMIZE_IP
+            ),
+            array(
+                '2001:db8:85a3::',
+                '2001:db8:85a3:0000:0000:0000:0000:0000',
+                DataBuilder::ANONYMIZE_IP
+            )
+        );
+    }
 }
