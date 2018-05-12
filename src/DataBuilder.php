@@ -811,21 +811,16 @@ class DataBuilder implements DataBuilderInterface
         $ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
         
         if ($this->captureIP === DataBuilder::ANONYMIZE_IP) {
-            
             if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-                
                 $parts = explode('.', $ip);
                 $ip = $parts[0] . '.' . $parts[1] . '.' . $parts[2] . '.0/24';
-                
-            } else if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
-                
+            } elseif (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
                 $parts = explode(':', $ip);
-                $ip = 
-                    $parts[0] . ':' . 
-                    $parts[1] . ':' . 
+                $ip =
+                    $parts[0] . ':' .
+                    $parts[1] . ':' .
                     $parts[2] . ':' .
                     '0000:0000:0000:0000:0000';
-                    
             }
         }
         
