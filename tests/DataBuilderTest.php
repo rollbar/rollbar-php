@@ -892,4 +892,36 @@ class DataBuilderTest extends BaseRollbarTest
             array(true,false)
         );
     }
+    
+    /**
+     * @dataProvider getUserIpProvider
+     */
+    public function testGetUserIp($ip, $expected, $captureIP)
+    {   
+        $_SERVER['REMOTE_ADDR'] = $ip;
+        
+        $config = array(
+            'access_token' => $this->getTestAccessToken(),
+            'environment' => 'tests'
+        );
+        
+        if ($captureIP !== null)  {
+            $config['capture_ip'] = $captureIP;
+        }
+        
+        $config = new Config($config);
+        
+        $dataBuilder = $config->getDataBuilder();
+        $output = $dataBuilder->makeData(Level::ERROR, "testing", array());
+        
+        $this->assertEquals($expected, $output->getRequest()->getUserIp());
+    }
+    
+    public function getUserIpProvider()
+    {
+        return array(
+            array('127.0.0.1', '127.0.0.1', null),
+            array('127.0.0.1', null, false),
+        );
+    }
 }

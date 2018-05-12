@@ -145,6 +145,7 @@ class Defaults
     private $defaultIncludeExcCodeContext;
     private $defaultRawRequestBody;
     private $defaultLocalVarsDump;
+    private $defaultCaptureIP = true;
     private $utilities;
 
     public function __construct($utilities)
@@ -379,5 +380,10 @@ class Defaults
     public function includeExcCodeContext($includeExcCodeContext = null)
     {
         return $includeExcCodeContext ?: $this->defaultIncludeExcCodeContext;
+    }
+    
+    public function captureIP($captureIP = null)
+    {
+        return $captureIP !== null ? $captureIP : $this->defaultCaptureIP;
     }
 }

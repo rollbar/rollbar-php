@@ -49,6 +49,7 @@ class DataBuilder implements DataBuilderInterface
     protected $rawRequestBody;
     protected $localVarsDump;
     protected $captureErrorStacktraces;
+    protected $captureIP;
     
     /**
      * @var LevelFactory
@@ -98,6 +99,13 @@ class DataBuilder implements DataBuilderInterface
         $this->setLocalVarsDump($config);
         $this->setCaptureErrorStacktraces($config);
         $this->setLevelFactory($config);
+        $this->setCaptureIP($config);
+    }
+
+    protected function setCaptureIP($config)
+    {
+        $fromConfig = isset($config['capture_ip']) ? $config['capture_ip'] : null;
+        $this->captureIP = self::$defaults->captureIP($fromConfig);
     }
 
     protected function setEnvironment($config)
@@ -782,7 +790,7 @@ class DataBuilder implements DataBuilderInterface
      */
     protected function getUserIp()
     {
-        if (!isset($_SERVER)) {
+        if (!isset($_SERVER) || !$this->captureIP) {
             return null;
         }
         $forwardFor = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : null;
