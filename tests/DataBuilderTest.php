@@ -921,9 +921,9 @@ class DataBuilderTest extends BaseRollbarTest
     /**
      * @dataProvider getUserIpProvider
      */
-    public function testGetUserIp($ip, $expected, $captureIP)
+    public function testGetUserIp($ipAddress, $expected, $captureIP)
     {
-        $_SERVER['REMOTE_ADDR'] = $ip;
+        $_SERVER['REMOTE_ADDR'] = $ipAddress;
         
         $config = array(
             'access_token' => $this->getTestAccessToken(),

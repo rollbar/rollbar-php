@@ -812,27 +812,27 @@ class DataBuilder implements DataBuilderInterface
             return null;
         }
         
-        $ip = null;
+        $ipAddress = null;
         
         $forwardFor = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : null;
         if ($forwardFor) {
             // return everything until the first comma
             $parts = explode(',', $forwardFor);
-            $ip = $parts[0];
+            $ipAddress = $parts[0];
         }
         $realIp = isset($_SERVER['HTTP_X_REAL_IP']) ? $_SERVER['HTTP_X_REAL_IP'] : null;
         if ($realIp) {
-            $ip = $realIp;
+            $ipAddress = $realIp;
         }
-        $ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
+        $ipAddress = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
         
         if ($this->captureIP === DataBuilder::ANONYMIZE_IP) {
-            if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-                $parts = explode('.', $ip);
-                $ip = $parts[0] . '.' . $parts[1] . '.' . $parts[2] . '.0/24';
-            } elseif (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
-                $parts = explode(':', $ip);
-                $ip =
+            if (filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                $parts = explode('.', $ipAddress);
+                $ipAddress = $parts[0] . '.' . $parts[1] . '.' . $parts[2] . '.0/24';
+            } elseif (filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+                $parts = explode(':', $ipAddress);
+                $ipAddress =
                     $parts[0] . ':' .
                     $parts[1] . ':' .
                     $parts[2] . ':' .
@@ -840,7 +840,7 @@ class DataBuilder implements DataBuilderInterface
             }
         }
         
-        return $ip;
+        return $ipAddress;
     }
 
     protected function getRequestExtras()
