@@ -690,12 +690,37 @@ class DataBuilderTest extends BaseRollbarTest
             'environment' => 'tests',
             'person' => array(
                 'id' => '123',
+                'username' => 'tester',
                 'email' => 'test@test.com'
             ),
             'levelFactory' => new LevelFactory,
             'utilities' => new Utilities
         ));
         $output = $dataBuilder->makeData(Level::ERROR, "testing", array());
+        $this->assertEquals('123', $output->getPerson()->getId());
+        $this->assertNull($output->getPerson()->getUsername());
+        $this->assertNull($output->getPerson()->getEmail());
+    }
+    
+    public function testPersonCaptureEmailUsername()
+    {
+        $config = new Config(array(
+            'access_token' => $this->getTestAccessToken(),
+            'environment' => 'tests',
+            'person' => array(
+                'id' => '123',
+                'username' => 'tester',
+                'email' => 'test@test.com'
+            ),
+            'capture_email' => true,
+            'capture_username' => true
+        ));
+        $dataBuilder = $config->getDataBuilder();
+        
+        $output = $dataBuilder->makeData(Level::ERROR, "testing", array());
+        
+        $this->assertEquals('123', $output->getPerson()->getId());
+        $this->assertEquals('tester', $output->getPerson()->getUsername());
         $this->assertEquals('test@test.com', $output->getPerson()->getEmail());
     }
 
@@ -714,7 +739,7 @@ class DataBuilderTest extends BaseRollbarTest
             'utilities' => new Utilities
         ));
         $output = $dataBuilder->makeData(Level::ERROR, "testing", array());
-        $this->assertEquals('test@test.com', $output->getPerson()->getEmail());
+        $this->assertEquals('123', $output->getPerson()->getId());
     }
     
     public function testPersonFuncException()
@@ -859,7 +884,7 @@ class DataBuilderTest extends BaseRollbarTest
             'tests/DataBuilderTest.php',
             $frames[count($frames)-1]->getFilename()
         );
-        $this->assertEquals(857, $frames[count($frames)-1]->getLineno());
+        $this->assertEquals(882, $frames[count($frames)-1]->getLineno());
         $this->assertEquals('Rollbar\DataBuilderTest::testFramesOrder', $frames[count($frames)-2]->getMethod());
     }
     

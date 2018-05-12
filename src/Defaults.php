@@ -147,6 +147,8 @@ class Defaults
     private $defaultIncludeExcCodeContext;
     private $defaultRawRequestBody;
     private $defaultLocalVarsDump;
+    private $defaultCaptureEmail = false;
+    private $defaultCaptureUsername = false;
     private $utilities;
 
     public function __construct($utilities)
@@ -381,5 +383,15 @@ class Defaults
     public function includeExcCodeContext($includeExcCodeContext = null)
     {
         return $includeExcCodeContext ?: $this->defaultIncludeExcCodeContext;
+    }
+    
+    public function captureEmail($captureEmail = null)
+    {
+        return $captureEmail ?: $this->defaultCaptureEmail;
+    }
+    
+    public function captureUsername($captureUsername = null)
+    {
+        return $captureUsername ?: $this->defaultCaptureUsername;
     }
 }

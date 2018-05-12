@@ -39,6 +39,8 @@ class Config
         'logger',
         'person',
         'person_fn',
+        'capture_username',
+        'capture_email',
         'root',
         'scrub_fields',
         'scrub_whitelist',
