@@ -40,6 +40,8 @@ class Config
         'person',
         'person_fn',
         'capture_ip',
+        'capture_username',
+        'capture_email',
         'root',
         'scrub_fields',
         'scrub_whitelist',

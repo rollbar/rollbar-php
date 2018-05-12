@@ -242,4 +242,14 @@ class DefaultsTest extends BaseRollbarTest
     {
         $this->assertFalse($this->defaults->useErrorReporting());
     }
+    
+    public function testCaptureEmail()
+    {
+        $this->assertFalse($this->defaults->captureEmail());
+    }
+    
+    public function testCaptureUsername()
+    {
+        $this->assertFalse($this->defaults->captureUsername());
+    }
 }
