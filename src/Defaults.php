@@ -4,6 +4,8 @@ use Rollbar\Utilities;
 use Rollbar\Payload\Notifier;
 use Psr\Log\LogLevel;
 
+require_once 'Config.php';
+
 class Defaults
 {
     private static $singleton = null;
