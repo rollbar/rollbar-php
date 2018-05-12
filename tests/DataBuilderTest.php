@@ -897,7 +897,7 @@ class DataBuilderTest extends BaseRollbarTest
      * @dataProvider getUserIpProvider
      */
     public function testGetUserIp($ip, $expected, $captureIP)
-    {   
+    {
         $_SERVER['REMOTE_ADDR'] = $ip;
         
         $config = array(
@@ -905,7 +905,7 @@ class DataBuilderTest extends BaseRollbarTest
             'environment' => 'tests'
         );
         
-        if ($captureIP !== null)  {
+        if ($captureIP !== null) {
             $config['capture_ip'] = $captureIP;
         }
         
