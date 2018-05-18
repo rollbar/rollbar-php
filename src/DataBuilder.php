@@ -829,7 +829,7 @@ class DataBuilder implements DataBuilderInterface
         if ($this->captureIP === DataBuilder::ANONYMIZE_IP) {
             if (filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
                 $parts = explode('.', $ipAddress);
-                $ipAddress = $parts[0] . '.' . $parts[1] . '.' . $parts[2] . '.0/24';
+                $ipAddress = $parts[0] . '.' . $parts[1] . '.' . $parts[2] . '.0';
             } elseif (filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
                 $parts = explode(':', $ipAddress);
                 $ipAddress =
