@@ -947,7 +947,7 @@ class DataBuilderTest extends BaseRollbarTest
         return array(
             array('127.0.0.1', '127.0.0.1', null),
             array('127.0.0.1', null, false),
-            array('127.0.0.1', '127.0.0.0/24', DataBuilder::ANONYMIZE_IP),
+            array('127.0.0.1', '127.0.0.0', DataBuilder::ANONYMIZE_IP),
             array(
                 '2001:0db8:85a3:0000:0000:8a2e:0370:7334',
                 '2001:0db8:85a3:0000:0000:0000:0000:0000',
