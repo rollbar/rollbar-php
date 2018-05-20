@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.5.1
+- #367 Newest version 1.5.0 missing changelog, Notifier version not bumped
+- #366 Make the anonymized IP addresses indexable
+- Removed `CHANGELOG.md` in favor of using [release notes](https://github.com/rollbar/rollbar-php/releases)
+
+## 1.5.0
+- #362 - Fix running isolated tests by requiring the Config.php file with ROLLBAR_INCLUDED_ERRNO_BITMASK definition
+- #353 - Only collect person.id by default for person tracking
+- #354 - Allow IP collection to be easily turned on and off in config
+- #355 - Anonymize IP address config option
+
 ## 1.4.1
 - Temporarily add `\Rollbar\Monolog\Handler\MonologHandler` until `Seldaek:monolog` PR 1042 gets merged into their `master`
 - Refactor JSON encoding mechanis to limit calls to `json_encode` to minimum with `\Rollbar\Payload\EncodedPayload`
