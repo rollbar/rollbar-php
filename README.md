@@ -691,6 +691,10 @@ Yii package: [baibaratsky/yii-rollbar](https://github.com/baibaratsky/yii-rollba
 
 Yii2 package: [baibaratsky/yii2-rollbar](https://github.com/baibaratsky/yii2-rollbar)
 
+## Changelog
+
+We moved away from using `CHANGELOG.md` in favor of [release notes](https://github.com/rollbar/rollbar-php/releases).
+
 ## Help / Support
 
 If you run into any issues, please email us at [support@rollbar.com](mailto:support@rollbar.com)
