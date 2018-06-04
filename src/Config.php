@@ -112,7 +112,7 @@ class Config
     private $mtRandmax;
 
     private $includedErrno;
-    private $use_error_reporting = false;
+    private $useErrorReporting = false;
     
     /**
      * @var boolean Should debug_backtrace() data be sent with string messages
@@ -209,9 +209,9 @@ class Config
             $this->includedErrno = $config['included_errno'];
         }
 
-        $this->use_error_reporting = \Rollbar\Defaults::get()->useErrorReporting();
+        $this->useErrorReporting = \Rollbar\Defaults::get()->useErrorReporting();
         if (isset($config['use_error_reporting'])) {
-            $this->use_error_reporting = $config['use_error_reporting'];
+            $this->useErrorReporting = $config['use_error_reporting'];
         }
     }
 
@@ -648,7 +648,7 @@ class Config
      */
     public function shouldIgnoreError($errno)
     {
-        if ($this->use_error_reporting && ($errno & error_reporting()) === 0) {
+        if ($this->useErrorReporting && ($errno & error_reporting()) === 0) {
             // ignore due to error_reporting level
             return true;
         }
