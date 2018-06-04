@@ -108,7 +108,7 @@ class Config
      */
     private $checkIgnore;
     private $errorSampleRates;
-    private $exception_sample_rates;
+    private $exceptionSampleRates;
     private $mt_randmax;
 
     private $included_errno;
@@ -143,9 +143,9 @@ class Config
             $this->errorSampleRates = $configArray['error_sample_rates'];
         }
         
-        $this->exception_sample_rates = \Rollbar\Defaults::get()->exceptionSampleRates();
+        $this->exceptionSampleRates = \Rollbar\Defaults::get()->exceptionSampleRates();
         if (isset($configArray['exception_sample_rates'])) {
-            $this->exception_sample_rates = $configArray['exception_sample_rates'];
+            $this->exceptionSampleRates = $configArray['exception_sample_rates'];
         }
 
         $levels = array(E_WARNING, E_NOTICE, E_USER_ERROR, E_USER_WARNING,
@@ -716,7 +716,7 @@ class Config
     public function exceptionSampleRate(\Exception $toLog)
     {
         $sampleRate = 1.0;
-        if (count($this->exception_sample_rates) == 0) {
+        if (count($this->exceptionSampleRates) == 0) {
             return $sampleRate;
         }
         
@@ -730,8 +730,8 @@ class Config
         $exceptionClasses = array_reverse($exceptionClasses);
         
         foreach ($exceptionClasses as $exceptionClass) {
-            if (isset($this->exception_sample_rates["$exceptionClass"])) {
-                $sampleRate = $this->exception_sample_rates["$exceptionClass"];
+            if (isset($this->exceptionSampleRates["$exceptionClass"])) {
+                $sampleRate = $this->exceptionSampleRates["$exceptionClass"];
             }
         }
         
