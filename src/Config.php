@@ -106,7 +106,7 @@ class Config
     /**
      * @var callable
      */
-    private $check_ignore;
+    private $checkIgnore;
     private $error_sample_rates;
     private $exception_sample_rates;
     private $mt_randmax;
@@ -424,11 +424,11 @@ class Config
     {
         // Remain backwards compatible
         if (isset($config['checkIgnore'])) {
-            $this->check_ignore = $config['checkIgnore'];
+            $this->checkIgnore = $config['checkIgnore'];
         }
         
         if (isset($config['check_ignore'])) {
-            $this->check_ignore = $config['check_ignore'];
+            $this->checkIgnore = $config['check_ignore'];
         }
     }
 
@@ -595,14 +595,14 @@ class Config
 
     public function checkIgnored($payload, $accessToken, $toLog, $isUncaught)
     {
-        if (isset($this->check_ignore)) {
+        if (isset($this->checkIgnore)) {
             try {
-                if (call_user_func($this->check_ignore, $isUncaught, $toLog, $payload)) {
+                if (call_user_func($this->checkIgnore, $isUncaught, $toLog, $payload)) {
                     return true;
                 }
             } catch (Exception $exception) {
                 // We should log that we are removing the custom checkIgnore
-                $this->check_ignore = null;
+                $this->checkIgnore = null;
             }
         }
         
