@@ -943,8 +943,8 @@ class DataBuilder implements DataBuilderInterface
         $custom = $this->getCustom();
 
         // Make this an array if possible:
-        if ($custom instanceof \JsonSerializable) {
-            $custom = $custom->jsonSerialize();
+        if ($custom instanceof \Serializable) {
+            $custom = $custom->serialize();
         } elseif (is_null($custom)) {
             $custom = array();
         } elseif (!is_array($custom)) {

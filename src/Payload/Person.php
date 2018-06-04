@@ -6,7 +6,7 @@
  *
  * @SuppressWarnings(PHPMD.ShortVariable)
  */
-class Person implements \JsonSerializable
+class Person implements \Serializable
 {
     private $id;
     private $username;
@@ -66,7 +66,7 @@ class Person implements \JsonSerializable
         $this->extra[$name] = $val;
     }
 
-    public function jsonSerialize()
+    public function serialize()
     {
         $result = array(
             "id" => $this->id,
@@ -77,5 +77,10 @@ class Person implements \JsonSerializable
             $result[$key] = $val;
         }
         return $this->utilities->serializeForRollbar($result, array_keys($this->extra));
+    }
+    
+    public function unserialize($serialized)
+    {
+        throw new \Exception('Not implemented yet.');
     }
 }

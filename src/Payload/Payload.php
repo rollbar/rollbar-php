@@ -3,7 +3,7 @@
 use Rollbar\DataBuilder;
 use Rollbar\Config;
 
-class Payload implements \JsonSerializable
+class Payload implements \Serializable
 {
     private $data;
     private $accessToken;
@@ -41,12 +41,17 @@ class Payload implements \JsonSerializable
         return $this;
     }
 
-    public function jsonSerialize()
+    public function serialize()
     {
         $result = array(
             "data" => $this->data,
             "access_token" => $this->accessToken,
         );
         return $this->utilities->serializeForRollbar($result);
+    }
+    
+    public function unserialize($serialized)
+    {
+        throw new \Exception('Not implemented yet.');
     }
 }

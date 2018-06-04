@@ -1,6 +1,6 @@
 <?php namespace Rollbar\Payload;
 
-class Request implements \JsonSerializable
+class Request implements \Serializable
 {
     private $url;
     private $method;
@@ -133,7 +133,7 @@ class Request implements \JsonSerializable
         $this->extra['session'] = $session;
     }
 
-    public function jsonSerialize()
+    public function serialize()
     {
         $result = array(
             "url" => $this->url,
@@ -150,5 +150,10 @@ class Request implements \JsonSerializable
             $result[$key] = $val;
         }
         return $this->utilities->serializeForRollbar($result, array_keys($this->extra));
+    }
+    
+    public function unserialize($serialized)
+    {
+        throw new \Exception('Not implemented yet.');
     }
 }

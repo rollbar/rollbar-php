@@ -161,7 +161,7 @@ class DataTest extends BaseRollbarTest
             ->setUuid("123e4567-e89b-12d3-a456-426655440000")
             ->setNotifier($notifier);
 
-        $encoded = json_encode($data->jsonSerialize());
+        $encoded = json_encode($data->serialize());
 
         $this->assertContains("\"environment\":\"testing\"", $encoded);
         $this->assertContains("\"body\":\"{BODY}\"", $encoded);
@@ -185,9 +185,9 @@ class DataTest extends BaseRollbarTest
     private function mockSerialize($mock, $returnVal)
     {
         if (is_string($mock)) {
-            $mock = m::mock("$mock, \JsonSerializable");
+            $mock = m::mock("$mock, \Serializable");
         }
-        return $mock->shouldReceive("jsonSerialize")
+        return $mock->shouldReceive("serialize")
             ->andReturn($returnVal)
             ->mock();
     }

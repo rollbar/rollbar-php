@@ -37,14 +37,14 @@ class TraceChainTest extends Rollbar\BaseRollbarTest
     public function testEncode()
     {
         $trace1 = m::mock("Rollbar\Payload\Trace")
-            ->shouldReceive("jsonSerialize")
+            ->shouldReceive("serialize")
             ->andReturn("TRACE1")
             ->mock();
         $trace2 = m::mock("Rollbar\Payload\Trace")
-            ->shouldReceive("jsonSerialize")
+            ->shouldReceive("serialize")
             ->andReturn("TRACE2")
             ->mock();
         $chain = new TraceChain(array($trace1, $trace2));
-        $this->assertEquals('["TRACE1","TRACE2"]', json_encode($chain->jsonSerialize()));
+        $this->assertEquals('["TRACE1","TRACE2"]', json_encode($chain->serialize()));
     }
 }

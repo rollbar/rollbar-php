@@ -50,7 +50,7 @@ class PersonTest extends BaseRollbarTest
         $person->Settings = array(
             "send_email" => true
         );
-        $encoded = json_encode($person->jsonSerialize());
+        $encoded = json_encode($person->serialize());
         $expected ='{"id":"1024","username":"username","email":"user@gmail.com","Settings":{"send_email":true}}';
         $this->assertEquals($expected, $encoded);
     }

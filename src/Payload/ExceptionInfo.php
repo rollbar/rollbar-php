@@ -1,6 +1,6 @@
 <?php namespace Rollbar\Payload;
 
-class ExceptionInfo implements \JsonSerializable
+class ExceptionInfo implements \Serializable
 {
     private $class;
     private $message;
@@ -48,7 +48,7 @@ class ExceptionInfo implements \JsonSerializable
         return $this;
     }
 
-    public function jsonSerialize()
+    public function serialize()
     {
         $result = array(
             "class" => $this->class,
@@ -56,5 +56,10 @@ class ExceptionInfo implements \JsonSerializable
             "description" => $this->description,
         );
         return $this->utilities->serializeForRollbar($result);
+    }
+    
+    public function unserialize($serialized)
+    {
+        throw new \Exception('Not implemented yet.');
     }
 }

@@ -55,7 +55,7 @@ class Message implements ContentInterface
         return isset($this->extra[$key]) ? $this->extra[$key] : null;
     }
 
-    public function jsonSerialize()
+    public function serialize()
     {
         $toSerialize = array(
             "body" => $this->getBody(),
@@ -65,5 +65,10 @@ class Message implements ContentInterface
             $toSerialize[$key] = $value;
         }
         return $this->utilities->serializeForRollbar($toSerialize, array_keys($this->extra));
+    }
+    
+    public function unserialize($serialized)
+    {
+        throw new \Exception('Not implemented yet.');
     }
 }

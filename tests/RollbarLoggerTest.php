@@ -357,7 +357,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         $data = $dataBuilder->makeData(Level::ERROR, "testing", $context);
         $payload = new Payload($data, $config->getAccessToken());
 
-        $scrubbed = $payload->jsonSerialize();
+        $scrubbed = $payload->serialize();
         $scrubber = $config->getScrubber();
 
         $result = $scrubber->scrub($scrubbed);

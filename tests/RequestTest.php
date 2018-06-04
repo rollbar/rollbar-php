@@ -162,6 +162,6 @@ class RequestTest extends BaseRollbarTest
              '"test":"testing"' .
         '}';
 
-        $this->assertEquals($expected, json_encode($request->jsonSerialize()));
+        $this->assertEquals($expected, json_encode($request->serialize()));
     }
 }

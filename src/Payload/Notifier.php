@@ -1,6 +1,6 @@
 <?php namespace Rollbar\Payload;
 
-class Notifier implements \JsonSerializable
+class Notifier implements \Serializable
 {
     const NAME = "rollbar-php";
     const VERSION = "1.5.1";
@@ -43,12 +43,17 @@ class Notifier implements \JsonSerializable
         return $this;
     }
 
-    public function jsonSerialize()
+    public function serialize()
     {
         $result = array(
             "name" => $this->name,
             "version" => $this->version,
         );
         return $this->utilities->serializeForRollbar($result);
+    }
+    
+    public function unserialize($serialized)
+    {
+        throw new \Exception('Not implemented yet.');
     }
 }
