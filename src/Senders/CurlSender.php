@@ -16,6 +16,7 @@ class CurlSender implements SenderInterface
     private $timeout;
     private $proxy = null;
     private $verifyPeer = true;
+    private $caCertPath = null;
     private $multiHandle = null;
     private $maxBatchRequests = 75;
     private $batchRequests = array();
@@ -45,6 +46,9 @@ class CurlSender implements SenderInterface
         if (array_key_exists('verifyPeer', $opts)) {
             $this->utilities->validateBoolean($opts['verifyPeer'], 'opts["verifyPeer"]', false);
             $this->verifyPeer = $opts['verifyPeer'];
+        }
+        if (array_key_exists('ca_cert_path', $opts)) {
+            $this->caCertPath = $opts['ca_cert_path'];
         }
     }
     
@@ -132,6 +136,10 @@ class CurlSender implements SenderInterface
         curl_setopt($handle, CURLOPT_TIMEOUT, $this->timeout);
         curl_setopt($handle, CURLOPT_HTTPHEADER, array('X-Rollbar-Access-Token: ' . $accessToken));
         curl_setopt($handle, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+
+        if (!is_null($this->caCertPath)) {
+            curl_setopt($handle, CURLOPT_CAINFO, $this->caCertPath);
+        }
 
         if ($this->proxy) {
             $proxy = is_array($this->proxy) ? $this->proxy : array('address' => $this->proxy);

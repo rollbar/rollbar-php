@@ -373,6 +373,10 @@ class Config
         if (array_key_exists('proxy', $config)) {
             $config['senderOptions']['proxy'] = $config['proxy'];
         }
+
+        if (array_key_exists('ca_cert_path', $config)) {
+            $config['senderOptions']['ca_cert_path'] = $config['ca_cert_path'];
+        }
     }
 
     private function setAgentSenderOptions(&$config, $default)
