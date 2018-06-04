@@ -46,7 +46,7 @@ class AgentSender implements SenderInterface
             $this->loadAgentFile();
         }
         foreach ($batch as $payload) {
-            fwrite($this->agentLog, json_encode($payload) . "\n");
+            fwrite($this->agentLog, $payload->encoded() . "\n");
         }
     }
 
