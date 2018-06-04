@@ -111,7 +111,7 @@ class Config
     private $exceptionSampleRates;
     private $mtRandmax;
 
-    private $included_errno;
+    private $includedErrno;
     private $use_error_reporting = false;
     
     /**
@@ -131,7 +131,7 @@ class Config
     public function __construct(array $configArray)
     {
         $this->verbosity = \Rollbar\Defaults::get()->verbosity();
-        $this->included_errno = \Rollbar\Defaults::get()->includedErrno();
+        $this->includedErrno = \Rollbar\Defaults::get()->includedErrno();
         
         $this->levelFactory = new LevelFactory();
         $this->utilities = new Utilities();
@@ -206,7 +206,7 @@ class Config
         $this->setVerbosity($config);
 
         if (isset($config['included_errno'])) {
-            $this->included_errno = $config['included_errno'];
+            $this->includedErrno = $config['included_errno'];
         }
 
         $this->use_error_reporting = \Rollbar\Defaults::get()->useErrorReporting();
@@ -653,7 +653,7 @@ class Config
             return true;
         }
 
-        if ($this->included_errno != -1 && ($errno & $this->included_errno) != $errno) {
+        if ($this->includedErrno != -1 && ($errno & $this->includedErrno) != $errno) {
             // ignore
             return true;
         }
