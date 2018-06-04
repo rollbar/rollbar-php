@@ -109,7 +109,7 @@ class Config
     private $checkIgnore;
     private $errorSampleRates;
     private $exceptionSampleRates;
-    private $mt_randmax;
+    private $mtRandmax;
 
     private $included_errno;
     private $use_error_reporting = false;
@@ -161,7 +161,7 @@ class Config
                 $this->errorSampleRates[$level] = $curr;
             }
         }
-        $this->mt_randmax = mt_getrandmax();
+        $this->mtRandmax = mt_getrandmax();
     }
     
     public static function listOptions()
@@ -661,7 +661,7 @@ class Config
         if (isset($this->errorSampleRates[$errno])) {
             // get a float in the range [0, 1)
             // mt_rand() is inclusive, so add 1 to mt_randmax
-            $float_rand = mt_rand() / ($this->mt_randmax + 1);
+            $float_rand = mt_rand() / ($this->mtRandmax + 1);
             if ($float_rand > $this->errorSampleRates[$errno]) {
                 // skip
                 return true;
@@ -696,7 +696,7 @@ class Config
     {
         // get a float in the range [0, 1)
         // mt_rand() is inclusive, so add 1 to mt_randmax
-        $floatRand = mt_rand() / ($this->mt_randmax + 1);
+        $floatRand = mt_rand() / ($this->mtRandmax + 1);
         if ($floatRand > $this->exceptionSampleRate($toLog)) {
             // skip
             return true;
