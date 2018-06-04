@@ -100,7 +100,7 @@ class Config
     private $scrubber;
 
     private $batched = false;
-    private $batch_size = 50;
+    private $batchSize = 50;
 
     private $custom = array();
     /**
@@ -332,7 +332,7 @@ class Config
     private function setBatchSize($config)
     {
         if (array_key_exists('batch_size', $config)) {
-            $this->batch_size = $config['batch_size'];
+            $this->batchSize = $config['batch_size'];
         }
     }
 
@@ -548,7 +548,7 @@ class Config
 
     public function getBatchSize()
     {
-        return $this->batch_size;
+        return $this->batchSize;
     }
 
     /**
