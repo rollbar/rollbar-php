@@ -107,7 +107,7 @@ class Config
      * @var callable
      */
     private $checkIgnore;
-    private $error_sample_rates;
+    private $errorSampleRates;
     private $exception_sample_rates;
     private $mt_randmax;
 
@@ -138,9 +138,9 @@ class Config
         
         $this->updateConfig($configArray);
 
-        $this->error_sample_rates = \Rollbar\Defaults::get()->errorSampleRates();
+        $this->errorSampleRates = \Rollbar\Defaults::get()->errorSampleRates();
         if (isset($configArray['error_sample_rates'])) {
-            $this->error_sample_rates = $configArray['error_sample_rates'];
+            $this->errorSampleRates = $configArray['error_sample_rates'];
         }
         
         $this->exception_sample_rates = \Rollbar\Defaults::get()->exceptionSampleRates();
@@ -157,8 +157,8 @@ class Config
         $curr = 1;
         for ($i = 0, $num = count($levels); $i < $num; $i++) {
             $level = $levels[$i];
-            if (!isset($this->error_sample_rates[$level])) {
-                $this->error_sample_rates[$level] = $curr;
+            if (!isset($this->errorSampleRates[$level])) {
+                $this->errorSampleRates[$level] = $curr;
             }
         }
         $this->mt_randmax = mt_getrandmax();
@@ -658,11 +658,11 @@ class Config
             return true;
         }
 
-        if (isset($this->error_sample_rates[$errno])) {
+        if (isset($this->errorSampleRates[$errno])) {
             // get a float in the range [0, 1)
             // mt_rand() is inclusive, so add 1 to mt_randmax
             $float_rand = mt_rand() / ($this->mt_randmax + 1);
-            if ($float_rand > $this->error_sample_rates[$errno]) {
+            if ($float_rand > $this->errorSampleRates[$errno]) {
                 // skip
                 return true;
             }
