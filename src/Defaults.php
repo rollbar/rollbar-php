@@ -121,7 +121,8 @@ class Defaults
     
     public function fromSnakeCase($option)
     {
-        $method = lcfirst(str_replace('_', '', ucwords($option, '_')));
+        $spaced = str_replace('_', ' ', $option);
+        $method = lcfirst(str_replace(' ', '', ucwords($spaced)));
         return $this->$method();
     }
 

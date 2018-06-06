@@ -268,9 +268,7 @@ class DefaultsTest extends BaseRollbarTest
                 $option = 'server_root';
             }
             
-            $method = lcfirst(str_replace('_', '', ucwords($option, '_')));
-            
-            $this->defaults->$method();
+            $this->defaults->fromSnakeCase($option);
         }
     }
     
