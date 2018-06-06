@@ -72,6 +72,8 @@ class Defaults
         $this->data['errorSampleRates'] = array();
         $this->data['exceptionSampleRates'] = array();
         $this->data['includedErrno'] = ROLLBAR_INCLUDED_ERRNO_BITMASK;
+        $this->data['includeErrorCodeContext'] = null;
+        $this->data['includeExceptionCodeContext'] = null;
         $this->data['agentLogLocation'] = '/var/tmp';
         $this->data['allowExec'] = true;
         $this->data['messageLevel'] = "warning";
@@ -115,6 +117,12 @@ class Defaults
         }
         
         return (isset($args[0]) && $args[0] !== null) ? $args[0] : $this->data[$method];
+    }
+    
+    public function fromSnakeCase($option)
+    {
+        $method = lcfirst(str_replace('_', '', ucwords($option, '_')));
+        return $this->$method();
     }
 
     public function gitBranch($gitBranch = null, $allowExec = true)

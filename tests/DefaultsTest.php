@@ -246,4 +246,39 @@ class DefaultsTest extends BaseRollbarTest
     {
         $this->assertFalse($this->defaults->captureUsername());
     }
+    
+    public function testDefaultsForConfigOptions()
+    {
+        foreach (\Rollbar\Config::listOptions() as $option) {
+            if ($option == 'access_token' ||
+                $option == 'logger' ||
+                $option == 'person' ||
+                $option == 'person_fn' ||
+                $option == 'scrub_whitelist' ||
+                $option == 'proxy' ||
+                $option == 'include_raw_request_body') {
+                continue;
+            } elseif ($option == 'base_api_url') {
+                $option = 'endpoint';
+            } elseif ($option == 'branch') {
+                $option = 'git_branch';
+            } elseif ($option == 'capture_ip') {
+                $option = 'captureIP';
+            } elseif ($option == 'root') {
+                $option = 'server_root';
+            }
+            
+            $method = lcfirst(str_replace('_', '', ucwords($option, '_')));
+            
+            $this->defaults->$method();
+        }
+    }
+    
+    public function testFromSnakeCase()
+    {
+        $this->assertEquals(
+            'warning',
+            \Rollbar\Defaults::get()->fromSnakeCase('message_level')
+        );
+    }
 }
