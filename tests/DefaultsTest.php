@@ -86,6 +86,17 @@ class DefaultsTest extends BaseRollbarTest
         $this->assertEquals($val, $this->defaults->gitBranch());
     }
 
+    public function testGitBranchExplicit()
+    {
+        $val = 'some-branch';
+        $this->assertEquals($val, $this->defaults->gitBranch($val));
+    }
+
+    public function testGitBranchNoExec()
+    {
+        $this->assertEquals(null, $this->defaults->gitBranch(null, false));
+    }
+
     public function testServerRoot()
     {
         $_ENV["HEROKU_APP_DIR"] = "abc123";
