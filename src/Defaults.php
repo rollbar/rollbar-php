@@ -131,10 +131,16 @@ class Defaults
         if ($gitBranch) {
             return $gitBranch;
         }
-        if (!isset($this->defaultGitBranch) && $allowExec) {
-            $this->defaultGitBranch = self::getGitBranch();
+        if ($allowExec) {
+            static $cachedValue;
+            static $hasExecuted = false;
+            if (!$hasExecuted) {
+                $cachedValue = self::getGitBranch();
+                $hasExecuted = true;
+            }
+            return $cachedValue;
         }
-        return $this->defaultGitBranch;
+        return null;
     }
     
     private static function getGitBranch()
