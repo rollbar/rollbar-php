@@ -74,6 +74,8 @@ final class Utilities
         foreach ($obj as $key => $val) {
             if ($val instanceof \Serializable) {
                 $val = $val->serialize();
+            } elseif (is_array($val)) {
+                $val = self::serializeForRollbar($val);
             }
             if ($customKeys !== null && in_array($key, $customKeys)) {
                 $returnVal[$key] = $val;
