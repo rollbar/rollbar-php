@@ -59,12 +59,11 @@ To fix code style issues: `composer fix`
 
 1. `export ROLLBAR_PHP_TAG=[version number]`
 2. `git checkout master`
-3. Update `data/readmeio.md`.
-4. Update version numbers in `src/Payload/Notifier.php` and `tests/NotifierTest.php`.
-5. `git add .`
-6. `git commit -m"Update readme.io dump and bump version numbers"`.
-7. `git push origin master`
-8. `git tag $ROLLBAR_PHP_TAG_VERSION`
+3. Update version numbers in `src/Payload/Notifier.php` and `tests/NotifierTest.php`.
+4. `git add .`
+5. `git commit -m"Update readme.io dump and bump version numbers"`.
+6. `git push origin master`
+7. `git tag $ROLLBAR_PHP_TAG_VERSION`
 
 # License
 Rollbar-gem is free software released under the MIT License. See [LICENSE.txt](LICENSE.txt) for details.
