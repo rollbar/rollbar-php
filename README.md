@@ -17,7 +17,7 @@ For complete usage instructions and configuration reference, see our [PHP SDK do
 
 See our [Releases](https://github.com/rollbar/rollbar-php/releases) page for a list of all releases, including changes.
 
-## Related projects
+# Related projects
 
 A range of examples of using Rollbar PHP is available here: [Rollbar PHP Examples](https://github.com/rollbar/rollbar-php-examples).
 
@@ -34,7 +34,7 @@ Yii package: [baibaratsky/yii-rollbar](https://github.com/baibaratsky/yii-rollba
 
 Yii2 package: [baibaratsky/yii2-rollbar](https://github.com/baibaratsky/yii2-rollbar)
 
-## Help / Support
+# Help / Support
 
 If you run into any issues, please email us at [support@rollbar.com](mailto:support@rollbar.com)
 
@@ -42,7 +42,7 @@ For bug reports, please [open an issue on GitHub](https://github.com/rollbar/rol
 The best, configure your Rollbar with `verbosity` at level `\Psr\Log\LogLevel::DEBUG` and attach
 the contents of your `sys_get_temp_dir() . '/rollbar.debug.log'` (usually `/tmp/rollbar.debug.log`).
 
-## Contributing
+# Contributing
 
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
@@ -50,10 +50,21 @@ the contents of your `sys_get_temp_dir() . '/rollbar.debug.log'` (usually `/tmp/
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
 
-## Testing
+# Testing
 Tests are in `tests`.
 To run the tests: `composer test`
 To fix code style issues: `composer fix`
+
+# Tagging
+
+1. `export ROLLBAR_PHP_TAG=[version number]`
+2. `git checkout master`
+3. Update `data/readmeio.md`.
+4. Update version numbers in `src/Payload/Notifier.php` and `tests/NotifierTest.php`.
+5. `git add .`
+6. `git commit -m"Update readme.io dump and bump version numbers"`.
+7. `git push origin master`
+8. `git tag $ROLLBAR_PHP_TAG_VERSION`
 
 # License
 Rollbar-gem is free software released under the MIT License. See [LICENSE.txt](LICENSE.txt) for details.
