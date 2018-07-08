@@ -66,4 +66,4 @@ To fix code style issues: `composer fix`
 7. `git tag $ROLLBAR_PHP_TAG_VERSION`
 
 # License
-Rollbar-gem is free software released under the MIT License. See [LICENSE.txt](LICENSE.txt) for details.
+Rollbar-PHP is free software released under the MIT License. See [LICENSE.txt](LICENSE.txt) for details.
