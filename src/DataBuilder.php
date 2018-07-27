@@ -282,19 +282,11 @@ class DataBuilder implements DataBuilderInterface
     protected function setFingerprint($config)
     {
         $this->fingerprint = isset($config['fingerprint']) ? $config['fingerprint'] : null;
-        if (!is_null($this->fingerprint) && !is_callable($this->fingerprint)) {
-            $msg = "If set, config['fingerprint'] must be a callable that returns a uuid string";
-            throw new \InvalidArgumentException($msg);
-        }
     }
 
     protected function setTitle($config)
     {
         $this->title = isset($config['title']) ? $config['title'] : null;
-        if (!is_null($this->title) && !is_callable($this->title)) {
-            $msg = "If set, config['title'] must be a callable that returns a string";
-            throw new \InvalidArgumentException($msg);
-        }
     }
 
     protected function setNotifier($config)
