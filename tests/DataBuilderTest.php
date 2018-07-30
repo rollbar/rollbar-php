@@ -940,6 +940,24 @@ class DataBuilderTest extends BaseRollbarTest
         $output = $dataBuilder->makeData(Level::ERROR, "testing", array());
         
         $this->assertEquals($expected, $output->getRequest()->getUserIp());
+        
+        unset($_SERVER['REMOTE_ADDR']);
+        
+        $_SERVER['HTTP_X_FORWARDED_FOR'] = $ipAddress;
+        $_SERVER['REMOTE_ADDR'] = 'dont use this, this time';
+        $output = $dataBuilder->makeData(Level::ERROR, "testing", array());
+        $this->assertEquals($expected, $output->getRequest()->getUserIp());
+        
+        unset($_SERVER['REMOTE_ADDR']);
+        unset($_SERVER['HTTP_X_FORWARDED_FOR']);
+        
+        $_SERVER['HTTP_X_REAL_IP'] = $ipAddress;
+        $_SERVER['REMOTE_ADDR'] = 'dont use this, this time';
+        $output = $dataBuilder->makeData(Level::ERROR, "testing", array());
+        $this->assertEquals($expected, $output->getRequest()->getUserIp());
+        
+        unset($_SERVER['REMOTE_ADDR']);
+        unset($_SERVER['HTTP_X_REAL_IP']);
     }
     
     public function getUserIpProvider()

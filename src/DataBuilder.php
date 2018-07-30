@@ -804,7 +804,7 @@ class DataBuilder implements DataBuilderInterface
             return null;
         }
         
-        $ipAddress = null;
+        $ipAddress = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
         
         $forwardFor = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : null;
         if ($forwardFor) {
@@ -816,7 +816,6 @@ class DataBuilder implements DataBuilderInterface
         if ($realIp) {
             $ipAddress = $realIp;
         }
-        $ipAddress = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
         
         if ($this->captureIP === DataBuilder::ANONYMIZE_IP) {
             if (filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
