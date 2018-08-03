@@ -75,6 +75,8 @@ class FluentSender implements SenderInterface
         if (empty($this->fluentLogger)) {
             $this->loadFluentLogger();
         }
+        
+        $scrubbedPayload = $payload->data();
 
         $success = $this->fluentLogger->post($this->fluentTag, $scrubbedPayload);
         $status = $success ? 200 : 400;
