@@ -3,14 +3,17 @@
 namespace Rollbar\Truncation;
 
 use Rollbar\Payload\EncodedPayload;
+use \Rollbar\Config;
+use \Rollbar\BaseRollbarTest;
 
-class RawStrategyTest extends \PHPUnit_Framework_TestCase
+class RawStrategyTest extends BaseRollbarTest
 {
     public function testExecute()
     {
         $payload = array('test' => 'test data');
 
-        $truncation = new Truncation();
+        $config = new Config(array('access_token' => $this->getTestAccessToken()));
+        $truncation = new Truncation($config);
                     
         $strategy = new RawStrategy($truncation);
         

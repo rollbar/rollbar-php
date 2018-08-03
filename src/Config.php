@@ -46,6 +46,7 @@ class Config
         'scrub_fields',
         'scrub_whitelist',
         'timeout',
+        'custom_truncation',
         'report_suppressed',
         'use_error_reporting',
         'proxy',
@@ -127,6 +128,13 @@ class Config
      * Default: Psr\Log\LogLevel::ERROR
      */
     private $verbosity;
+    
+    /**
+     * @var string (fully qualified class name) The name of the your custom
+     * truncation strategy class. The class should inherit from 
+     * Rollbar\Truncation\AbstractStrategy.
+     */
+    private $customTruncation;
 
     public function __construct(array $configArray)
     {
@@ -212,6 +220,10 @@ class Config
         $this->useErrorReporting = \Rollbar\Defaults::get()->useErrorReporting();
         if (isset($config['use_error_reporting'])) {
             $this->useErrorReporting = $config['use_error_reporting'];
+        }
+        
+        if (isset($config['custom_truncation'])) {
+            $this->customTruncation = $config['custom_truncation'];
         }
     }
 
@@ -354,6 +366,16 @@ class Config
     public function getCustom()
     {
         return $this->dataBuilder->getCustom();
+    }
+    
+    public function setCustomTruncation($type)
+    {
+        $this->customTruncation = $type;
+    }
+    
+    public function getCustomTruncation()
+    {
+        return $this->customTruncation;
     }
 
     private function setTransportOptions(&$config)
