@@ -28,7 +28,7 @@ class MessageTest extends Rollbar\BaseRollbarTest
         $msg->hello = "Świat"; // Polish for "World"
         $this->assertEquals("Świat", $msg->hello);
         // Unicode Ś == u015a
-        $this->assertEquals('{"body":"M","hello":"\u015awiat"}', json_encode($msg->jsonSerialize()));
+        $this->assertEquals('{"body":"M","hello":"\u015awiat"}', json_encode($msg->serialize()));
     }
 
     public function testMessageCustom()
@@ -41,7 +41,7 @@ class MessageTest extends Rollbar\BaseRollbarTest
         $this->assertEquals(15, $msg->whatever);
 
         $expected = '{"body":"Test","CustomData":"custom data","whatever":15}';
-        $this->assertEquals($expected, json_encode($msg->jsonSerialize()));
+        $this->assertEquals($expected, json_encode($msg->serialize()));
     }
 
     public function testMessageKey()

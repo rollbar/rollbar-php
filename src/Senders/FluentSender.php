@@ -4,6 +4,7 @@ namespace Rollbar\Senders;
 
 use Fluent\Logger\FluentLogger;
 use Rollbar\Response;
+use Rollbar\Payload\EncodedPayload;
 
 class FluentSender implements SenderInterface
 {
@@ -20,7 +21,7 @@ class FluentSender implements SenderInterface
     /**
      * @var string IP of the fluentd host
      */
-    private $fluentHost = FluentLogger::DEFAULT_ADDRESS;
+    private $fluentHost;
 
     /**
      * @var int Port of the fluentd instance listening on
@@ -39,6 +40,10 @@ class FluentSender implements SenderInterface
      */
     public function __construct($opts)
     {
+        $this->fluentHost = \Rollbar\Defaults::get()->fluentHost();
+        $this->fluentPort = \Rollbar\Defaults::get()->fluentPort();
+        $this->fluentTag = \Rollbar\Defaults::get()->fluentTag();
+        
         $this->utilities = new \Rollbar\Utilities();
         if (isset($opts['fluentHost'])) {
             $this->utilities->validateString($opts['fluentHost'], 'opts["fluentHost"]', null, false);
@@ -58,18 +63,20 @@ class FluentSender implements SenderInterface
 
 
     /**
-     * @param $scrubbedPayload
+     * @param \Rollbar\Payload\EncodedPayload $scrubbedPayload
      * @param $accessToken
      * @return Response
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter) Unsued parameter is
      * intended here to comply to SenderInterface
      */
-    public function send($scrubbedPayload, $accessToken)
+    public function send(EncodedPayload $payload, $accessToken)
     {
         if (empty($this->fluentLogger)) {
             $this->loadFluentLogger();
         }
+        
+        $scrubbedPayload = $payload->data();
 
         $success = $this->fluentLogger->post($this->fluentTag, $scrubbedPayload);
         $status = $success ? 200 : 400;
@@ -102,5 +109,11 @@ class FluentSender implements SenderInterface
     protected function loadFluentLogger()
     {
         $this->fluentLogger = new FluentLogger($this->fluentHost, $this->fluentPort);
+    }
+    
+    public function toString()
+    {
+        return "fluentd " . $this->fluentHost . ":" . $this->fluentPort .
+                " tag: " . $this->fluentTag;
     }
 }

@@ -25,14 +25,19 @@ class TraceChain implements ContentInterface
         return $this;
     }
 
-    public function jsonSerialize()
+    public function serialize()
     {
         $mapValue = function ($value) {
-            if ($value instanceof \JsonSerializable) {
-                return $value->jsonSerialize();
+            if ($value instanceof \Serializable) {
+                return $value->serialize();
             }
             return $value;
         };
         return array_map($mapValue, $this->traces);
+    }
+    
+    public function unserialize($serialized)
+    {
+        throw new \Exception('Not implemented yet.');
     }
 }

@@ -49,8 +49,8 @@ class PayloadTest extends BaseRollbarTest
     public function testEncode()
     {
         $accessToken = $this->getTestAccessToken();
-        $data = m::mock('Rollbar\Payload\Data, \JsonSerializable')
-            ->shouldReceive('jsonSerialize')
+        $data = m::mock('Rollbar\Payload\Data, \Serializable')
+            ->shouldReceive('serialize')
             ->andReturn(new \ArrayObject())
             ->mock();
         m::mock('Rollbar\DataBuilder')
@@ -61,7 +61,7 @@ class PayloadTest extends BaseRollbarTest
             ->mock();
         
         $payload = new Payload($data, $accessToken);
-        $encoded = json_encode($payload->jsonSerialize());
+        $encoded = json_encode($payload->serialize());
         $json = '{"data":{},"access_token":"'.$accessToken.'"}';
         $this->assertEquals($json, $encoded);
     }

@@ -64,9 +64,11 @@ class Scrubber implements ScrubberInterface
 
     public function internalScrub(&$data, $fields, $replacement, $path)
     {
-        if (is_array($data)) { // scrub arrays
+        if (is_array($data)) {
+// scrub arrays
             $data = $this->scrubArray($data, $fields, $replacement, $path);
-        } elseif (is_string($data)) { // scrub URLs and query strings
+        } elseif (is_string($data)) {
+// scrub URLs and query strings
             $query = parse_url($data, PHP_URL_QUERY);
             if ($query) {
                 $data = str_replace(

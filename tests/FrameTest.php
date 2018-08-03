@@ -64,12 +64,12 @@ class FrameTest extends BaseRollbarTest
 
     public function testEncode()
     {
-        $context = m::mock("Rollbar\Payload\Context, \JsonSerializable")
-            ->shouldReceive("jsonSerialize")
+        $context = m::mock("Rollbar\Payload\Context, \Serializable")
+            ->shouldReceive("serialize")
             ->andReturn("{CONTEXT}")
             ->mock();
         $this->exception
-            ->shouldReceive("jsonSerialize")
+            ->shouldReceive("serialize")
             ->andReturn("{EXC}")
             ->mock();
         $this->frame->setFilename("rollbar.php")
@@ -80,7 +80,7 @@ class FrameTest extends BaseRollbarTest
             ->setContext($context)
             ->setArgs(array("hello", "world"));
 
-        $actual = json_encode($this->frame->jsonSerialize());
+        $actual = json_encode($this->frame->serialize());
         $expected = '{' .
                 '"filename":"rollbar.php",' .
                 '"lineno":1024,"colno":42,' .

@@ -20,6 +20,6 @@ class LevelTest extends BaseRollbarTest
         $level = Level::Info();
         $this->assertNotNull($level);
         $this->assertSame(Level::INFO(), $level);
-        $this->assertSame('"info"', json_encode($level->jsonSerialize()));
+        $this->assertSame('"info"', json_encode($level->serialize()));
     }
 }

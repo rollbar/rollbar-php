@@ -44,12 +44,12 @@ class TraceTest extends BaseRollbarTest
 
     public function testEncode()
     {
-        $value = m::mock("Rollbar\Payload\ExceptionInfo, \JsonSerializable")
-            ->shouldReceive("jsonSerialize")
+        $value = m::mock("Rollbar\Payload\ExceptionInfo, \Serializable")
+            ->shouldReceive("serialize")
             ->andReturn("{EXCEPTION}")
             ->mock();
         $trace = new Trace(array(), $value);
-        $encoded = json_encode($trace->jsonSerialize());
+        $encoded = json_encode($trace->serialize());
         $this->assertEquals("{\"frames\":[],\"exception\":\"{EXCEPTION}\"}", $encoded);
     }
 

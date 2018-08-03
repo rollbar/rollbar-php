@@ -2,7 +2,7 @@
 
 use Rollbar\LevelFactory;
 
-class Level implements \JsonSerializable
+class Level implements \Serializable
 {
     /**
      * Those are PSR-3 compatible loggin levels. They are mapped to Rollbar
@@ -67,8 +67,13 @@ class Level implements \JsonSerializable
         return $this->val;
     }
 
-    public function jsonSerialize()
+    public function serialize()
     {
         return $this->level;
+    }
+    
+    public function unserialize($serialized)
+    {
+        throw new \Exception('Not implemented yet.');
     }
 }

@@ -80,16 +80,21 @@ class DefaultsTest extends BaseRollbarTest
         $this->assertEquals($expected, $this->defaults->psrLevels());
     }
 
-    public function testGitHash()
-    {
-        $val = exec('git rev-parse --verify HEAD');
-        $this->assertEquals($val, $this->defaults->gitHash());
-    }
-
     public function testGitBranch()
     {
-        $val = exec('git rev-parse --abbrev-ref HEAD');
+        $val = rtrim(shell_exec('git rev-parse --abbrev-ref HEAD'));
         $this->assertEquals($val, $this->defaults->gitBranch());
+    }
+
+    public function testGitBranchExplicit()
+    {
+        $val = 'some-branch';
+        $this->assertEquals($val, $this->defaults->gitBranch($val));
+    }
+
+    public function testGitBranchNoExec()
+    {
+        $this->assertEquals(null, $this->defaults->gitBranch(null, false));
     }
 
     public function testServerRoot()
@@ -138,5 +143,151 @@ class DefaultsTest extends BaseRollbarTest
     public function testSendMessageTrace()
     {
         $this->assertFalse($this->defaults->sendMessageTrace());
+    }
+    
+    public function testAgentLogLocation()
+    {
+        $this->assertEquals('/var/tmp', $this->defaults->agentLogLocation());
+    }
+    
+    public function testAllowExec()
+    {
+        $this->assertEquals(true, $this->defaults->allowExec());
+    }
+    
+    public function testEndpoint()
+    {
+        $this->assertEquals('https://api.rollbar.com/api/1/', $this->defaults->endpoint());
+    }
+    
+    public function testCaptureErrorStacktraces()
+    {
+        $this->assertTrue($this->defaults->captureErrorStacktraces());
+    }
+    
+    public function testCheckIgnore()
+    {
+        $this->assertNull($this->defaults->checkIgnore());
+    }
+    
+    public function testCodeVersion()
+    {
+        $this->assertEquals("", $this->defaults->codeVersion());
+    }
+    
+    public function testCustom()
+    {
+        $this->assertNull($this->defaults->custom());
+    }
+    
+    public function testEnabled()
+    {
+        $this->assertTrue($this->defaults->enabled());
+    }
+    
+    public function testEnvironment()
+    {
+        $this->assertEquals('production', $this->defaults->environment());
+    }
+    
+    public function testErrorSampleRates()
+    {
+        $this->assertEmpty($this->defaults->errorSampleRates());
+    }
+    
+    public function testExceptionSampleRates()
+    {
+        $this->assertEmpty($this->defaults->exceptionSampleRates());
+    }
+    
+    public function testFluentHost()
+    {
+        $this->assertEquals('127.0.0.1', $this->defaults->fluentHost());
+    }
+    
+    public function testFluentPort()
+    {
+        $this->assertEquals(24224, $this->defaults->fluentPort());
+    }
+    
+    public function testFluentTag()
+    {
+        $this->assertEquals('rollbar', $this->defaults->fluentTag());
+    }
+    
+    public function testHandler()
+    {
+        $this->assertEquals('blocking', $this->defaults->handler());
+    }
+    
+    public function testHost()
+    {
+        $this->assertNull($this->defaults->host());
+    }
+    
+    public function testIncludedErrno()
+    {
+        $this->assertEquals(
+            ROLLBAR_INCLUDED_ERRNO_BITMASK,
+            $this->defaults->includedErrno()
+        );
+    }
+    
+    public function testTimeout()
+    {
+        $this->assertEquals(3, $this->defaults->timeout());
+    }
+    
+    public function testReportSuppressed()
+    {
+        $this->assertFalse($this->defaults->reportSuppressed());
+    }
+    
+    public function testUseErrorReporting()
+    {
+        $this->assertFalse($this->defaults->useErrorReporting());
+    }
+    
+    public function testCaptureEmail()
+    {
+        $this->assertFalse($this->defaults->captureEmail());
+    }
+    
+    public function testCaptureUsername()
+    {
+        $this->assertFalse($this->defaults->captureUsername());
+    }
+    
+    public function testDefaultsForConfigOptions()
+    {
+        foreach (\Rollbar\Config::listOptions() as $option) {
+            if ($option == 'access_token' ||
+                $option == 'logger' ||
+                $option == 'person' ||
+                $option == 'person_fn' ||
+                $option == 'scrub_whitelist' ||
+                $option == 'proxy' ||
+                $option == 'include_raw_request_body') {
+                continue;
+            } elseif ($option == 'base_api_url') {
+                $option = 'endpoint';
+            } elseif ($option == 'branch') {
+                $option = 'git_branch';
+            } elseif ($option == 'capture_ip') {
+                $option = 'captureIP';
+            } elseif ($option == 'root') {
+                $option = 'server_root';
+            }
+            
+            $this->defaults->fromSnakeCase($option);
+        }
+    }
+    
+    public function testFromSnakeCase()
+    {
+        $this->assertEquals(
+            'warning',
+            \Rollbar\Defaults::get()->fromSnakeCase('message_level')
+        );
     }
 }

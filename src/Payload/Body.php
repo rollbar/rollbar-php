@@ -1,6 +1,6 @@
 <?php namespace Rollbar\Payload;
 
-class Body implements \JsonSerializable
+class Body implements \Serializable
 {
     /**
      * @var ContentInterface
@@ -25,10 +25,15 @@ class Body implements \JsonSerializable
         return $this;
     }
 
-    public function jsonSerialize()
+    public function serialize()
     {
         $result = array();
         $result[$this->value->getKey()] = $this->value;
         return $this->utilities->serializeForRollbar($result);
+    }
+    
+    public function unserialize($serialized)
+    {
+        throw new \Exception('Not implemented yet.');
     }
 }

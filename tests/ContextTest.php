@@ -28,11 +28,11 @@ class ContextTest extends BaseRollbarTest
     public function testEncode()
     {
         $context = new Context(array(), array());
-        $encoded = json_encode($context->jsonSerialize());
+        $encoded = json_encode($context->serialize());
         $this->assertEquals('{"pre":[],"post":[]}', $encoded);
 
         $context = new Context(array("one"), array("three"));
-        $encoded = json_encode($context->jsonSerialize());
+        $encoded = json_encode($context->serialize());
         $this->assertEquals('{"pre":["one"],"post":["three"]}', $encoded);
     }
 }

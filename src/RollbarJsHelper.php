@@ -164,8 +164,10 @@ class RollbarJsHelper
     {
         if ($headers !== null && $this->shouldAppendNonce($headers)) {
             if (!$nonce) {
-                throw new \Exception('Content-Security-Policy is script-src '.
-                                     'inline-unsafe but nonce value not provided.');
+                throw new \Exception(
+                    'Content-Security-Policy is script-src '.
+                    'inline-unsafe but nonce value not provided.'
+                );
             }
             
             return "\n<script type=\"text/javascript\" nonce=\"$nonce\">$content</script>";

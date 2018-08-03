@@ -3,6 +3,7 @@
 use Rollbar\Payload\Level;
 use Rollbar\Payload\Payload;
 use Rollbar\TestHelpers\Exceptions\SilentExceptionSampleRate;
+use Psr\Log\LogLevel as PsrLogLevel;
 
 class RollbarLoggerTest extends BaseRollbarTest
 {
@@ -10,6 +11,91 @@ class RollbarLoggerTest extends BaseRollbarTest
     public function setUp()
     {
         $_SESSION = array();
+    }
+    
+    public function testAddCustom()
+    {
+        $logger = new RollbarLogger(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => "testing-php"
+        ));
+        
+        $logger->addCustom("foo", "bar");
+        
+        $dataBuilder = $logger->getDataBuilder();
+        
+        $result = $dataBuilder->makeData(
+            Level::INFO,
+            "This test message should have custom data attached.",
+            array()
+        );
+        
+        $customData = $result->getCustom();
+        $this->assertEquals("bar", $customData["foo"]);
+        
+        $logger = new RollbarLogger(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => "testing-php",
+            "custom" => array(
+                "baz" => "xyz"
+            )
+        ));
+        
+        $logger->addCustom("foo", "bar");
+        
+        $dataBuilder = $logger->getDataBuilder();
+        
+        $result = $dataBuilder->makeData(
+            Level::INFO,
+            "This test message should have custom data attached.",
+            array()
+        );
+        
+        $customData = $result->getCustom();
+        $this->assertEquals("bar", $customData["foo"]);
+    }
+    
+    public function testRemoveCustom()
+    {
+        $logger = new RollbarLogger(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => "testing-php",
+            "custom" => array(
+                "foo" => "bar",
+                "bar" => "xyz"
+            )
+        ));
+        
+        $logger->removeCustom("foo");
+        
+        $dataBuilder = $logger->getDataBuilder();
+        
+        $result = $dataBuilder->makeData(
+            Level::INFO,
+            "This test message should have custom data attached.",
+            array()
+        );
+        
+        $customData = $result->getCustom();
+        $this->assertFalse(isset($customData["foo"]));
+        $this->assertEquals("xyz", $customData["bar"]);
+    }
+    
+    public function testGetCustom()
+    {
+        $logger = new RollbarLogger(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => "testing-php",
+            "custom" => array(
+                "foo" => "bar",
+                "bar" => "xyz"
+            )
+        ));
+        
+        $custom = $logger->getCustom();
+        
+        $this->assertEquals("bar", $custom["foo"]);
+        $this->assertEquals("xyz", $custom["bar"]);
     }
 
     public function testConfigure()
@@ -30,6 +116,154 @@ class RollbarLoggerTest extends BaseRollbarTest
             "environment" => "testing-php"
         ));
         $response = $l->log(Level::WARNING, "Testing PHP Notifier", array());
+        $this->assertEquals(200, $response->getStatus());
+    }
+    
+    public function testEnabled()
+    {
+        $logger = new RollbarLogger(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => "testing-php"
+        ));
+        $response = $logger->log(Level::WARNING, "Testing PHP Notifier", array());
+        $this->assertEquals(200, $response->getStatus());
+        
+        $logger = new RollbarLogger(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => "testing-php",
+            "enabled" => false
+        ));
+        $response = $logger->log(Level::WARNING, "Testing PHP Notifier", array());
+        $this->assertEquals(0, $response->getStatus());
+    }
+    
+    public function testLogMalformedPayloadData()
+    {
+        $logger = new RollbarLogger(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => "testing-php",
+            "transformer" => '\Rollbar\TestHelpers\MalformedPayloadDataTransformer',
+            "verbosity" => \Psr\Log\LogLevel::DEBUG
+        ));
+        
+        $response = $logger->log(
+            Level::ERROR,
+            "Forced payload's data to false value.",
+            array()
+        );
+        
+        $this->assertEquals(400, $response->getStatus());
+    }
+    
+    /**
+     * @dataProvider debugLoggerProvider
+     */
+    public function testDebugLogger($expected, $verbosity)
+    {
+        $logger = new RollbarLogger(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => "testing-php",
+            "verbosity" => $verbosity
+        ));
+        
+        @\unlink($logger->getDebugLogFile());
+        
+        $response = $logger->log(Level::WARNING, "Testing PHP Notifier", array());
+        
+        $result = @\file_get_contents($logger->getDebugLogFile()) ?: "";
+        
+        if (isset($expected['regexp'])) {
+            foreach ($expected['regexp'] as $regexp) {
+                $this->assertRegExp($regexp, $result);
+            }
+        }
+        
+        if (isset($expected['notRegExp'])) {
+            foreach ($expected['notRegExp'] as $regexp) {
+                $this->assertNotRegExp($regexp, $result);
+            }
+        }
+        
+        @\unlink($logger->getDebugLogFile());
+    }
+    
+    public function debugLoggerProvider()
+    {
+        return array(
+            array(
+                array(
+                    'notRegExp' => array(
+                        
+                        '/'.
+                        '\[[0-9]*-[0-9]*-[0-9]* [0-9]*:[0-9]*:[0-9]*\] '.
+                        'RollbarDebugLogger.DEBUG:'.
+                        '/',
+                        
+                        '/'.
+                        '\[[0-9]*-[0-9]*-[0-9]* [0-9]*:[0-9]*:[0-9]*\] '.
+                        'RollbarDebugLogger.INFO:'.
+                        '/'
+                        
+                    )
+                ),
+                PsrLogLevel::ERROR // verbosity
+            ),
+            array(
+                array(
+                    'regexp' => array(
+                        '/'.
+                        '\[[0-9]*-[0-9]*-[0-9]* [0-9]*:[0-9]*:[0-9]*\] '.
+                        'RollbarDebugLogger.INFO: '.
+                        '.*'.
+                        '\[\] \[\]'.
+                        '/'
+                    ),
+                    'notRegExp' => array(
+                        '/'.
+                        '\[[0-9]*-[0-9]*-[0-9]* [0-9]*:[0-9]*:[0-9]*\] '.
+                        'RollbarDebugLogger.DEBUG:'.
+                        '/'
+                    )
+                ),
+                PsrLogLevel::INFO // verbosity
+            ),
+            array(
+                array(
+                    'regexp' => array(
+                        
+                        '/'.
+                        '\[[0-9]*-[0-9]*-[0-9]* [0-9]*:[0-9]*:[0-9]*\] '.
+                        'RollbarDebugLogger.INFO: '.
+                        '.*'.
+                        '\[\] \[\]'.
+                        '/',
+                        
+                        '/'.
+                        '\[[0-9]*-[0-9]*-[0-9]* [0-9]*:[0-9]*:[0-9]*\] '.
+                        'RollbarDebugLogger.DEBUG: '.
+                        '.*'.
+                        '\[\] \[\]'.
+                        '/'
+                    )
+                ),
+                PsrLogLevel::DEBUG // verbosity
+            )
+        );
+    }
+    
+    public function testContext()
+    {
+        $l = new RollbarLogger(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => "testing-php"
+        ));
+        $response = $l->log(
+            Level::ERROR,
+            new \Exception("Testing PHP Notifier"),
+            array(
+                "foo" => "bar"
+            )
+        );
         $this->assertEquals(200, $response->getStatus());
     }
     
@@ -123,7 +357,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         $data = $dataBuilder->makeData(Level::ERROR, "testing", $context);
         $payload = new Payload($data, $config->getAccessToken());
 
-        $scrubbed = $payload->jsonSerialize();
+        $scrubbed = $payload->serialize();
         $scrubber = $config->getScrubber();
 
         $result = $scrubber->scrub($scrubbed);

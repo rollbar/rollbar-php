@@ -17,6 +17,8 @@ use Rollbar\Exceptions\PersonFuncException;
 
 class DataBuilder implements DataBuilderInterface
 {
+    const ANONYMIZE_IP = 'anonymize';
+    
     protected static $defaults;
 
     protected $environment;
@@ -49,6 +51,9 @@ class DataBuilder implements DataBuilderInterface
     protected $rawRequestBody;
     protected $localVarsDump;
     protected $captureErrorStacktraces;
+    protected $captureIP;
+    protected $captureEmail;
+    protected $captureUsername;
     
     /**
      * @var LevelFactory
@@ -98,11 +103,32 @@ class DataBuilder implements DataBuilderInterface
         $this->setLocalVarsDump($config);
         $this->setCaptureErrorStacktraces($config);
         $this->setLevelFactory($config);
+        $this->setCaptureEmail($config);
+        $this->setCaptureUsername($config);
+        $this->setCaptureIP($config);
+    }
+
+    protected function setCaptureIP($config)
+    {
+        $fromConfig = isset($config['capture_ip']) ? $config['capture_ip'] : null;
+        $this->captureIP = self::$defaults->captureIP($fromConfig);
+    }
+    
+    protected function setCaptureEmail($config)
+    {
+        $fromConfig = isset($config['capture_email']) ? $config['capture_email'] : null;
+        $this->captureEmail = self::$defaults->captureEmail($fromConfig);
+    }
+    
+    protected function setCaptureUsername($config)
+    {
+        $fromConfig = isset($config['capture_username']) ? $config['capture_username'] : null;
+        $this->captureUsername = self::$defaults->captureUsername($fromConfig);
     }
 
     protected function setEnvironment($config)
     {
-        $fromConfig = isset($config['environment']) ? $config['environment'] : null;
+        $fromConfig = isset($config['environment']) ? $config['environment'] : self::$defaults->get()->environment();
         $this->utilities->validateString($fromConfig, "config['environment']", null, false);
         $this->environment = $fromConfig;
     }
@@ -248,27 +274,19 @@ class DataBuilder implements DataBuilderInterface
         $this->serverExtras = isset($config['serverExtras']) ? $config['serverExtras'] : null;
     }
 
-    protected function setCustom($config)
+    public function setCustom($config)
     {
-        $this->custom = isset($config['custom']) ? $config['custom'] : null;
+        $this->custom = isset($config['custom']) ? $config['custom'] : \Rollbar\Defaults::get()->custom();
     }
 
     protected function setFingerprint($config)
     {
         $this->fingerprint = isset($config['fingerprint']) ? $config['fingerprint'] : null;
-        if (!is_null($this->fingerprint) && !is_callable($this->fingerprint)) {
-            $msg = "If set, config['fingerprint'] must be a callable that returns a uuid string";
-            throw new \InvalidArgumentException($msg);
-        }
     }
 
     protected function setTitle($config)
     {
         $this->title = isset($config['title']) ? $config['title'] : null;
-        if (!is_null($this->title) && !is_callable($this->title)) {
-            $msg = "If set, config['title'] must be a callable that returns a string";
-            throw new \InvalidArgumentException($msg);
-        }
     }
 
     protected function setNotifier($config)
@@ -318,7 +336,7 @@ class DataBuilder implements DataBuilderInterface
 
     protected function setHost($config)
     {
-        $this->host = isset($config['host']) ? $config['host'] : null;
+        $this->host = isset($config['host']) ? $config['host'] : self::$defaults->host();
     }
 
     /**
@@ -342,7 +360,7 @@ class DataBuilder implements DataBuilderInterface
             ->setRequest($this->getRequest())
             ->setPerson($this->getPerson())
             ->setServer($this->getServer())
-            ->setCustom($this->getCustom($toLog, $context))
+            ->setCustom($this->getCustomForPayload($toLog, $context))
             ->setFingerprint($this->getFingerprint())
             ->setTitle($this->getTitle())
             ->setUuid($this->getUuid())
@@ -424,16 +442,11 @@ class DataBuilder implements DataBuilderInterface
     public function makeFrames($exception, $includeContext)
     {
         $frames = array();
+        
         foreach ($this->getTrace($exception) as $frameInfo) {
             $filename = isset($frameInfo['file']) ? $frameInfo['file'] : null;
-            if ($filename === null) {
-                $filename = $exception->getFile() ?: '<internal>';
-            }
             $lineno = isset($frameInfo['line']) ? $frameInfo['line'] : null;
-            if ($lineno === null) {
-                $lineno = $exception->getLine() ?: 0;
-            }
-            $method = $frameInfo['function'];
+            $method = isset($frameInfo['function']) ? $frameInfo['function'] : null;
             if (isset($frameInfo['class'])) {
                 $method = $frameInfo['class'] . "::" . $method;
             }
@@ -489,7 +502,12 @@ class DataBuilder implements DataBuilderInterface
         if ($exc instanceof ErrorWrapper) {
             return $exc->getBacktrace();
         } else {
-            return $exc->getTrace();
+            $trace = $exc->getTrace();
+            
+            // Add the Exception's file and line as the last frame of the trace
+            array_unshift($trace, array('file' => $exc->getFile(), 'line' => $exc->getLine()));
+            
+            return $trace;
         }
     }
 
@@ -499,8 +517,8 @@ class DataBuilder implements DataBuilderInterface
             (string)$toLog,
             $context,
             $this->sendMessageTrace ?
-                debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS) :
-                null
+            debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS) :
+            null
         );
     }
 
@@ -782,20 +800,38 @@ class DataBuilder implements DataBuilderInterface
      */
     protected function getUserIp()
     {
-        if (!isset($_SERVER)) {
+        if (!isset($_SERVER) || $this->captureIP === false) {
             return null;
         }
+        
+        $ipAddress = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
+        
         $forwardFor = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : null;
         if ($forwardFor) {
             // return everything until the first comma
             $parts = explode(',', $forwardFor);
-            return $parts[0];
+            $ipAddress = $parts[0];
         }
         $realIp = isset($_SERVER['HTTP_X_REAL_IP']) ? $_SERVER['HTTP_X_REAL_IP'] : null;
         if ($realIp) {
-            return $realIp;
+            $ipAddress = $realIp;
         }
-        return isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
+        
+        if ($this->captureIP === DataBuilder::ANONYMIZE_IP) {
+            if (filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                $parts = explode('.', $ipAddress);
+                $ipAddress = $parts[0] . '.' . $parts[1] . '.' . $parts[2] . '.0';
+            } elseif (filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+                $parts = explode(':', $ipAddress);
+                $ipAddress =
+                    $parts[0] . ':' .
+                    $parts[1] . ':' .
+                    $parts[2] . ':' .
+                    '0000:0000:0000:0000:0000';
+            }
+        }
+        
+        return $ipAddress;
     }
 
     protected function getRequestExtras()
@@ -825,12 +861,12 @@ class DataBuilder implements DataBuilderInterface
         $identifier = $personData['id'];
 
         $email = null;
-        if (isset($personData['email'])) {
+        if ($this->captureEmail && isset($personData['email'])) {
             $email = $personData['email'];
         }
 
         $username = null;
-        if (isset($personData['username'])) {
+        if ($this->captureUsername && isset($personData['username'])) {
             $username = $personData['username'];
         }
 
@@ -887,26 +923,46 @@ class DataBuilder implements DataBuilderInterface
     {
         return $this->serverExtras;
     }
-
-    protected function getCustom($toLog, $context)
+    
+    public function getCustom()
     {
-        $custom = $this->custom;
+        return $this->custom;
+    }
+
+    protected function getCustomForPayload($toLog, $context)
+    {
+        $custom = $this->getCustom();
 
         // Make this an array if possible:
-        if ($custom instanceof \JsonSerializable) {
-            $custom = $custom->jsonSerialize();
+        if ($custom instanceof \Serializable) {
+            $custom = $custom->serialize();
         } elseif (is_null($custom)) {
-            return null;
+            $custom = array();
         } elseif (!is_array($custom)) {
             $custom = get_object_vars($custom);
         }
 
-        $baseException = $this->getBaseException();
-        if (!$toLog instanceof $baseException) {
-            return array_replace_recursive(array(), $custom);
-        }
-
         return array_replace_recursive(array(), $context, $custom);
+    }
+    
+    public function addCustom($key, $data)
+    {
+        if ($this->custom === null) {
+            $this->custom = array();
+        }
+        
+        if (!is_array($this->custom)) {
+            throw new \Exception(
+                "Custom data configured in Rollbar::init() is not an array."
+            );
+        }
+        
+        $this->custom[$key] = $data;
+    }
+    
+    public function removeCustom($key)
+    {
+        unset($this->custom[$key]);
     }
 
     protected function getFingerprint()
@@ -973,18 +1029,81 @@ class DataBuilder implements DataBuilderInterface
      */
     public function generateErrorWrapper($errno, $errstr, $errfile, $errline)
     {
-        if ($this->captureErrorStacktraces) {
-            $backTrace = debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS);
-        } else {
-            $backTrace = array();
-        }
         return new ErrorWrapper(
             $errno,
             $errstr,
             $errfile,
             $errline,
-            $backTrace,
+            $this->buildErrorTrace($errfile, $errline),
             $this->utilities
         );
+    }
+    
+    /**
+     * Fetches the stack trace for fatal and regular errors.
+     *
+     * @var string $errfile
+     * @var string $errline
+     *
+     * @return Rollbar\ErrorWrapper
+     */
+    protected function buildErrorTrace($errfile, $errline)
+    {
+        if ($this->captureErrorStacktraces) {
+            $backTrace = $this->fetchErrorTrace();
+            
+            $backTrace = $this->stripShutdownFrames($backTrace);
+            
+            // Add the final frame
+            array_unshift(
+                $backTrace,
+                array('file' => $errfile, 'line' => $errline)
+            );
+        } else {
+            $backTrace = array();
+        }
+        
+        return $backTrace;
+    }
+    
+    private function fetchErrorTrace()
+    {
+        if (function_exists('xdebug_get_function_stack')) {
+            return array_reverse(\xdebug_get_function_stack());
+        } else {
+            return debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS);
+        }
+    }
+    
+    private function stripShutdownFrames($backTrace)
+    {
+        foreach ($backTrace as $index => $frame) {
+            extract($frame);
+            
+            $fatalHandlerMethod = (isset($method)
+                                    && $method === 'Rollbar\\Handlers\\FatalHandler::handle');
+                                    
+            $fatalHandlerClassAndFunction = (isset($class)
+                                                && $class === 'Rollbar\\Handlers\\FatalHandler'
+                                                && isset($function)
+                                                && $function === 'handle');
+            
+            $errorHandlerMethod = (isset($method)
+                                    && $method === 'Rollbar\\Handlers\\ErrorHandler::handle');
+                                    
+            $errorHandlerClassAndFunction = (isset($class)
+                                                && $class === 'Rollbar\\Handlers\\ErrorHandler'
+                                                && isset($function)
+                                                && $function === 'handle');
+            
+            if ($fatalHandlerMethod ||
+                 $fatalHandlerClassAndFunction ||
+                 $errorHandlerMethod ||
+                 $errorHandlerClassAndFunction ) {
+                return array_slice($backTrace, $index+1);
+            }
+        }
+        
+        return $backTrace;
     }
 }

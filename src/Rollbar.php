@@ -1,6 +1,9 @@
 <?php namespace Rollbar;
 
 use Rollbar\Payload\Level;
+use Rollbar\Handlers\FatalHandler;
+use Rollbar\Handlers\ErrorHandler;
+use Rollbar\Handlers\ExceptionHandler;
 
 class Rollbar
 {
@@ -8,7 +11,9 @@ class Rollbar
      * @var RollbarLogger
      */
     private static $logger = null;
-    private static $fatalErrors = array(E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR);
+    private static $fatalHandler = null;
+    private static $errorHandler = null;
+    private static $exceptionHandler = null;
 
     public static function init(
         $configOrLogger,
@@ -48,6 +53,26 @@ class Rollbar
 
         self::$logger = isset($logger) ? $logger : new RollbarLogger($configOrLogger);
     }
+    
+    public static function enable()
+    {
+        return self::logger()->enable();
+    }
+    
+    public static function disable()
+    {
+        return self::logger()->disable();
+    }
+    
+    public static function enabled()
+    {
+        return self::logger()->enabled();
+    }
+    
+    public static function disabled()
+    {
+        return self::logger()->disabled();
+    }
 
     public static function logger()
     {
@@ -62,126 +87,70 @@ class Rollbar
         return self::$logger->scope($config);
     }
 
-    public static function setupExceptionHandling()
-    {
-        set_exception_handler('Rollbar\Rollbar::exceptionHandler');
-    }
-    
-    public static function exceptionHandler($exception)
-    {
-        self::log(Level::ERROR, $exception, array(), true);
-        restore_exception_handler();
-        throw $exception;
-    }
-
-    public static function log($level, $toLog, $extra = array())
+    public static function log($level, $toLog, $extra = array(), $isUncaught = false)
     {
         if (is_null(self::$logger)) {
             return self::getNotInitializedResponse();
         }
-        return self::$logger->log($level, $toLog, (array)$extra);
+        return self::$logger->log($level, $toLog, (array)$extra, $isUncaught);
     }
     
     public static function debug($toLog, $extra = array())
     {
-        self::log(Level::DEBUG, $toLog, $extra);
+        return self::log(Level::DEBUG, $toLog, $extra);
     }
     
     public static function info($toLog, $extra = array())
     {
-        self::log(Level::INFO, $toLog, $extra);
+        return self::log(Level::INFO, $toLog, $extra);
     }
     
     public static function notice($toLog, $extra = array())
     {
-        self::log(Level::NOTICE, $toLog, $extra);
+        return self::log(Level::NOTICE, $toLog, $extra);
     }
     
     public static function warning($toLog, $extra = array())
     {
-        self::log(Level::WARNING, $toLog, $extra);
+        return self::log(Level::WARNING, $toLog, $extra);
     }
     
     public static function error($toLog, $extra = array())
     {
-        self::log(Level::ERROR, $toLog, $extra);
+        return self::log(Level::ERROR, $toLog, $extra);
     }
     
     public static function critical($toLog, $extra = array())
     {
-        self::log(Level::CRITICAL, $toLog, $extra);
+        return self::log(Level::CRITICAL, $toLog, $extra);
     }
     
     public static function alert($toLog, $extra = array())
     {
-        self::log(Level::ALERT, $toLog, $extra);
+        return self::log(Level::ALERT, $toLog, $extra);
     }
     
     public static function emergency($toLog, $extra = array())
     {
-        self::log(Level::EMERGENCY, $toLog, $extra);
+        return self::log(Level::EMERGENCY, $toLog, $extra);
+    }
+
+    public static function setupExceptionHandling()
+    {
+        self::$exceptionHandler = new ExceptionHandler(self::$logger);
+        self::$exceptionHandler->register();
     }
     
     public static function setupErrorHandling()
     {
-        set_error_handler('Rollbar\Rollbar::errorHandler');
-    }
-
-    public static function errorHandler($errno, $errstr, $errfile, $errline)
-    {
-        if (is_null(self::$logger)) {
-            return false;
-        }
-        if (self::$logger->shouldIgnoreError($errno)) {
-            return false;
-        }
-
-        $exception = self::generateErrorWrapper($errno, $errstr, $errfile, $errline);
-        self::$logger->log(Level::ERROR, $exception, array(), true);
-        return false;
+        self::$errorHandler = new ErrorHandler(self::$logger);
+        self::$errorHandler->register();
     }
 
     public static function setupFatalHandling()
     {
-        register_shutdown_function('Rollbar\Rollbar::fatalHandler');
-    }
-
-    public static function fatalHandler()
-    {
-        if (is_null(self::$logger)) {
-            return;
-        }
-        $last_error = error_get_last();
-        
-        if (self::shouldLogFatal($last_error)) {
-            $errno = $last_error['type'];
-            $errstr = $last_error['message'];
-            $errfile = $last_error['file'];
-            $errline = $last_error['line'];
-            $exception = self::generateErrorWrapper($errno, $errstr, $errfile, $errline);
-            self::$logger->log(Level::CRITICAL, $exception, array(), true);
-        }
-    }
-    
-    protected static function shouldLogFatal($last_error)
-    {
-        return
-            !is_null($last_error) &&
-            in_array($last_error['type'], self::$fatalErrors, true) &&
-            // don't log uncaught exceptions as they were handled by exceptionHandler()
-            !(isset($last_error['message']) &&
-              strpos($last_error['message'], 'Uncaught exception') === 0);
-    }
-
-    private static function generateErrorWrapper($errno, $errstr, $errfile, $errline)
-    {
-        if (null === self::$logger) {
-            return;
-        }
-        
-        $dataBuilder = self::$logger->getDataBuilder();
-        
-        return $dataBuilder->generateErrorWrapper($errno, $errstr, $errfile, $errline);
+        self::$fatalHandler = new FatalHandler(self::$logger);
+        self::$fatalHandler->register();
     }
 
     private static function getNotInitializedResponse()
@@ -208,6 +177,35 @@ class Rollbar
             return;
         }
         self::$logger->flushAndWait();
+    }
+    
+    public static function addCustom($key, $value)
+    {
+        self::$logger->addCustom($key, $value);
+    }
+    
+    public static function removeCustom($key)
+    {
+        self::$logger->removeCustom($key);
+    }
+    
+    public static function getCustom()
+    {
+        self::$logger->getCustom();
+    }
+    
+    public static function configure($config)
+    {
+        self::$logger->configure($config);
+    }
+    
+    /**
+     * Destroys the currently stored $logger allowing for a fresh configuration.
+     * This is especially used in testing scenarios.
+     */
+    public static function destroy()
+    {
+        self::$logger = null;
     }
     
     // @codingStandardsIgnoreStart
@@ -268,7 +266,7 @@ class Rollbar
      */
     public static function report_fatal_error()
     {
-        self::fatalHandler();
+        self::$fatalHandler->handle();
     }
 
 
@@ -279,7 +277,7 @@ class Rollbar
      */
     public static function report_php_error($errno, $errstr, $errfile, $errline)
     {
-        self::errorHandler($errno, $errstr, $errfile, $errline);
+        self::$errorHandler->handle($errno, $errstr, $errfile, $errline);
         return false;
     }
 

@@ -78,6 +78,6 @@ class ServerTest extends BaseRollbarTest
                     '[]' .
                 ']' .
             '}';
-        $this->assertEquals($expected, json_encode($server->jsonSerialize()));
+        $this->assertEquals($expected, json_encode($server->serialize()));
     }
 }

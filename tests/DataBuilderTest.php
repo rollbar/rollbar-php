@@ -406,26 +406,8 @@ class DataBuilderTest extends BaseRollbarTest
             'send_message_trace' => true
         ));
         $dataBuilder = $c->getDataBuilder();
-    
-        $result = $dataBuilder->makeData(Level::ERROR, 'testing', array());
-        $frames = $result->getBody()->getValue()->getBacktrace();
-        
-        $this->assertArrayNotHasKey(
-            'args',
-            $frames[0],
-            "Arguments in stack frames included when they should have not been."
-        );
-        
-        // Positive test
-        $c = new Config(array(
-            'access_token' => $this->getTestAccessToken(),
-            'environment' => 'tests',
-            'send_message_trace' => true,
-            'local_vars_dump' => true
-        ));
-        $dataBuilder = $c->getDataBuilder();
-    
         $expected = 'testing';
+    
         $result = $dataBuilder->makeData(Level::ERROR, $expected, array());
         $frames = $result->getBody()->getValue()->getBacktrace();
         
@@ -433,6 +415,24 @@ class DataBuilderTest extends BaseRollbarTest
             $expected,
             $frames[0]['args'][0],
             "Arguments in stack frames NOT included when they should be."
+        );
+        
+        // Positive test
+        $c = new Config(array(
+            'access_token' => $this->getTestAccessToken(),
+            'environment' => 'tests',
+            'send_message_trace' => true,
+            'local_vars_dump' => false
+        ));
+        $dataBuilder = $c->getDataBuilder();
+    
+        $result = $dataBuilder->makeData(Level::ERROR, $expected, array());
+        $frames = $result->getBody()->getValue()->getBacktrace();
+        
+        $this->assertArrayNotHasKey(
+            'args',
+            $frames[0],
+            "Arguments in stack frames included when they should have not been."
         );
     }
     
@@ -445,8 +445,8 @@ class DataBuilderTest extends BaseRollbarTest
             'levelFactory' => new LevelFactory,
             'utilities' => new Utilities
         ));
-        $ex = $this->exceptionTraceArgsHelper('trace args message');
-        $frames = $dataBuilder->getExceptionTrace($ex)->getFrames();
+        $exception = $this->exceptionTraceArgsHelper('trace args message');
+        $frames = $dataBuilder->getExceptionTrace($exception)->getFrames();
         $this->assertNull(
             $frames[count($frames)-1]->getArgs(),
             "Frames arguments available in trace when they should not be."
@@ -461,9 +461,9 @@ class DataBuilderTest extends BaseRollbarTest
             'utilities' => new Utilities
         ));
         $expected = 'trace args message';
-        $ex = $this->exceptionTraceArgsHelper($expected);
-        $frames = $dataBuilder->getExceptionTrace($ex)->getFrames();
-        $args = $frames[count($frames)-1]->getArgs();
+        $exception = $this->exceptionTraceArgsHelper($expected);
+        $frames = $dataBuilder->getExceptionTrace($exception)->getFrames();
+        $args = $frames[count($frames)-2]->getArgs();
         
         $this->assertEquals(
             $expected,
@@ -472,6 +472,14 @@ class DataBuilderTest extends BaseRollbarTest
         );
     }
     
+    /**
+     * The purpose of this method is to provide a frame with an expected
+     * argument in testExceptionTraceArguments.
+     *
+     * @param string $message Argument expected in the last frame of the trace
+     *
+     * @return \Exception
+     */
     private function exceptionTraceArgsHelper($message)
     {
         return new \Exception($message);
@@ -513,7 +521,7 @@ class DataBuilderTest extends BaseRollbarTest
             'utilities' => new Utilities
         ));
         $output = $dataBuilder->getExceptionTrace(new \Exception())->getFrames();
-        $this->assertNotEmpty($output[count($output)-2]->getContext());
+        $this->assertNotEmpty($output[count($output)-1]->getContext());
     }
 
     public function testFramesWithoutContext()
@@ -682,12 +690,37 @@ class DataBuilderTest extends BaseRollbarTest
             'environment' => 'tests',
             'person' => array(
                 'id' => '123',
+                'username' => 'tester',
                 'email' => 'test@test.com'
             ),
             'levelFactory' => new LevelFactory,
             'utilities' => new Utilities
         ));
         $output = $dataBuilder->makeData(Level::ERROR, "testing", array());
+        $this->assertEquals('123', $output->getPerson()->getId());
+        $this->assertNull($output->getPerson()->getUsername());
+        $this->assertNull($output->getPerson()->getEmail());
+    }
+    
+    public function testPersonCaptureEmailUsername()
+    {
+        $config = new Config(array(
+            'access_token' => $this->getTestAccessToken(),
+            'environment' => 'tests',
+            'person' => array(
+                'id' => '123',
+                'username' => 'tester',
+                'email' => 'test@test.com'
+            ),
+            'capture_email' => true,
+            'capture_username' => true
+        ));
+        $dataBuilder = $config->getDataBuilder();
+        
+        $output = $dataBuilder->makeData(Level::ERROR, "testing", array());
+        
+        $this->assertEquals('123', $output->getPerson()->getId());
+        $this->assertEquals('tester', $output->getPerson()->getUsername());
         $this->assertEquals('test@test.com', $output->getPerson()->getEmail());
     }
 
@@ -706,7 +739,7 @@ class DataBuilderTest extends BaseRollbarTest
             'utilities' => new Utilities
         ));
         $output = $dataBuilder->makeData(Level::ERROR, "testing", array());
-        $this->assertEquals('test@test.com', $output->getPerson()->getEmail());
+        $this->assertEquals('123', $output->getPerson()->getId());
     }
     
     public function testPersonFuncException()
@@ -851,8 +884,8 @@ class DataBuilderTest extends BaseRollbarTest
             'tests/DataBuilderTest.php',
             $frames[count($frames)-1]->getFilename()
         );
-        $this->assertEquals(849, $frames[count($frames)-1]->getLineno());
-        $this->assertEquals('Rollbar\DataBuilderTest::testFramesOrder', $frames[count($frames)-1]->getMethod());
+        $this->assertEquals(882, $frames[count($frames)-1]->getLineno());
+        $this->assertEquals('Rollbar\DataBuilderTest::testFramesOrder', $frames[count($frames)-2]->getMethod());
     }
     
     /**
@@ -882,6 +915,67 @@ class DataBuilderTest extends BaseRollbarTest
         return array(
             array(false,true),
             array(true,false)
+        );
+    }
+    
+    /**
+     * @dataProvider getUserIpProvider
+     */
+    public function testGetUserIp($ipAddress, $expected, $captureIP)
+    {
+        $_SERVER['REMOTE_ADDR'] = $ipAddress;
+        
+        $config = array(
+            'access_token' => $this->getTestAccessToken(),
+            'environment' => 'tests'
+        );
+        
+        if ($captureIP !== null) {
+            $config['capture_ip'] = $captureIP;
+        }
+        
+        $config = new Config($config);
+        
+        $dataBuilder = $config->getDataBuilder();
+        $output = $dataBuilder->makeData(Level::ERROR, "testing", array());
+        
+        $this->assertEquals($expected, $output->getRequest()->getUserIp());
+        
+        unset($_SERVER['REMOTE_ADDR']);
+        
+        $_SERVER['HTTP_X_FORWARDED_FOR'] = $ipAddress;
+        $_SERVER['REMOTE_ADDR'] = 'dont use this, this time';
+        $output = $dataBuilder->makeData(Level::ERROR, "testing", array());
+        $this->assertEquals($expected, $output->getRequest()->getUserIp());
+        
+        unset($_SERVER['REMOTE_ADDR']);
+        unset($_SERVER['HTTP_X_FORWARDED_FOR']);
+        
+        $_SERVER['HTTP_X_REAL_IP'] = $ipAddress;
+        $_SERVER['REMOTE_ADDR'] = 'dont use this, this time';
+        $output = $dataBuilder->makeData(Level::ERROR, "testing", array());
+        $this->assertEquals($expected, $output->getRequest()->getUserIp());
+        
+        unset($_SERVER['REMOTE_ADDR']);
+        unset($_SERVER['HTTP_X_REAL_IP']);
+    }
+    
+    public function getUserIpProvider()
+    {
+        return array(
+            array('127.0.0.1', '127.0.0.1', null),
+            array('127.0.0.1', null, false),
+            array('127.0.0.1', '127.0.0.0', DataBuilder::ANONYMIZE_IP),
+            array(
+                '2001:0db8:85a3:0000:0000:8a2e:0370:7334',
+                '2001:0db8:85a3:0000:0000:0000:0000:0000',
+                DataBuilder::ANONYMIZE_IP
+            ),
+            array(
+                '2001:db8:85a3::',
+                '2001:db8:85a3:0000:0000:0000:0000:0000',
+                DataBuilder::ANONYMIZE_IP
+            )
         );
     }
 }

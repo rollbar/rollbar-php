@@ -40,12 +40,17 @@ class Trace implements ContentInterface
         return $this;
     }
 
-    public function jsonSerialize()
+    public function serialize()
     {
         $result = array(
             "frames" => $this->frames,
             "exception" => $this->exception,
         );
         return $this->utilities->serializeForRollbar($result);
+    }
+    
+    public function unserialize($serialized)
+    {
+        throw new \Exception('Not implemented yet.');
     }
 }

@@ -9,7 +9,6 @@ use Rollbar\Payload\Message;
 use Rollbar\Payload\Payload;
 use Rollbar\RollbarLogger;
 
-
 use Rollbar\TestHelpers\Exceptions\SilentExceptionSampleRate;
 use Rollbar\TestHelpers\Exceptions\FiftyFiftyExceptionSampleRate;
 use Rollbar\TestHelpers\Exceptions\FiftyFityChildExceptionSampleRate;
@@ -34,6 +33,7 @@ class ConfigTest extends BaseRollbarTest
 
     public function tearDown()
     {
+        parent::tearDown();
         m::close();
     }
     
@@ -46,6 +46,22 @@ class ConfigTest extends BaseRollbarTest
             'environment' => $this->env
         ));
         $this->assertEquals($this->getTestAccessToken(), $config->getAccessToken());
+    }
+
+    public function testEnabled()
+    {
+        $config = new Config(array(
+            'access_token' => $this->getTestAccessToken(),
+            'environment' => $this->env
+        ));
+        $this->assertTrue($config->enabled());
+        
+        $config = new Config(array(
+            'access_token' => $this->getTestAccessToken(),
+            'environment' => $this->env,
+            'enabled' => false
+        ));
+        $this->assertFalse($config->enabled());
     }
 
     public function testAccessTokenFromEnvironment()
@@ -205,7 +221,7 @@ class ConfigTest extends BaseRollbarTest
 
     public function testSender()
     {
-        $p = m::mock("Rollbar\Payload\Payload");
+        $p = m::mock("Rollbar\Payload\EncodedPayload");
         $sender = m::mock("Rollbar\Senders\SenderInterface")
             ->shouldReceive("send")
             ->with($p, $this->getTestAccessToken())
@@ -232,6 +248,19 @@ class ConfigTest extends BaseRollbarTest
             $config->getSender()->getEndpoint()
         );
     }
+    
+    public function testVerbosity()
+    {
+        $expected = 3;
+        
+        $config = new Config(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => $this->env,
+            "verbosity" => $expected
+        ));
+        
+        $this->assertEquals($expected, $config->getVerbosity());
+    }
 
     public function testCustom()
     {
@@ -243,13 +272,18 @@ class ConfigTest extends BaseRollbarTest
                 "fuzz" => "buzz"
             )
         ));
-
-        $data = new Data("test", new Body(new Message("body")));
-        $data->setCustom(array("foo" => "baz"));
-        $payload = new Payload($data, $this->getTestAccessToken());
-        $result = $config->transform($payload, "level", "toLog", "context");
-        $custom = $result->getData()->getCustom();
-        $this->assertEquals("baz", $custom["foo"]);
+        
+        $dataBuilder = $config->getDataBuilder();
+        
+        $result = $dataBuilder->makeData(
+            Level::INFO,
+            "Test message with custom data added dynamically.",
+            array()
+        );
+        
+        $custom = $result->getCustom();
+        
+        $this->assertEquals("bar", $custom["foo"]);
         $this->assertEquals("buzz", $custom["fuzz"]);
     }
 
@@ -317,7 +351,7 @@ class ConfigTest extends BaseRollbarTest
         $config = new Config(array(
             "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env,
-            "checkIgnore" => function () use (&$called) {
+            "check_ignore" => function () use (&$called) {
                 $called = true;
             }
         ));
@@ -348,7 +382,7 @@ class ConfigTest extends BaseRollbarTest
         $config = new Config(array(
             "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env,
-            "checkIgnore" => function (
+            "check_ignore" => function (
                 $isUncaught,
                 $exc
             ) use (
@@ -411,7 +445,7 @@ class ConfigTest extends BaseRollbarTest
         $config = new Config(array(
             "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env,
-            "checkIgnore" => function () use (&$called) {
+            "check_ignore" => function () use (&$called) {
                 $called = true;
             },
             "use_error_reporting" => $use_error_reporting

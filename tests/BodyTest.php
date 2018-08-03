@@ -15,16 +15,16 @@ class BodyTest extends BaseRollbarTest
         $this->assertEquals($mock2, $body->setValue($mock2)->getValue());
     }
 
-    public function testEncode()
+    public function testSerialize()
     {
         $value = m::mock("Rollbar\Payload\ContentInterface")
-            ->shouldReceive("jsonSerialize")
+            ->shouldReceive("serialize")
             ->andReturn("{CONTENT}")
             ->shouldReceive("getKey")
             ->andReturn("content_interface")
             ->mock();
         $body = new Body($value);
-        $encoded = json_encode($body->jsonSerialize());
+        $encoded = json_encode($body->serialize());
         $this->assertEquals("{\"content_interface\":\"{CONTENT}\"}", $encoded);
     }
 }

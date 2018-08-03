@@ -2,6 +2,7 @@
 
 use Rollbar\Payload\Level;
 use Rollbar\Payload\Payload;
+use \Rollbar\Payload\EncodedPayload;
 
 if (!defined('ROLLBAR_INCLUDED_ERRNO_BITMASK')) {
     define(
@@ -12,7 +13,53 @@ if (!defined('ROLLBAR_INCLUDED_ERRNO_BITMASK')) {
 
 class Config
 {
+    private static $options = array(
+        'access_token',
+        'agent_log_location',
+        'allow_exec',
+        'endpoint',
+        'base_api_url',
+        'branch',
+        'capture_error_stacktraces',
+        'check_ignore',
+        'code_version',
+        'custom',
+        'enabled',
+        'environment',
+        'error_sample_rates',
+        'exception_sample_rates',
+        'fluent_host',
+        'fluent_port',
+        'fluent_tag',
+        'handler',
+        'host',
+        'include_error_code_context',
+        'include_exception_code_context',
+        'included_errno',
+        'logger',
+        'person',
+        'person_fn',
+        'capture_ip',
+        'capture_username',
+        'capture_email',
+        'root',
+        'scrub_fields',
+        'scrub_whitelist',
+        'timeout',
+        'report_suppressed',
+        'use_error_reporting',
+        'proxy',
+        'send_message_trace',
+        'include_raw_request_body',
+        'local_vars_dump',
+        'verbosity'
+    );
+    
     private $accessToken;
+    /**
+     * @var string $enabled Enable / disable Rollbar SDK.
+     */
+    private $enabled = true;
     /**
      * @var DataBuilder
      */
@@ -53,39 +100,52 @@ class Config
     private $scrubber;
 
     private $batched = false;
-    private $batch_size = 50;
+    private $batchSize = 50;
 
     private $custom = array();
     /**
      * @var callable
      */
     private $checkIgnore;
-    private $error_sample_rates = array();
-    private $exception_sample_rates = array();
-    private $mt_randmax;
+    private $errorSampleRates;
+    private $exceptionSampleRates;
+    private $mtRandmax;
 
-    private $included_errno = ROLLBAR_INCLUDED_ERRNO_BITMASK;
-    private $use_error_reporting = false;
+    private $includedErrno;
+    private $useErrorReporting = false;
     
     /**
      * @var boolean Should debug_backtrace() data be sent with string messages
-     * sent through RollbarLogger::log()
+     * sent through RollbarLogger::log().
      */
     private $sendMessageTrace = false;
+    
+    /**
+     * @var string (One of the \Psr\Log\LogLevel constants) How much debugging
+     * info should be recorded in the Rollbar debug log file.
+     * ($rollbarLogger->getDebugLogFile() => commonly /tmp/rollbar.debug.log.
+     * Default: Psr\Log\LogLevel::ERROR
+     */
+    private $verbosity;
 
     public function __construct(array $configArray)
     {
+        $this->verbosity = \Rollbar\Defaults::get()->verbosity();
+        $this->includedErrno = \Rollbar\Defaults::get()->includedErrno();
+        
         $this->levelFactory = new LevelFactory();
         $this->utilities = new Utilities();
         
         $this->updateConfig($configArray);
 
+        $this->errorSampleRates = \Rollbar\Defaults::get()->errorSampleRates();
         if (isset($configArray['error_sample_rates'])) {
-            $this->error_sample_rates = $configArray['error_sample_rates'];
+            $this->errorSampleRates = $configArray['error_sample_rates'];
         }
         
+        $this->exceptionSampleRates = \Rollbar\Defaults::get()->exceptionSampleRates();
         if (isset($configArray['exception_sample_rates'])) {
-            $this->exception_sample_rates = $configArray['exception_sample_rates'];
+            $this->exceptionSampleRates = $configArray['exception_sample_rates'];
         }
 
         $levels = array(E_WARNING, E_NOTICE, E_USER_ERROR, E_USER_WARNING,
@@ -97,11 +157,16 @@ class Config
         $curr = 1;
         for ($i = 0, $num = count($levels); $i < $num; $i++) {
             $level = $levels[$i];
-            if (!isset($this->error_sample_rates[$level])) {
-                $this->error_sample_rates[$level] = $curr;
+            if (!isset($this->errorSampleRates[$level])) {
+                $this->errorSampleRates[$level] = $curr;
             }
         }
-        $this->mt_randmax = mt_getrandmax();
+        $this->mtRandmax = mt_getrandmax();
+    }
+    
+    public static function listOptions()
+    {
+        return self::$options;
     }
 
     public function configure($config)
@@ -123,6 +188,7 @@ class Config
     {
         $this->configArray = $config;
 
+        $this->setEnabled($config);
         $this->setAccessToken($config);
         $this->setDataBuilder($config);
         $this->setTransformer($config);
@@ -137,13 +203,15 @@ class Config
         $this->setResponseHandler($config);
         $this->setCheckIgnoreFunction($config);
         $this->setSendMessageTrace($config);
+        $this->setVerbosity($config);
 
         if (isset($config['included_errno'])) {
-            $this->included_errno = $config['included_errno'];
+            $this->includedErrno = $config['included_errno'];
         }
 
+        $this->useErrorReporting = \Rollbar\Defaults::get()->useErrorReporting();
         if (isset($config['use_error_reporting'])) {
-            $this->use_error_reporting = $config['use_error_reporting'];
+            $this->useErrorReporting = $config['use_error_reporting'];
         }
     }
 
@@ -154,6 +222,29 @@ class Config
         }
         $this->utilities->validateString($config['access_token'], "config['access_token']", 32, false);
         $this->accessToken = $config['access_token'];
+    }
+
+    private function setEnabled($config)
+    {
+        if (array_key_exists('enabled', $config) && $config['enabled'] === false) {
+            $this->disable();
+        } else {
+            if (\Rollbar\Defaults::get()->enabled() === false) {
+                $this->disable();
+            } else {
+                $this->enable();
+            }
+        }
+    }
+    
+    public function enable()
+    {
+        $this->enabled = true;
+    }
+    
+    public function disable()
+    {
+        $this->enabled = false;
     }
 
     private function setDataBuilder($config)
@@ -200,6 +291,10 @@ class Config
         if (!isset($this->reportSuppressed)) {
             $this->reportSuppressed = isset($config['report_suppressed']) && $config['report_suppressed'];
         }
+        
+        if (!isset($this->reportSuppressed)) {
+            $this->reportSuppressed = \Rollbar\Defaults::get()->reportSuppressed();
+        }
     }
 
     private function setFilters($config)
@@ -210,6 +305,7 @@ class Config
     private function setSender($config)
     {
         $expected = "Rollbar\Senders\SenderInterface";
+        
         $default = "Rollbar\Senders\CurlSender";
 
         $this->setTransportOptions($config);
@@ -236,15 +332,28 @@ class Config
     private function setBatchSize($config)
     {
         if (array_key_exists('batch_size', $config)) {
-            $this->batch_size = $config['batch_size'];
+            $this->batchSize = $config['batch_size'];
         }
     }
 
-    private function setCustom($config)
+    public function setCustom($config)
     {
-        if (array_key_exists('custom', $config)) {
-            $this->custom = $config['custom'];
-        }
+        $this->dataBuilder->setCustom($config);
+    }
+    
+    public function addCustom($key, $data)
+    {
+        $this->dataBuilder->addCustom($key, $data);
+    }
+    
+    public function removeCustom($key)
+    {
+        $this->dataBuilder->removeCustom($key);
+    }
+    
+    public function getCustom()
+    {
+        return $this->dataBuilder->getCustom();
     }
 
     private function setTransportOptions(&$config)
@@ -263,6 +372,10 @@ class Config
 
         if (array_key_exists('proxy', $config)) {
             $config['senderOptions']['proxy'] = $config['proxy'];
+        }
+
+        if (array_key_exists('ca_cert_path', $config)) {
+            $config['senderOptions']['ca_cert_path'] = $config['ca_cert_path'];
         }
     }
 
@@ -309,11 +422,14 @@ class Config
 
     private function setCheckIgnoreFunction($config)
     {
-        if (!isset($config['checkIgnore'])) {
-            return;
+        // Remain backwards compatible
+        if (isset($config['checkIgnore'])) {
+            $this->checkIgnore = $config['checkIgnore'];
         }
-
-        $this->checkIgnore = $config['checkIgnore'];
+        
+        if (isset($config['check_ignore'])) {
+            $this->checkIgnore = $config['check_ignore'];
+        }
     }
 
     private function setSendMessageTrace($config)
@@ -323,6 +439,20 @@ class Config
         }
 
         $this->sendMessageTrace = $config['send_message_trace'];
+    }
+    
+    private function setVerbosity($config)
+    {
+        if (!isset($config['verbosity'])) {
+            return;
+        }
+
+        $this->verbosity = $config['verbosity'];
+    }
+    
+    public function getVerbosity()
+    {
+        return $this->verbosity;
     }
 
     /**
@@ -418,7 +548,7 @@ class Config
 
     public function getBatchSize()
     {
-        return $this->batch_size;
+        return $this->batchSize;
     }
 
     /**
@@ -446,6 +576,16 @@ class Config
     public function getAccessToken()
     {
         return $this->accessToken;
+    }
+
+    public function enabled()
+    {
+        return $this->enabled === true;
+    }
+    
+    public function disabled()
+    {
+        return !$this->enabled();
     }
 
     public function getSendMessageTrace()
@@ -508,21 +648,21 @@ class Config
      */
     public function shouldIgnoreError($errno)
     {
-        if ($this->use_error_reporting && ($errno & error_reporting()) === 0) {
+        if ($this->useErrorReporting && ($errno & error_reporting()) === 0) {
             // ignore due to error_reporting level
             return true;
         }
 
-        if ($this->included_errno != -1 && ($errno & $this->included_errno) != $errno) {
+        if ($this->includedErrno != -1 && ($errno & $this->includedErrno) != $errno) {
             // ignore
             return true;
         }
 
-        if (isset($this->error_sample_rates[$errno])) {
+        if (isset($this->errorSampleRates[$errno])) {
             // get a float in the range [0, 1)
             // mt_rand() is inclusive, so add 1 to mt_randmax
-            $float_rand = mt_rand() / ($this->mt_randmax + 1);
-            if ($float_rand > $this->error_sample_rates[$errno]) {
+            $float_rand = mt_rand() / ($this->mtRandmax + 1);
+            if ($float_rand > $this->errorSampleRates[$errno]) {
                 // skip
                 return true;
             }
@@ -556,7 +696,7 @@ class Config
     {
         // get a float in the range [0, 1)
         // mt_rand() is inclusive, so add 1 to mt_randmax
-        $floatRand = mt_rand() / ($this->mt_randmax + 1);
+        $floatRand = mt_rand() / ($this->mtRandmax + 1);
         if ($floatRand > $this->exceptionSampleRate($toLog)) {
             // skip
             return true;
@@ -576,7 +716,7 @@ class Config
     public function exceptionSampleRate(\Exception $toLog)
     {
         $sampleRate = 1.0;
-        if (count($this->exception_sample_rates) == 0) {
+        if (count($this->exceptionSampleRates) == 0) {
             return $sampleRate;
         }
         
@@ -590,8 +730,8 @@ class Config
         $exceptionClasses = array_reverse($exceptionClasses);
         
         foreach ($exceptionClasses as $exceptionClass) {
-            if (isset($this->exception_sample_rates["$exceptionClass"])) {
-                $sampleRate = $this->exception_sample_rates["$exceptionClass"];
+            if (isset($this->exceptionSampleRates["$exceptionClass"])) {
+                $sampleRate = $this->exceptionSampleRates["$exceptionClass"];
             }
         }
         
@@ -621,9 +761,9 @@ class Config
         return error_reporting() === 0 && !$this->reportSuppressed;
     }
 
-    public function send(&$scrubbedPayload, $accessToken)
+    public function send(EncodedPayload $payload, $accessToken)
     {
-        return $this->sender->send($scrubbedPayload, $accessToken);
+        return $this->sender->send($payload, $accessToken);
     }
 
     public function sendBatch(&$batch, $accessToken)

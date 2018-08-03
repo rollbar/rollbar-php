@@ -1,5 +1,59 @@
 # Changelog
 
+## 1.5.1
+- #367 Newest version 1.5.0 missing changelog, Notifier version not bumped
+- #366 Make the anonymized IP addresses indexable
+- Removed `CHANGELOG.md` in favor of using [release notes](https://github.com/rollbar/rollbar-php/releases)
+
+## 1.5.0
+- #362 - Fix running isolated tests by requiring the Config.php file with ROLLBAR_INCLUDED_ERRNO_BITMASK definition
+- #353 - Only collect person.id by default for person tracking
+- #354 - Allow IP collection to be easily turned on and off in config
+- #355 - Anonymize IP address config option
+
+## 1.4.1
+- Temporarily add `\Rollbar\Monolog\Handler\MonologHandler` until `Seldaek:monolog` PR 1042 gets merged into their `master`
+- Refactor JSON encoding mechanis to limit calls to `json_encode` to minimum with `\Rollbar\Payload\EncodedPayload`
+- Optimize performance of `StringsStrategy` and `FramesStrategy` truncation strategies
+- Remove `RawStrategy` and `MinBodyStrategy` completely (they are not adding any value - the same results are achieved by the combination of other strategies)
+- Fix for non-encodable values in the payload data. This was occasionally causing `400` response codes from the API
+- Updat code examples in README.md
+- Lock Monolog dependency at `^1.23`. The implementation of `\Monolog\TestCase` class in their master is currently not stable
+- Add instructions on using Rollbar with Monolog after bringing the `MonologHandler` into this repo
+- Clean up `RollbarLogger` instances after each test in the testsuite so the configuration doesn't persist between test cases
+- Add `composer performance` command to run performance test suite
+
+## 1.4.0
+- Add internal SDK debugging with `verbosity` configuration option
+- `local_vars_dump` configuration option is now enabled by default
+- Update rollbar.js snippet to v2.3.6
+- Refactor error, fatal error and exception handling from the ground up
+- Exception traces will now include an additional frame with the file name and line
+  where the Exception was actually thrown
+- Fix a bug where `E_USER_ERROR` type errors were reported twice
+- Add enable / disable functionality to Rollbar class and `enabled` configuration option
+- `Rollbar`'s class proxy methods will now return the return value of the proxied method
+
+## 1.3.6
+
+- Replace a leftover invocation to exec() with shell_exec()
+- Eliminate error duplication on PHP 7+ / Symfony environments by expanding ignore to all Throwables
+[293](https://github.com/rollbar/rollbar-php/issues/293)
+
+## 1.3.5
+
+- Fix sending $context argument from the log() method with exception logs.
+
+## 1.3.4
+
+- Increase the minimum version constraint for the monolog/monolog package to support composer --prefer-minimum
+- Decrease the minimum version constraint for psr/log package to match the monolog/monolog package in --prefer-minimum
+- Add support for dynamic custom data
+
+## 1.3.3
+
+- Remove fluent/logger from the required section of composer.json
+
 ## 1.3.2
 
 - Performance improvments

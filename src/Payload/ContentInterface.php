@@ -1,6 +1,6 @@
 <?php namespace Rollbar\Payload;
 
-interface ContentInterface extends \JsonSerializable
+interface ContentInterface extends \Serializable
 {
     public function getKey();
 }

@@ -155,13 +155,13 @@ class DataTest extends BaseRollbarTest
             ->setRequest($request)
             ->setPerson($person)
             ->setServer($server)
-            ->setCustom(array("x" => "hello", "extra" => new \ArrayObject()))
+            ->setCustom(array("x" => "hello", "extra" => array('key'=>'val')))
             ->setFingerprint("big-fingerprint")
             ->setTitle("The Title")
             ->setUuid("123e4567-e89b-12d3-a456-426655440000")
             ->setNotifier($notifier);
 
-        $encoded = json_encode($data->jsonSerialize());
+        $encoded = json_encode($data->serialize());
 
         $this->assertContains("\"environment\":\"testing\"", $encoded);
         $this->assertContains("\"body\":\"{BODY}\"", $encoded);
@@ -175,7 +175,7 @@ class DataTest extends BaseRollbarTest
         $this->assertContains("\"request\":\"{REQUEST}\"", $encoded);
         $this->assertContains("\"person\":\"{PERSON}\"", $encoded);
         $this->assertContains("\"server\":\"{SERVER}\"", $encoded);
-        $this->assertContains("\"custom\":{\"x\":\"hello\",\"extra\":{}}", $encoded);
+        $this->assertContains("\"custom\":{\"x\":\"hello\",\"extra\":{\"key\":\"val\"}}", $encoded);
         $this->assertContains("\"fingerprint\":\"big-fingerprint\"", $encoded);
         $this->assertContains("\"title\":\"The Title\"", $encoded);
         $this->assertContains("\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"", $encoded);
@@ -185,9 +185,9 @@ class DataTest extends BaseRollbarTest
     private function mockSerialize($mock, $returnVal)
     {
         if (is_string($mock)) {
-            $mock = m::mock("$mock, \JsonSerializable");
+            $mock = m::mock("$mock, \Serializable");
         }
-        return $mock->shouldReceive("jsonSerialize")
+        return $mock->shouldReceive("serialize")
             ->andReturn($returnVal)
             ->mock();
     }

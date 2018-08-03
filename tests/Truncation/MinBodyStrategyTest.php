@@ -2,6 +2,8 @@
 
 namespace Rollbar\Truncation;
 
+use Rollbar\Payload\EncodedPayload;
+
 class MinBodyStrategyTest extends \PHPUnit_Framework_TestCase
 {
     
@@ -13,9 +15,13 @@ class MinBodyStrategyTest extends \PHPUnit_Framework_TestCase
         $truncation = new Truncation();
 
         $strategy = new MinBodyStrategy($truncation);
+        
+        $data = new EncodedPayload($data);
+        $data->encode();
+        
         $result = $strategy->execute($data);
         
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($expected, $result->data());
     }
     
     public function executeProvider()
