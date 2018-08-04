@@ -10,12 +10,16 @@ use \Rollbar\Truncation\StringsStrategyTest;
 use \Rollbar\Truncation\FramesStrategyTest;
 use \Rollbar\Truncation\MinBodyStrategyTest;
 
-class TruncationTest extends \PHPUnit_Framework_TestCase
+use \Rollbar\Config;
+use \Rollbar\BaseRollbarTest;
+
+class TruncationTest extends BaseRollbarTest
 {
     
     public function setUp()
     {
-        $this->truncate = new Truncation();
+        $config = new Config(array('access_token' => $this->getTestAccessToken()));
+        $this->truncate = new Truncation($config);
     }
     
     /**

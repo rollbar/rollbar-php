@@ -106,6 +106,7 @@ class Defaults
             'csrf_token',
             'access_token'
         );
+        $this->data['customTruncation'] = null;
         
         $this->utilities = $utilities;
     }
