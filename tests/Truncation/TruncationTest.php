@@ -5,7 +5,6 @@ namespace Rollbar\Truncation;
 use \Rollbar\Config;
 use \Rollbar\BaseRollbarTest;
 use \Rollbar\Payload\EncodedPayload;
-use \Rollbar\TestHelpers\CustomTruncation;
 
 class TruncationTest extends BaseRollbarTest
 {
@@ -39,7 +38,7 @@ class TruncationTest extends BaseRollbarTest
         
         $result = $this->truncate->truncate($data);
         
-        $this->assertFalse(strpos($data, 'Custom truncation test string'));
+        $this->assertFalse(strpos($data, 'Custom truncation test string') === false);
     }
 
     /**

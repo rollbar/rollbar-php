@@ -21,10 +21,10 @@ class Truncation
     
     public function registerStrategy($type)
     {
-        if (class_exists($type) && is_subclass_of("Rollbar\Truncation\AbstractStrategy")) {
+        if (!class_exists($type) || !is_subclass_of($type, "Rollbar\Truncation\AbstractStrategy")) {
             throw new \Exception("Truncation strategy '$type' doesn't exist or is not a subclass of Rollbar\Truncation\AbstractStrategy");
         }
-        static::$truncationStrategies []= $type;
+        array_unshift(static::$truncationStrategies, $type);
     }
     
     /**

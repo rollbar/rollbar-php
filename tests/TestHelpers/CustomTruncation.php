@@ -1,16 +1,15 @@
 <?php
 
-namespace Rollbar\Truncation;
+namespace Rollbar\TestHelpers;
 
+use \Rollbar\Truncation\AbstractStrategy;
 use \Rollbar\Payload\EncodedPayload;
 
 class CustomTruncation extends AbstractStrategy
 {
     public function execute(EncodedPayload $payload)
     {
-        $payload->encode(array('Custom truncation test string'));
-        
-        var_dump($payload); die();
+        $payload->encode('Custom truncation test string');
         
         return $payload;
     }
