@@ -361,7 +361,7 @@ class DataBuilder implements DataBuilderInterface
             ->setPerson($this->getPerson())
             ->setServer($this->getServer())
             ->setCustom($this->getCustomForPayload($toLog, $context))
-            ->setFingerprint($this->getFingerprint())
+            ->setFingerprint($this->getFingerprint($context))
             ->setTitle($this->getTitle())
             ->setUuid($this->getUuid())
             ->setNotifier($this->getNotifier());
@@ -965,9 +965,9 @@ class DataBuilder implements DataBuilderInterface
         unset($this->custom[$key]);
     }
 
-    protected function getFingerprint()
+    protected function getFingerprint($context)
     {
-        return $this->fingerprint;
+        return isset($context['fingerprint']) ? $context['fingerprint'] : $this->fingerprint;
     }
 
     protected function getTitle()
