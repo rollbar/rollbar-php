@@ -131,7 +131,7 @@ class Config
     
     /**
      * @var string (fully qualified class name) The name of the your custom
-     * truncation strategy class. The class should inherit from 
+     * truncation strategy class. The class should inherit from
      * Rollbar\Truncation\AbstractStrategy.
      */
     private $customTruncation;
