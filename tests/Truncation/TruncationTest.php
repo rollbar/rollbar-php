@@ -2,12 +2,43 @@
 
 namespace Rollbar\Truncation;
 
-class TruncationTest extends \PHPUnit_Framework_TestCase
+use \Rollbar\Config;
+use \Rollbar\BaseRollbarTest;
+use \Rollbar\Payload\EncodedPayload;
+
+class TruncationTest extends BaseRollbarTest
 {
     
     public function setUp()
     {
-        $this->truncate = new \Rollbar\Truncation\Truncation();
+        $config = new Config(array('access_token' => $this->getTestAccessToken()));
+        $this->truncate = new \Rollbar\Truncation\Truncation($config);
+    }
+    
+    public function testCustomTruncation()
+    {
+        $config = new Config(array(
+            'access_token' => $this->getTestAccessToken(),
+            'custom_truncation' => 'Rollbar\TestHelpers\CustomTruncation'
+        ));
+        $this->truncate = new \Rollbar\Truncation\Truncation($config);
+        
+        $data = new EncodedPayload(array(
+            "data" => array(
+                "body" => array(
+                    "message" => array(
+                        "body" => array(
+                            "value" => str_repeat('A', 1000 * 1000)
+                        )
+                    )
+                )
+            )
+        ));
+        $data->encode();
+        
+        $result = $this->truncate->truncate($data);
+        
+        $this->assertFalse(strpos($data, 'Custom truncation test string') === false);
     }
 
     /**

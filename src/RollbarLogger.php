@@ -21,7 +21,7 @@ class RollbarLogger extends AbstractLogger
     {
         $this->config = new Config($config);
         $this->levelFactory = new LevelFactory();
-        $this->truncation = new Truncation();
+        $this->truncation = new Truncation($this->config);
         $this->queue = array();
         
         $this->debugLogFile = sys_get_temp_dir() . '/rollbar.debug.log';
