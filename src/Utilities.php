@@ -2,6 +2,11 @@
 
 final class Utilities
 {
+    public static function isWindows()
+    {
+        return strpos(strtolower(php_uname('s')), 'win') !== false;
+    }
+
     public static function validateString(
         $input,
         $name = "?",

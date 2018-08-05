@@ -148,7 +148,8 @@ class Defaults
     {
         try {
             if (function_exists('shell_exec')) {
-                $output = rtrim(shell_exec('git rev-parse --abbrev-ref HEAD 2> /dev/null'));
+                $stdRedirCmd = Utilities::isWindows() ? " > NUL" : " 2> /dev/null";
+                $output = rtrim(shell_exec('git rev-parse --abbrev-ref HEAD' . $stdRedirCmd));
                 if ($output) {
                     return $output;
                 }
