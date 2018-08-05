@@ -44,6 +44,8 @@ class FramesStrategy extends AbstractStrategy
     {
         $payload = $payload->data();
         
+        var_dump($payload['data']);
+        
         if (isset($payload['data']['body']['trace_chain']) ||
             isset($payload['data']['body']['trace']['frames'])) {
             return true;
