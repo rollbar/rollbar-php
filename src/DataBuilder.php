@@ -481,7 +481,7 @@ class DataBuilder implements DataBuilderInterface
         $source = $this->getSourceLines($filename);
 
         $total = count($source);
-        $line = $line - 1;
+        $line = max($line - 1, 0);
         $frame->setCode($source[$line]);
         $offset = 6;
         $min = max($line - $offset, 0);
