@@ -9,7 +9,17 @@ class CustomTruncation extends AbstractStrategy
 {
     public function execute(EncodedPayload $payload)
     {
-        $payload->encode('Custom truncation test string');
+        $payload->encode(array(
+            "data" => array(
+                "body" => array(
+                    "message" => array(
+                        "body" => array(
+                            "value" => 'Custom truncation test string'
+                        )
+                    )
+                )
+            )
+        ));
         
         return $payload;
     }
