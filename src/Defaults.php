@@ -82,6 +82,7 @@ class Defaults
         $this->data['captureErrorStacktraces'] = true;
         $this->data['checkIgnore'] = null;
         $this->data['custom'] = null;
+        $this->data['customDataMethod'] = null;
         $this->data['enabled'] = true;
         $this->data['environment'] = 'production';
         $this->data['fluentHost'] = '127.0.0.1';

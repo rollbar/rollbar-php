@@ -286,6 +286,32 @@ class ConfigTest extends BaseRollbarTest
         $this->assertEquals("bar", $custom["foo"]);
         $this->assertEquals("buzz", $custom["fuzz"]);
     }
+    
+    public function testCustomDataMethod()
+    {
+        $logger = new RollbarLogger(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => $this->env,
+            "custom_data_method" => function ($toLog, $customDataMethodContext) {
+                
+                return array(
+                    'data_from_my_custom_method' => $customDataMethodContext['foo']
+                );
+            }
+        ));
+        
+        $dataBuilder = $logger->getDataBuilder();
+        
+        $result = $dataBuilder->makeData(
+            Level::ERROR,
+            new \Exception(),
+            array(
+                'custom_data_method_context' => array('foo' => 'bar')
+            )
+        )->getCustom();
+        
+        $this->assertEquals('bar', $result['data_from_my_custom_method']);
+    }
 
     public function testEndpointDefault()
     {

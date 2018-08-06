@@ -41,6 +41,7 @@ class DataBuilder implements DataBuilderInterface
     protected $serverCodeVersion;
     protected $serverExtras;
     protected $custom;
+    protected $customDataMethod;
     protected $fingerprint;
     protected $title;
     protected $notifier;
@@ -106,6 +107,7 @@ class DataBuilder implements DataBuilderInterface
         $this->setCaptureEmail($config);
         $this->setCaptureUsername($config);
         $this->setCaptureIP($config);
+        $this->setCustomDataMethod($config);
     }
 
     protected function setCaptureIP($config)
@@ -277,6 +279,13 @@ class DataBuilder implements DataBuilderInterface
     public function setCustom($config)
     {
         $this->custom = isset($config['custom']) ? $config['custom'] : \Rollbar\Defaults::get()->custom();
+    }
+    
+    public function setCustomDataMethod($config)
+    {
+        $this->customDataMethod = isset($config['custom_data_method']) ?
+            $config['custom_data_method'] :
+            \Rollbar\Defaults::get()->customDataMethod();
     }
 
     protected function setFingerprint($config)
@@ -928,6 +937,11 @@ class DataBuilder implements DataBuilderInterface
     {
         return $this->custom;
     }
+    
+    public function getCustomDataMethod()
+    {
+        return $this->customDataMethod;
+    }
 
     protected function getCustomForPayload($toLog, $context)
     {
@@ -941,6 +955,18 @@ class DataBuilder implements DataBuilderInterface
         } elseif (!is_array($custom)) {
             $custom = get_object_vars($custom);
         }
+        
+        if ($customDataMethod = $this->getCustomDataMethod()) {
+            $customDataMethodContext = isset($context['custom_data_method_context']) ?
+                $context['custom_data_method_context'] :
+                null;
+                
+            $customDataMethodResult = $customDataMethod($toLog, $customDataMethodContext);
+            
+            $custom = array_merge($custom, $customDataMethodResult);
+        }
+        
+        unset($context['custom_data_method_context']);
 
         return array_replace_recursive(array(), $context, $custom);
     }
