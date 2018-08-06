@@ -292,12 +292,11 @@ class ConfigTest extends BaseRollbarTest
         $logger = new RollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env,
-            "custom_data_method" => function($toLog, $customDataMethodContext) {
+            "custom_data_method" => function ($toLog, $customDataMethodContext) {
                 
                 return array(
                     'data_from_my_custom_method' => $customDataMethodContext['foo']
                 );
-                
             }
         ));
         

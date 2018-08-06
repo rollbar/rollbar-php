@@ -283,8 +283,8 @@ class DataBuilder implements DataBuilderInterface
     
     public function setCustomDataMethod($config)
     {
-        $this->customDataMethod = isset($config['custom_data_method']) ? 
-            $config['custom_data_method'] : 
+        $this->customDataMethod = isset($config['custom_data_method']) ?
+            $config['custom_data_method'] :
             \Rollbar\Defaults::get()->customDataMethod();
     }
 
@@ -957,8 +957,7 @@ class DataBuilder implements DataBuilderInterface
         }
         
         if ($customDataMethod = $this->getCustomDataMethod()) {
-            
-            $customDataMethodContext = isset($context['custom_data_method_context']) ? 
+            $customDataMethodContext = isset($context['custom_data_method_context']) ?
                 $context['custom_data_method_context'] :
                 null;
                 
