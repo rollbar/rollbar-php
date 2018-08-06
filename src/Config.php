@@ -24,6 +24,7 @@ class Config
         'check_ignore',
         'code_version',
         'custom',
+        'custom_data_method',
         'enabled',
         'environment',
         'error_sample_rates',
@@ -104,6 +105,13 @@ class Config
     private $batchSize = 50;
 
     private $custom = array();
+    
+    /**
+     * @var callable with parameters $toLog, $contextDataMethodContext. The return
+     * value of the callable will be appended to the custom field of the item.
+     */
+    private $customDataMethod;
+    
     /**
      * @var callable
      */
@@ -224,6 +232,11 @@ class Config
         
         if (isset($config['custom_truncation'])) {
             $this->customTruncation = $config['custom_truncation'];
+        }
+        
+        $this->customDataMethod = \Rollbar\Defaults::get()->customDataMethod();
+        if (isset($config['custom_data_method'])) {
+            $this->customDataMethod = $config['custom_data_method'];
         }
     }
 
