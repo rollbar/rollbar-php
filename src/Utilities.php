@@ -4,7 +4,7 @@ final class Utilities
 {
     public static function isWindows()
     {
-        return strpos(strtolower(php_uname('s')), 'win') !== false;
+        return php_uname('s') == 'Windows NT';
     }
 
     public static function validateString(
