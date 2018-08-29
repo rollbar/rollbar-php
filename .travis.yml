@@ -8,7 +8,9 @@ php:
   - 5.6
   - 5.5
   - 5.4
-  - hhvm
+  - hhvm-3.6
+  - hhvm-3.18
+  - hhvm-nightly
 matrix:
   include:
     - php: 5.3
@@ -22,5 +24,3 @@ script: composer test
 
 after_success:
   - vendor/bin/test-reporter
-
-  
