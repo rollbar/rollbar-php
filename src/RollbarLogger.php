@@ -14,8 +14,6 @@ class RollbarLogger extends AbstractLogger
     private $levelFactory;
     private $truncation;
     private $queue;
-    private $debugLogger;
-    private $debugLogFile;
 
     public function __construct(array $config)
     {
@@ -23,13 +21,6 @@ class RollbarLogger extends AbstractLogger
         $this->levelFactory = new LevelFactory();
         $this->truncation = new Truncation($this->config);
         $this->queue = array();
-        
-        $this->debugLogFile = sys_get_temp_dir() . '/rollbar.debug.log';
-        $this->debugLogger = new MonologLogger("RollbarDebugLogger");
-        $this->debugLogger->pushHandler(new StreamHandler(
-            $this->debugLogFile,
-            $this->config->getVerbosity()
-        ));
     }
     
     public function enable()
@@ -105,16 +96,7 @@ class RollbarLogger extends AbstractLogger
             $encoded = $this->encode($scrubbed);
             $truncated = $this->truncate($encoded);
             
-            $this->debugLogger->info(
-                "Payload scrubbed and ready to send to ".
-                $this->config->getSender()->toString()
-            );
-            $this->debugLogger->debug($truncated);
-            
             $response = $this->send($truncated, $accessToken);
-            
-            $this->debugLogger->info("Received response from Rollbar API.");
-            $this->debugLogger->debug(print_r($response, true));
         }
         
         $this->handleResponse($payload, $response);
@@ -176,11 +158,6 @@ class RollbarLogger extends AbstractLogger
     public function getDataBuilder()
     {
         return $this->config->getDataBuilder();
-    }
-    
-    public function getDebugLogFile()
-    {
-        return $this->debugLogFile;
     }
 
     protected function handleResponse($payload, $response)
