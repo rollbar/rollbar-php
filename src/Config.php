@@ -19,6 +19,7 @@ class Config
         'allow_exec',
         'endpoint',
         'base_api_url',
+        'autodetect_branch',
         'branch',
         'capture_error_stacktraces',
         'check_ignore',
@@ -237,7 +238,7 @@ class Config
         $this->customDataMethod = \Rollbar\Defaults::get()->customDataMethod();
         if (isset($config['custom_data_method'])) {
             $this->customDataMethod = $config['custom_data_method'];
-        }
+        }   
     }
 
     private function setAccessToken($config)

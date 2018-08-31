@@ -57,8 +57,8 @@ class Defaults
             E_DEPRECATED => "info",
             E_USER_DEPRECATED => "info"
         );
-        $this->data['gitHash'] = null;
-        $this->data['gitBranch'] = null;
+        $this->data['autodetectBranch'] = false;
+        $this->data['branch'] = null;
         $this->data['serverRoot'] = isset($_ENV["HEROKU_APP_DIR"]) ? $_ENV["HEROKU_APP_DIR"] : null;
         $this->data['platform'] = php_uname('a');
         $this->data['notifier'] = Notifier::defaultNotifier();
@@ -126,38 +126,5 @@ class Defaults
         $spaced = str_replace('_', ' ', $option);
         $method = lcfirst(str_replace(' ', '', ucwords($spaced)));
         return $this->$method();
-    }
-
-    public function gitBranch($gitBranch = null, $allowExec = true)
-    {
-        if ($gitBranch) {
-            return $gitBranch;
-        }
-        if ($allowExec) {
-            static $cachedValue;
-            static $hasExecuted = false;
-            if (!$hasExecuted) {
-                $cachedValue = self::getGitBranch();
-                $hasExecuted = true;
-            }
-            return $cachedValue;
-        }
-        return null;
-    }
-    
-    private static function getGitBranch()
-    {
-        try {
-            if (function_exists('shell_exec')) {
-                $stdRedirCmd = Utilities::isWindows() ? " > NUL" : " 2> /dev/null";
-                $output = rtrim(shell_exec('git rev-parse --abbrev-ref HEAD' . $stdRedirCmd));
-                if ($output) {
-                    return $output;
-                }
-            }
-            return null;
-        } catch (\Exception $e) {
-            return null;
-        }
     }
 }
