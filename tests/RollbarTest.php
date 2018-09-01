@@ -27,6 +27,14 @@ class RollbarTest extends BaseRollbarTest
         Rollbar::destroy();
     }
     
+    public function testProfileInit()
+    {
+        $start = microtime(true);
+        Rollbar::init(self::$simpleConfig);
+        $finish = microtime(true);
+        echo number_format($finish - $start, 4) . "\n";
+    }
+    
     public function testInitWithConfig()
     {
         Rollbar::init(self::$simpleConfig);
