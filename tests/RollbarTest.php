@@ -27,19 +27,6 @@ class RollbarTest extends BaseRollbarTest
         Rollbar::destroy();
     }
     
-    public function testProfileInit()
-    {
-        $acceptable = 0.005;
-        $start = microtime(true);
-        Rollbar::init(self::$simpleConfig);
-        $finish = microtime(true);
-        $performance = $finish - $start;
-        $this->assertTrue(
-            $performance < $acceptable,
-            "Execution time of Rollbar::init ($performance sec) exceeded acceptable threshold of $acceptable sec."
-        );
-    }
-    
     public function testInitWithConfig()
     {
         Rollbar::init(self::$simpleConfig);
