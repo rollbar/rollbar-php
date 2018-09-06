@@ -29,10 +29,14 @@ class RollbarTest extends BaseRollbarTest
     
     public function testProfileInit()
     {
+        $acceptable = 0.005;
         $start = microtime(true);
         Rollbar::init(self::$simpleConfig);
         $finish = microtime(true);
-        echo number_format($finish - $start, 4) . "\n";
+        $this->assertTrue(
+            $finish - $start < $acceptable,
+            "Execution time of Rollbar::init exceeded acceptable threshold of $acceptable sec."
+        );
     }
     
     public function testInitWithConfig()
