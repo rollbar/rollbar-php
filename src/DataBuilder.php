@@ -263,15 +263,13 @@ class DataBuilder implements DataBuilderInterface
         $this->serverBranch = self::$defaults->branch($fromConfig);
         
         if ($this->serverBranch === null) {
-                
-            $autodetectBranch = isset($config['autodetect_branch']) ? 
-                $config['autodetect_branch'] : 
+            $autodetectBranch = isset($config['autodetect_branch']) ?
+                $config['autodetect_branch'] :
                 self::$defaults->autodetectBranch();
             
             if ($autodetectBranch) {
-                
-                $allowExec = isset($config['allow_exec']) ? 
-                    $config['allow_exec'] : 
+                $allowExec = isset($config['allow_exec']) ?
+                    $config['allow_exec'] :
                     self::$defaults->allowExec();
                     
                 $this->serverBranch = $this->detectGitBranch($allowExec);
