@@ -33,9 +33,10 @@ class RollbarTest extends BaseRollbarTest
         $start = microtime(true);
         Rollbar::init(self::$simpleConfig);
         $finish = microtime(true);
+        $performance = $finish - $start;
         $this->assertTrue(
-            $finish - $start < $acceptable,
-            "Execution time of Rollbar::init exceeded acceptable threshold of $acceptable sec."
+            $performance < $acceptable,
+            "Execution time of Rollbar::init ($performance sec) exceeded acceptable threshold of $acceptable sec."
         );
     }
     
