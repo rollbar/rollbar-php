@@ -540,7 +540,7 @@ class Config
                             $config[$keyName . "Options"] :
                             array();
             }
-            $this->$keyName = new $$keyName($options);
+            $this->$keyName = new ($$keyName)($options);
         } else {
             $this->$keyName = $$keyName;
         }
