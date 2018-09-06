@@ -523,26 +523,26 @@ class Config
         $passWholeConfig = false
     ) {
 
-        $$keyName = isset($config[$keyName]) ? $config[$keyName] : null;
+        $class = isset($config[$keyName]) ? $config[$keyName] : null;
 
-        if (is_null($defaultClass) && is_null($$keyName)) {
+        if (is_null($defaultClass) && is_null($class)) {
             return;
         }
 
-        if (is_null($$keyName)) {
-            $$keyName = $defaultClass;
+        if (is_null($class)) {
+            $class = $defaultClass;
         }
-        if (is_string($$keyName)) {
+        if (is_string($class)) {
             if ($passWholeConfig) {
                 $options = $config;
             } else {
-                $options = isset($config[$keyName . "Options"]) ?
-                            $config[$keyName . "Options"] :
+                $options = isset($config[$class . "Options"]) ?
+                            $config[$class . "Options"] :
                             array();
             }
-            $this->$keyName = new ($$keyName)($options);
+            $this->$keyName = new $class($options);
         } else {
-            $this->$keyName = $$keyName;
+            $this->$keyName = $class;
         }
 
         if (!$this->$keyName instanceof $expectedType) {
