@@ -978,4 +978,29 @@ class DataBuilderTest extends BaseRollbarTest
             )
         );
     }
+
+    public function testGitBranch()
+    {
+        $config = new Config(array(
+            'access_token' => $this->getTestAccessToken(),
+            'environment' => 'tests'
+        ));
+        
+        $dataBuilder = $config->getDataBuilder();
+        
+        $val = rtrim(shell_exec('git rev-parse --abbrev-ref HEAD'));
+        $this->assertEquals($val, $dataBuilder->detectGitBranch());
+    }
+
+    public function testGitBranchNoExec()
+    {
+        $config = new Config(array(
+            'access_token' => $this->getTestAccessToken(),
+            'environment' => 'tests'
+        ));
+        
+        $dataBuilder = $config->getDataBuilder();
+        
+        $this->assertEquals(null, $dataBuilder->detectGitBranch(false));
+    }
 }
