@@ -6,9 +6,6 @@ use Psr\Log\LogLevel;
 
 class Defaults
 {
-    private $utilities;
-    private $data;
-    private static $singleton = null;
 
     public static function get()
     {
@@ -20,9 +17,7 @@ class Defaults
 
     public function __construct($utilities)
     {
-        $this->data = array();
-        
-        $this->data['psrLevels'] = array(
+        $this->psrLevels = array(
             LogLevel::EMERGENCY => "critical",
             "emergency" => "critical",
             LogLevel::ALERT => "critical",
@@ -40,7 +35,7 @@ class Defaults
             LogLevel::DEBUG => "debug",
             "debug" => "debug"
         );
-        $this->data['errorLevels'] = array(
+        $this->errorLevels = array(
             E_ERROR => "error",
             E_WARNING => "warning",
             E_PARSE => "critical",
@@ -57,47 +52,7 @@ class Defaults
             E_DEPRECATED => "info",
             E_USER_DEPRECATED => "info"
         );
-        $this->data['autodetectBranch'] = false;
-        $this->data['branch'] = null;
-        $this->data['serverRoot'] = isset($_ENV["HEROKU_APP_DIR"]) ? $_ENV["HEROKU_APP_DIR"] : null;
-        $this->data['platform'] = php_uname('a');
-        $this->data['notifier'] = Notifier::defaultNotifier();
-        $this->data['baseException'] = version_compare(phpversion(), '7.0', '<') ? '\Exception' : '\Throwable';
-        $this->data['codeVersion'] = "";
-        $this->data['sendMessageTrace'] = false;
-        $this->data['includeCodeContext'] = false;
-        $this->data['includeExcCodeContext'] = false;
-        $this->data['rawRequestBody'] = false;
-        $this->data['localVarsDump'] = true;
-        $this->data['errorSampleRates'] = array();
-        $this->data['exceptionSampleRates'] = array();
-        $this->data['includedErrno'] = ROLLBAR_INCLUDED_ERRNO_BITMASK;
-        $this->data['includeErrorCodeContext'] = null;
-        $this->data['includeExceptionCodeContext'] = null;
-        $this->data['agentLogLocation'] = '/var/tmp';
-        $this->data['allowExec'] = true;
-        $this->data['messageLevel'] = "warning";
-        $this->data['exceptionLevel'] = "error";
-        $this->data['endpoint'] = 'https://api.rollbar.com/api/1/';
-        $this->data['captureErrorStacktraces'] = true;
-        $this->data['checkIgnore'] = null;
-        $this->data['custom'] = null;
-        $this->data['customDataMethod'] = null;
-        $this->data['enabled'] = true;
-        $this->data['environment'] = 'production';
-        $this->data['fluentHost'] = '127.0.0.1';
-        $this->data['fluentPort'] = 24224;
-        $this->data['fluentTag'] = 'rollbar';
-        $this->data['handler'] = 'blocking';
-        $this->data['host'] = null;
-        $this->data['timeout'] = 3;
-        $this->data['reportSuppressed'] = false;
-        $this->data['useErrorReporting'] = false;
-        $this->data['verbosity'] = \Psr\Log\LogLevel::ERROR;
-        $this->data['captureIP'] = true;
-        $this->data['captureEmail'] = false;
-        $this->data['captureUsername'] = false;
-        $this->data['scrubFields'] = array(
+        $this->scrubFields = array(
             'passwd',
             'password',
             'secret',
@@ -107,18 +62,14 @@ class Defaults
             'csrf_token',
             'access_token'
         );
-        $this->data['customTruncation'] = null;
+        $this->serverRoot = isset($_ENV["HEROKU_APP_DIR"]) ? $_ENV["HEROKU_APP_DIR"] : null;
+        $this->platform = php_uname('a');
+        $this->notifier = Notifier::defaultNotifier();
+        $this->baseException = version_compare(phpversion(), '7.0', '<') ? '\Exception' : '\Throwable';
+        $this->errorSampleRates = array();
+        $this->exceptionSampleRates = array();
         
         $this->utilities = $utilities;
-    }
-    
-    public function __call($method, $args)
-    {
-        if (!array_key_exists($method, $this->data)) {
-            throw new \Exception('No default value defined for property ' . $method . '.');
-        }
-        
-        return (isset($args[0]) && $args[0] !== null) ? $args[0] : $this->data[$method];
     }
     
     public function fromSnakeCase($option)
@@ -127,4 +78,273 @@ class Defaults
         $method = lcfirst(str_replace(' ', '', ucwords($spaced)));
         return $this->$method();
     }
+    
+    private $utilities;
+    private $data;
+    private static $singleton = null;
+    
+    public function psrLevels($value = null)
+    {
+        return $value !== null ? $value : $this->psrLevels;
+    }
+
+    public function errorLevels($value = null)
+    {
+        return $value !== null ? $value : $this->errorLevels;
+    }
+
+    public function autodetectBranch($value = null)
+    {
+        return $value !== null ? $value : $this->autodetectBranch;
+    }
+
+    public function branch($value = null)
+    {
+        return $value !== null ? $value : $this->branch;
+    }
+
+    public function serverRoot($value = null)
+    {
+        return $value !== null ? $value : $this->serverRoot;
+    }
+
+    public function platform($value = null)
+    {
+        return $value !== null ? $value : $this->platform;
+    }
+
+    public function notifier($value = null)
+    {
+        return $value !== null ? $value : $this->notifier;
+    }
+
+    public function baseException($value = null)
+    {
+        return $value !== null ? $value : $this->baseException;
+    }
+
+    public function codeVersion($value = null)
+    {
+        return $value !== null ? $value : $this->codeVersion;
+    }
+
+    public function sendMessageTrace($value = null)
+    {
+        return $value !== null ? $value : $this->sendMessageTrace;
+    }
+
+    public function includeCodeContext($value = null)
+    {
+        return $value !== null ? $value : $this->includeCodeContext;
+    }
+
+    public function includeExcCodeContext($value = null)
+    {
+        return $value !== null ? $value : $this->includeExcCodeContext;
+    }
+
+    public function rawRequestBody($value = null)
+    {
+        return $value !== null ? $value : $this->rawRequestBody;
+    }
+
+    public function localVarsDump($value = null)
+    {
+        return $value !== null ? $value : $this->localVarsDump;
+    }
+
+    public function errorSampleRates($value = null)
+    {
+        return $value !== null ? $value : $this->errorSampleRates;
+    }
+
+    public function exceptionSampleRates($value = null)
+    {
+        return $value !== null ? $value : $this->exceptionSampleRates;
+    }
+
+    public function includedErrno($value = null)
+    {
+        return $value !== null ? $value : $this->includedErrno;
+    }
+
+    public function includeErrorCodeContext($value = null)
+    {
+        return $value !== null ? $value : $this->includeErrorCodeContext;
+    }
+
+    public function includeExceptionCodeContext($value = null)
+    {
+        return $value !== null ? $value : $this->includeExceptionCodeContext;
+    }
+
+    public function agentLogLocation($value = null)
+    {
+        return $value !== null ? $value : $this->agentLogLocation;
+    }
+
+    public function allowExec($value = null)
+    {
+        return $value !== null ? $value : $this->allowExec;
+    }
+
+    public function messageLevel($value = null)
+    {
+        return $value !== null ? $value : $this->messageLevel;
+    }
+
+    public function exceptionLevel($value = null)
+    {
+        return $value !== null ? $value : $this->exceptionLevel;
+    }
+
+    public function endpoint($value = null)
+    {
+        return $value !== null ? $value : $this->endpoint;
+    }
+
+    public function captureErrorStacktraces($value = null)
+    {
+        return $value !== null ? $value : $this->captureErrorStacktraces;
+    }
+
+    public function checkIgnore($value = null)
+    {
+        return $value !== null ? $value : $this->checkIgnore;
+    }
+
+    public function custom($value = null)
+    {
+        return $value !== null ? $value : $this->custom;
+    }
+
+    public function customDataMethod($value = null)
+    {
+        return $value !== null ? $value : $this->customDataMethod;
+    }
+
+    public function enabled($value = null)
+    {
+        return $value !== null ? $value : $this->enabled;
+    }
+
+    public function environment($value = null)
+    {
+        return $value !== null ? $value : $this->environment;
+    }
+
+    public function fluentHost($value = null)
+    {
+        return $value !== null ? $value : $this->fluentHost;
+    }
+
+    public function fluentPort($value = null)
+    {
+        return $value !== null ? $value : $this->fluentPort;
+    }
+
+    public function fluentTag($value = null)
+    {
+        return $value !== null ? $value : $this->fluentTag;
+    }
+
+    public function handler($value = null)
+    {
+        return $value !== null ? $value : $this->handler;
+    }
+
+    public function host($value = null)
+    {
+        return $value !== null ? $value : $this->host;
+    }
+
+    public function timeout($value = null)
+    {
+        return $value !== null ? $value : $this->timeout;
+    }
+
+    public function reportSuppressed($value = null)
+    {
+        return $value !== null ? $value : $this->reportSuppressed;
+    }
+
+    public function useErrorReporting($value = null)
+    {
+        return $value !== null ? $value : $this->useErrorReporting;
+    }
+
+    public function verbosity($value = null)
+    {
+        return $value !== null ? $value : $this->verbosity;
+    }
+
+    public function captureIP($value = null)
+    {
+        return $value !== null ? $value : $this->captureIP;
+    }
+
+    public function captureEmail($value = null)
+    {
+        return $value !== null ? $value : $this->captureEmail;
+    }
+
+    public function captureUsername($value = null)
+    {
+        return $value !== null ? $value : $this->captureUsername;
+    }
+
+    public function scrubFields($value = null)
+    {
+        return $value !== null ? $value : $this->scrubFields;
+    }
+
+    public function customTruncation($value = null)
+    {
+        return $value !== null ? $value : $this->customTruncation;
+    }
+
+    private $psrLevels;
+    private $errorLevels;
+    private $autodetectBranch = false;
+    private $branch = null;
+    private $serverRoot;
+    private $platform;
+    private $notifier;
+    private $baseException;
+    private $codeVersion = "";
+    private $sendMessageTrace = false;
+    private $includeCodeContext = false;
+    private $includeExcCodeContext = false;
+    private $rawRequestBody = false;
+    private $localVarsDump = true;
+    private $errorSampleRates = array();
+    private $exceptionSampleRates = array();
+    private $includedErrno = ROLLBAR_INCLUDED_ERRNO_BITMASK;
+    private $includeErrorCodeContext = null;
+    private $includeExceptionCodeContext = null;
+    private $agentLogLocation = '/var/tmp';
+    private $allowExec = true;
+    private $messageLevel = "warning";
+    private $exceptionLevel = "error";
+    private $endpoint = 'https://api.rollbar.com/api/1/';
+    private $captureErrorStacktraces = true;
+    private $checkIgnore = null;
+    private $custom = null;
+    private $customDataMethod = null;
+    private $enabled = true;
+    private $environment = 'production';
+    private $fluentHost = '127.0.0.1';
+    private $fluentPort = 24224;
+    private $fluentTag = 'rollbar';
+    private $handler = 'blocking';
+    private $host = null;
+    private $timeout = 3;
+    private $reportSuppressed = false;
+    private $useErrorReporting = false;
+    private $verbosity = \Psr\Log\LogLevel::ERROR;
+    private $captureIP = true;
+    private $captureEmail = false;
+    private $captureUsername = false;
+    private $scrubFields;
+    private $customTruncation = null;
 }
