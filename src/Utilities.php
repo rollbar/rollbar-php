@@ -72,15 +72,19 @@ final class Utilities
 
     public static function serializeForRollbar(
         $obj,
-        array $customKeys = null
+        array $customKeys = null,
+        $maxDepth = -1,
+        $depth = 0
     ) {
         $returnVal = array();
-
+        if ($maxDepth > 0 && $depth > $maxDepth) {
+            return $returnVal;
+        }
         foreach ($obj as $key => $val) {
             if ($val instanceof \Serializable) {
                 $val = $val->serialize();
             } elseif (is_array($val)) {
-                $val = self::serializeForRollbar($val);
+                $val = self::serializeForRollbar($val, null, $maxDepth, $depth+1);
             } elseif (is_object($val)) {
                 $val = array(
                     'class' => get_class($val),
