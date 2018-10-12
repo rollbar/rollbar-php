@@ -78,7 +78,7 @@ final class Utilities
     ) {
         $returnVal = array();
         if ($maxDepth > 0 && $depth > $maxDepth) {
-            return $returnVal;
+            return null;
         }
         foreach ($obj as $key => $val) {
             if ($val instanceof \Serializable) {
