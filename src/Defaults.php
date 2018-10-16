@@ -303,6 +303,11 @@ class Defaults
         return $value !== null ? $value : $this->customTruncation;
     }
 
+    public function maxNestingDepth($value = null)
+    {
+        return $value !== null ? $value : $this->maxNestingDepth;
+    }
+
     private $psrLevels;
     private $errorLevels;
     private $autodetectBranch = false;
@@ -317,6 +322,7 @@ class Defaults
     private $includeExcCodeContext = false;
     private $rawRequestBody = false;
     private $localVarsDump = true;
+    private $maxNestingDepth = -1;
     private $errorSampleRates = array();
     private $exceptionSampleRates = array();
     private $includedErrno = ROLLBAR_INCLUDED_ERRNO_BITMASK;

@@ -91,7 +91,7 @@ class RollbarLogger extends AbstractLogger
         if ($this->config->checkIgnored($payload, $accessToken, $toLog, $isUncaught)) {
             $response = new Response(0, "Ignored");
         } else {
-            $serialized = $payload->serialize();
+            $serialized = $payload->serialize($this->config->getMaxNestingDepth());
             $scrubbed = $this->scrub($serialized);
             $encoded = $this->encode($scrubbed);
             $truncated = $this->truncate($encoded);
