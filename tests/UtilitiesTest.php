@@ -105,32 +105,32 @@ class UtilitiesTest extends BaseRollbarTest
         $this->assertArrayNotHasKey("my_null_value", $result);
     }
 
-	public function testSerializeForRollbarNestingLevels()
-	{
-		$obj = array(
-			"one" => array(
-				'two' => array(
-					'three' => array(
-						'four' => array(1, 2),
-					),
-				),
-			),
-		);
-		$result = Utilities::serializeForRollbar($obj, null, 2);
-		$this->assertArrayHasKey('one', $result);
-		$this->assertArrayHasKey('two', $result['one']);
-		$this->assertArrayNotHasKey('three', $result['one']['two']);
+    public function testSerializeForRollbarNestingLevels()
+    {
+        $obj = array(
+            "one" => array(
+                'two' => array(
+                    'three' => array(
+                        'four' => array(1, 2),
+                    ),
+                ),
+            ),
+        );
+        $result = Utilities::serializeForRollbar($obj, null, 2);
+        $this->assertArrayHasKey('one', $result);
+        $this->assertArrayHasKey('two', $result['one']);
+        $this->assertArrayNotHasKey('three', $result['one']['two']);
 
-		$result = Utilities::serializeForRollbar($obj, null, 3);
-		$this->assertArrayHasKey('one', $result);
-		$this->assertArrayHasKey('two', $result['one']);
-		$this->assertArrayHasKey('three', $result['one']['two']);
-		$this->assertArrayNotHasKey('four', $result['one']['two']['three']);
+        $result = Utilities::serializeForRollbar($obj, null, 3);
+        $this->assertArrayHasKey('one', $result);
+        $this->assertArrayHasKey('two', $result['one']);
+        $this->assertArrayHasKey('three', $result['one']['two']);
+        $this->assertArrayNotHasKey('four', $result['one']['two']['three']);
 
-		$result = Utilities::serializeForRollbar($obj);
-		$this->assertArrayHasKey('one', $result);
-		$this->assertArrayHasKey('two', $result['one']);
-		$this->assertArrayHasKey('three', $result['one']['two']);
-		$this->assertArrayHasKey('four', $result['one']['two']['three']);
-	}
+        $result = Utilities::serializeForRollbar($obj);
+        $this->assertArrayHasKey('one', $result);
+        $this->assertArrayHasKey('two', $result['one']);
+        $this->assertArrayHasKey('three', $result['one']['two']);
+        $this->assertArrayHasKey('four', $result['one']['two']['three']);
+    }
 }
