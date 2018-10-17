@@ -249,6 +249,30 @@ class ConfigTest extends BaseRollbarTest
         );
     }
     
+    public function testAllowedCircularReferenceTypes()
+    {
+        $config = new Config(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => $this->env
+        ));
+        
+        $this->assertEmpty(
+            $config->getAllowedCircularReferenceTypes()
+        );
+        
+        $config = new Config(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => $this->env,
+            "allowed_circular_reference_types" => array("\CircularType")
+        ));
+        
+        $allowedCircularReferenceTypes = $config->getAllowedCircularReferenceTypes();
+        $this->assertEquals(
+            "\CircularType",
+            $allowedCircularReferenceTypes[0]
+        );
+    }
+    
     public function testVerbosity()
     {
         $expected = 3;

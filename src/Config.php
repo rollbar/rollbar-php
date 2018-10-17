@@ -55,7 +55,8 @@ class Config
         'send_message_trace',
         'include_raw_request_body',
         'local_vars_dump',
-        'verbosity'
+        'verbosity',
+        'allowed_circular_reference_types'
     );
     
     private $accessToken;
@@ -144,6 +145,13 @@ class Config
      * Rollbar\Truncation\AbstractStrategy.
      */
     private $customTruncation;
+    
+    /**
+     * @var array (list of fully qualified class names) with types 
+     * that are allowed to be circularly serialzed.
+     */
+    private $allowedCircularReferenceTypes;
+    
 
     public function __construct(array $configArray)
     {
@@ -229,6 +237,11 @@ class Config
         $this->useErrorReporting = \Rollbar\Defaults::get()->useErrorReporting();
         if (isset($config['use_error_reporting'])) {
             $this->useErrorReporting = $config['use_error_reporting'];
+        }
+        
+        $this->allowedCircularReferenceTypes = \Rollbar\Defaults::get()->allowedCircularReferenceTypes();
+        if (isset($config['allowed_circular_reference_types'])) {
+            $this->allowedCircularReferenceTypes = $config['allowed_circular_reference_types'];
         }
         
         if (isset($config['custom_truncation'])) {
@@ -380,6 +393,11 @@ class Config
     public function getCustom()
     {
         return $this->dataBuilder->getCustom();
+    }
+    
+    public function getAllowedCircularReferenceTypes()
+    {
+        return $this->allowedCircularReferenceTypes;
     }
     
     public function setCustomTruncation($type)
