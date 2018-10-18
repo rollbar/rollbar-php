@@ -27,7 +27,7 @@ class ErrorWrapperTest extends BaseRollbarTest
             null,
             new Utilities
         );
-        $this->assertEquals("E_ERROR: Message Content", $errWrapper->getClassName());
+        $this->assertEquals("E_ERROR", $errWrapper->getClassName());
 
         $errWrapper = new ErrorWrapper(
             3,
@@ -37,6 +37,6 @@ class ErrorWrapperTest extends BaseRollbarTest
             null,
             new Utilities
         );
-        $this->assertEquals("#3: Fake Error Number", $errWrapper->getClassName());
+        $this->assertEquals("#3", $errWrapper->getClassName());
     }
 }
