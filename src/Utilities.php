@@ -95,31 +95,32 @@ final class Utilities
         
         foreach ($obj as $key => $val) {
             
-            if ($val instanceof \Serializable) {
+            if (is_object($val)) {
                 
                 if(self::serializedAlready($val, $objectHashes)) {
+                    
                     $val = "CircularType";
                 } else {
                     
-                    self::markSerialized($val, $objectHashes);
-                    
-                    $val = $val->serialize();
+                    if ($val instanceof \Serializable) {
+                        
+                        self::markSerialized($val, $objectHashes);
+                        $val = $val->serialize();
+                        
+                    } else {
+                        
+                        $val = array(
+                            'class' => get_class($val),
+                            'value' => self::serializeForRollbar($val, $customKeys, $objectHashes)
+                        );
+                        
+                    }
                 }
                 
             } elseif (is_array($val)) {
                 
                 $val = self::serializeForRollbar($val, $customKeys, $objectHashes);
                 
-            } elseif (is_object($val)) {
-                
-                if(self::serializedAlready($val, $objectHashes)) {
-                    $val = "CircularType";
-                } else {
-                    $val = array(
-                        'class' => get_class($val),
-                        'value' => self::serializeForRollbar($val, $customKeys, $objectHashes)
-                    );
-                }
             }
             
             if ($customKeys !== null && in_array($key, $customKeys)) {
