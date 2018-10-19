@@ -89,26 +89,27 @@ final class Utilities
             if (self::serializedAlready($obj, $objectHashes)) {
                 return "CircularType";    
             } else {
-                $objectHashes[spl_object_hash ($obj)] = true;
-                self::$ObjectHashes = $objectHashes;
+                self::markSerialized($obj, $objectHashes);
             }
         }
         
         foreach ($obj as $key => $val) {
+            
             if ($val instanceof \Serializable) {
                 
                 if(self::serializedAlready($val, $objectHashes)) {
                     $val = "CircularType";
                 } else {
                     
-                    $objectHashes[spl_object_hash($val)] = true;
-                    self::$ObjectHashes = $objectHashes;
+                    self::markSerialized($val, $objectHashes);
                     
                     $val = $val->serialize();
                 }
                 
             } elseif (is_array($val)) {
+                
                 $val = self::serializeForRollbar($val, $customKeys, $objectHashes);
+                
             } elseif (is_object($val)) {
                 
                 if(self::serializedAlready($val, $objectHashes)) {
@@ -139,15 +140,11 @@ final class Utilities
         
         return true;
     }
-
-    private static function serializedOnce($obj, &$objectHashes)
+    
+    private static function markSerialized($obj, &$objectHashes)
     {
-        if(isset($objectHashes[spl_object_hash ($obj)])) {
-            return false;
-        }
-        $objectHashes [spl_object_hash ($obj)] = true ;
+        $objectHashes[spl_object_hash ($obj)] = true;
         self::$ObjectHashes = $objectHashes;
-        return true;
     }
     
     // from http://www.php.net/manual/en/function.uniqid.php#94959
