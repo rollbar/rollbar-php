@@ -100,6 +100,7 @@ final class Utilities
                 if(self::serializedAlready($val, $objectHashes)) {
                     
                     $val = "CircularType";
+                    
                 } else {
                     
                     if ($val instanceof \Serializable) {
