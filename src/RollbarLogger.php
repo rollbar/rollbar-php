@@ -14,6 +14,7 @@ class RollbarLogger extends AbstractLogger
     private $levelFactory;
     private $truncation;
     private $queue;
+    private $reportCount = 0;
 
     public function __construct(array $config)
     {
@@ -132,6 +133,17 @@ class RollbarLogger extends AbstractLogger
 
     protected function send(\Rollbar\Payload\EncodedPayload $payload, $accessToken)
     {
+        if ($this->reportCount >= $this->config->getMaxItems()) {
+            return new Response(
+                0,
+                "Maximum number of items per request has been reached. If you " .
+                "want to report more items, please use `max_items` " .
+                "configuration option."
+            );
+        } else {
+            $this->reportCount++;
+        }
+        
         if ($this->config->getBatched()) {
             $response = new Response(0, "Pending");
             if ($this->getQueueSize() >= $this->config->getBatchSize()) {
@@ -140,6 +152,7 @@ class RollbarLogger extends AbstractLogger
             $this->queue[] = $payload;
             return $response;
         }
+        
         return $this->config->send($payload, $accessToken);
     }
 

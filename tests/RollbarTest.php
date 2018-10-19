@@ -12,12 +12,10 @@ use Rollbar\Payload\Level;
 class RollbarTest extends BaseRollbarTest
 {
     
-    public function __construct()
+    public function setUp()
     {
         self::$simpleConfig['access_token'] = $this->getTestAccessToken();
         self::$simpleConfig['environment'] = 'test';
-        
-        parent::__construct();
     }
 
     private static $simpleConfig = array();
