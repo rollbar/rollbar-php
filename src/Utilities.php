@@ -80,7 +80,9 @@ final class Utilities
     public static function serializeForRollbar(
         $obj,
         array $customKeys = null,
-        &$objectHashes = array()
+        &$objectHashes = array(),
+        $maxDepth = -1,
+        $depth = 0
     ) {
         
         $returnVal = array();
@@ -93,6 +95,10 @@ final class Utilities
             }
         }
         
+        if ($maxDepth > 0 && $depth > $maxDepth) {
+            return null;
+        }
+
         foreach ($obj as $key => $val) {
             if (is_object($val)) {
                 if (self::serializedAlready($val, $objectHashes)) {
@@ -104,12 +110,12 @@ final class Utilities
                     } else {
                         $val = array(
                             'class' => get_class($val),
-                            'value' => self::serializeForRollbar($val, $customKeys, $objectHashes)
+                            'value' => self::serializeForRollbar($val, $customKeys, $objectHashes, $maxDepth, $depth+1)
                         );
                     }
                 }
             } elseif (is_array($val)) {
-                $val = self::serializeForRollbar($val, $customKeys, $objectHashes);
+                $val = self::serializeForRollbar($val, $customKeys, $objectHashes, $maxDepth, $depth+1);
             }
             
             if ($customKeys !== null && in_array($key, $customKeys)) {

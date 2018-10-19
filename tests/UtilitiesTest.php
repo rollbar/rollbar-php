@@ -140,4 +140,36 @@ class UtilitiesTest extends BaseRollbarTest
             $result["payload"]["data"]["body"]["message"][0]["value"]["child"]["value"]["parent"]
         );
     }
+
+    public function testSerializeForRollbarNestingLevels()
+    {
+        $obj = array(
+            "one" => array(
+                'two' => array(
+                    'three' => array(
+                        'four' => array(1, 2),
+                    ),
+                ),
+            ),
+        );
+        
+        $objectHashes = array();
+        $result = Utilities::serializeForRollbar($obj, null, $objectHashes, 2);
+        $this->assertArrayHasKey('one', $result);
+        $this->assertArrayHasKey('two', $result['one']);
+        $this->assertArrayNotHasKey('three', $result['one']['two']);
+
+        $objectHashes = array();
+        $result = Utilities::serializeForRollbar($obj, null, $objectHashes, 3);
+        $this->assertArrayHasKey('one', $result);
+        $this->assertArrayHasKey('two', $result['one']);
+        $this->assertArrayHasKey('three', $result['one']['two']);
+        $this->assertArrayNotHasKey('four', $result['one']['two']['three']);
+
+        $result = Utilities::serializeForRollbar($obj);
+        $this->assertArrayHasKey('one', $result);
+        $this->assertArrayHasKey('two', $result['one']);
+        $this->assertArrayHasKey('three', $result['one']['two']);
+        $this->assertArrayHasKey('four', $result['one']['two']['three']);
+    }
 }

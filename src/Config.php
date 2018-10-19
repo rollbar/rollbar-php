@@ -55,6 +55,7 @@ class Config
         'send_message_trace',
         'include_raw_request_body',
         'local_vars_dump',
+        'max_nesting_depth',
         'verbosity'
     );
     
@@ -104,6 +105,8 @@ class Config
 
     private $batched = false;
     private $batchSize = 50;
+
+    private $maxNestingDepth = 10;
 
     private $custom = array();
     
@@ -217,6 +220,7 @@ class Config
         $this->setScrubber($config);
         $this->setBatched($config);
         $this->setBatchSize($config);
+        $this->setMaxNestingDepth($config);
         $this->setCustom($config);
         $this->setResponseHandler($config);
         $this->setCheckIgnoreFunction($config);
@@ -360,6 +364,13 @@ class Config
     {
         if (array_key_exists('batch_size', $config)) {
             $this->batchSize = $config['batch_size'];
+        }
+    }
+
+    private function setMaxNestingDepth($config)
+    {
+        if (array_key_exists('max_nesting_depth', $config)) {
+            $this->maxNestingDepth = $config['max_nesting_depth'];
         }
     }
 
@@ -591,6 +602,11 @@ class Config
     public function getBatchSize()
     {
         return $this->batchSize;
+    }
+
+    public function getMaxNestingDepth()
+    {
+        return $this->maxNestingDepth;
     }
 
     /**
