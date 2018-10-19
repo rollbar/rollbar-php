@@ -247,11 +247,6 @@ class DefaultsTest extends BaseRollbarTest
         $this->assertFalse($this->defaults->captureUsername());
     }
     
-    public function testAllowedCircularReferenceTypes()
-    {
-        $this->assertEmpty($this->defaults->allowedCircularReferenceTypes());
-    }
-    
     public function testDefaultsForConfigOptions()
     {
         foreach (\Rollbar\Config::listOptions() as $option) {

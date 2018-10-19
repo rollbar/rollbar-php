@@ -302,11 +302,6 @@ class Defaults
     {
         return $value !== null ? $value : $this->customTruncation;
     }
-    
-    public function allowedCircularReferenceTypes($value = null)
-    {
-        return $value !== null ? $value : $this->allowedCircularReferenceTypes;
-    }
 
     private $psrLevels;
     private $errorLevels;
@@ -352,5 +347,4 @@ class Defaults
     private $captureUsername = false;
     private $scrubFields;
     private $customTruncation = null;
-    private $allowedCircularReferenceTypes = array();
 }
