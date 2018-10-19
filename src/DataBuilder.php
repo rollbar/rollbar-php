@@ -979,7 +979,7 @@ class DataBuilder implements DataBuilderInterface
         
         unset($context['custom_data_method_context']);
 
-        return array_replace_recursive(array(), $context, $custom);
+        return $custom;
     }
     
     public function addCustom($key, $data)
