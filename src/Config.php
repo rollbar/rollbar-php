@@ -215,7 +215,6 @@ class Config
         $this->setResponseHandler($config);
         $this->setCheckIgnoreFunction($config);
         $this->setSendMessageTrace($config);
-        $this->setVerbosity($config);
 
         if (isset($config['included_errno'])) {
             $this->includedErrno = $config['included_errno'];
