@@ -41,7 +41,7 @@ class Context implements \Serializable
             "pre" => $this->pre,
             "post" => $this->post,
         );
-        return $this->utilities->serializeForRollbar($result);
+        return $this->utilities->serializeForRollbar($result, null, \Rollbar\Utilities::GetObjectHashes());
     }
     
     public function unserialize($serialized)

@@ -250,7 +250,7 @@ class Data implements \Serializable
             "uuid" => $this->uuid,
             "notifier" => $this->notifier,
         );
-        return $this->utilities->serializeForRollbar($result);
+        return $this->utilities->serializeForRollbar($result, null, \Rollbar\Utilities::GetObjectHashes());
     }
     
     public function unserialize($serialized)

@@ -105,7 +105,7 @@ class Frame implements \Serializable
             "context" => $this->context,
             "args" => $this->args
         );
-        return $this->utilities->serializeForRollbar($result);
+        return $this->utilities->serializeForRollbar($result, null, \Rollbar\Utilities::GetObjectHashes());
     }
     
     public function unserialize($serialized)

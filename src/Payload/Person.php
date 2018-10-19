@@ -76,7 +76,7 @@ class Person implements \Serializable
         foreach ($this->extra as $key => $val) {
             $result[$key] = $val;
         }
-        return $this->utilities->serializeForRollbar($result, array_keys($this->extra));
+        return $this->utilities->serializeForRollbar($result, array_keys($this->extra), \Rollbar\Utilities::GetObjectHashes());
     }
     
     public function unserialize($serialized)

@@ -2,6 +2,13 @@
 
 final class Utilities
 {
+    private static $ObjectHashes;
+    
+    public static function GetObjectHashes() 
+    {
+        return self::$ObjectHashes;
+    }
+    
     public static function isWindows()
     {
         return php_uname('s') == 'Windows NT';
@@ -72,20 +79,35 @@ final class Utilities
 
     public static function serializeForRollbar(
         $obj,
-        array $customKeys = null
+        array $customKeys = null,
+        &$objectHashes = array()
     ) {
+        
         $returnVal = array();
-
+        
+        if(is_object($obj) &&  !self::serializedOnce($obj, $objectHashes)) {
+            return "CircularType";
+        }
+        
         foreach ($obj as $key => $val) {
             if ($val instanceof \Serializable) {
-                $val = $val->serialize();
+                if(self::serializedOnce($val, $objectHashes)) {
+                    $val = $val->serialize();
+                } else {
+                    $val = "CircularType";
+                }
+                
             } elseif (is_array($val)) {
-                $val = self::serializeForRollbar($val);
+                $val = self::serializeForRollbar($val, $customKeys, $objectHashes);
             } elseif (is_object($val)) {
-                $val = array(
-                    'class' => get_class($val),
-                    'value' => $val
-                );
+                if(self::serializedOnce($val, $objectHashes)) {
+                    $val = array(
+                        'class' => get_class($val),
+                        'value' => self::serializeForRollbar($val, $customKeys, $objectHashes)
+                    );
+                } else {
+                    $val = "CircularType";
+                }
             }
             
             if ($customKeys !== null && in_array($key, $customKeys)) {
@@ -98,6 +120,16 @@ final class Utilities
         return $returnVal;
     }
 
+    private static function serializedOnce($obj, &$objectHashes)
+    {
+        if(isset($objectHashes[spl_object_hash ($obj)])) {
+            return false;
+        }
+        $objectHashes [spl_object_hash ($obj)] = true ;
+        self::$ObjectHashes = $objectHashes;
+        return true;
+    }
+    
     // from http://www.php.net/manual/en/function.uniqid.php#94959
     public static function uuid4()
     {
