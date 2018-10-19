@@ -10,8 +10,6 @@ php:
   - 5.4
   - hhvm-3.6
   - hhvm-3.18
-  - hhvm-3.20
-  - hhvm-3.28
   - hhvm
   - hhvm-nightly
 matrix:
