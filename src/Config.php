@@ -147,6 +147,7 @@ class Config
      * Rollbar\Truncation\AbstractStrategy.
      */
     private $customTruncation;
+    
 
     public function __construct(array $configArray)
     {
@@ -391,6 +392,11 @@ class Config
     public function getCustom()
     {
         return $this->dataBuilder->getCustom();
+    }
+    
+    public function getAllowedCircularReferenceTypes()
+    {
+        return $this->allowedCircularReferenceTypes;
     }
     
     public function setCustomTruncation($type)

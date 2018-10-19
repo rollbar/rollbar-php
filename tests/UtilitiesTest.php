@@ -1,5 +1,10 @@
 <?php namespace Rollbar;
 
+use Rollbar\CycleCheck\ParentCycleCheck;
+use Rollbar\CycleCheck\ChildCycleCheck;
+use Rollbar\CycleCheck\ParentCycleCheckSerializable;
+use Rollbar\CycleCheck\ChildCycleCheckSerializable;
+
 class UtilitiesTest extends BaseRollbarTest
 {
     public function testValidateString()
@@ -104,6 +109,37 @@ class UtilitiesTest extends BaseRollbarTest
         $this->assertArrayNotHasKey("myNullValue", $result);
         $this->assertArrayNotHasKey("my_null_value", $result);
     }
+    
+    public function testSerializationCycleChecking()
+    {
+        $config = new Config(array("access_token"=>$this->getTestAccessToken()));
+        $data = $config->getRollbarData(\Rollbar\Payload\Level::WARNING, "String", array(new ParentCycleCheck()));
+        $payload = new \Rollbar\Payload\Payload($data, $this->getTestAccessToken());
+        $obj = array(
+            "one_two" => array(1, 2),
+            "payload" => $payload,
+            "obj" => new ParentCycleCheck(),
+            "serializedObj" => new ParentCycleCheckSerializable(),
+        );
+        $objectHashes = array();
+        
+        $result = Utilities::serializeForRollbar($obj, null, $objectHashes);
+        
+        $this->assertRegExp(
+            '/<CircularReference.*/',
+            $result["obj"]["value"]["child"]["value"]["parent"]
+        );
+        
+        $this->assertRegExp(
+            '/<CircularReference.*/',
+            $result["serializedObj"]["child"]["parent"]
+        );
+        
+        $this->assertRegExp(
+            '/<CircularReference.*/',
+            $result["payload"]["data"]["body"]["message"][0]["value"]["child"]["value"]["parent"]
+        );
+    }
 
     public function testSerializeForRollbarNestingLevels()
     {
@@ -116,12 +152,15 @@ class UtilitiesTest extends BaseRollbarTest
                 ),
             ),
         );
-        $result = Utilities::serializeForRollbar($obj, null, 2);
+        
+        $objectHashes = array();
+        $result = Utilities::serializeForRollbar($obj, null, $objectHashes, 2);
         $this->assertArrayHasKey('one', $result);
         $this->assertArrayHasKey('two', $result['one']);
         $this->assertArrayNotHasKey('three', $result['one']['two']);
 
-        $result = Utilities::serializeForRollbar($obj, null, 3);
+        $objectHashes = array();
+        $result = Utilities::serializeForRollbar($obj, null, $objectHashes, 3);
         $this->assertArrayHasKey('one', $result);
         $this->assertArrayHasKey('two', $result['one']);
         $this->assertArrayHasKey('three', $result['one']['two']);

@@ -29,7 +29,10 @@ class Body implements \Serializable
     {
         $result = array();
         $result[$this->value->getKey()] = $this->value;
-        return $this->utilities->serializeForRollbar($result);
+        
+        $objectHashes = \Rollbar\Utilities::getObjectHashes();
+        
+        return $this->utilities->serializeForRollbar($result, null, $objectHashes);
     }
     
     public function unserialize($serialized)
