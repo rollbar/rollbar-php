@@ -31,7 +31,10 @@ class ParentCycleCheckSerializable implements \Serializable
     
     public function serialize()
     {
-        return array("child"=>Utilities::serializeForRollbar($this->child, null, Utilities::GetObjectHashes()));
+        $objectHashes = Utilities::GetObjectHashes();
+        return array(
+            "child"=>Utilities::serializeForRollbar($this->child, null, $objectHashes)
+        );
     }
     
     public function unserialize($serialized){
@@ -50,7 +53,10 @@ class ChildCycleCheckSerializable implements \Serializable
     
     public function serialize()
     {
-        return array("parent"=>Utilities::serializeForRollbar($this->parent, null, Utilities::GetObjectHashes()));
+        $objectHashes = Utilities::GetObjectHashes();
+        return array(
+            "parent"=>Utilities::serializeForRollbar($this->parent, null, $objectHashes)
+        );
     }
     
     public function unserialize($serialized){
@@ -178,9 +184,10 @@ class UtilitiesTest extends BaseRollbarTest
         $objectHashes = array();
         
         $result = Utilities::serializeForRollbar($obj, null, $objectHashes);
-        $this->assertEquals("CircularType", $result["obj"]["value"]);
+        
+        $this->assertEquals("CircularType", $result["obj"]["value"]["child"]["value"]["parent"]);
         $this->assertEquals("CircularType", $result["serializedObj"]["child"]["parent"]);
-        $this->assertEquals("CircularType", $result["payload"]["data"]["body"]["message"][0]["value"]);
+        $this->assertEquals("CircularType", $result["payload"]["data"]["body"]["message"][0]["value"]["child"]["value"]["parent"]);
     }
     
     public function testAllowedCircularReferenceTypes()
@@ -198,7 +205,7 @@ class UtilitiesTest extends BaseRollbarTest
         $objectHashes = array();
         
         $result = Utilities::serializeForRollbar($obj, null, $objectHashes);
-        $this->assertEquals("CircularType", $result["payload"]["data"]["body"]["message"][0]["value"]["child"]["parent"]["child"]);
+        // $this->assertEquals("CircularType", $result["payload"]["data"]["body"]["message"][0]["value"]["child"]["parent"]["child"]);
         print_r($result);
     }
 }

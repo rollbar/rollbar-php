@@ -85,28 +85,39 @@ final class Utilities
         
         $returnVal = array();
         
-        if(is_object($obj) &&  !self::serializedOnce($obj, $objectHashes)) {
-            return "CircularType";
+        if(is_object($obj)) {
+            if (self::serializedAlready($obj, $objectHashes)) {
+                return "CircularType";    
+            } else {
+                $objectHashes[spl_object_hash ($obj)] = true;
+                self::$ObjectHashes = $objectHashes;
+            }
         }
         
         foreach ($obj as $key => $val) {
             if ($val instanceof \Serializable) {
-                if(self::serializedOnce($val, $objectHashes)) {
-                    $val = $val->serialize();
-                } else {
+                
+                if(self::serializedAlready($val, $objectHashes)) {
                     $val = "CircularType";
+                } else {
+                    
+                    $objectHashes[spl_object_hash($val)] = true;
+                    self::$ObjectHashes = $objectHashes;
+                    
+                    $val = $val->serialize();
                 }
                 
             } elseif (is_array($val)) {
                 $val = self::serializeForRollbar($val, $customKeys, $objectHashes);
             } elseif (is_object($val)) {
-                if(self::serializedOnce($val, $objectHashes)) {
+                
+                if(self::serializedAlready($val, $objectHashes)) {
+                    $val = "CircularType";
+                } else {
                     $val = array(
                         'class' => get_class($val),
                         'value' => self::serializeForRollbar($val, $customKeys, $objectHashes)
                     );
-                } else {
-                    $val = "CircularType";
                 }
             }
             
@@ -118,6 +129,15 @@ final class Utilities
         }
 
         return $returnVal;
+    }
+    
+    private static function serializedAlready($obj, &$objectHashes)
+    {
+        if(!isset($objectHashes[spl_object_hash ($obj)])) {
+            return false;
+        }
+        
+        return true;
     }
 
     private static function serializedOnce($obj, &$objectHashes)

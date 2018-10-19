@@ -149,7 +149,10 @@ class Request implements \Serializable
         foreach ($this->extra as $key => $val) {
             $result[$key] = $val;
         }
-        return $this->utilities->serializeForRollbar($result, array_keys($this->extra), \Rollbar\Utilities::GetObjectHashes());
+        
+        $objectHashes = \Rollbar\Utilities::GetObjectHashes();
+        
+        return $this->utilities->serializeForRollbar($result, array_keys($this->extra), $objectHashes);
     }
     
     public function unserialize($serialized)
