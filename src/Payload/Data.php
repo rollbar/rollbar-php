@@ -251,7 +251,7 @@ class Data implements \Serializable
             "notifier" => $this->notifier,
         );
         
-        $objectHashes = \Rollbar\Utilities::GetObjectHashes();
+        $objectHashes = \Rollbar\Utilities::getObjectHashes();
         
         return $this->utilities->serializeForRollbar($result, null, $objectHashes);
     }

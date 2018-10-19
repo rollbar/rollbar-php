@@ -106,7 +106,7 @@ class Frame implements \Serializable
             "args" => $this->args
         );
         
-        $objectHashes = \Rollbar\Utilities::GetObjectHashes();
+        $objectHashes = \Rollbar\Utilities::getObjectHashes();
         
         return $this->utilities->serializeForRollbar($result, null, $objectHashes);
     }

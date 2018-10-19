@@ -4,7 +4,7 @@ final class Utilities
 {
     private static $ObjectHashes;
     
-    public static function GetObjectHashes() 
+    public static function getObjectHashes()
     {
         return self::$ObjectHashes;
     }
@@ -85,43 +85,31 @@ final class Utilities
         
         $returnVal = array();
         
-        if(is_object($obj)) {
+        if (is_object($obj)) {
             if (self::serializedAlready($obj, $objectHashes)) {
-                return self::circularReferenceLabel($obj);    
+                return self::circularReferenceLabel($obj);
             } else {
                 self::markSerialized($obj, $objectHashes);
             }
         }
         
         foreach ($obj as $key => $val) {
-            
             if (is_object($val)) {
-                
-                if(self::serializedAlready($val, $objectHashes)) {
-                    
+                if (self::serializedAlready($val, $objectHashes)) {
                     $val = self::circularReferenceLabel($val);
-                    
                 } else {
-                    
                     if ($val instanceof \Serializable) {
-                        
                         self::markSerialized($val, $objectHashes);
                         $val = $val->serialize();
-                        
                     } else {
-                        
                         $val = array(
                             'class' => get_class($val),
                             'value' => self::serializeForRollbar($val, $customKeys, $objectHashes)
                         );
-                        
                     }
                 }
-                
             } elseif (is_array($val)) {
-                
                 $val = self::serializeForRollbar($val, $customKeys, $objectHashes);
-                
             }
             
             if ($customKeys !== null && in_array($key, $customKeys)) {
@@ -136,7 +124,7 @@ final class Utilities
     
     private static function serializedAlready($obj, &$objectHashes)
     {
-        if(!isset($objectHashes[spl_object_hash ($obj)])) {
+        if (!isset($objectHashes[spl_object_hash($obj)])) {
             return false;
         }
         
@@ -145,7 +133,7 @@ final class Utilities
     
     private static function markSerialized($obj, &$objectHashes)
     {
-        $objectHashes[spl_object_hash ($obj)] = true;
+        $objectHashes[spl_object_hash($obj)] = true;
         self::$ObjectHashes = $objectHashes;
     }
     

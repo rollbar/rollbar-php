@@ -56,7 +56,7 @@ class ExceptionInfo implements \Serializable
             "description" => $this->description,
         );
         
-        $objectHashes = \Rollbar\Utilities::GetObjectHashes();
+        $objectHashes = \Rollbar\Utilities::getObjectHashes();
         
         return $this->utilities->serializeForRollbar($result, null, $objectHashes);
     }

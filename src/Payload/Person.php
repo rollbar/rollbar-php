@@ -77,7 +77,7 @@ class Person implements \Serializable
             $result[$key] = $val;
         }
         
-        $objectHashes = \Rollbar\Utilities::GetObjectHashes();
+        $objectHashes = \Rollbar\Utilities::getObjectHashes();
         
         return $this->utilities->serializeForRollbar($result, array_keys($this->extra), $objectHashes);
     }

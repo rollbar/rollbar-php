@@ -1,69 +1,9 @@
 <?php namespace Rollbar;
 
-class ParentCycleCheck
-{
-    public $child;
-    
-    public function __construct() 
-    {
-        $this->child = new ChildCycleCheck($this);
-    }
-}
-
-class ChildCycleCheck
-{
-    public $parent;
-    
-    public function __construct($parent) 
-    {
-        $this->parent = $parent;
-    }
-}
-
-class ParentCycleCheckSerializable implements \Serializable
-{
-    public $child;
-    
-    public function __construct() 
-    {
-        $this->child = new ChildCycleCheck($this);
-    }
-    
-    public function serialize()
-    {
-        $objectHashes = Utilities::GetObjectHashes();
-        return array(
-            "child"=>Utilities::serializeForRollbar($this->child, null, $objectHashes)
-        );
-    }
-    
-    public function unserialize($serialized){
-        
-    }
-}
-
-class ChildCycleCheckSerializable implements \Serializable
-{
-    public $parent;
-    
-    public function __construct($parent) 
-    {
-        $this->parent = $parent;
-    }
-    
-    public function serialize()
-    {
-        $objectHashes = Utilities::GetObjectHashes();
-        return array(
-            "parent"=>Utilities::serializeForRollbar($this->parent, null, $objectHashes)
-        );
-    }
-    
-    public function unserialize($serialized){
-        
-    }
-}
-
+use Rollbar\CycleCheck\ParentCycleCheck;
+use Rollbar\CycleCheck\ChildCycleCheck;
+use Rollbar\CycleCheck\ParentCycleCheckSerializable;
+use Rollbar\CycleCheck\ChildCycleCheckSerializable;
 
 class UtilitiesTest extends BaseRollbarTest
 {
@@ -185,8 +125,19 @@ class UtilitiesTest extends BaseRollbarTest
         
         $result = Utilities::serializeForRollbar($obj, null, $objectHashes);
         
-        $this->assertRegExp('/<CircularReference.*/', $result["obj"]["value"]["child"]["value"]["parent"]);
-        $this->assertRegExp('/<CircularReference.*/', $result["serializedObj"]["child"]["parent"]);
-        $this->assertRegExp('/<CircularReference.*/', $result["payload"]["data"]["body"]["message"][0]["value"]["child"]["value"]["parent"]);
+        $this->assertRegExp(
+            '/<CircularReference.*/',
+            $result["obj"]["value"]["child"]["value"]["parent"]
+        );
+        
+        $this->assertRegExp(
+            '/<CircularReference.*/',
+            $result["serializedObj"]["child"]["parent"]
+        );
+        
+        $this->assertRegExp(
+            '/<CircularReference.*/',
+            $result["payload"]["data"]["body"]["message"][0]["value"]["child"]["value"]["parent"]
+        );
     }
 }

@@ -30,7 +30,7 @@ class Body implements \Serializable
         $result = array();
         $result[$this->value->getKey()] = $this->value;
         
-        $objectHashes = \Rollbar\Utilities::GetObjectHashes();
+        $objectHashes = \Rollbar\Utilities::getObjectHashes();
         
         return $this->utilities->serializeForRollbar($result, null, $objectHashes);
     }
