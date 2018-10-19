@@ -55,7 +55,8 @@ class Config
         'send_message_trace',
         'include_raw_request_body',
         'local_vars_dump',
-        'max_nesting_depth'
+        'max_nesting_depth',
+        'max_items'
     );
     
     private $accessToken;
@@ -139,6 +140,11 @@ class Config
      */
     private $customTruncation;
     
+    /**
+     * @var int The maximum number of items reported to Rollbar within one
+     * request.
+     */
+    private $maxItems;
 
     public function __construct(array $configArray)
     {
@@ -223,6 +229,11 @@ class Config
         $this->useErrorReporting = \Rollbar\Defaults::get()->useErrorReporting();
         if (isset($config['use_error_reporting'])) {
             $this->useErrorReporting = $config['use_error_reporting'];
+        }
+        
+        $this->maxItems = \Rollbar\Defaults::get()->maxItems();
+        if (isset($config['max_items'])) {
+            $this->maxItems = $config['max_items'];
         }
         
         if (isset($config['custom_truncation'])) {
@@ -582,6 +593,11 @@ class Config
     public function getMaxNestingDepth()
     {
         return $this->maxNestingDepth;
+    }
+    
+    public function getMaxItems()
+    {
+        return $this->maxItems;
     }
 
     /**

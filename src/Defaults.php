@@ -302,6 +302,11 @@ class Defaults
     {
         return $value !== null ? $value : $this->maxNestingDepth;
     }
+    
+    public function maxItems($value = null)
+    {
+        return $value !== null ? $value : $this->maxItems;
+    }
 
     private $psrLevels;
     private $errorLevels;
@@ -347,4 +352,5 @@ class Defaults
     private $captureUsername = false;
     private $scrubFields;
     private $customTruncation = null;
+    private $maxItems = 10;
 }
