@@ -87,7 +87,7 @@ final class Utilities
         
         if(is_object($obj)) {
             if (self::serializedAlready($obj, $objectHashes)) {
-                return "CircularType";    
+                return self::circularReferenceLabel($obj);    
             } else {
                 self::markSerialized($obj, $objectHashes);
             }
@@ -99,7 +99,7 @@ final class Utilities
                 
                 if(self::serializedAlready($val, $objectHashes)) {
                     
-                    $val = "CircularType";
+                    $val = self::circularReferenceLabel($val);
                     
                 } else {
                     
@@ -147,6 +147,11 @@ final class Utilities
     {
         $objectHashes[spl_object_hash ($obj)] = true;
         self::$ObjectHashes = $objectHashes;
+    }
+    
+    private static function circularReferenceLabel($obj)
+    {
+        return '<CircularReference type:('.get_class($obj).') ref:('.spl_object_hash($obj).')>';
     }
     
     // from http://www.php.net/manual/en/function.uniqid.php#94959

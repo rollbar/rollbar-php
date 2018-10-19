@@ -185,27 +185,8 @@ class UtilitiesTest extends BaseRollbarTest
         
         $result = Utilities::serializeForRollbar($obj, null, $objectHashes);
         
-        $this->assertEquals("CircularType", $result["obj"]["value"]["child"]["value"]["parent"]);
-        $this->assertEquals("CircularType", $result["serializedObj"]["child"]["parent"]);
-        $this->assertEquals("CircularType", $result["payload"]["data"]["body"]["message"][0]["value"]["child"]["value"]["parent"]);
-    }
-    
-    public function testAllowedCircularReferenceTypes()
-    {
-        $config = new Config(array(
-            "access_token"=>$this->getTestAccessToken(), 
-            "allowed_circular_reference_types"=> array("ParentCycleCheck")
-        ));
-        $data = $config->getRollbarData(\Rollbar\Payload\Level::WARNING, "String", array(new ParentCycleCheck()));
-        $payload = new \Rollbar\Payload\Payload($data, $this->getTestAccessToken());
-        $obj = array(
-            "one_two" => array(1, 2),
-            "payload" => $payload,
-        );
-        $objectHashes = array();
-        
-        $result = Utilities::serializeForRollbar($obj, null, $objectHashes);
-        // $this->assertEquals("CircularType", $result["payload"]["data"]["body"]["message"][0]["value"]["child"]["parent"]["child"]);
-        print_r($result);
+        $this->assertRegExp('/<CircularReference.*/', $result["obj"]["value"]["child"]["value"]["parent"]);
+        $this->assertRegExp('/<CircularReference.*/', $result["serializedObj"]["child"]["parent"]);
+        $this->assertRegExp('/<CircularReference.*/', $result["payload"]["data"]["body"]["message"][0]["value"]["child"]["value"]["parent"]);
     }
 }
