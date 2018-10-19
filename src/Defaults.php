@@ -273,11 +273,6 @@ class Defaults
         return $value !== null ? $value : $this->useErrorReporting;
     }
 
-    public function verbosity($value = null)
-    {
-        return $value !== null ? $value : $this->verbosity;
-    }
-
     public function captureIP($value = null)
     {
         return $value !== null ? $value : $this->captureIP;
@@ -347,7 +342,6 @@ class Defaults
     private $timeout = 3;
     private $reportSuppressed = false;
     private $useErrorReporting = false;
-    private $verbosity = \Psr\Log\LogLevel::ERROR;
     private $captureIP = true;
     private $captureEmail = false;
     private $captureUsername = false;

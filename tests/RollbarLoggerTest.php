@@ -142,8 +142,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         $logger = new RollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php",
-            "transformer" => '\Rollbar\TestHelpers\MalformedPayloadDataTransformer',
-            "verbosity" => \Psr\Log\LogLevel::DEBUG
+            "transformer" => '\Rollbar\TestHelpers\MalformedPayloadDataTransformer'
         ));
         
         $response = $logger->log(

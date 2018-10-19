@@ -55,8 +55,7 @@ class Config
         'send_message_trace',
         'include_raw_request_body',
         'local_vars_dump',
-        'max_nesting_depth',
-        'verbosity'
+        'max_nesting_depth'
     );
     
     private $accessToken;
@@ -134,14 +133,6 @@ class Config
     private $sendMessageTrace = false;
     
     /**
-     * @var string (One of the \Psr\Log\LogLevel constants) How much debugging
-     * info should be recorded in the Rollbar debug log file.
-     * ($rollbarLogger->getDebugLogFile() => commonly /tmp/rollbar.debug.log.
-     * Default: Psr\Log\LogLevel::ERROR
-     */
-    private $verbosity;
-    
-    /**
      * @var string (fully qualified class name) The name of the your custom
      * truncation strategy class. The class should inherit from
      * Rollbar\Truncation\AbstractStrategy.
@@ -151,7 +142,6 @@ class Config
 
     public function __construct(array $configArray)
     {
-        $this->verbosity = \Rollbar\Defaults::get()->verbosity();
         $this->includedErrno = \Rollbar\Defaults::get()->includedErrno();
         
         $this->levelFactory = new LevelFactory();
@@ -492,20 +482,6 @@ class Config
         }
 
         $this->sendMessageTrace = $config['send_message_trace'];
-    }
-    
-    private function setVerbosity($config)
-    {
-        if (!isset($config['verbosity'])) {
-            return;
-        }
-
-        $this->verbosity = $config['verbosity'];
-    }
-    
-    public function getVerbosity()
-    {
-        return $this->verbosity;
     }
 
     /**

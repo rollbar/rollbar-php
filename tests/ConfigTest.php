@@ -248,19 +248,6 @@ class ConfigTest extends BaseRollbarTest
             $config->getSender()->getEndpoint()
         );
     }
-    
-    public function testVerbosity()
-    {
-        $expected = 3;
-        
-        $config = new Config(array(
-            "access_token" => $this->getTestAccessToken(),
-            "environment" => $this->env,
-            "verbosity" => $expected
-        ));
-        
-        $this->assertEquals($expected, $config->getVerbosity());
-    }
 
     public function testCustom()
     {

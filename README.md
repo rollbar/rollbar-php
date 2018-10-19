@@ -40,8 +40,6 @@ Yii2 package: [baibaratsky/yii2-rollbar](https://github.com/baibaratsky/yii2-rol
 If you run into any issues, please email us at [support@rollbar.com](mailto:support@rollbar.com)
 
 For bug reports, please [open an issue on GitHub](https://github.com/rollbar/rollbar-php/issues/new).
-The best, configure your Rollbar with `verbosity` at level `\Psr\Log\LogLevel::DEBUG` and attach
-the contents of your `sys_get_temp_dir() . '/rollbar.debug.log'` (usually `/tmp/rollbar.debug.log`).
 
 # Contributing
 
