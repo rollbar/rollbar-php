@@ -76,7 +76,12 @@ class Defaults
     {
         $spaced = str_replace('_', ' ', $option);
         $method = lcfirst(str_replace(' ', '', ucwords($spaced)));
-        return $this->$method();
+        
+        if (method_exists($this, $method)) {
+            return $this->$method();
+        } else {
+            throw new \Exception('No default value defined for property ' . $method . '.');
+        }
     }
     
     private $utilities;
