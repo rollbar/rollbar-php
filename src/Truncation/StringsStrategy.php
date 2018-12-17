@@ -38,7 +38,9 @@ class StringsStrategy extends AbstractStrategy
         
         foreach ($data as $key => &$value) {
             if (is_array($value)) {
-                return $this->traverse($value, $threshold, $payload);
+                if ($this->traverse($value, $threshold, $payload)) {
+                    $modified = true;
+                }
             } else {
                 $strlen = strlen($value);
                 if (is_string($value) && $strlen > $threshold) {

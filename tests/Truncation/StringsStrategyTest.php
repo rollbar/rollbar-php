@@ -8,6 +8,7 @@ use \Rollbar\BaseRollbarTest;
 
 class StringsStrategyTest extends BaseRollbarTest
 {
+    
     /**
      * @dataProvider executeProvider
      */
@@ -48,13 +49,19 @@ class StringsStrategyTest extends BaseRollbarTest
         $stringLengthToTrim = $threshold+1;
         
         $payload = $this->payloadStructureProvider(array());
+        $payload['data']['body']['message']['body']['value2'] = array();
         $expected = $this->payloadStructureProvider(array());
+        $expected['data']['body']['message']['body']['value2'] = array();
         
         while (strlen(json_encode($payload)) < Truncation::MAX_PAYLOAD_SIZE) {
             $payload['data']['body']['message']['body']['value'] []=
                 str_repeat('A', $stringLengthToTrim);
+            $payload['data']['body']['message']['body']['value2'] []=
+                str_repeat('A', $stringLengthToTrim);
                 
             $expected['data']['body']['message']['body']['value'] []=
+                str_repeat('A', $threshold);
+            $expected['data']['body']['message']['body']['value2'] []=
                 str_repeat('A', $threshold);
         }
         
