@@ -40,7 +40,8 @@ class StringsStrategy extends AbstractStrategy
             if (is_array($value)) {
                 return $this->traverse($value, $threshold, $payload);
             } else {
-                if (is_string($value) && $strlen = strlen($value) > $threshold) {
+                $strlen = strlen($value);
+                if (is_string($value) && $strlen > $threshold) {
                     $value = substr($value, 0, $threshold);
                     $modified = true;
                     $payload->decreaseSize($strlen - $threshold);
