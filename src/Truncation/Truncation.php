@@ -5,7 +5,7 @@ use \Rollbar\Config;
 
 class Truncation
 {
-    const MAX_PAYLOAD_SIZE = 524288; // 512 * 1024
+    const MAX_PAYLOAD_SIZE = 131072; // 128 * 1024
  
     protected static $truncationStrategies = array(
         "Rollbar\Truncation\FramesStrategy",
