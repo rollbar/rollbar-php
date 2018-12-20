@@ -23,7 +23,7 @@ class EncodedPayload
     
     public function decreaseSize($amount)
     {
-        $this->size =- $amount;
+        $this->size -= $amount;
     }
     
     public function encode($data = null)

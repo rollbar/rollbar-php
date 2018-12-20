@@ -81,7 +81,8 @@ class TruncationTest extends BaseRollbarTest
         }
         
         $data = array_merge(
-            $stringsTest->executeProvider(),
+            $stringsTest->executeTruncateNothingProvider(),
+            $stringsTest->executearrayProvider(),
             $framesTestData
         );
         

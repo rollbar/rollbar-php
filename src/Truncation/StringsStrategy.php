@@ -16,6 +16,8 @@ class StringsStrategy extends AbstractStrategy
         $modified = false;
         
         foreach (static::getThresholds() as $threshold) {
+            $maxPayloadSize = \Rollbar\Truncation\Truncation::MAX_PAYLOAD_SIZE;
+            
             if (!$this->truncation->needsTruncating($payload, $this)) {
                 break;
             }
