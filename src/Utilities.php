@@ -101,21 +101,21 @@ final class Utilities
 
         foreach ($obj as $key => $val) {
             if (is_object($val)) {
-                if (self::serializedAlready($val, $objectHashes)) {
-                    $val = self::circularReferenceLabel($val);
-                } else {
-                    if ($val instanceof \Serializable) {
-                        self::markSerialized($val, $objectHashes);
-                        $val = $val->serialize();
-                    } else {
-                        $val = array(
-                            'class' => get_class($val),
-                            'value' => self::serializeForRollbar($val, $customKeys, $objectHashes, $maxDepth, $depth+1)
-                        );
-                    }
-                }
+                $val = self::serializeObject(
+                    $val,
+                    $customKeys,
+                    $objectHashes,
+                    $maxDepth,
+                    $depth
+                );
             } elseif (is_array($val)) {
-                $val = self::serializeForRollbar($val, $customKeys, $objectHashes, $maxDepth, $depth+1);
+                $val = self::serializeForRollbar(
+                    $val,
+                    $customKeys,
+                    $objectHashes,
+                    $maxDepth,
+                    $depth+1
+                );
             }
             
             if ($customKeys !== null && in_array($key, $customKeys)) {
@@ -126,6 +126,43 @@ final class Utilities
         }
 
         return $returnVal;
+    }
+    
+    private static function serializeObject(
+        $obj,
+        array $customKeys = null,
+        &$objectHashes = array(),
+        $maxDepth = -1,
+        $depth = 0
+    ) {
+        $serialized = null;
+        
+        if (self::serializedAlready($obj, $objectHashes)) {
+            $serialized = self::circularReferenceLabel($obj);
+        } else {
+            if ($obj instanceof \Serializable) {
+                self::markSerialized($obj, $objectHashes);
+                $serialized = $obj->serialize();
+            } else {
+                $serialized = array(
+                    'class' => get_class($obj)
+                );
+                
+                if ($obj instanceof \Iterator) {
+                    $serialized['value'] = 'non-serializable';
+                } else {
+                    $serialized['value'] = self::serializeForRollbar(
+                        $obj,
+                        $customKeys,
+                        $objectHashes,
+                        $maxDepth,
+                        $depth+1
+                    );
+                }
+            }
+        }
+        
+        return $serialized;
     }
     
     private static function serializedAlready($obj, &$objectHashes)
