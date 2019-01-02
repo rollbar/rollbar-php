@@ -11,7 +11,6 @@ php:
   - hhvm-3.6
   - hhvm-3.18
   - hhvm
-  - hhvm-nightly
 matrix:
   include:
     - php: 5.3
