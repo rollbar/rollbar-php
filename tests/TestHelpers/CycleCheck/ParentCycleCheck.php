@@ -1,4 +1,4 @@
-<?php namespace Rollbar\CycleCheck;
+<?php namespace Rollbar\TestHelpers\CycleCheck;
 
 class ParentCycleCheck
 {

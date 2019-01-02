@@ -458,7 +458,7 @@ class RollbarLoggerTest extends BaseRollbarTest
 
         $this->scrubTestAssert(
             "Request body context",
-            $result['data']['body']['message']['context1']
+            $result['data']['body']['extra']['context1']
         );
     }
     

@@ -1,4 +1,4 @@
-<?php namespace Rollbar\ChildCycle;
+<?php namespace Rollbar\TestHelpers\ChildCycle;
 
 class ChildCycleCheckSerializable implements \Serializable
 {

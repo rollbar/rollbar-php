@@ -1,9 +1,9 @@
 <?php namespace Rollbar;
 
-use Rollbar\CycleCheck\ParentCycleCheck;
-use Rollbar\CycleCheck\ChildCycleCheck;
-use Rollbar\CycleCheck\ParentCycleCheckSerializable;
-use Rollbar\CycleCheck\ChildCycleCheckSerializable;
+use Rollbar\TestHelpers\CycleCheck\ParentCycleCheck;
+use Rollbar\TestHelpers\CycleCheck\ChildCycleCheck;
+use Rollbar\TestHelpers\CycleCheck\ParentCycleCheckSerializable;
+use Rollbar\TestHelpers\CycleCheck\ChildCycleCheckSerializable;
 
 class UtilitiesTest extends BaseRollbarTest
 {
@@ -137,7 +137,7 @@ class UtilitiesTest extends BaseRollbarTest
         
         $this->assertRegExp(
             '/<CircularReference.*/',
-            $result["payload"]["data"]["body"]["message"][0]["value"]["child"]["value"]["parent"]
+            $result["payload"]["data"]["body"]["extra"][0]["value"]["child"]["value"]["parent"]
         );
     }
 

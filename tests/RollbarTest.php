@@ -105,9 +105,11 @@ class RollbarTest extends BaseRollbarTest
             )
         );
         
+        $extra = $payload->getData()->getBody()->getExtra();
+        
         $this->assertEquals(
             "some value",
-            $payload->getData()->getBody()->getValue()->some_key
+            $extra['some_key']
         );
     }
     

@@ -401,9 +401,9 @@ class DataBuilder implements DataBuilderInterface
         } elseif ($toLog instanceof $baseException) {
             $content = $this->getExceptionTrace($toLog);
         } else {
-            $content = $this->getMessage($toLog, $context);
+            $content = $this->getMessage($toLog);
         }
-        return new Body($content);
+        return new Body($content, $context);
     }
 
     public function getErrorTrace(ErrorWrapper $error)
@@ -531,11 +531,10 @@ class DataBuilder implements DataBuilderInterface
         }
     }
 
-    protected function getMessage($toLog, $context)
+    protected function getMessage($toLog)
     {
         return new Message(
             (string)$toLog,
-            $context,
             $this->sendMessageTrace ?
             debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS) :
             null
