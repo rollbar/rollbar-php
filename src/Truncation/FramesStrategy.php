@@ -12,16 +12,19 @@ class FramesStrategy extends AbstractStrategy
         $key = false;
         $data = $payload->data();
 
-        if (isset($data['data']['body']['trace_chain']['frames'])) {
+        if (isset($data['data']['body']['trace_chain'])) {
             $key = 'trace_chain';
+            foreach ($data['data']['body']['trace_chain'] as $offset => $value) {
+                $data['data']['body']['trace_chain'][$offset]['frames'] = $this->selectFrames($value['frames']);
+            }
         } elseif (isset($data['data']['body']['trace']['frames'])) {
             $key = 'trace';
+            $data['data']['body'][$key]['frames'] = $this->selectFrames($data['data']['body'][$key]['frames']);
         }
         
         
         
         if ($key) {
-            $data['data']['body'][$key]['frames'] = $this->selectFrames($data['data']['body'][$key]['frames']);
             $payload->encode($data);
         }
 

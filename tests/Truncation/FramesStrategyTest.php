@@ -39,10 +39,10 @@ class FramesStrategyTest extends BaseRollbarTest
             ),
             'nothing to truncate using trace_chain key' => array(
                 array('data' => array('body' =>
-                    array('trace_chain' => array('frames' => range(1, 6)))
+                    array('trace_chain' => array(array('frames' => range(1, 6))))
                 )),
                 array('data' => array('body' =>
-                    array('trace_chain' => array('frames' => range(1, 6)))
+                    array('trace_chain' => array(array('frames' => range(1, 6))))
                 ))
             ),
             'truncate middle using trace key' => array(
@@ -75,9 +75,11 @@ class FramesStrategyTest extends BaseRollbarTest
                 array('data' => array('body' =>
                     array(
                         'trace_chain' => array(
-                            'frames' => range(
-                                1,
-                                FramesStrategy::FRAMES_OPTIMIZATION_RANGE * 2 + 1
+                            array(
+                                'frames' => range(
+                                    1,
+                                    FramesStrategy::FRAMES_OPTIMIZATION_RANGE * 2 + 1
+                                )
                             )
                         )
                     )
@@ -85,11 +87,13 @@ class FramesStrategyTest extends BaseRollbarTest
                 array('data' => array('body' =>
                     array(
                         'trace_chain' => array(
-                            'frames' => array_merge(
-                                range(1, FramesStrategy::FRAMES_OPTIMIZATION_RANGE),
-                                range(
-                                    FramesStrategy::FRAMES_OPTIMIZATION_RANGE + 2,
-                                    FramesStrategy::FRAMES_OPTIMIZATION_RANGE * 2 + 1
+                            array(
+                                'frames' => array_merge(
+                                    range(1, FramesStrategy::FRAMES_OPTIMIZATION_RANGE),
+                                    range(
+                                        FramesStrategy::FRAMES_OPTIMIZATION_RANGE + 2,
+                                        FramesStrategy::FRAMES_OPTIMIZATION_RANGE * 2 + 1
+                                    )
                                 )
                             )
                         )
