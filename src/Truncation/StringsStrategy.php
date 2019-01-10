@@ -44,8 +44,7 @@ class StringsStrategy extends AbstractStrategy
                     $modified = true;
                 }
             } else {
-                $strlen = strlen($value);
-                if (is_string($value) && $strlen > $threshold) {
+                if (is_string($value) && (($strlen = strlen($value)) > $threshold)) {
                     $value = substr($value, 0, $threshold);
                     $modified = true;
                     $payload->decreaseSize($strlen - $threshold);
