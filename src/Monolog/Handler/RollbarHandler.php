@@ -9,6 +9,15 @@
  *
  * Using Monolog's handler is the recommended approach when using Rollbar
  * with Monolog.
+ *
+ * !!! 1/17/2019 UPDATE !!!
+ * Rollbar PHP SDK is dropping dependency on the Monolog library completely. For
+ * a while the Monolog library provided a mechanism to report to Rollbar as
+ * part of their `2.0.0-beta`.
+ * IF you decide to use this class, i.e. due to legacy code, please make sure
+ * to require `Seldaek/monolog:v1.24` in your project by yourself. Otherwise,
+ * using this class will result in a fatal error due to lack of the Monolog
+ * library.
  */
 
 /*
