@@ -268,7 +268,9 @@ class ScrubberTest extends BaseRollbarTest
                             'sensitive' => 'scrubit',
                             'arg2' => array(
                                 'arg3' => 'val 3',
-                                'sensitive' => 'scrubit'
+                                'sensitive' => 'scrubit',
+                                'SENSITIVE' => 'scrubit',
+                                'sensitive2' => 'scrubit'
                             )
                         )
                     ),
@@ -280,7 +282,8 @@ class ScrubberTest extends BaseRollbarTest
             array( // $scrubFields
                 'sensitive data',
                 'recursive sensitive data',
-                'sensitive'
+                'sensitive',
+                'SENSITIVE2'
             ),
             array( // $expected
                 'non sensitive data 1' => '123',
@@ -295,7 +298,9 @@ class ScrubberTest extends BaseRollbarTest
                             'sensitive' => 'xxxxxxxx',
                             'arg2' => array(
                                 'arg3' => 'val 3',
-                                'sensitive' => 'xxxxxxxx'
+                                'sensitive' => 'xxxxxxxx',
+                                'SENSITIVE' => 'xxxxxxxx',
+                                'sensitive2' => 'xxxxxxxx'
                             )
                         )
                     ),
@@ -325,14 +330,20 @@ class ScrubberTest extends BaseRollbarTest
             'flat data array' => array(
                 array( // $testData
                     'non sensitive data' => '123',
-                    'sensitive data' => '456'
+                    'sensitive data' => '456',
+                    'UPPERCASE SENSITIVE DATA' => '789',
+                    'also sensitive data' => '012'
                 ),
                 array( // $scrubFields
-                    'sensitive data'
+                    'sensitive data',
+                    'uppercase sensitive data',
+                    'ALSO SENSITIVE DATA'
                 ),
                 array( // $expected
                     'non sensitive data' => '123',
-                    'sensitive data' => '********'
+                    'sensitive data' => '********',
+                    'UPPERCASE SENSITIVE DATA' => '********',
+                    'also sensitive data' => '********'
                 )
             ),
             'recursive data array' => array(

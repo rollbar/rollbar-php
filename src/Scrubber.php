@@ -57,7 +57,8 @@ class Scrubber implements ScrubberInterface
             return $data;
         }
 
-        $fields = array_flip($fields);
+        // Scrub fields is case insensitive, so force all fields to lowercase
+        $fields = array_change_key_case(array_flip($fields), CASE_LOWER);
 
         return $this->internalScrub($data, $fields, $replacement, $path);
     }
@@ -110,7 +111,7 @@ class Scrubber implements ScrubberInterface
                 return;
             }
 
-            if (isset($fields[$key])) {
+            if (isset($fields[strtolower($key)])) {
                 $val = $replacement;
             } else {
                 $val = $scrubber->internalScrub($val, $fields, $replacement, $current);
