@@ -33,9 +33,9 @@ class ErrorHandler extends AbstractHandler
 
         parent::handle();
 
-        if (!is_null($this->previous_handler)) {
+        if (!is_null($this->previousHandler)) {
             $stop_processing = call_user_func(
-                $this->previous_handler,
+                $this->previousHandler,
                 $errno,
                 $errstr,
                 $errfile,
