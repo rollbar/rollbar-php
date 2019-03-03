@@ -10,7 +10,7 @@ php:
   - 5.4
   - hhvm-3.6
   - hhvm-3.18
-  - hhvm
+  - hhvm-3.30
 matrix:
   include:
     - php: 5.3
