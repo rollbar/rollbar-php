@@ -56,7 +56,8 @@ class Config
         'include_raw_request_body',
         'local_vars_dump',
         'max_nesting_depth',
-        'max_items'
+        'max_items',
+        'minimum_level'
     );
     
     private $accessToken;
