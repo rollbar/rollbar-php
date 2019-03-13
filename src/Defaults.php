@@ -313,6 +313,11 @@ class Defaults
         return $value !== null ? $value : $this->maxItems;
     }
 
+    public function minimumLevel($value = null)
+    {
+        return $value !== null ? $value : $this->minimumLevel;
+    }
+
     private $psrLevels;
     private $errorLevels;
     private $autodetectBranch = false;
@@ -358,4 +363,5 @@ class Defaults
     private $scrubFields;
     private $customTruncation = null;
     private $maxItems = 10;
+    private $minimumLevel = null;
 }
