@@ -57,7 +57,7 @@ class Config
         'local_vars_dump',
         'max_nesting_depth',
         'max_items',
-        'minimum_level'
+        'monolog_minimum_level'
     );
     
     private $accessToken;
@@ -89,7 +89,7 @@ class Config
      * @var FilterInterface
      */
     private $filter;
-    private $minimumLevel;
+    private $monologMinimumLevel;
     /**
      * @var ResponseHandlerInterface
      */
@@ -210,7 +210,7 @@ class Config
         $this->setAccessToken($config);
         $this->setDataBuilder($config);
         $this->setTransformer($config);
-        $this->setMinimumLevel($config);
+        $this->setMonologMinimumLevel($config);
         $this->setReportSuppressed($config);
         $this->setFilters($config);
         $this->setSender($config);
@@ -300,20 +300,20 @@ class Config
         $this->setupWithOptions($config, "transformer", $expected);
     }
 
-    private function setMinimumLevel($config)
+    private function setMonologMinimumLevel($config)
     {
-        $this->minimumLevel = 0;
-        if (empty($config['minimumLevel'])) {
-            $this->minimumLevel = 0;
-        } elseif ($config['minimumLevel'] instanceof Level) {
-            $this->minimumLevel = $config['minimumLevel']->toInt();
-        } elseif (is_string($config['minimumLevel'])) {
-            $level = $this->levelFactory->fromName($config['minimumLevel']);
+        $this->monologMinimumLevel = 0;
+        if (empty($config['monologMinimumLevel'])) {
+            $this->monologMinimumLevel = 0;
+        } elseif ($config['monologMinimumLevel'] instanceof Level) {
+            $this->monologMinimumLevel = $config['monologMinimumLevel']->toInt();
+        } elseif (is_string($config['monologMinimumLevel'])) {
+            $level = $this->levelFactory->fromName($config['monologMinimumLevel']);
             if ($level !== null) {
-                $this->minimumLevel = $level->toInt();
+                $this->monologMinimumLevel = $level->toInt();
             }
-        } elseif (is_int($config['minimumLevel'])) {
-            $this->minimumLevel = $config['minimumLevel'];
+        } elseif (is_int($config['monologMinimumLevel'])) {
+            $this->monologMinimumLevel = $config['monologMinimumLevel'];
         }
     }
 
@@ -601,6 +601,11 @@ class Config
         return $this->maxItems;
     }
 
+    public function getMonologMinimumLevel()
+    {
+        return $this->monologMinimumLevel;
+    }
+
     /**
      * @param Payload $payload
      * @param Level $level
@@ -803,7 +808,7 @@ class Config
      */
     private function levelTooLow($level)
     {
-        return $level->toInt() < $this->minimumLevel;
+        return $level->toInt() < $this->monologMinimumLevel;
     }
 
     private function shouldSuppress()

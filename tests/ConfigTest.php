@@ -150,19 +150,19 @@ class ConfigTest extends BaseRollbarTest
         $this->assertEquals($pPrime, $config->transform($p, "error", "message", "extra_data"));
     }
 
-    public function testMinimumLevel()
+    public function testMonologMinimumLevel()
     {
         $c = new Config(array(
-            "access_token" => $this->getTestAccessToken(),
-            "environment" => $this->env,
-            "minimumLevel" => "warning"
+            'access_token' => $this->getTestAccessToken(),
+            'environment' => $this->env,
+            'monologMinimumLevel' => 'warning'
         ));
         $this->runConfigTest($c);
 
-        $c->configure(array("minimumLevel" => Level::WARNING));
+        $c->configure(array('monologMinimumLevel' => Level::WARNING));
         $this->runConfigTest($c);
         
-        $c->configure(array("minimumLevel" => Level::WARNING()->toInt()));
+        $c->configure(array('monologMinimumLevel' => Level::WARNING()->toInt()));
         $this->runConfigTest($c);
     }
 

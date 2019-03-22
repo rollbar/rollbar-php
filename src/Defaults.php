@@ -313,9 +313,9 @@ class Defaults
         return $value !== null ? $value : $this->maxItems;
     }
 
-    public function minimumLevel($value = null)
+    public function monologMinimumLevel($value = null)
     {
-        return $value !== null ? $value : $this->minimumLevel;
+        return $value !== null ? $value : $this->monologMinimumLevel;
     }
 
     private $psrLevels;
@@ -363,5 +363,5 @@ class Defaults
     private $scrubFields;
     private $customTruncation = null;
     private $maxItems = 10;
-    private $minimumLevel = Logger::ERROR;
+    private $monologMinimumLevel = Logger::ERROR;
 }
