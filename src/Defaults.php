@@ -1,6 +1,6 @@
 <?php namespace Rollbar;
 
-use Rollbar\Utilities;
+use Monolog\Logger;
 use Rollbar\Payload\Notifier;
 use Psr\Log\LogLevel;
 
@@ -363,5 +363,5 @@ class Defaults
     private $scrubFields;
     private $customTruncation = null;
     private $maxItems = 10;
-    private $minimumLevel = null;
+    private $minimumLevel = 0;
 }

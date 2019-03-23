@@ -89,7 +89,12 @@ class Config
      * @var FilterInterface
      */
     private $filter;
+    
+    /**
+     * @var int
+     */
     private $minimumLevel;
+    
     /**
      * @var ResponseHandlerInterface
      */
@@ -302,18 +307,20 @@ class Config
 
     private function setMinimumLevel($config)
     {
-        $this->minimumLevel = 0;
-        if (empty($config['minimumLevel'])) {
-            $this->minimumLevel = 0;
-        } elseif ($config['minimumLevel'] instanceof Level) {
-            $this->minimumLevel = $config['minimumLevel']->toInt();
-        } elseif (is_string($config['minimumLevel'])) {
-            $level = $this->levelFactory->fromName($config['minimumLevel']);
+        $this->minimumLevel = \Rollbar\Defaults::minimumLevel();
+        
+        $override = array_key_exists('minimum_level', $config) ? $config['minimum_level'] : null;
+        $override = array_key_exists('minimumLevel', $config) ? $config['minimumLevel'] : $override;
+        
+        if ($override instanceof Level) {
+            $this->minimumLevel = $override->toInt();
+        } elseif (is_string($override)) {
+            $level = $this->levelFactory->fromName($override);
             if ($level !== null) {
                 $this->minimumLevel = $level->toInt();
             }
-        } elseif (is_int($config['minimumLevel'])) {
-            $this->minimumLevel = $config['minimumLevel'];
+        } elseif (is_int($override)) {
+            $this->minimumLevel = $override;
         }
     }
 
@@ -599,6 +606,11 @@ class Config
     public function getMaxItems()
     {
         return $this->maxItems;
+    }
+
+    public function getMinimumLevel()
+    {
+        return $this->minimumLevel;
     }
 
     /**
