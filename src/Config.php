@@ -307,7 +307,7 @@ class Config
 
     private function setMinimumLevel($config)
     {
-        $this->minimumLevel = \Rollbar\Defaults::minimumLevel();
+        $this->minimumLevel = \Rollbar\Defaults::get()->minimumLevel();
         
         $override = array_key_exists('minimum_level', $config) ? $config['minimum_level'] : null;
         $override = array_key_exists('minimumLevel', $config) ? $config['minimumLevel'] : $override;

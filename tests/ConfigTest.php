@@ -150,45 +150,47 @@ class ConfigTest extends BaseRollbarTest
         $this->assertEquals($pPrime, $config->transform($p, "error", "message", "extra_data"));
     }
 
-    public function testMonologMinimumLevel()
+    public function testMinimumLevel()
     {
-        $c = new Config(array(
+        $config = new Config(array(
+            'access_token' => $this->getTestAccessToken(),
+            'environment' => $this->env
+        ));
+        
+        $this->assertPayloadNotIgnored($config, $this->prepareMockPayload(Level::DEBUG()));
+        
+        $config->configure(array('minimum_level' => Level::WARNING()));
+        
+        $this->assertPayloadIgnored($config, $this->prepareMockPayload(Level::DEBUG()));
+        $this->assertPayloadNotIgnored($config, $this->prepareMockPayload(Level::WARNING()));
+        
+        $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
             'environment' => $this->env,
-            'monologMinimumLevel' => 'warning'
+            'minimumLevel' => Level::ERROR()
         ));
-        $this->runConfigTest($c);
-
-        $c->configure(array('monologMinimumLevel' => Level::WARNING));
-        $this->runConfigTest($c);
         
-        $c->configure(array('monologMinimumLevel' => Level::WARNING()->toInt()));
-        $this->runConfigTest($c);
+        $this->assertPayloadIgnored($config, $this->prepareMockPayload(Level::WARNING()));
+        $this->assertPayloadNotIgnored($config, $this->prepareMockPayload(Level::ERROR()));
     }
-
-    private function runConfigTest($config)
+    
+    public function assertPayloadIgnored($config, $payload)
     {
-        $accessToken = $config->getAccessToken();
-        $debugData = m::mock("Rollbar\Payload\Data")
+        $this->assertTrue($config->checkIgnored($payload, null, $this->error, false));
+    }
+    
+    public function assertPayloadNotIgnored($config, $payload)
+    {
+        $this->assertFalse($config->checkIgnored($payload, null, $this->error, false));
+    }
+    
+    private function prepareMockPayload($level)
+    {
+        $data = m::mock("Rollbar\Payload\Data")
             ->shouldReceive('getLevel')
-            ->andReturn(Level::DEBUG())
+            ->andReturn($level)
             ->mock();
-        $debug = new Payload($debugData, $accessToken);
-        $this->assertTrue($config->checkIgnored($debug, null, $this->error, false));
-
-        $criticalData = m::mock("Rollbar\Payload\Data")
-            ->shouldReceive('getLevel')
-            ->andReturn(Level::CRITICAL())
-            ->mock();
-        $critical = new Payload($criticalData, $accessToken);
-        $this->assertFalse($config->checkIgnored($critical, null, $this->error, false));
-
-        $warningData = m::mock("Rollbar\Payload\Data")
-            ->shouldReceive('getLevel')
-            ->andReturn(Level::warning())
-            ->mock();
-        $warning = new Payload($warningData, $accessToken);
-        $this->assertFalse($config->checkIgnored($warning, null, $this->error, false));
+        return new Payload($data, $this->getTestAccessToken());
     }
 
     public function testReportSuppressed()
