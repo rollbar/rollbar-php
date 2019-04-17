@@ -634,6 +634,15 @@ class Config
     {
         return $this->reraiseInEnvironments;
     }
+    
+    public function shouldReraise()
+    {
+        if (in_array($this->dataBuilder->getEnvironment(), $this->reraiseInEnvironments)) {
+            return true;
+        }
+        
+        return false;
+    }
 
     /**
      * @param Payload $payload

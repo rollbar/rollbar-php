@@ -372,6 +372,29 @@ class ConfigTest extends BaseRollbarTest
         $this->assertContains('production', $config->getReraiseInEnvironments());
         $this->assertContains('test', $config->getReraiseInEnvironments());
     }
+    
+    public function testShouldReraise()
+    {
+        $config = new Config(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => 'test'
+        ));
+        
+        $this->assertFalse($config->shouldReraise());
+        
+        $config->configure(array(
+            'reraise_in_environments' => array('test')
+        ));
+        
+        $this->assertTrue($config->shouldReraise());
+        
+        $config->configure(array(
+            'environment' => 'production',
+            'reraise_in_environments' => array('test')
+        ));
+        
+        $this->assertFalse($config->shouldReraise());
+    }
 
     public function testSendMessageTrace()
     {
