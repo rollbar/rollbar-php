@@ -656,7 +656,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         
         try {
             throw new \Exception();
-        } catch(\Exception $ex) {
+        } catch (\Exception $ex) {
             $logger->log(Level::ERROR, $ex);
         }
     }
