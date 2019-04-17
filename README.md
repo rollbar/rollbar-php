@@ -45,9 +45,23 @@ For bug reports, please [open an issue on GitHub](https://github.com/rollbar/rol
 
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Added some feature'`)
+3. Commit your changes (`git cz`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
+## Commit message convention
+
+This repository follows [The Conventional Changelog](https://www.conventionalcommits.org/en/v1.0.0-beta.4/#specification) specification as the commit message convention.
+
+## Development tools
+
+To enable the full range of development tools run:
+
+`npm install commitizen -g && npm install`
+
+### Commitizen
+
+After installing the development tools you will be able to use `git cz` to generate commit messages according to The Conventional Changelog specification.
 
 # Testing
 Tests are in `tests`.
