@@ -149,7 +149,8 @@ class Config
     
     /**
      * @var array An array of environments in which the exception should be
-     * reraised from the logger.
+     * reraised from the logger. See for more details: 
+     * https://github.com/rollbar/rollbar-php/issues/448
      */
     private $reraiseInEnvironments = array();
     
