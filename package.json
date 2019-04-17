@@ -1,0 +1,25 @@
+{
+  "name": "rollbar-php",
+  "version": "1.0.0",
+  "description": "Development tools for Rollbar PHP.",
+  "dependencies": {},
+  "devDependencies": {
+    "commitizen": "*",
+    "cz-conventional-changelog": "2.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rollbar/rollbar-php.git"
+  },
+  "author": "Rollbar, Inc.",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rollbar/rollbar-php/issues"
+  },
+  "homepage": "https://github.com/rollbar/rollbar-php#readme",
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}
