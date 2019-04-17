@@ -358,6 +358,20 @@ class ConfigTest extends BaseRollbarTest
             $config->getSender()->getEndpoint()
         );
     }
+    
+    public function testReraiseInEnvironments()
+    {
+        $config = new Config(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => $this->env,
+            "reraise_in_environments" => array(
+                "production", "test"
+            )
+        ));
+        
+        $this->assertContains('production', $config->getReraiseInEnvironments());
+        $this->assertContains('test', $config->getReraiseInEnvironments());
+    }
 
     public function testSendMessageTrace()
     {

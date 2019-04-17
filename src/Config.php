@@ -57,7 +57,8 @@ class Config
         'local_vars_dump',
         'max_nesting_depth',
         'max_items',
-        'minimum_level'
+        'minimum_level',
+        'reraise_in_environments'
     );
     
     private $accessToken;
@@ -147,6 +148,12 @@ class Config
     private $customTruncation;
     
     /**
+     * @var array An array of environments in which the exception should be
+     * reraised from the logger.
+     */
+    private $reraiseInEnvironments = array();
+    
+    /**
      * @var int The maximum number of items reported to Rollbar within one
      * request.
      */
@@ -227,6 +234,7 @@ class Config
         $this->setResponseHandler($config);
         $this->setCheckIgnoreFunction($config);
         $this->setSendMessageTrace($config);
+        $this->setReraiseInEnvironments($config);
 
         if (isset($config['included_errno'])) {
             $this->includedErrno = $config['included_errno'];
@@ -365,6 +373,15 @@ class Config
     {
         if (array_key_exists('batched', $config)) {
             $this->batched = $config['batched'];
+        }
+    }
+    
+    private function setReraiseInEnvironments($config)
+    {
+        if (array_key_exists('reraise_in_environments', $config)) {
+            $this->reraiseInEnvironments = $config['reraise_in_environments'];
+        } else {
+            $this->reraiseInEnvironments = \Rollbar\Defaults::get()->reraiseInEnvironments();
         }
     }
 
@@ -611,6 +628,11 @@ class Config
     public function getMinimumLevel()
     {
         return $this->minimumLevel;
+    }
+    
+    public function getReraiseInEnvironments()
+    {
+        return $this->reraiseInEnvironments;
     }
 
     /**
