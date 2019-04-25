@@ -2,6 +2,5 @@
 *.swo
 vendor
 composer.lock
-package-lock.json
 .idea
 build
