@@ -45,23 +45,29 @@ For bug reports, please [open an issue on GitHub](https://github.com/rollbar/rol
 
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git cz`)
+3. Commit your changes (See Conventional Commits below)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
 
-## Commit message convention
+### Conventional Commits
+This repository follows the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0-beta.4/) guidelines.
+Commit messages should include a prefix describing the commit before the short description.
+Recognized prefixes include: feat, fix, doc, style, refactor, perf, test, build, chore, revert.
+Breaking changes should include 'BREAKING CHANGE'.
 
-This repository follows [The Conventional Changelog](https://www.conventionalcommits.org/en/v1.0.0-beta.4/#specification) specification as the commit message convention.
+Example:
+```
+git commit -m 'feat: add foo support for all bars'
+```
 
-## Development tools
+Optionally, you can use commitizen to format your commit messages.
+```
+npm install -g commitizen
+npm install -g cz-conventional-changelog
+echo '{ "path": "cz-conventional-changelog" }' > ~/.czrc
+```
 
-To enable the full range of development tools run:
-
-`npm install commitizen -g && npm install`
-
-### Commitizen
-
-After installing the development tools you will be able to use `git cz` to generate commit messages according to The Conventional Changelog specification.
+And then commit using `git cz`. You'll be prompted for information describing your commit.
 
 # Testing
 Tests are in `tests`.
