@@ -57,7 +57,10 @@ Breaking changes should include 'BREAKING CHANGE'.
 
 Example:
 ```
-git commit -m 'feat: add foo support for all bars'
+git commit -m 'feat(bars): add foo support for all bars
+
+fix #123
+BREAKING CHANGE: bars supporting foo break bars supporting qwerty'
 ```
 
 Optionally, you can use commitizen to format your commit messages.
