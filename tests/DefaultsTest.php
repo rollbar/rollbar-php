@@ -178,6 +178,11 @@ class DefaultsTest extends BaseRollbarTest
     {
         $this->assertTrue($this->defaults->transmit());
     }
+
+    public function testOutput()
+    {
+        $this->assertFlase($this->defaults->output());
+    }
     
     public function testEnvironment()
     {

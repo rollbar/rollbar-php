@@ -238,6 +238,11 @@ class Defaults
         return $value !== null ? $value : $this->transmit;
     }
 
+    public function output($value = null)
+    {
+        return $value !== null ? $value : $this->output;
+    }
+
     public function environment($value = null)
     {
         return $value !== null ? $value : $this->environment;
@@ -354,6 +359,7 @@ class Defaults
     private $customDataMethod = null;
     private $enabled = true;
     private $transmit = true;
+    private $output = false;
     private $environment = 'production';
     private $fluentHost = '127.0.0.1';
     private $fluentPort = 24224;

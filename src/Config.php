@@ -28,6 +28,7 @@ class Config
         'custom_data_method',
         'enabled',
         'transmit',
+        'output',
         'environment',
         'error_sample_rates',
         'exception_sample_rates',
@@ -73,7 +74,13 @@ class Config
      * @var boolean $transmit If this is false then we do everything except 
      * make the post request at the end of the pipeline.
      */
-    private $transmit = true;
+    private $transmit;
+
+    /**
+     * @var boolean $output If this is true then we output the payload to 
+     * standard out or a configured logger right before transmitting.
+     */
+    private $output;
 
     /**
      * @var DataBuilder
@@ -223,6 +230,7 @@ class Config
 
         $this->setEnabled($config);
         $this->setTransmit($config);
+        $this->setOutput($config);
         $this->setAccessToken($config);
         $this->setDataBuilder($config);
         $this->setTransformer($config);
@@ -290,6 +298,13 @@ class Config
         $this->transmit = isset($config['transmit']) ?
             $config['transmit'] : 
             \Rollbar\Defaults::get()->transmit();
+    }
+
+    private function setOutput($config)
+    {
+        $this->output = isset($config['output']) ?
+            $config['output'] : 
+            \Rollbar\Defaults::get()->output();
     }
     
     public function enable()
@@ -418,6 +433,11 @@ class Config
     public function transmitting()
     {
         return $this->transmit;
+    }
+
+    public function outputting()
+    {
+        return $this->output;
     }
     
     public function getCustom()
