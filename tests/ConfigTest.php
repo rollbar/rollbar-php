@@ -65,6 +65,22 @@ class ConfigTest extends BaseRollbarTest
         $this->assertFalse($config->enabled());
     }
 
+    public function testTransmit()
+    {
+        $config = new Config(array(
+            'access_token' => $this->getTestAccessToken(),
+            'environment' => $this->env
+        ));
+        $this->assertTrue($config->transmitting());
+        
+        $config = new Config(array(
+            'access_token' => $this->getTestAccessToken(),
+            'environment' => $this->env,
+            'transmit' => false
+        ));
+        $this->assertFalse($config->transmitting());
+    }
+
     public function testAccessTokenFromEnvironment()
     {
         $_ENV['ROLLBAR_ACCESS_TOKEN'] = $this->getTestAccessToken();

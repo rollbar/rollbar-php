@@ -27,6 +27,7 @@ class Config
         'custom',
         'custom_data_method',
         'enabled',
+        'transmit',
         'environment',
         'error_sample_rates',
         'exception_sample_rates',
@@ -67,6 +68,13 @@ class Config
      * all in the code.
      */
     private $enabled = true;
+
+    /**
+     * @var boolean $transmit If this is false then we do everything except 
+     * make the post request at the end of the pipeline.
+     */
+    private $transmit = true;
+
     /**
      * @var DataBuilder
      */
@@ -214,6 +222,7 @@ class Config
         $this->configArray = $config;
 
         $this->setEnabled($config);
+        $this->setTransmit($config);
         $this->setAccessToken($config);
         $this->setDataBuilder($config);
         $this->setTransformer($config);
@@ -274,6 +283,13 @@ class Config
                 $this->enable();
             }
         }
+    }
+
+    private function setTransmit($config)
+    {
+        $this->transmit = isset($config['transmit']) ?
+            $config['transmit'] : 
+            \Rollbar\Defaults::get()->transmit();
     }
     
     public function enable()
@@ -397,6 +413,11 @@ class Config
     public function removeCustom($key)
     {
         $this->dataBuilder->removeCustom($key);
+    }
+
+    public function transmitting()
+    {
+        return $this->transmit;
     }
     
     public function getCustom()
