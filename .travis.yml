@@ -15,6 +15,7 @@ matrix:
   include:
     - php: 5.3
       dist: precise
+      env: COMPOSER_MEMORY_LIMIT=-1
 
 sudo: false
 
