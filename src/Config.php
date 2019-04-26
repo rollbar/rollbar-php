@@ -58,7 +58,7 @@ class Config
         'max_nesting_depth',
         'max_items',
         'minimum_level',
-        'reraise_in_environments'
+        'raise_on_error'
     );
     
     private $accessToken;
@@ -148,11 +148,11 @@ class Config
     private $customTruncation;
     
     /**
-     * @var array An array of environments in which the exception should be
-     * reraised from the logger. See for more details:
+     * @var boolean Should the SDK raise an exception after logging an error.
+     * This is useful in test and development enviroments.
      * https://github.com/rollbar/rollbar-php/issues/448
      */
-    private $reraiseInEnvironments = array();
+    private $raiseOnError = false;
     
     /**
      * @var int The maximum number of items reported to Rollbar within one
@@ -235,7 +235,7 @@ class Config
         $this->setResponseHandler($config);
         $this->setCheckIgnoreFunction($config);
         $this->setSendMessageTrace($config);
-        $this->setReraiseInEnvironments($config);
+        $this->setRaiseOnError($config);
 
         if (isset($config['included_errno'])) {
             $this->includedErrno = $config['included_errno'];
@@ -377,12 +377,12 @@ class Config
         }
     }
     
-    private function setReraiseInEnvironments($config)
+    private function setRaiseOnError($config)
     {
-        if (array_key_exists('reraise_in_environments', $config)) {
-            $this->reraiseInEnvironments = $config['reraise_in_environments'];
+        if (array_key_exists('raise_on_error', $config)) {
+            $this->raiseOnError = $config['raise_on_error'];
         } else {
-            $this->reraiseInEnvironments = \Rollbar\Defaults::get()->reraiseInEnvironments();
+            $this->raiseOnError = \Rollbar\Defaults::get()->raiseOnError();
         }
     }
 
@@ -631,18 +631,9 @@ class Config
         return $this->minimumLevel;
     }
     
-    public function getReraiseInEnvironments()
+    public function getRaiseOnError()
     {
-        return $this->reraiseInEnvironments;
-    }
-    
-    public function shouldReraise()
-    {
-        if (in_array($this->dataBuilder->getEnvironment(), $this->reraiseInEnvironments)) {
-            return true;
-        }
-        
-        return false;
+        return $this->raiseOnError;
     }
 
     /**

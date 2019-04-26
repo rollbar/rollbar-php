@@ -318,9 +318,9 @@ class Defaults
         return $value !== null ? $value : $this->minimumLevel;
     }
     
-    public function reraiseInEnvironments($value = null)
+    public function raiseOnError($value = null)
     {
-        return $value !== null ? $value : $this->reraiseInEnvironments;
+        return $value !== null ? $value : $this->raiseOnError;
     }
 
     private $psrLevels;
@@ -369,5 +369,5 @@ class Defaults
     private $customTruncation = null;
     private $maxItems = 10;
     private $minimumLevel = 0;
-    private $reraiseInEnvironments = array();
+    private $raiseOnError = false;
 }

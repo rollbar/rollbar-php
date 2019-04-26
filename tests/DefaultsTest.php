@@ -252,9 +252,9 @@ class DefaultsTest extends BaseRollbarTest
         $this->assertEquals(10, $this->defaults->maxItems());
     }
     
-    public function testReraiseInEnvironments()
+    public function testRaiseOnError()
     {
-        $this->assertEquals(array(), $this->defaults->reraiseInEnvironments());
+        $this->assertEquals(false, $this->defaults->raiseOnError());
     }
     
     public function testDefaultsForConfigOptions()

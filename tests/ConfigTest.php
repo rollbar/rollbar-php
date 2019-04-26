@@ -359,41 +359,15 @@ class ConfigTest extends BaseRollbarTest
         );
     }
     
-    public function testReraiseInEnvironments()
+    public function testRaiseOnError()
     {
         $config = new Config(array(
             "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env,
-            "reraise_in_environments" => array(
-                "production", "test"
-            )
+            "raise_on_error" => true
         ));
         
-        $this->assertContains('production', $config->getReraiseInEnvironments());
-        $this->assertContains('test', $config->getReraiseInEnvironments());
-    }
-    
-    public function testShouldReraise()
-    {
-        $config = new Config(array(
-            "access_token" => $this->getTestAccessToken(),
-            "environment" => 'test'
-        ));
-        
-        $this->assertFalse($config->shouldReraise());
-        
-        $config->configure(array(
-            'reraise_in_environments' => array('test')
-        ));
-        
-        $this->assertTrue($config->shouldReraise());
-        
-        $config->configure(array(
-            'environment' => 'production',
-            'reraise_in_environments' => array('test')
-        ));
-        
-        $this->assertFalse($config->shouldReraise());
+        $this->assertTrue($config->getRaiseOnError());
     }
 
     public function testSendMessageTrace()

@@ -644,14 +644,12 @@ class RollbarLoggerTest extends BaseRollbarTest
     /**
      * @expectedException Exception
      */
-    public function testReraiseExceptions()
+    public function testRaiseOnError()
     {
         $logger = new RollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
             "environment" => 'test',
-            "reraise_in_environments" => array(
-                "test"
-            )
+            "raise_on_error" => true
         ));
         
         try {

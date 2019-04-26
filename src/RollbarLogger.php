@@ -102,7 +102,7 @@ class RollbarLogger extends AbstractLogger
         
         $this->handleResponse($payload, $response);
         
-        if (is_a($toLog, 'Exception') && $this->config->shouldReraise()) {
+        if ((is_a($toLog, 'Throwable') || is_a($toLog, 'Exception')) && $this->config->getRaiseOnError()) {
             throw $toLog;
         }
         
