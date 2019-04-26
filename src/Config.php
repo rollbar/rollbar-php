@@ -62,7 +62,9 @@ class Config
     
     private $accessToken;
     /**
-     * @var string $enabled Enable / disable Rollbar SDK.
+     * @var boolean $enabled If this is false then do absolutely nothing, 
+     * try to be as close to the scenario where Rollbar did not exist at 
+     * all in the code.
      */
     private $enabled = true;
     /**
