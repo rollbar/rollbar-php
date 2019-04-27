@@ -243,9 +243,9 @@ class Defaults
         return $value !== null ? $value : $this->output;
     }
 
-    public function internalLogger($value = null)
+    public function outputLogger($value = null)
     {
-        $logger = new \Monolog\Logger('rollbar.internal');
+        $logger = new \Monolog\Logger('rollbar.output');
         $logger->pushHandler(new \Monolog\Handler\ErrorLogHandler());
         return $logger;
     }

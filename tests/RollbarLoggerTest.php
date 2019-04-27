@@ -126,14 +126,14 @@ class RollbarLoggerTest extends BaseRollbarTest
 
     public function testNotOutputting()
     {
-        $internalLoggerMock = $this->getMockBuilder('\Psr\Log\LoggerInterface')->getMock();
-        $internalLoggerMock->expects($this->never())->method('debug');
+        $outputLoggerMock = $this->getMockBuilder('\Psr\Log\LoggerInterface')->getMock();
+        $outputLoggerMock->expects($this->never())->method('debug');
 
         $l = new RollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php",
             "output" => false,
-            "internal_logger" => $internalLoggerMock
+            "outputLogger" => $outputLoggerMock
         ));
         $response = $l->log(Level::WARNING, "Testing PHP Notifier");
         
@@ -143,8 +143,8 @@ class RollbarLoggerTest extends BaseRollbarTest
 
     public function testOutputting()
     {
-        $internalLoggerMock = $this->getMockBuilder('\Psr\Log\LoggerInterface')->getMock();
-        $internalLoggerMock->expects($this->exactly(2))
+        $outputLoggerMock = $this->getMockBuilder('\Psr\Log\LoggerInterface')->getMock();
+        $outputLoggerMock->expects($this->exactly(2))
                         ->method('debug')
                         ->withConsecutive(
                             array($this->matchesRegularExpression(
@@ -157,7 +157,7 @@ class RollbarLoggerTest extends BaseRollbarTest
             "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php",
             "output" => true,
-            "internal_logger" => $internalLoggerMock
+            "output_logger" => $outputLoggerMock
         ));
         $response = $l->log(Level::WARNING, "Testing PHP Notifier");
         
@@ -199,7 +199,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         ));
         $response = $logger->log(Level::WARNING, "Testing PHP Notifier");
         $this->assertEquals(0, $response->getStatus());
-        $this->assertEquals("Not transmitting", $response->getInfo());
+        $this->assertEquals("Not transmitting (transmitting disabled in configuration)", $response->getInfo());
     }
 
     public function testTransmitBatched()
@@ -233,7 +233,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         $this->assertEquals("Pending", $response->getInfo());
         $response = $logger->flush();
         $this->assertEquals(0, $response->getStatus());
-        $this->assertEquals("Not transmitting", $response->getInfo());
+        $this->assertEquals("Not transmitting (transmitting disabled in configuration)", $response->getInfo());
     }
     
     public function testLogMalformedPayloadData()

@@ -29,7 +29,7 @@ class Config
         'enabled',
         'transmit',
         'output',
-        'internal_logger',
+        'output_logger',
         'environment',
         'error_sample_rates',
         'exception_sample_rates',
@@ -86,12 +86,12 @@ class Config
     private $output;
 
     /**
-     * @var Monolog\Logger $internalLogger Logger responsible for logging info on
-     * the internal workings of the SDK. The messages logged can be controlled with
-     * `output` and `verbose` config options.
+     * @var Monolog\Logger $outputLogger Logger responsible for logging request
+     * payload and response dumps on. The messages logged can be controlled with
+     * `output` config options.
      * Default: \Monolog\Logger with \Monolog\Handler\ErrorLogHandler
      */
-    private $internalLogger;
+    private $outputLogger;
 
     /**
      * @var DataBuilder
@@ -242,7 +242,7 @@ class Config
         $this->setEnabled($config);
         $this->setTransmit($config);
         $this->setOutput($config);
-        $this->setInternalLogger($config);
+        $this->setOutputLogger($config);
         $this->setAccessToken($config);
         $this->setDataBuilder($config);
         $this->setTransformer($config);
@@ -319,14 +319,14 @@ class Config
             \Rollbar\Defaults::get()->output();
     }
 
-    private function setInternalLogger($config)
+    private function setOutputLogger($config)
     {
-        $this->internalLogger = isset($config['internal_logger']) ?
-            $config['internal_logger'] : 
-            \Rollbar\Defaults::get()->internalLogger();
+        $this->outputLogger = isset($config['output_logger']) ?
+            $config['output_logger'] : 
+            \Rollbar\Defaults::get()->outputLogger();
         
-        if (!($this->internalLogger instanceof \Psr\Log\LoggerInterface)) {
-            throw new \Exception('Internal logger must implement \Psr\Log\LoggerInterface');
+        if (!($this->outputLogger instanceof \Psr\Log\LoggerInterface)) {
+            throw new \Exception('Output logger must implement \Psr\Log\LoggerInterface');
         }
     }
     
@@ -629,9 +629,9 @@ class Config
         }
     }
 
-    public function internalLogger()
+    public function outputLogger()
     {
-        return $this->internalLogger;
+        return $this->outputLogger;
     }
 
     public function getRollbarData($level, $toLog, $context)
@@ -899,15 +899,15 @@ class Config
         if ($this->transmitting()) {
             $response = $this->sender->send($payload, $accessToken);
         } else {
-            $response = new Response(0, "Not transmitting");
+            $response = new Response(0, "Not transmitting (transmitting disabled in configuration)");
         }
 
         if ($this->outputting()) {
-            $this->internalLogger()->debug(
+            $this->outputLogger()->debug(
                 'Sending payload with ' . get_class($this->sender) . ":\n" .
                 $payload
             );
-            $this->internalLogger()->debug($response);
+            $this->outputLogger()->debug($response);
         }
 
         return $response;
@@ -918,7 +918,7 @@ class Config
         if ($this->transmitting()) {
             return $this->sender->sendBatch($batch, $accessToken);
         } else {
-            return new Response(0, "Not transmitting");
+            return new Response(0, "Not transmitting (transmitting disabled in configuration)");
         }
     }
 

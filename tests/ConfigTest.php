@@ -97,20 +97,20 @@ class ConfigTest extends BaseRollbarTest
         $this->assertTrue($config->outputting());
     }
 
-    public function testConfigureInternalLogger()
+    public function testConfigureOutputLogger()
     {
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
             'environment' => $this->env
         ));
-        $this->assertInstanceOf('\Monolog\Logger', $config->internalLogger());
+        $this->assertInstanceOf('\Monolog\Logger', $config->outputLogger());
 
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
             'environment' => $this->env,
-            'internal_logger' => new \Psr\Log\NullLogger()
+            'output_logger' => new \Psr\Log\NullLogger()
         ));
-        $this->assertInstanceOf('\Psr\Log\NullLogger', $config->internalLogger());
+        $this->assertInstanceOf('\Psr\Log\NullLogger', $config->outputLogger());
     }
 
     public function testAccessTokenFromEnvironment()
