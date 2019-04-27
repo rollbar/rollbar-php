@@ -29,6 +29,7 @@ class Config
         'enabled',
         'transmit',
         'output',
+        'internal_logger',
         'environment',
         'error_sample_rates',
         'exception_sample_rates',
@@ -40,7 +41,6 @@ class Config
         'include_error_code_context',
         'include_exception_code_context',
         'included_errno',
-        'logger',
         'person',
         'person_fn',
         'capture_ip',
@@ -67,20 +67,31 @@ class Config
      * @var boolean $enabled If this is false then do absolutely nothing, 
      * try to be as close to the scenario where Rollbar did not exist at 
      * all in the code.
+     * Default: true
      */
     private $enabled = true;
 
     /**
      * @var boolean $transmit If this is false then we do everything except 
      * make the post request at the end of the pipeline.
+     * Default: true
      */
     private $transmit;
 
     /**
      * @var boolean $output If this is true then we output the payload to 
      * standard out or a configured logger right before transmitting.
+     * Default: false
      */
     private $output;
+
+    /**
+     * @var Monolog\Logger $internalLogger Logger responsible for logging info on
+     * the internal workings of the SDK. The messages logged can be controlled with
+     * `output` and `verbose` config options.
+     * Default: \Monolog\Logger with \Monolog\Handler\ErrorLogHandler
+     */
+    private $internalLogger;
 
     /**
      * @var DataBuilder
@@ -231,6 +242,7 @@ class Config
         $this->setEnabled($config);
         $this->setTransmit($config);
         $this->setOutput($config);
+        $this->setInternalLogger($config);
         $this->setAccessToken($config);
         $this->setDataBuilder($config);
         $this->setTransformer($config);
@@ -305,6 +317,17 @@ class Config
         $this->output = isset($config['output']) ?
             $config['output'] : 
             \Rollbar\Defaults::get()->output();
+    }
+
+    private function setInternalLogger($config)
+    {
+        $this->internalLogger = isset($config['internal_logger']) ?
+            $config['internal_logger'] : 
+            \Rollbar\Defaults::get()->internalLogger();
+        
+        if (!($this->internalLogger instanceof \Psr\Log\LoggerInterface)) {
+            throw new \Exception('Internal logger must implement \Psr\Log\LoggerInterface');
+        }
     }
     
     public function enable()
@@ -606,6 +629,11 @@ class Config
         }
     }
 
+    public function internalLogger()
+    {
+        return $this->internalLogger;
+    }
+
     public function getRollbarData($level, $toLog, $context)
     {
         return $this->dataBuilder->makeData($level, $toLog, $context);
@@ -868,12 +896,30 @@ class Config
 
     public function send(EncodedPayload $payload, $accessToken)
     {
-        return $this->sender->send($payload, $accessToken);
+        if ($this->transmitting()) {
+            $response = $this->sender->send($payload, $accessToken);
+        } else {
+            $response = new Response(0, "Not transmitting");
+        }
+
+        if ($this->outputting()) {
+            $this->internalLogger()->debug(
+                'Sending payload with ' . get_class($this->sender) . ":\n" .
+                $payload
+            );
+            $this->internalLogger()->debug($response);
+        }
+
+        return $response;
     }
 
     public function sendBatch(&$batch, $accessToken)
     {
-        return $this->sender->sendBatch($batch, $accessToken);
+        if ($this->transmitting()) {
+            return $this->sender->sendBatch($batch, $accessToken);
+        } else {
+            return new Response(0, "Not transmitting");
+        }
     }
 
     public function wait($accessToken, $max = 0)

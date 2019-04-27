@@ -144,10 +144,6 @@ class RollbarLogger extends AbstractLogger
             $this->reportCount++;
         }
 
-        if (!$this->config->transmitting()) {
-            return new Response(0, "Ignored (not transmitting)");
-        }
-        
         if ($this->config->getBatched()) {
             $response = new Response(0, "Pending");
             if ($this->getQueueSize() >= $this->config->getBatchSize()) {

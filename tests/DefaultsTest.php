@@ -181,7 +181,17 @@ class DefaultsTest extends BaseRollbarTest
 
     public function testOutput()
     {
-        $this->assertFlase($this->defaults->output());
+        $this->assertFalse($this->defaults->output());
+    }
+
+    public function testInternalLogger()
+    {
+        $logger = $this->defaults->internalLogger();
+        $this->assertInstanceOf('Psr\Log\LoggerInterface', $logger);
+        $this->assertEquals('rollbar.internal', $logger->getName());
+        $handlers = $logger->getHandlers();
+        $this->assertCount(1, $handlers);
+        $this->assertInstanceOf('Monolog\Handler\ErrorLogHandler', $handlers[0]);
     }
     
     public function testEnvironment()

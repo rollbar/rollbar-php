@@ -243,6 +243,13 @@ class Defaults
         return $value !== null ? $value : $this->output;
     }
 
+    public function internalLogger($value = null)
+    {
+        $logger = new \Monolog\Logger('rollbar.internal');
+        $logger->pushHandler(new \Monolog\Handler\ErrorLogHandler());
+        return $logger;
+    }
+
     public function environment($value = null)
     {
         return $value !== null ? $value : $this->environment;
