@@ -123,7 +123,7 @@ class ConfigTest extends BaseRollbarTest
             'environment' => $this->env
         ));
         $this->assertEquals(Config::VERBOSE_NONE, $config->verbose());
-        $this->assertInstanceOf('\Psr\Log\NullLogger', $config->verboseLogger());
+        $this->assertInstanceOf('\Rollbar\VerboseLogger', $config->verboseLogger());
         
         $config->configure(array('verbose' => \Psr\Log\LogLevel::INFO));
         $this->assertEquals(\Psr\Log\LogLevel::INFO, $config->verbose());
