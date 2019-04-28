@@ -369,9 +369,13 @@ class Config
 
     private function setVerboseLogger($config)
     {
-        $this->verboseLogger = isset($config['verbose_logger']) ?
-            $config['verbose_logger'] : 
-            new VerboseLogger('rollbar.verbose', $this);
+        if (isset($config['verbose_logger'])) {
+            $this->verboseLogger = $config['verbose_logger'];
+        } else {
+            $handler = new \Monolog\Handler\ErrorLogHandler();
+            $handler->setLevel($this->verboseInteger());
+            $this->verboseLogger = new \Monolog\Logger('rollbar.verbose', array($handler));
+        }
         
         if (!($this->verboseLogger instanceof \Psr\Log\LoggerInterface)) {
             throw new \Exception('Verbose logger must implement \Psr\Log\LoggerInterface');
@@ -514,6 +518,14 @@ class Config
     public function verbose()
     {
         return $this->verbose;
+    }
+
+    public function verboseInteger()
+    {
+        if ($this->verbose == self::VERBOSE_NONE) {
+            return 1000;
+        }
+        return \Monolog\Logger::toMonologLevel($this->verbose);
     }
     
     public function getCustom()

@@ -103,10 +103,11 @@ class ConfigTest extends BaseRollbarTest
             'access_token' => $this->getTestAccessToken(),
             'environment' => $this->env
         ));
-        $outputLogger = $config->outputLogger();
-        $this->assertInstanceOf('\Monolog\Logger', $outputLogger);
-        $handlers = $outputLogger->getHandlers();
-        $this->assertInstanceOf('\Monolog\Handler\ErrorLogHandler', $handlers[0]);
+        $this->assertInstanceOf('\Monolog\Logger', $config->outputLogger());
+        $handlers = $config->outputLogger()->getHandlers();
+        $handler = $handlers[0];
+        $this->assertInstanceOf('\Monolog\Handler\ErrorLogHandler', $handler);
+        $this->assertEquals(\Monolog\Logger::DEBUG, $handler->getLevel());
 
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
@@ -122,12 +123,33 @@ class ConfigTest extends BaseRollbarTest
             'access_token' => $this->getTestAccessToken(),
             'environment' => $this->env
         ));
+        // assert the appropriate default logger
         $this->assertEquals(Config::VERBOSE_NONE, $config->verbose());
-        $this->assertInstanceOf('\Rollbar\VerboseLogger', $config->verboseLogger());
-        
-        $config->configure(array('verbose' => \Psr\Log\LogLevel::INFO));
-        $this->assertEquals(\Psr\Log\LogLevel::INFO, $config->verbose());
         $this->assertInstanceOf('\Monolog\Logger', $config->verboseLogger());
+        // assert the appropriate default handler
+        $handlers = $config->verboseLogger()->getHandlers();
+        $handler = $handlers[0];
+        $this->assertInstanceOf('\Monolog\Handler\ErrorLogHandler', $handler);
+        // assert the appropriate default handler level
+        $this->assertEquals($config->verboseInteger(), $handler->getLevel());
+        
+        // assert the verbosity level in the handler matches the level in the config
+        $config->configure(array('verbose' => \Psr\Log\LogLevel::DEBUG));
+        $handlers = $config->verboseLogger()->getHandlers();
+        $handler = $handlers[0];
+        $this->assertEquals($config->verboseInteger(), $handler->getLevel());
+    }
+
+    public function testVerboseInteger()
+    {
+        $config = new Config(array(
+            'access_token' => $this->getTestAccessToken(),
+            'environment' => $this->env
+        ));
+        $this->assertEquals(1000, $config->verboseInteger());
+
+        $config->configure(array('verbose' => \Psr\Log\LogLevel::DEBUG));
+        $this->assertEquals(100, $config->verboseInteger());
     }
 
     public function testConfigureVerboseLogger()
@@ -136,8 +158,8 @@ class ConfigTest extends BaseRollbarTest
             'access_token' => $this->getTestAccessToken(),
             'environment' => $this->env
         ));
-        $this->assertInstanceOf('\Rollbar\VerboseLogger', $config->verboseLogger());
-
+        $this->assertInstanceOf('\Monolog\Logger', $config->verboseLogger());
+        
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
             'environment' => $this->env,

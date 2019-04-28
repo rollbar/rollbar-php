@@ -173,6 +173,16 @@ class RollbarLogger extends AbstractLogger
         return $this->config->getDataBuilder();
     }
 
+    public function outputLogger()
+    {
+        return $this->config->outputLogger();
+    }
+
+    public function verboseLogger()
+    {
+        return $this->config->verboseLogger();
+    }
+
     protected function handleResponse($payload, $response)
     {
         $this->config->handleResponse($payload, $response);

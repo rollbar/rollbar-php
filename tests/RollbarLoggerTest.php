@@ -1,5 +1,6 @@
 <?php namespace Rollbar;
 
+use \Mockery as m;
 use Rollbar\Payload\Level;
 use Rollbar\Payload\Payload;
 use Rollbar\TestHelpers\Exceptions\SilentExceptionSampleRate;
@@ -129,13 +130,13 @@ class RollbarLoggerTest extends BaseRollbarTest
         $outputLoggerMock = $this->getMockBuilder('\Psr\Log\LoggerInterface')->getMock();
         $outputLoggerMock->expects($this->never())->method('debug');
 
-        $l = new RollbarLogger(array(
+        $logger = new RollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php",
             "output" => false,
             "outputLogger" => $outputLoggerMock
         ));
-        $response = $l->log(Level::WARNING, "Testing PHP Notifier");
+        $response = $logger->log(Level::WARNING, "Testing PHP Notifier");
         
         $this->assertEquals(200, $response->getStatus());
         
@@ -153,16 +154,58 @@ class RollbarLoggerTest extends BaseRollbarTest
                             array($this->isInstanceOf('\Rollbar\Response'))
                         );
 
-        $l = new RollbarLogger(array(
+        $logger = new RollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php",
             "output" => true,
             "output_logger" => $outputLoggerMock
         ));
-        $response = $l->log(Level::WARNING, "Testing PHP Notifier");
+        $response = $logger->log(Level::WARNING, "Testing PHP Notifier");
         
         $this->assertEquals(200, $response->getStatus());
         
+    }
+
+    public function testDefaultVerbose()
+    {
+        return $this->testNotVerbose();
+    }
+
+    public function testNotVerbose()
+    {
+        $logger = new RollbarLogger(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => "testing-php",
+            "verbose" => \Rollbar\Config::VERBOSE_NONE
+        ));
+
+        $handlerMock = $this->getMockBuilder('\Monolog\Handler\ErrorLogHandler')
+            ->setMethods(['handle'])
+            ->getMock();
+
+        $verboseLogger = $logger->verboseLogger();
+        $verboseLogger->setHandlers(array($handlerMock));
+
+        $logger->info('Internal message');
+    }
+
+    public function testVerbose()
+    {
+        $logger = new RollbarLogger(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => "testing-php",
+            "verbose" => \Psr\Log\LogLevel::DEBUG
+        ));
+
+        $handlerMock = $this->getMockBuilder('\Monolog\Handler\ErrorLogHandler')
+            ->setMethods(['handle'])
+            ->getMock();
+        $handlerMock->expects($this->atLeastOnce())->method('handle');
+
+        $verboseLogger = $logger->verboseLogger();
+        $verboseLogger->setHandlers(array($handlerMock));
+
+        $logger->info('Internal message');
     }
     
     public function testEnabled()
