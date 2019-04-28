@@ -180,7 +180,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         ));
 
         $handlerMock = $this->getMockBuilder('\Monolog\Handler\ErrorLogHandler')
-            ->setMethods(['handle'])
+            ->setMethods(array('handle'))
             ->getMock();
 
         $verboseLogger = $logger->verboseLogger();
@@ -198,7 +198,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         ));
 
         $handlerMock = $this->getMockBuilder('\Monolog\Handler\ErrorLogHandler')
-            ->setMethods(['handle'])
+            ->setMethods(array('handle'))
             ->getMock();
         $handlerMock->expects($this->atLeastOnce())->method('handle');
 

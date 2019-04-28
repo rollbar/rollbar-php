@@ -140,13 +140,36 @@ class ConfigTest extends BaseRollbarTest
         $this->assertEquals($config->verboseInteger(), $handler->getLevel());
     }
 
+    public function testVerboseInfo()
+    {
+        $config = new Config(array(
+            'access_token' => $this->getTestAccessToken(),
+            'environment' => $this->env,
+            'verbose' => \Psr\Log\LogLevel::INFO
+        ));
+
+        $handlerMock = $this->getMockBuilder('\Monolog\Handler\ErrorLogHandler')
+            ->setMethods(array('handle'))
+            ->getMock();
+
+        $handlerMock->expects($this->once())->method('handle');
+
+        $config->verboseLogger()->setHandlers(array($handlerMock));
+
+        $this->assertTrue($config->verboseLogger()->info('Test trace'));
+    }
+
     public function testVerboseInteger()
     {
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
-            'environment' => $this->env
+            'environment' => $this->env,
+            'verbose' => Config::VERBOSE_NONE
         ));
         $this->assertEquals(1000, $config->verboseInteger());
+
+        $config->configure(array('verbose' => Config::VERBOSE_TRACE));
+        $this->assertEquals(50, $config->verboseInteger());
 
         $config->configure(array('verbose' => \Psr\Log\LogLevel::DEBUG));
         $this->assertEquals(100, $config->verboseInteger());
