@@ -243,11 +243,9 @@ class Defaults
         return $value !== null ? $value : $this->output;
     }
 
-    public function outputLogger($value = null)
+    public function verbose($value = null)
     {
-        $logger = new \Monolog\Logger('rollbar.output');
-        $logger->pushHandler(new \Monolog\Handler\ErrorLogHandler());
-        return $logger;
+        return $value !== null ? $value : $this->verbose;
     }
 
     public function environment($value = null)
@@ -367,6 +365,7 @@ class Defaults
     private $enabled = true;
     private $transmit = true;
     private $output = false;
+    private $verbose = \Rollbar\Config::VERBOSE_NONE;
     private $environment = 'production';
     private $fluentHost = '127.0.0.1';
     private $fluentPort = 24224;

@@ -103,7 +103,10 @@ class ConfigTest extends BaseRollbarTest
             'access_token' => $this->getTestAccessToken(),
             'environment' => $this->env
         ));
-        $this->assertInstanceOf('\Monolog\Logger', $config->outputLogger());
+        $outputLogger = $config->outputLogger();
+        $this->assertInstanceOf('\Monolog\Logger', $outputLogger);
+        $handlers = $outputLogger->getHandlers();
+        $this->assertInstanceOf('\Monolog\Handler\ErrorLogHandler', $handlers[0]);
 
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
@@ -111,6 +114,36 @@ class ConfigTest extends BaseRollbarTest
             'output_logger' => new \Psr\Log\NullLogger()
         ));
         $this->assertInstanceOf('\Psr\Log\NullLogger', $config->outputLogger());
+    }
+
+    public function testVerbose()
+    {
+        $config = new Config(array(
+            'access_token' => $this->getTestAccessToken(),
+            'environment' => $this->env
+        ));
+        $this->assertEquals(Config::VERBOSE_NONE, $config->verbose());
+        $this->assertInstanceOf('\Psr\Log\NullLogger', $config->verboseLogger());
+        
+        $config->configure(array('verbose' => \Psr\Log\LogLevel::INFO));
+        $this->assertEquals(\Psr\Log\LogLevel::INFO, $config->verbose());
+        $this->assertInstanceOf('\Monolog\Logger', $config->verboseLogger());
+    }
+
+    public function testConfigureVerboseLogger()
+    {
+        $config = new Config(array(
+            'access_token' => $this->getTestAccessToken(),
+            'environment' => $this->env
+        ));
+        $this->assertInstanceOf('\Rollbar\VerboseLogger', $config->verboseLogger());
+
+        $config = new Config(array(
+            'access_token' => $this->getTestAccessToken(),
+            'environment' => $this->env,
+            'verbose_logger' => new \Psr\Log\NullLogger()
+        ));
+        $this->assertInstanceOf('\Psr\Log\NullLogger', $config->verboseLogger());
     }
 
     public function testAccessTokenFromEnvironment()

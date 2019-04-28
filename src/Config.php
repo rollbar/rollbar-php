@@ -13,6 +13,8 @@ if (!defined('ROLLBAR_INCLUDED_ERRNO_BITMASK')) {
 
 class Config
 {
+    const VERBOSE_NONE = 'none';
+
     private static $options = array(
         'access_token',
         'agent_log_location',
@@ -59,7 +61,9 @@ class Config
         'local_vars_dump',
         'max_nesting_depth',
         'max_items',
-        'minimum_level'
+        'minimum_level',
+        'verbose',
+        'verbose_logger'
     );
     
     private $accessToken;
@@ -86,12 +90,36 @@ class Config
     private $output;
 
     /**
-     * @var Monolog\Logger $outputLogger Logger responsible for logging request
+     * @var \Psr\Log\Logger $outputLogger Logger responsible for logging request
      * payload and response dumps on. The messages logged can be controlled with
      * `output` config options.
      * Default: \Monolog\Logger with \Monolog\Handler\ErrorLogHandler
      */
     private $outputLogger;
+
+    /**
+     * @var string $verbose If this is set to any of the \Psr\Log\LogLevel options
+     * then we output messages related to the processing of items that might be 
+     * useful to someone trying to understand what Rollbar is doing. The logged
+     * messages are dependent on the level of verbosity. The supported options are 
+     * all the log levels of \Psr\Log\LogLevel 
+     * (https://github.com/php-fig/log/blob/master/Psr/Log/LogLevel.php) plus
+     * an additional Rollbar\Config::VERBOSE_NONE option which makes the SDK quiet 
+     * (excluding `output` option configured separetely).
+     * Essentially this option controls the level of verbosity of the default
+     * `verbose_logger`. If you override the default `verbose_logger`, you need
+     * to implement obeying the `verbose` config option yourself.
+     * Default: Rollbar\Config::VERBOSE_NONE
+     */
+    private $verbose;
+
+    /**
+     * @var \Psr\Log\Logger $versbosity_logger The logger object used to log
+     * the internal messages of the SDK. The verbosity level of the default
+     * $verbosityLogger can be controlled with `verbose` config option.
+     * Default: \Rollbar\VerboseLogger
+     */
+    private $verboseLogger;
 
     /**
      * @var DataBuilder
@@ -243,6 +271,8 @@ class Config
         $this->setTransmit($config);
         $this->setOutput($config);
         $this->setOutputLogger($config);
+        $this->setVerbose($config);
+        $this->setVerboseLogger($config);
         $this->setAccessToken($config);
         $this->setDataBuilder($config);
         $this->setTransformer($config);
@@ -323,10 +353,28 @@ class Config
     {
         $this->outputLogger = isset($config['output_logger']) ?
             $config['output_logger'] : 
-            \Rollbar\Defaults::get()->outputLogger();
+            new \Monolog\Logger('rollbar.output', array(new \Monolog\Handler\ErrorLogHandler()));
         
         if (!($this->outputLogger instanceof \Psr\Log\LoggerInterface)) {
             throw new \Exception('Output logger must implement \Psr\Log\LoggerInterface');
+        }
+    }
+
+    private function setVerbose($config)
+    {
+        $this->verbose = isset($config['verbose']) ?
+            $config['verbose'] : 
+            \Rollbar\Defaults::get()->verbose();
+    }
+
+    private function setVerboseLogger($config)
+    {
+        $this->verboseLogger = isset($config['verbose_logger']) ?
+            $config['verbose_logger'] : 
+            new VerboseLogger('rollbar.verbose', $this);
+        
+        if (!($this->verboseLogger instanceof \Psr\Log\LoggerInterface)) {
+            throw new \Exception('Verbose logger must implement \Psr\Log\LoggerInterface');
         }
     }
     
@@ -461,6 +509,11 @@ class Config
     public function outputting()
     {
         return $this->output;
+    }
+
+    public function verbose()
+    {
+        return $this->verbose;
     }
     
     public function getCustom()
@@ -632,6 +685,11 @@ class Config
     public function outputLogger()
     {
         return $this->outputLogger;
+    }
+
+    public function verboseLogger()
+    {
+        return $this->verboseLogger;
     }
 
     public function getRollbarData($level, $toLog, $context)
