@@ -358,6 +358,17 @@ class ConfigTest extends BaseRollbarTest
             $config->getSender()->getEndpoint()
         );
     }
+    
+    public function testRaiseOnError()
+    {
+        $config = new Config(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => $this->env,
+            "raise_on_error" => true
+        ));
+        
+        $this->assertTrue($config->getRaiseOnError());
+    }
 
     public function testSendMessageTrace()
     {

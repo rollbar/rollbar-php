@@ -57,7 +57,8 @@ class Config
         'local_vars_dump',
         'max_nesting_depth',
         'max_items',
-        'minimum_level'
+        'minimum_level',
+        'raise_on_error'
     );
     
     private $accessToken;
@@ -147,6 +148,13 @@ class Config
     private $customTruncation;
     
     /**
+     * @var boolean Should the SDK raise an exception after logging an error.
+     * This is useful in test and development enviroments.
+     * https://github.com/rollbar/rollbar-php/issues/448
+     */
+    private $raiseOnError = false;
+    
+    /**
      * @var int The maximum number of items reported to Rollbar within one
      * request.
      */
@@ -227,6 +235,7 @@ class Config
         $this->setResponseHandler($config);
         $this->setCheckIgnoreFunction($config);
         $this->setSendMessageTrace($config);
+        $this->setRaiseOnError($config);
 
         if (isset($config['included_errno'])) {
             $this->includedErrno = $config['included_errno'];
@@ -365,6 +374,15 @@ class Config
     {
         if (array_key_exists('batched', $config)) {
             $this->batched = $config['batched'];
+        }
+    }
+    
+    private function setRaiseOnError($config)
+    {
+        if (array_key_exists('raise_on_error', $config)) {
+            $this->raiseOnError = $config['raise_on_error'];
+        } else {
+            $this->raiseOnError = \Rollbar\Defaults::get()->raiseOnError();
         }
     }
 
@@ -611,6 +629,11 @@ class Config
     public function getMinimumLevel()
     {
         return $this->minimumLevel;
+    }
+    
+    public function getRaiseOnError()
+    {
+        return $this->raiseOnError;
     }
 
     /**
