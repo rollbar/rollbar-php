@@ -271,7 +271,9 @@ class DefaultsTest extends BaseRollbarTest
                 $option == 'person_fn' ||
                 $option == 'scrub_whitelist' ||
                 $option == 'proxy' ||
-                $option == 'include_raw_request_body') {
+                $option == 'include_raw_request_body' ||
+                $option == 'verbose_logger' ||
+                $option == 'output_logger') {
                 continue;
             } elseif ($option == 'base_api_url') {
                 $option = 'endpoint';
