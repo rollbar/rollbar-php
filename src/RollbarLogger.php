@@ -85,12 +85,13 @@ class RollbarLogger extends AbstractLogger
         
         if (!$this->levelFactory->isValidLevel($level)) {
 
-            $this->verboseLogger()->error("Invalid log level '$level'.");
-            throw new \Psr\Log\InvalidArgumentException("Invalid log level '$level'.");
-
+            $exception = new \Psr\Log\InvalidArgumentException("Invalid log level '$level'.");
+            $this->verboseLogger()->error($exception->getMessage());
+            throw $exception;
+            
         }
 
-        $this->verboseLogger()->info("Attempting to log ($level): " . $toLog);
+        $this->verboseLogger()->info("Attempting to log: [$level] " . $toLog);
 
         if ($this->config->internalCheckIgnored($level, $toLog)) {
 
@@ -99,7 +100,6 @@ class RollbarLogger extends AbstractLogger
 
         }
 
-        $this->verboseLogger()->debug('Building the payload...');
         $accessToken = $this->getAccessToken();
         $payload = $this->getPayload($accessToken, $level, $toLog, $context);
         

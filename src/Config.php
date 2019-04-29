@@ -14,6 +14,7 @@ if (!defined('ROLLBAR_INCLUDED_ERRNO_BITMASK')) {
 class Config
 {
     const VERBOSE_NONE = 'none';
+    const VERBOSE_NONE_INT = 1000;
 
     private static $options = array(
         'access_token',
@@ -523,7 +524,7 @@ class Config
     public function verboseInteger()
     {
         if ($this->verbose == self::VERBOSE_NONE) {
-            return 1000;
+            return self::VERBOSE_NONE_INT;
         }
         return \Monolog\Logger::toMonologLevel($this->verbose);
     }
@@ -917,6 +918,7 @@ class Config
         $floatRand = mt_rand() / ($this->mtRandmax + 1);
         if ($floatRand > $this->exceptionSampleRate($toLog)) {
             // skip
+            $this->verboseLogger()->debug("Skip exception due to exception sample rating");
             return true;
         }
         

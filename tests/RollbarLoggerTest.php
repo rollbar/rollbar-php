@@ -12,11 +12,13 @@ class RollbarLoggerTest extends BaseRollbarTest
     public function setUp()
     {
         $_SESSION = array();
+        parent::setUp();
     }
     
     public function tearDown()
     {
         Rollbar::destroy();
+        parent::tearDown();
     }
     
     public function testAddCustom()
@@ -179,11 +181,18 @@ class RollbarLoggerTest extends BaseRollbarTest
             "verbose" => \Rollbar\Config::VERBOSE_NONE
         ));
 
+        $verboseLogger = $logger->verboseLogger();
+        $originalHandler = $verboseLogger->getHandlers();
+        $originalHandler = $originalHandler[0];
+
         $handlerMock = $this->getMockBuilder('\Monolog\Handler\ErrorLogHandler')
             ->setMethods(array('handle'))
             ->getMock();
 
-        $verboseLogger = $logger->verboseLogger();
+        $handlerMock->setLevel($originalHandler->getLevel());
+        
+        $handlerMock->expects($this->never())->method('handle');
+
         $verboseLogger->setHandlers(array($handlerMock));
 
         $logger->info('Internal message');
@@ -197,12 +206,17 @@ class RollbarLoggerTest extends BaseRollbarTest
             "verbose" => \Psr\Log\LogLevel::DEBUG
         ));
 
+        $verboseLogger = $logger->verboseLogger();
+        $originalHandler = $verboseLogger->getHandlers();
+        $originalHandler = $originalHandler[0];
+
         $handlerMock = $this->getMockBuilder('\Monolog\Handler\ErrorLogHandler')
             ->setMethods(array('handle'))
             ->getMock();
+        $handlerMock->setLevel($originalHandler->getLevel());
+
         $handlerMock->expects($this->atLeastOnce())->method('handle');
 
-        $verboseLogger = $logger->verboseLogger();
         $verboseLogger->setHandlers(array($handlerMock));
 
         $logger->info('Internal message');
@@ -214,6 +228,7 @@ class RollbarLoggerTest extends BaseRollbarTest
             "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php"
         ));
+
         $response = $logger->log(Level::WARNING, "Testing PHP Notifier", array());
         $this->assertEquals(200, $response->getStatus());
         
@@ -224,6 +239,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         ));
         $response = $logger->log(Level::WARNING, "Testing PHP Notifier", array());
         $this->assertEquals(0, $response->getStatus());
+        $this->assertEquals("Disabled", $response->getInfo());
     }
 
     public function testTransmit()
