@@ -77,30 +77,58 @@ class RollbarLogger extends AbstractLogger
     public function log($level, $toLog, array $context = array(), $isUncaught = false)
     {
         if ($this->disabled()) {
+
+            $this->verboseLogger()->notice('Rollbar is disabled');
             return new Response(0, "Disabled");
+            
         }
         
         if (!$this->levelFactory->isValidLevel($level)) {
+
+            $this->verboseLogger()->error("Invalid log level '$level'.");
             throw new \Psr\Log\InvalidArgumentException("Invalid log level '$level'.");
+
         }
+
+        $this->verboseLogger()->info("Attempting to log ($level): " . $toLog);
+
         if ($this->config->internalCheckIgnored($level, $toLog)) {
+
+            $this->verboseLogger()->info('Occurrence ignored');
             return new Response(0, "Ignored");
+
         }
+
+        $this->verboseLogger()->debug('Building the payload...');
         $accessToken = $this->getAccessToken();
         $payload = $this->getPayload($accessToken, $level, $toLog, $context);
         
         if ($this->config->checkIgnored($payload, $accessToken, $toLog, $isUncaught)) {
+
+            $this->verboseLogger()->info('Occurrence ignored');
             $response = new Response(0, "Ignored");
+
         } else {
             $serialized = $payload->serialize($this->config->getMaxNestingDepth());
+
             $scrubbed = $this->scrub($serialized);
+
             $encoded = $this->encode($scrubbed);
+
             $truncated = $this->truncate($encoded);
             
             $response = $this->send($truncated, $accessToken);
         }
         
         $this->handleResponse($payload, $response);
+
+        if ($response->getStatus() === 0) {
+            $this->verboseLogger()->error('Occurrence rejected by the SDK');
+        } else if ($response->getStatus() >= 400) {
+            $this->verboseLogger()->error('Occurrence rejected by the API');
+        } else {
+            $this->verboseLogger()->info('Occurrence successfully logged');
+        }
         
         return $response;
     }
@@ -112,6 +140,7 @@ class RollbarLogger extends AbstractLogger
             $this->queue = array();
             return $this->config->sendBatch($batch, $this->getAccessToken());
         }
+        $this->verboseLogger()->debug('Queue flushed');
         return new Response(0, "Queue empty");
     }
 
@@ -134,12 +163,14 @@ class RollbarLogger extends AbstractLogger
     protected function send(\Rollbar\Payload\EncodedPayload $payload, $accessToken)
     {
         if ($this->reportCount >= $this->config->getMaxItems()) {
-            return new Response(
+            $response = new Response(
                 0,
                 "Maximum number of items per request has been reached. If you " .
                 "want to report more items, please use `max_items` " .
                 "configuration option."
             );
+            $this->verboseLogger()->warning($response->getInfo());
+            return $response;
         } else {
             $this->reportCount++;
         }
@@ -150,6 +181,7 @@ class RollbarLogger extends AbstractLogger
                 $response = $this->flush();
             }
             $this->queue[] = $payload;
+            $this->verboseLogger()->debug("Added payload to the queue (running in `batched` mode.");
             return $response;
         }
         

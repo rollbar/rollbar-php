@@ -168,9 +168,6 @@ class ConfigTest extends BaseRollbarTest
         ));
         $this->assertEquals(1000, $config->verboseInteger());
 
-        $config->configure(array('verbose' => Config::VERBOSE_TRACE));
-        $this->assertEquals(50, $config->verboseInteger());
-
         $config->configure(array('verbose' => \Psr\Log\LogLevel::DEBUG));
         $this->assertEquals(100, $config->verboseInteger());
     }

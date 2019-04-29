@@ -764,6 +764,7 @@ class Config
     public function transform($payload, $level, $toLog, $context)
     {
         if (count($this->custom) > 0) {
+            $this->verboseLogger()->debug("Adding custom data to the payload.");
             $data = $payload->getData();
             $custom = $data->getCustom();
             $custom = array_merge(array(), $this->custom, (array)$custom);
@@ -773,6 +774,9 @@ class Config
         if (is_null($this->transformer)) {
             return $payload;
         }
+
+        $this->verboseLogger()->debug("Applying transformer " . get_class($this->transformer) . " to the payload.");
+
         return $this->transformer->transform($payload, $level, $toLog, $context);
     }
 
@@ -801,20 +805,26 @@ class Config
         if (isset($this->checkIgnore)) {
             try {
                 if (call_user_func($this->checkIgnore, $isUncaught, $toLog, $payload)) {
+                    $this->verboseLogger()->info('Occurrence ignored due to custom checkIgnore logic');
                     return true;
                 }
             } catch (Exception $exception) {
-                // We should log that we are removing the custom checkIgnore
+                $this->verboseLogger()->error(
+                    'Exception occurred in the custom checkIgnore logic:' . $exception->getMessage()
+                );
                 $this->checkIgnore = null;
             }
         }
         
         if ($this->payloadLevelTooLow($payload)) {
+            $this->verboseLogger()->debug("Occurrence's level is too low");
             return true;
         }
 
         if (!is_null($this->filter)) {
-            return $this->filter->shouldSend($payload, $accessToken);
+            $filter = $this->filter->shouldSend($payload, $accessToken);
+            $this->verboseLogger()->debug("Custom filter result: $filter");
+            return $filter;
         }
 
         return false;
@@ -823,10 +833,12 @@ class Config
     public function internalCheckIgnored($level, $toLog)
     {
         if ($this->shouldSuppress()) {
+            $this->verboseLogger()->debug('Ignoring due to error reporting has been disabled in PHP config');
             return true;
         }
 
         if ($this->levelTooLow($this->levelFactory->fromName($level))) {
+            $this->verboseLogger()->debug("Occurrence's level is too low");
             return true;
         }
 
@@ -853,11 +865,13 @@ class Config
     {
         if ($this->useErrorReporting && ($errno & error_reporting()) === 0) {
             // ignore due to error_reporting level
+            $this->verboseLogger()->debug("Ignore due to error_reporting level");
             return true;
         }
 
         if ($this->includedErrno != -1 && ($errno & $this->includedErrno) != $errno) {
             // ignore
+            $this->verboseLogger()->debug("Ignore due to includedErrno level");
             return true;
         }
 
@@ -867,6 +881,7 @@ class Config
             $float_rand = mt_rand() / ($this->mtRandmax + 1);
             if ($float_rand > $this->errorSampleRates[$errno]) {
                 // skip
+                $this->verboseLogger()->debug("Skip due to error sample rating");
                 return true;
             }
         }
@@ -970,6 +985,7 @@ class Config
             $response = $this->sender->send($payload, $accessToken);
         } else {
             $response = new Response(0, "Not transmitting (transmitting disabled in configuration)");
+            $this->verboseLogger()->warning($response->getInfo());
         }
 
         if ($this->outputting()) {
@@ -988,18 +1004,24 @@ class Config
         if ($this->transmitting()) {
             return $this->sender->sendBatch($batch, $accessToken);
         } else {
-            return new Response(0, "Not transmitting (transmitting disabled in configuration)");
+            $response = new Response(0, "Not transmitting (transmitting disabled in configuration)");
+            $this->verboseLogger()->warning($response->getInfo());
+            return $response;
         }
     }
 
     public function wait($accessToken, $max = 0)
     {
-          $this->sender->wait($accessToken, $max);
+        $this->verboseLogger()->debug("Sender waiting...");
+        $this->sender->wait($accessToken, $max);
     }
 
     public function handleResponse($payload, $response)
     {
         if (!is_null($this->responseHandler)) {
+            $this->verboseLogger()->debug(
+                'Applying custom response handler: ' . get_class($this->responseHandler)
+            );
             $this->responseHandler->handleResponse($payload, $response);
         }
     }
