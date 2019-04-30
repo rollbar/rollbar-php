@@ -53,20 +53,21 @@ class VerbosityTest extends BaseRollbarTest
      */
     public function testRollbarLoggerEnabled()
     {
+        $unitTest = $this;
         $this->rollbarLogTest(
             array( // config
                 "access_token" => $this->getTestAccessToken(),
                 "environment" => "testing-php",
                 "enabled" => true
             ),
-            function () {
+            function () use ($unitTest) {
             // verbosity expectations
-                $this->expectLog(
+                $unitTest->expectLog(
                     0,
                     '/Attempting to log: \[warning\] Testing PHP Notifier/',
                     \Psr\Log\LogLevel::INFO
                 );
-                $this->expectLog(
+                $unitTest->expectLog(
                     1,
                     '/Occurrence/',
                     \Psr\Log\LogLevel::INFO
@@ -83,15 +84,16 @@ class VerbosityTest extends BaseRollbarTest
      */
     public function testRollbarLoggerDisabled()
     {
+        $unitTest = $this;
         $this->rollbarLogTest(
             array( // config
                 "access_token" => $this->getTestAccessToken(),
                 "environment" => "testing-php",
                 "enabled" => false
             ),
-            function () {
+            function () use ($unitTest) {
             // verbosity expectations
-                $this->expectLog(0, '/Rollbar is disabled/', \Psr\Log\LogLevel::NOTICE);
+                $unitTest->expectLog(0, '/Rollbar is disabled/', \Psr\Log\LogLevel::NOTICE);
             }
         );
     }
@@ -104,14 +106,15 @@ class VerbosityTest extends BaseRollbarTest
      */
     public function testRollbarLoggerInvalidLogLevel()
     {
+        $unitTest = $this;
         $this->rollbarLogTest(
             array( // config
                 "access_token" => $this->getTestAccessToken(),
                 "environment" => "testing-php"
             ),
-            function () {
+            function () use ($unitTest) {
             // verbosity expectations
-                $this->expectLog(0, '/Invalid log level \'nolevel\'\./', \Psr\Log\LogLevel::ERROR);
+                $unitTest->expectLog(0, '/Invalid log level \'nolevel\'\./', \Psr\Log\LogLevel::ERROR);
             },
             'nolevel' // rollbar message level
         );
@@ -125,15 +128,16 @@ class VerbosityTest extends BaseRollbarTest
      */
     public function testRollbarLoggerInternalCheckIgnored()
     {
+        $unitTest = $this;
         $errorReporting = \error_reporting();
         $this->rollbarLogTest(
             array( // config
                 "access_token" => $this->getTestAccessToken(),
                 "environment" => "testing-php"
             ),
-            function () {
+            function () use ($unitTest) {
             // verbosity expectations
-                $this->expectLog(2, '/Occurrence ignored/', \Psr\Log\LogLevel::INFO);
+                $unitTest->expectLog(2, '/Occurrence ignored/', \Psr\Log\LogLevel::INFO);
             },
             \Psr\Log\LogLevel::INFO, // rollbar message level
             function () {
@@ -155,6 +159,7 @@ class VerbosityTest extends BaseRollbarTest
      */
     public function testRollbarLoggerCheckIgnored()
     {
+        $unitTest = $this;
         $this->rollbarLogTest(
             array( // config
                 "access_token" => $this->getTestAccessToken(),
@@ -163,9 +168,9 @@ class VerbosityTest extends BaseRollbarTest
                     return true;
                 }
             ),
-            function () {
+            function () use ($unitTest) {
             // verbosity expectations
-                $this->expectLog(2, '/Occurrence ignored/', \Psr\Log\LogLevel::INFO);
+                $unitTest->expectLog(2, '/Occurrence ignored/', \Psr\Log\LogLevel::INFO);
             },
             \Psr\Log\LogLevel::INFO // rollbar message level
         );
@@ -179,15 +184,16 @@ class VerbosityTest extends BaseRollbarTest
      */
     public function testRollbarLoggerSendMaxItems()
     {
+        $unitTest = this;
         $this->rollbarLogTest(
             array( // config
                 "access_token" => $this->getTestAccessToken(),
                 "environment" => "testing-php",
                 "max_items" => 0
             ),
-            function () {
+            function () use ($unitTest) {
             // verbosity expectations
-                $this->expectLog(
+                $unitTest->expectLog(
                     1,
                     '/Maximum number of items per request has been reached.*/',
                     \Psr\Log\LogLevel::WARNING
@@ -205,15 +211,16 @@ class VerbosityTest extends BaseRollbarTest
      */
     public function testRollbarLoggerSendBatched()
     {
+        $unitTest = this;
         $this->rollbarLogTest(
             array( // config
                 "access_token" => $this->getTestAccessToken(),
                 "environment" => "testing-php",
                 "batched" => true
             ),
-            function () {
+            function () use ($unitTest) {
             // verbosity expectations
-                $this->expectLog(
+                $unitTest->expectLog(
                     1,
                     '/Added payload to the queue \(running in `batched` mode\)\./',
                     \Psr\Log\LogLevel::DEBUG
@@ -230,6 +237,7 @@ class VerbosityTest extends BaseRollbarTest
      */
     public function testRollbarLoggerFlush()
     {
+        $unitTest = $this;
         $rollbarLogger = $this->verboseRollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php"
@@ -241,9 +249,9 @@ class VerbosityTest extends BaseRollbarTest
             // logic under test
                 $rollbarLogger->flush();
             },
-            function () {
+            function () use ($unitTest) {
             // verbosity expectations
-                $this->expectLog(
+                $unitTest->expectLog(
                     0,
                     '/Queue flushed/',
                     \Psr\Log\LogLevel::DEBUG
@@ -260,6 +268,7 @@ class VerbosityTest extends BaseRollbarTest
      */
     public function testRollbarLoggerResponseStatusZero()
     {
+        $unitTest = $this;
         $this->rollbarLogTest(
             array( // config
                 "access_token" => $this->getTestAccessToken(),
@@ -268,9 +277,9 @@ class VerbosityTest extends BaseRollbarTest
                     return true;
                 }
             ),
-            function () {
+            function () use ($unitTest) {
             // verbosity expectations
-                $this->expectLog(
+                $unitTest->expectLog(
                     3,
                     '/Occurrence rejected by the SDK: .*/',
                     \Psr\Log\LogLevel::ERROR
@@ -288,15 +297,16 @@ class VerbosityTest extends BaseRollbarTest
      */
     public function testRollbarLoggerResponseStatusError()
     {
+        $unitTest = $this;
         $this->rollbarLogTest(
             array( // config
                 "access_token" => $this->getTestAccessToken(),
                 "environment" => "testing-php",
                 "endpoint" => "https://api.rollbar.com/api/foo/"
             ),
-            function () {
+            function () use($unitTest) {
             // verbosity expectations
-                $this->expectLog(
+                $unitTest->expectLog(
                     1,
                     '/Occurrence rejected by the API: .*/',
                     \Psr\Log\LogLevel::ERROR
@@ -314,14 +324,15 @@ class VerbosityTest extends BaseRollbarTest
      */
     public function testRollbarLoggerResponseStatusSuccess()
     {
+        $unitTest = $this;
         $this->rollbarLogTest(
             array( // config
                 "access_token" => $this->getTestAccessToken(),
                 "environment" => "testing-php"
             ),
-            function () {
+            function () use ($unitTest) {
             // verbosity expectations
-                $this->expectLog(
+                $unitTest->expectLog(
                     1,
                     '/Occurrence successfully logged/',
                     \Psr\Log\LogLevel::INFO
@@ -339,6 +350,7 @@ class VerbosityTest extends BaseRollbarTest
      */
     public function testRollbarConfigInternalCheckIgnoredShouldSuppress()
     {
+        $unitTest = $this;
         $config = $this->verboseRollbarConfig(array( // config
             "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php"
@@ -352,9 +364,9 @@ class VerbosityTest extends BaseRollbarTest
             // logic under test
                 $config->internalCheckIgnored(\Psr\Log\LogLevel::WARNING, "Some message");
             },
-            function () {
+            function () use ($unitTest) {
             // verbosity expectations
-                $this->expectLog(
+                $unitTest->expectLog(
                     0,
                     '/Ignoring \(error reporting has been disabled in PHP config\)/',
                     \Psr\Log\LogLevel::DEBUG
@@ -381,6 +393,7 @@ class VerbosityTest extends BaseRollbarTest
      */
     public function testRollbarConfigInternalCheckIgnoredLevelTooLow()
     {
+        $unitTest = $this;
         $config = $this->verboseRollbarConfig(array( // config
             "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php",
@@ -394,9 +407,9 @@ class VerbosityTest extends BaseRollbarTest
             // logic under test
                 $config->internalCheckIgnored(\Psr\Log\LogLevel::WARNING, "Some message");
             },
-            function () {
+            function () use ($unitTest) {
             // verbosity expectations
-                $this->expectLog(
+                $unitTest->expectLog(
                     0,
                     '/Occurrence\'s level is too low/',
                     \Psr\Log\LogLevel::DEBUG
@@ -414,6 +427,7 @@ class VerbosityTest extends BaseRollbarTest
      */
     public function testRollbarConfigShouldIgnoreErrorErrorReporting()
     {
+        $unitTest = $this;
         $config = $this->verboseRollbarConfig(array( // config
             "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php",
@@ -428,9 +442,9 @@ class VerbosityTest extends BaseRollbarTest
             // logic under test
                 $config->shouldIgnoreError(\E_WARNING);
             },
-            function () {
+            function () use ($unitTest) {
             // verbosity expectations
-                $this->expectLog(
+                $unitTest->expectLog(
                     0,
                     '/Ignore \(error below allowed error_reporting level\)/',
                     \Psr\Log\LogLevel::DEBUG
@@ -455,6 +469,7 @@ class VerbosityTest extends BaseRollbarTest
      */
     public function testRollbarConfigShouldIgnoreErrorIncludedErrno()
     {
+        $unitTest = $this;
         $config = $this->verboseRollbarConfig(array( // config
             "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php",
@@ -469,9 +484,9 @@ class VerbosityTest extends BaseRollbarTest
             // logic under test
                 $config->shouldIgnoreError(\E_ERROR);
             },
-            function () {
+            function () use ($unitTest) {
             // verbosity expectations
-                $this->expectLog(
+                $unitTest->expectLog(
                     0,
                     '/Ignore due to includedErrno level/',
                     \Psr\Log\LogLevel::DEBUG
@@ -496,6 +511,7 @@ class VerbosityTest extends BaseRollbarTest
      */
     public function testRollbarConfigShouldIgnoreErrorErrorSampleRates()
     {
+        $unitTest = $this;
         $config = $this->verboseRollbarConfig(array( // config
             "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php",
@@ -511,9 +527,9 @@ class VerbosityTest extends BaseRollbarTest
             // logic under test
                 $config->shouldIgnoreError(\E_WARNING);
             },
-            function () {
+            function () use ($unitTest) {
             // verbosity expectations
-                $this->expectLog(
+                $unitTest->expectLog(
                     0,
                     '/Skip due to error sample rating/',
                     \Psr\Log\LogLevel::DEBUG
@@ -530,6 +546,7 @@ class VerbosityTest extends BaseRollbarTest
      */
     public function testRollbarConfigShouldIgnoreException()
     {
+        $unitTest = $this;
         $config = $this->verboseRollbarConfig(array( // config
             "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php",
@@ -545,9 +562,9 @@ class VerbosityTest extends BaseRollbarTest
             // logic under test
                 $config->shouldIgnoreException(new \Exception());
             },
-            function () {
+            function () use ($unitTest) {
             // verbosity expectations
-                $this->expectLog(
+                $unitTest->expectLog(
                     0,
                     '/Skip exception due to exception sample rating/',
                     \Psr\Log\LogLevel::DEBUG
@@ -564,6 +581,7 @@ class VerbosityTest extends BaseRollbarTest
      */
     public function testRollbarConfigCheckIgnored()
     {
+        $unitTest = $this;
         $config = $this->verboseRollbarConfig(array( // config
             "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php",
@@ -579,9 +597,9 @@ class VerbosityTest extends BaseRollbarTest
             // logic under test
                 $config->checkIgnored(null, null, null, null);
             },
-            function () {
+            function () use ($unitTest) {
             // verbosity expectations
-                $this->expectLog(
+                $unitTest->expectLog(
                     0,
                     '/Occurrence ignored due to custom checkIgnore logic/',
                     \Psr\Log\LogLevel::INFO
@@ -598,6 +616,7 @@ class VerbosityTest extends BaseRollbarTest
      */
     public function testRollbarConfigCheckIgnoredException()
     {
+        $unitTest = $this;
         $config = $this->verboseRollbarConfig(array( // config
             "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php",
@@ -609,15 +628,15 @@ class VerbosityTest extends BaseRollbarTest
         $this->configurableObjectVerbosityTest(
 
             $config,
-            function () use ($config) {
+            function () use ($config, $unitTest) {
             // logic under test
                 $data = $config->getRollbarData(\Rollbar\Payload\Level::INFO, 'some message', array());
-                $payload = new \Rollbar\Payload\Payload($data, $this->getTestAccessToken());
-                $config->checkIgnored($payload, $this->getTestAccessToken(), 'some message', false);
+                $payload = new \Rollbar\Payload\Payload($data, $unitTest->getTestAccessToken());
+                $config->checkIgnored($payload, $unitTest->getTestAccessToken(), 'some message', false);
             },
-            function () {
+            function () use ($unitTest) {
             // verbosity expectations
-                $this->expectLog(
+                $unitTest->expectLog(
                     0,
                     '/Exception occurred in the custom checkIgnore logic:.*/',
                     \Psr\Log\LogLevel::ERROR
@@ -634,6 +653,7 @@ class VerbosityTest extends BaseRollbarTest
      */
     public function testRollbarConfigCheckIgnoredPayloadLevelTooLow()
     {
+        $unitTest = $this;
         $config = $this->verboseRollbarConfig(array( // config
             "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php",
@@ -643,15 +663,15 @@ class VerbosityTest extends BaseRollbarTest
         $this->configurableObjectVerbosityTest(
 
             $config,
-            function () use ($config) {
+            function () use ($config, $unitTest) {
             // logic under test
                 $data = $config->getRollbarData(\Rollbar\Payload\Level::INFO, 'some message', array());
-                $payload = new \Rollbar\Payload\Payload($data, $this->getTestAccessToken());
-                $config->checkIgnored($payload, $this->getTestAccessToken(), 'some message', false);
+                $payload = new \Rollbar\Payload\Payload($data, $unitTest->getTestAccessToken());
+                $config->checkIgnored($payload, $unitTest->getTestAccessToken(), 'some message', false);
             },
-            function () {
+            function () use ($unitTest) {
             // verbosity expectations
-                $this->expectLog(
+                $unitTest->expectLog(
                     0,
                     '/Occurrence\'s level is too low/',
                     \Psr\Log\LogLevel::DEBUG
@@ -668,6 +688,7 @@ class VerbosityTest extends BaseRollbarTest
      */
     public function testRollbarConfigCheckIgnoredFilter()
     {
+        $unitTest = $this;
         $filterMock = $this->getMockBuilder('\Rollbar\FilterInterface')->getMock();
         $filterMock->method('shouldSend')->willReturn(true);
 
@@ -680,15 +701,15 @@ class VerbosityTest extends BaseRollbarTest
         $this->configurableObjectVerbosityTest(
 
             $config,
-            function () use ($config) {
+            function () use ($config, $unitTest) {
             // logic under test
                 $data = $config->getRollbarData(\Rollbar\Payload\Level::INFO, 'some message', array());
-                $payload = new \Rollbar\Payload\Payload($data, $this->getTestAccessToken());
-                $config->checkIgnored($payload, $this->getTestAccessToken(), 'some message', false);
+                $payload = new \Rollbar\Payload\Payload($data, $unitTest->getTestAccessToken());
+                $config->checkIgnored($payload, $unitTest->getTestAccessToken(), 'some message', false);
             },
-            function () {
+            function () use ($unitTest) {
             // verbosity expectations
-                $this->expectLog(
+                $unitTest->expectLog(
                     0,
                     '/Custom filter result: true/',
                     \Psr\Log\LogLevel::DEBUG
@@ -705,6 +726,7 @@ class VerbosityTest extends BaseRollbarTest
      */
     public function testRollbarConfigSendTransmit()
     {
+        $unitTest = $this;
         $config = $this->verboseRollbarConfig(array( // config
             "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php",
@@ -714,14 +736,14 @@ class VerbosityTest extends BaseRollbarTest
         $this->configurableObjectVerbosityTest(
 
             $config,
-            function () use ($config) {
+            function () use ($config, $unitTest) {
             // logic under test
                 $encoded = new \Rollbar\Payload\EncodedPayload(array());
-                $config->send($encoded, $this->getTestAccessToken());
+                $config->send($encoded, $unitTest->getTestAccessToken());
             },
-            function () {
+            function () use ($unitTest) {
             // verbosity expectations
-                $this->expectLog(
+                $unitTest->expectLog(
                     0,
                     '/Not transmitting \(transmitting disabled in configuration\)/',
                     \Psr\Log\LogLevel::WARNING
@@ -738,6 +760,7 @@ class VerbosityTest extends BaseRollbarTest
      */
     public function testRollbarConfigSendBatchTransmit()
     {
+        $unitTest = $this;
         $config = $this->verboseRollbarConfig(array( // config
             "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php",
@@ -753,9 +776,9 @@ class VerbosityTest extends BaseRollbarTest
                 $batch = array();
                 $config->sendBatch($batch, null);
             },
-            function () {
+            function () use ($unitTest) {
             // verbosity expectations
-                $this->expectLog(
+                $unitTest->expectLog(
                     0,
                     '/Not transmitting \(transmitting disabled in configuration\)/',
                     \Psr\Log\LogLevel::WARNING
@@ -772,6 +795,7 @@ class VerbosityTest extends BaseRollbarTest
      */
     public function testRollbarConfigHandleResponse()
     {
+        $unitTest = $this;
         $responseHandlerMock = $this->getMockBuilder('\Rollbar\ResponseHandlerInterface')->getMock();
         $config = $this->verboseRollbarConfig(array( // config
             "access_token" => $this->getTestAccessToken(),
@@ -782,19 +806,19 @@ class VerbosityTest extends BaseRollbarTest
         $this->configurableObjectVerbosityTest(
 
             $config,
-            function () use ($config) {
+            function () use ($config, $unitTest) {
             // logic under test
-                $payloadMock = $this->getMockBuilder('\Rollbar\Payload')
+                $payloadMock = $unitTest->getMockBuilder('\Rollbar\Payload')
                     ->disableOriginalConstructor()
                     ->getMock();
-                $responseMock = $this->getMockBuilder('\Rollbar\Response')
+                $responseMock = $unitTest->getMockBuilder('\Rollbar\Response')
                     ->disableOriginalConstructor()
                     ->getMock();
                 $config->handleResponse($payloadMock, $responseMock);
             },
-            function () {
+            function () use ($unitTest) {
             // verbosity expectations
-                $this->expectLog(
+                $unitTest->expectLog(
                     0,
                     '/Applying custom response handler: .*/',
                     \Psr\Log\LogLevel::DEBUG
@@ -811,6 +835,7 @@ class VerbosityTest extends BaseRollbarTest
      */
     public function testRollbarTruncation()
     {
+        $unitTest = $this;
         $rollbarLogger = $this->verboseRollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php"
@@ -827,9 +852,9 @@ class VerbosityTest extends BaseRollbarTest
                     array()
                 );
             },
-            function () {
+            function () use ($unitTest) {
             // verbosity expectations
-                $this->expectLog(
+                $unitTest->expectLog(
                     1,
                     '/Applying truncation strategy .*/',
                     \Psr\Log\LogLevel::DEBUG
@@ -950,7 +975,7 @@ class VerbosityTest extends BaseRollbarTest
      * @param mock|null $handlerMock (optional) The handler mock on which to set the
      * expectations.
      */
-    private function expectLog($at, $messageRegEx, $level, $handlerMock = null)
+    public function expectLog($at, $messageRegEx, $level, $handlerMock = null)
     {
         if ($handlerMock === null) {
             $handlerMock = $this->verboseHandlerMock;
@@ -970,7 +995,7 @@ class VerbosityTest extends BaseRollbarTest
      * @param mock|null $handlerMock (optional) The handler mock on which to set the
      * expectations.
      */
-    private function expectQuiet($handlerMock = null)
+    public function expectQuiet($handlerMock = null)
     {
         if ($handlerMock === null) {
             $handlerMock = $this->verboseHandlerMock;
