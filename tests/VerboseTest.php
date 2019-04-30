@@ -246,7 +246,7 @@ class VerbosityTest extends BaseRollbarTest
                     '/Queue flushed/',
                     \Psr\Log\LogLevel::DEBUG
                 );
-            },
+            }
         );
     }
 
@@ -516,7 +516,7 @@ class VerbosityTest extends BaseRollbarTest
                     '/Skip due to error sample rating/', 
                     \Psr\Log\LogLevel::DEBUG
                 );
-            },
+            }
         );
     }
 
@@ -550,7 +550,7 @@ class VerbosityTest extends BaseRollbarTest
                     '/Skip exception due to exception sample rating/', 
                     \Psr\Log\LogLevel::DEBUG
                 );
-            },
+            }
         );
     }
 
@@ -582,7 +582,7 @@ class VerbosityTest extends BaseRollbarTest
                     '/Occurrence ignored due to custom checkIgnore logic/', 
                     \Psr\Log\LogLevel::INFO
                 );
-            },
+            }
         );
     }
 
@@ -616,7 +616,7 @@ class VerbosityTest extends BaseRollbarTest
                     '/Exception occurred in the custom checkIgnore logic:.*/', 
                     \Psr\Log\LogLevel::ERROR
                 );
-            },
+            }
         );
     }
 
@@ -650,7 +650,7 @@ class VerbosityTest extends BaseRollbarTest
                     '/Occurrence\'s level is too low/', 
                     \Psr\Log\LogLevel::DEBUG
                 );
-            },
+            }
         );
     }
 
@@ -687,7 +687,7 @@ class VerbosityTest extends BaseRollbarTest
                     '/Custom filter result: true/', 
                     \Psr\Log\LogLevel::DEBUG
                 );
-            },
+            }
         );
     }
 
@@ -720,7 +720,7 @@ class VerbosityTest extends BaseRollbarTest
                     '/Not transmitting \(transmitting disabled in configuration\)/', 
                     \Psr\Log\LogLevel::WARNING
                 );
-            },
+            }
         );
     }
 
@@ -754,7 +754,7 @@ class VerbosityTest extends BaseRollbarTest
                     '/Not transmitting \(transmitting disabled in configuration\)/', 
                     \Psr\Log\LogLevel::WARNING
                 );
-            },
+            }
         );
     }
 
@@ -793,7 +793,7 @@ class VerbosityTest extends BaseRollbarTest
                     '/Applying custom response handler: .*/', 
                     \Psr\Log\LogLevel::DEBUG
                 );
-            },
+            }
         );
     }
 
@@ -954,7 +954,7 @@ class VerbosityTest extends BaseRollbarTest
             ->expects($this->at($at))
             ->method('handle')
             ->with(
-                $this->withLogParams($messageRegEx, $level),
+                $this->withLogParams($messageRegEx, $level)
             );
     }
 
