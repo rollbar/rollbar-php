@@ -829,7 +829,7 @@ class Config
         if (isset($this->checkIgnore)) {
             try {
                 if (call_user_func($this->checkIgnore, $isUncaught, $toLog, $payload)) {
-                    $this->verboseLogger()->info('Occurrence ignored due to custom checkIgnore logic');
+                    $this->verboseLogger()->info('Occurrence ignored due to custom check_ignore logic');
                     return true;
                 }
             } catch (\Exception $exception) {
@@ -854,7 +854,7 @@ class Config
         return false;
     }
 
-    public function internalCheckIgnored($level, $toLog)
+    public function internalCheckIgnored($level, $toLog)    
     {
         if ($this->shouldSuppress()) {
             $this->verboseLogger()->debug('Ignoring (error reporting has been disabled in PHP config)');
@@ -895,7 +895,7 @@ class Config
 
         if ($this->includedErrno != -1 && ($errno & $this->includedErrno) != $errno) {
             // ignore
-            $this->verboseLogger()->debug("Ignore due to includedErrno level");
+            $this->verboseLogger()->debug("Ignore due to included_errno level");
             return true;
         }
 
