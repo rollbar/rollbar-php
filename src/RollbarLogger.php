@@ -185,7 +185,7 @@ class RollbarLogger extends AbstractLogger
                 $response = $this->flush();
             }
             $this->queue[] = $payload;
-            $this->verboseLogger()->debug("Added payload to the queue (running in `batched` mode.");
+            $this->verboseLogger()->debug("Added payload to the queue (running in `batched` mode).");
             return $response;
         }
         

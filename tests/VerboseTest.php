@@ -195,6 +195,33 @@ class VerbosityTest extends BaseRollbarTest
     }
 
     /**
+     * Test verbosity of \Rollbar\RollbarLogger::log for adding
+     * occurrences to the queue when `batched` == true.
+     * 
+     * @return void
+     */
+    public function testRollbarLoggerSendBatched()
+    {
+        $this->rollbarLogTest(
+            array( // config
+                "access_token" => $this->getTestAccessToken(),
+                "environment" => "testing-php",
+                "batched" => true
+            ),
+
+            function() { // verbosity expectations
+                $this->expectLog(
+                    1,
+                    '/Added payload to the queue \(running in `batched` mode\)\./',
+                    \Psr\Log\LogLevel::DEBUG
+                );
+            },
+
+            \Psr\Log\LogLevel::INFO, // rollbar message level
+        );
+    }
+
+    /**
      * Test verbosity of \Rollbar\Config::internalCheckIgnored 
      * when error_reporting === 0.
      * 
