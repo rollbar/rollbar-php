@@ -305,6 +305,32 @@ class VerbosityTest extends BaseRollbarTest
     }
 
     /**
+     * Test verbosity of \Rollbar\RollbarLogger::log for reports
+     * successfully processed.
+     * 
+     * @return void
+     */
+    public function testRollbarLoggerResponseStatusSuccess()
+    {
+        $this->rollbarLogTest(
+            array( // config
+                "access_token" => $this->getTestAccessToken(),
+                "environment" => "testing-php"
+            ),
+
+            function() { // verbosity expectations
+                $this->expectLog(
+                    1,
+                    '/Occurrence successfully logged/',
+                    \Psr\Log\LogLevel::INFO
+                );
+            },
+
+            \Psr\Log\LogLevel::INFO, // rollbar message level
+        );
+    }
+
+    /**
      * Test verbosity of \Rollbar\Config::internalCheckIgnored 
      * when error_reporting === 0.
      * 
