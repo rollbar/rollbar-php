@@ -857,7 +857,7 @@ class Config
     public function internalCheckIgnored($level, $toLog)
     {
         if ($this->shouldSuppress()) {
-            $this->verboseLogger()->debug('Ignoring due to error reporting has been disabled in PHP config');
+            $this->verboseLogger()->debug('Ignoring (error reporting has been disabled in PHP config)');
             return true;
         }
 

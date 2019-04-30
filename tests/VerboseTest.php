@@ -67,7 +67,7 @@ class VerbosityTest extends BaseRollbarTest
                 );
                 $this->expectLog(
                     1,
-                    '/Occurrence successfully logged/',
+                    '/Occurrence/',
                     \Psr\Log\LogLevel::INFO
                 );
             }
@@ -355,14 +355,12 @@ class VerbosityTest extends BaseRollbarTest
             function() { // verbosity expectations
                 $this->expectLog(
                     0, 
-                    '/Ignoring due to error reporting has been disabled in PHP config/', 
+                    '/Ignoring \(error reporting has been disabled in PHP config\)/', 
                     \Psr\Log\LogLevel::DEBUG
                 );
             }, 
 
-            function() use ($errorReporting) { // test setup
-
-                $errorReporting = \error_reporting();
+            function() { // test setup
                 \error_reporting(0);
 
             }, function() use ($errorReporting) { // test cleanup
@@ -419,7 +417,7 @@ class VerbosityTest extends BaseRollbarTest
             "environment" => "testing-php",
             "use_error_reporting" => true
         ));
-        $error_reporting = \error_reporting(0);
+        $errorReporting = \error_reporting();
 
         $this->configurableObjectVerbosityTest(
 
@@ -460,7 +458,7 @@ class VerbosityTest extends BaseRollbarTest
             "environment" => "testing-php",
             "included_errno" => \E_WARNING
         ));
-        $error_reporting = \error_reporting(0);
+        $errorReporting = \error_reporting();
 
         $this->configurableObjectVerbosityTest(
 
