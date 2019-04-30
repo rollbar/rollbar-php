@@ -70,22 +70,22 @@ class Config
     
     private $accessToken;
     /**
-     * @var boolean $enabled If this is false then do absolutely nothing, 
-     * try to be as close to the scenario where Rollbar did not exist at 
+     * @var boolean $enabled If this is false then do absolutely nothing,
+     * try to be as close to the scenario where Rollbar did not exist at
      * all in the code.
      * Default: true
      */
     private $enabled = true;
 
     /**
-     * @var boolean $transmit If this is false then we do everything except 
+     * @var boolean $transmit If this is false then we do everything except
      * make the post request at the end of the pipeline.
      * Default: true
      */
     private $transmit;
 
     /**
-     * @var boolean $output If this is true then we output the payload to 
+     * @var boolean $output If this is true then we output the payload to
      * standard out or a configured logger right before transmitting.
      * Default: false
      */
@@ -101,12 +101,12 @@ class Config
 
     /**
      * @var string $verbose If this is set to any of the \Psr\Log\LogLevel options
-     * then we output messages related to the processing of items that might be 
+     * then we output messages related to the processing of items that might be
      * useful to someone trying to understand what Rollbar is doing. The logged
-     * messages are dependent on the level of verbosity. The supported options are 
-     * all the log levels of \Psr\Log\LogLevel 
+     * messages are dependent on the level of verbosity. The supported options are
+     * all the log levels of \Psr\Log\LogLevel
      * (https://github.com/php-fig/log/blob/master/Psr/Log/LogLevel.php) plus
-     * an additional Rollbar\Config::VERBOSE_NONE option which makes the SDK quiet 
+     * an additional Rollbar\Config::VERBOSE_NONE option which makes the SDK quiet
      * (excluding `output` option configured separetely).
      * Essentially this option controls the level of verbosity of the default
      * `verbose_logger`. If you override the default `verbose_logger`, you need
@@ -348,21 +348,21 @@ class Config
     private function setTransmit($config)
     {
         $this->transmit = isset($config['transmit']) ?
-            $config['transmit'] : 
+            $config['transmit'] :
             \Rollbar\Defaults::get()->transmit();
     }
 
     private function setOutput($config)
     {
         $this->output = isset($config['output']) ?
-            $config['output'] : 
+            $config['output'] :
             \Rollbar\Defaults::get()->output();
     }
 
     private function setOutputLogger($config)
     {
         $this->outputLogger = isset($config['output_logger']) ?
-            $config['output_logger'] : 
+            $config['output_logger'] :
             new \Monolog\Logger('rollbar.output', array(new \Monolog\Handler\ErrorLogHandler()));
         
         if (!($this->outputLogger instanceof \Psr\Log\LoggerInterface)) {
@@ -373,7 +373,7 @@ class Config
     private function setVerbose($config)
     {
         $this->verbose = isset($config['verbose']) ?
-            $config['verbose'] : 
+            $config['verbose'] :
             \Rollbar\Defaults::get()->verbose();
     }
 

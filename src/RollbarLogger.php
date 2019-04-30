@@ -77,37 +77,29 @@ class RollbarLogger extends AbstractLogger
     public function log($level, $toLog, array $context = array(), $isUncaught = false)
     {
         if ($this->disabled()) {
-
             $this->verboseLogger()->notice('Rollbar is disabled');
             return new Response(0, "Disabled");
-            
         }
         
         if (!$this->levelFactory->isValidLevel($level)) {
-
             $exception = new \Psr\Log\InvalidArgumentException("Invalid log level '$level'.");
             $this->verboseLogger()->error($exception->getMessage());
             throw $exception;
-            
         }
 
         $this->verboseLogger()->info("Attempting to log: [$level] " . $toLog);
 
         if ($this->config->internalCheckIgnored($level, $toLog)) {
-
             $this->verboseLogger()->info('Occurrence ignored');
             return new Response(0, "Ignored");
-
         }
 
         $accessToken = $this->getAccessToken();
         $payload = $this->getPayload($accessToken, $level, $toLog, $context);
         
         if ($this->config->checkIgnored($payload, $accessToken, $toLog, $isUncaught)) {
-
             $this->verboseLogger()->info('Occurrence ignored');
             $response = new Response(0, "Ignored");
-
         } else {
             $serialized = $payload->serialize($this->config->getMaxNestingDepth());
 
@@ -124,7 +116,7 @@ class RollbarLogger extends AbstractLogger
 
         if ($response->getStatus() === 0) {
             $this->verboseLogger()->error('Occurrence rejected by the SDK');
-        } else if ($response->getStatus() >= 400) {
+        } elseif ($response->getStatus() >= 400) {
             $this->verboseLogger()->error('Occurrence rejected by the API');
         } else {
             $this->verboseLogger()->info('Occurrence successfully logged');

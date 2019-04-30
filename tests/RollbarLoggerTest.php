@@ -141,7 +141,6 @@ class RollbarLoggerTest extends BaseRollbarTest
         $response = $logger->log(Level::WARNING, "Testing PHP Notifier");
         
         $this->assertEquals(200, $response->getStatus());
-        
     }
 
     public function testOutputting()
@@ -165,7 +164,6 @@ class RollbarLoggerTest extends BaseRollbarTest
         $response = $logger->log(Level::WARNING, "Testing PHP Notifier");
         
         $this->assertEquals(200, $response->getStatus());
-        
     }
 
     public function testDefaultVerbose()
@@ -336,7 +334,6 @@ class RollbarLoggerTest extends BaseRollbarTest
         $this->assertEquals("Pending", $response->getInfo());
 
         $response = $logger->flush();
-
     }
     
     public function testContext()
