@@ -832,7 +832,7 @@ class Config
                     $this->verboseLogger()->info('Occurrence ignored due to custom checkIgnore logic');
                     return true;
                 }
-            } catch (Exception $exception) {
+            } catch (\Exception $exception) {
                 $this->verboseLogger()->error(
                     'Exception occurred in the custom checkIgnore logic:' . $exception->getMessage()
                 );
@@ -847,7 +847,7 @@ class Config
 
         if (!is_null($this->filter)) {
             $filter = $this->filter->shouldSend($payload, $accessToken);
-            $this->verboseLogger()->debug("Custom filter result: $filter");
+            $this->verboseLogger()->debug("Custom filter result: " . var_export($filter, true));
             return $filter;
         }
 
@@ -889,7 +889,7 @@ class Config
     {
         if ($this->useErrorReporting && ($errno & error_reporting()) === 0) {
             // ignore due to error_reporting level
-            $this->verboseLogger()->debug("Ignore due to error_reporting level");
+            $this->verboseLogger()->debug("Ignore (error below allowed error_reporting level)");
             return true;
         }
 
@@ -934,7 +934,7 @@ class Config
      *
      * @return bool
      */
-    protected function shouldIgnoreException(\Exception $toLog)
+    public function shouldIgnoreException(\Exception $toLog)
     {
         // get a float in the range [0, 1)
         // mt_rand() is inclusive, so add 1 to mt_randmax
