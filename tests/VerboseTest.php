@@ -531,6 +531,41 @@ class VerbosityTest extends BaseRollbarTest
     }
 
     /**
+     * Test verbosity of \Rollbar\Truncation\Truncation::registerStrategy
+     * in truncate method.
+     * 
+     * @return void
+     */
+    public function testRollbarTruncation()
+    {   
+        $rollbarLogger = $this->verboseRollbarLogger(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => "testing-php"
+        ));
+
+        $this->configurableObjectVerbosityTest(
+
+            $rollbarLogger,
+
+            function() use ($rollbarLogger) { // logic under test
+                $rollbarLogger->log(
+                    \Rollbar\Payload\Level::INFO,
+                    \str_repeat("x", \Rollbar\Truncation\Truncation::MAX_PAYLOAD_SIZE), 
+                    array()
+                );
+            },
+
+            function() { // verbosity expectations
+                $this->expectLog(
+                    1,
+                    '/Applying truncation strategy .*/',
+                    \Psr\Log\LogLevel::DEBUG
+                );
+            }
+        );
+    }
+
+    /**
      * @var mock $verboseHandlerMock The verboser log handler used for
      * verbose logging in tests.
      */
