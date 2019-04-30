@@ -681,6 +681,45 @@ class VerbosityTest extends BaseRollbarTest
     }
 
     /**
+     * Test verbosity of \Rollbar\Config::handleResponse with
+     * custom `responseHandler`.
+     * 
+     * @return void
+     */
+    public function testRollbarConfigHandleResponse()
+    {
+        $responseHandlerMock = $this->getMockBuilder('\Rollbar\ResponseHandlerInterface')->getMock();
+        $config = $this->verboseRollbarConfig(array( // config
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => "testing-php",
+            "responseHandler" => $responseHandlerMock
+        ));
+
+        $this->configurableObjectVerbosityTest(
+
+            $config,
+
+            function() use ($config) { // logic under test
+                $payloadMock = $this->getMockBuilder('\Rollbar\Payload')
+                    ->disableOriginalConstructor()
+                    ->getMock();
+                $responseMock = $this->getMockBuilder('\Rollbar\Response')
+                    ->disableOriginalConstructor()
+                    ->getMock();
+                $config->handleResponse($payloadMock, $responseMock);
+            },
+            
+            function() { // verbosity expectations
+                $this->expectLog(
+                    0,
+                    '/Applying custom response handler: .*/', 
+                    \Psr\Log\LogLevel::DEBUG
+                );
+            },
+        );
+    }
+
+    /**
      * Test verbosity of \Rollbar\Truncation\Truncation::registerStrategy
      * in truncate method.
      * 
