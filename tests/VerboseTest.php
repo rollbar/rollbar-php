@@ -184,7 +184,7 @@ class VerbosityTest extends BaseRollbarTest
      */
     public function testRollbarLoggerSendMaxItems()
     {
-        $unitTest = this;
+        $unitTest = $this;
         $this->rollbarLogTest(
             array( // config
                 "access_token" => $this->getTestAccessToken(),
@@ -211,7 +211,7 @@ class VerbosityTest extends BaseRollbarTest
      */
     public function testRollbarLoggerSendBatched()
     {
-        $unitTest = this;
+        $unitTest = $this;
         $this->rollbarLogTest(
             array( // config
                 "access_token" => $this->getTestAccessToken(),
@@ -304,7 +304,7 @@ class VerbosityTest extends BaseRollbarTest
                 "environment" => "testing-php",
                 "endpoint" => "https://api.rollbar.com/api/foo/"
             ),
-            function () use($unitTest) {
+            function () use ($unitTest) {
             // verbosity expectations
                 $unitTest->expectLog(
                     1,
