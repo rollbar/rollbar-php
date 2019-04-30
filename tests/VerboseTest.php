@@ -222,6 +222,35 @@ class VerbosityTest extends BaseRollbarTest
     }
 
     /**
+     * Test verbosity of \Rollbar\RollbarLogger::flush
+     * 
+     * @return void
+     */
+    public function testRollbarLoggerFlush()
+    {
+        $rollbarLogger = $this->verboseRollbarLogger(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => "testing-php"
+        ));
+
+        $this->configurableObjectVerbosityTest(
+            $rollbarLogger,
+
+            function() use ($rollbarLogger) { // logic under test
+                $rollbarLogger->flush();
+            },
+
+            function() { // verbosity expectations
+                $this->expectLog(
+                    0,
+                    '/Queue flushed/',
+                    \Psr\Log\LogLevel::DEBUG
+                );
+            },
+        );
+    }
+
+    /**
      * Test verbosity of \Rollbar\Config::internalCheckIgnored 
      * when error_reporting === 0.
      * 
