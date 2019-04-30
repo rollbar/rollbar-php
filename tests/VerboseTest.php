@@ -1002,6 +1002,7 @@ class VerbosityTest extends BaseRollbarTest
         $pre = null,
         $post = null
     ) {
+        $unitTest = $this;
         // Quiet scenario
         $this->prepareForLogMocking(
             array('verbose' => \Rollbar\Config::VERBOSE_NONE),
@@ -1009,8 +1010,8 @@ class VerbosityTest extends BaseRollbarTest
         );
         $this->withTestLambdas(
             $test,
-            function () {
-                $this->expectQuiet();
+            function () use ($unitTest) {
+                $unitTest->expectQuiet();
             },
             $pre,
             $post
