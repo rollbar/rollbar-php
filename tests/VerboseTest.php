@@ -163,7 +163,7 @@ class VerbosityTest extends BaseRollbarTest
                 $this->expectLog(2, '/Occurrence ignored/', \Psr\Log\LogLevel::INFO);
             },
 
-            \Psr\Log\LogLevel::INFO, // rollbar message level
+            \Psr\Log\LogLevel::INFO // rollbar message level
         );
     }
 
@@ -190,7 +190,7 @@ class VerbosityTest extends BaseRollbarTest
                 );
             },
 
-            \Psr\Log\LogLevel::INFO, // rollbar message level
+            \Psr\Log\LogLevel::INFO // rollbar message level
         );
     }
 
@@ -217,7 +217,7 @@ class VerbosityTest extends BaseRollbarTest
                 );
             },
 
-            \Psr\Log\LogLevel::INFO, // rollbar message level
+            \Psr\Log\LogLevel::INFO // rollbar message level
         );
     }
 
@@ -273,7 +273,7 @@ class VerbosityTest extends BaseRollbarTest
                 );
             },
 
-            \Psr\Log\LogLevel::INFO, // rollbar message level
+            \Psr\Log\LogLevel::INFO // rollbar message level
         );
     }
 
@@ -300,7 +300,7 @@ class VerbosityTest extends BaseRollbarTest
                 );
             },
 
-            \Psr\Log\LogLevel::INFO, // rollbar message level
+            \Psr\Log\LogLevel::INFO // rollbar message level
         );
     }
 
@@ -326,7 +326,7 @@ class VerbosityTest extends BaseRollbarTest
                 );
             },
 
-            \Psr\Log\LogLevel::INFO, // rollbar message level
+            \Psr\Log\LogLevel::INFO // rollbar message level
         );
     }
 
