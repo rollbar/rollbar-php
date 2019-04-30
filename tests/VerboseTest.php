@@ -585,6 +585,73 @@ class VerbosityTest extends BaseRollbarTest
     }
 
     /**
+     * Test verbosity of \Rollbar\Config::send due the
+     * custom `transmit` == false.
+     * 
+     * @return void
+     */
+    public function testRollbarConfigSendTransmit()
+    {
+        $config = $this->verboseRollbarConfig(array( // config
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => "testing-php",
+            "transmit" => false
+        ));
+
+        $this->configurableObjectVerbosityTest(
+
+            $config,
+
+            function() use ($config) { // logic under test
+                $encoded = new \Rollbar\Payload\EncodedPayload(array());
+                $config->send($encoded, $this->getTestAccessToken());
+            },
+            
+            function() { // verbosity expectations
+                $this->expectLog(
+                    0,
+                    '/Not transmitting \(transmitting disabled in configuration\)/', 
+                    \Psr\Log\LogLevel::WARNING
+                );
+            },
+        );
+    }
+
+    /**
+     * Test verbosity of \Rollbar\Config::sendBatch due the
+     * custom `transmit` == false.
+     * 
+     * @return void
+     */
+    public function testRollbarConfigSendBatchTransmit()
+    {
+        $config = $this->verboseRollbarConfig(array( // config
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => "testing-php",
+            "transmit" => false,
+            "batched" => true
+        ));
+
+        $this->configurableObjectVerbosityTest(
+
+            $config,
+
+            function() use ($config) { // logic under test
+                $batch = array();
+                $config->sendBatch($batch, null);
+            },
+            
+            function() { // verbosity expectations
+                $this->expectLog(
+                    0,
+                    '/Not transmitting \(transmitting disabled in configuration\)/', 
+                    \Psr\Log\LogLevel::WARNING
+                );
+            },
+        );
+    }
+
+    /**
      * Test verbosity of \Rollbar\Truncation\Truncation::registerStrategy
      * in truncate method.
      * 
