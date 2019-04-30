@@ -251,6 +251,33 @@ class VerbosityTest extends BaseRollbarTest
     }
 
     /**
+     * Test verbosity of \Rollbar\RollbarLogger::log for reports
+     * rejected by the SDK (response status == 0).
+     * 
+     * @return void
+     */
+    public function testRollbarLoggerResponseStatusZero()
+    {
+        $this->rollbarLogTest(
+            array( // config
+                "access_token" => $this->getTestAccessToken(),
+                "environment" => "testing-php",
+                "check_ignore" => function() { return true; }
+            ),
+
+            function() { // verbosity expectations
+                $this->expectLog(
+                    3,
+                    '/Occurrence rejected by the SDK/',
+                    \Psr\Log\LogLevel::ERROR
+                );
+            },
+
+            \Psr\Log\LogLevel::INFO, // rollbar message level
+        );
+    }
+
+    /**
      * Test verbosity of \Rollbar\Config::internalCheckIgnored 
      * when error_reporting === 0.
      * 
