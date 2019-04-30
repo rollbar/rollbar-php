@@ -332,6 +332,11 @@ class Defaults
     {
         return $value !== null ? $value : $this->minimumLevel;
     }
+    
+    public function raiseOnError($value = null)
+    {
+        return $value !== null ? $value : $this->raiseOnError;
+    }
 
     private $psrLevels;
     private $errorLevels;
@@ -382,4 +387,5 @@ class Defaults
     private $customTruncation = null;
     private $maxItems = 10;
     private $minimumLevel = 0;
+    private $raiseOnError = false;
 }

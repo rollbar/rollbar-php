@@ -262,6 +262,11 @@ class DefaultsTest extends BaseRollbarTest
         $this->assertEquals(10, $this->defaults->maxItems());
     }
     
+    public function testRaiseOnError()
+    {
+        $this->assertEquals(false, $this->defaults->raiseOnError());
+    }
+    
     public function testDefaultsForConfigOptions()
     {
         foreach (\Rollbar\Config::listOptions() as $option) {

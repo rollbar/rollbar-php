@@ -820,4 +820,22 @@ class RollbarLoggerTest extends BaseRollbarTest
             'use provided max_items' => array(3)
         );
     }
+    
+    /**
+     * @expectedException Exception
+     */
+    public function testRaiseOnError()
+    {
+        $logger = new RollbarLogger(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => 'test',
+            "raise_on_error" => true
+        ));
+        
+        try {
+            throw new \Exception();
+        } catch (\Exception $ex) {
+            $logger->log(Level::ERROR, $ex);
+        }
+    }
 }

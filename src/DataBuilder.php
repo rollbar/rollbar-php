@@ -388,7 +388,7 @@ class DataBuilder implements DataBuilderInterface
         return $data;
     }
 
-    protected function getEnvironment()
+    public function getEnvironment()
     {
         return $this->environment;
     }

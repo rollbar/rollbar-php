@@ -130,6 +130,10 @@ class RollbarLogger extends AbstractLogger
             $this->verboseLogger()->info('Occurrence successfully logged');
         }
         
+        if ((is_a($toLog, 'Throwable') || is_a($toLog, 'Exception')) && $this->config->getRaiseOnError()) {
+            throw $toLog;
+        }
+        
         return $response;
     }
 
