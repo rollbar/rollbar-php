@@ -168,6 +168,33 @@ class VerbosityTest extends BaseRollbarTest
     }
 
     /**
+     * Test verbosity of \Rollbar\RollbarLogger::log when
+     * `max_items` is reached.
+     * 
+     * @return void
+     */
+    public function testRollbarLoggerSendMaxItems()
+    {
+        $this->rollbarLogTest(
+            array( // config
+                "access_token" => $this->getTestAccessToken(),
+                "environment" => "testing-php",
+                "max_items" => 0
+            ),
+
+            function() { // verbosity expectations
+                $this->expectLog(
+                    1,
+                    '/Maximum number of items per request has been reached.*/',
+                    \Psr\Log\LogLevel::WARNING
+                );
+            },
+
+            \Psr\Log\LogLevel::INFO, // rollbar message level
+        );
+    }
+
+    /**
      * Test verbosity of \Rollbar\Config::internalCheckIgnored 
      * when error_reporting === 0.
      * 
