@@ -11,6 +11,9 @@ use \Rollbar\Payload\Level as Level;
  * Instead it tests `verbose` functionality across multiple
  * classes.
  * 
+ * The log mocking is achieved by mocking out the `handle`
+ * method of the log handler used in the `verbose_logger`.
+ * 
  * @package Rollbar
  * @author Artur Moczulski <artur.moczulski@gmail.com>
  * @author Rollbar, Inc.
@@ -359,7 +362,10 @@ class VerbosityTest extends BaseRollbarTest
 
     /**
      * Test helper providing a quiet and verbose scenario testing
-     * for given functionality.
+     * for given functionality. Passing `verbose` config option
+     * to the initial config is not needed as the method takes 
+     * care of performing assertions in both quiet and verbose 
+     * scenarios.
      * 
      * @param \Rollbar\RollbarLogger|\Rollbar\Config $object Object under test.
      * @param callback $test Logic under test
@@ -432,7 +438,10 @@ class VerbosityTest extends BaseRollbarTest
 
     /**
      * Convenience test helper for a Rollbar logger log test with
-     * a verbose logger handler mock.
+     * a verbose logger handler mock. Passing `verbose` config option
+     * to the initial config is not needed as 
+     * `configurableObjectVerbosityTest` takes care of performing
+     * assertions in both quiet and verbose scenarios.
      * 
      * @param array $config Configuration for Rollbar logger.
      * @param callback $expectations A callback with expectations to be
