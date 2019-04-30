@@ -278,6 +278,33 @@ class VerbosityTest extends BaseRollbarTest
     }
 
     /**
+     * Test verbosity of \Rollbar\RollbarLogger::log for reports
+     * rejected by the API (response status >= 400).
+     * 
+     * @return void
+     */
+    public function testRollbarLoggerResponseStatusError()
+    {
+        $this->rollbarLogTest(
+            array( // config
+                "access_token" => $this->getTestAccessToken(),
+                "environment" => "testing-php",
+                "endpoint" => "https://api.rollbar.com/api/foo/"
+            ),
+
+            function() { // verbosity expectations
+                $this->expectLog(
+                    1,
+                    '/Occurrence rejected by the API/',
+                    \Psr\Log\LogLevel::ERROR
+                );
+            },
+
+            \Psr\Log\LogLevel::INFO, // rollbar message level
+        );
+    }
+
+    /**
      * Test verbosity of \Rollbar\Config::internalCheckIgnored 
      * when error_reporting === 0.
      * 
