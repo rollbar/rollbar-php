@@ -272,7 +272,7 @@ class VerbosityTest extends BaseRollbarTest
             // verbosity expectations
                 $this->expectLog(
                     3,
-                    '/Occurrence rejected by the SDK/',
+                    '/Occurrence rejected by the SDK: .*/',
                     \Psr\Log\LogLevel::ERROR
                 );
             },
@@ -298,7 +298,7 @@ class VerbosityTest extends BaseRollbarTest
             // verbosity expectations
                 $this->expectLog(
                     1,
-                    '/Occurrence rejected by the API/',
+                    '/Occurrence rejected by the API: .*/',
                     \Psr\Log\LogLevel::ERROR
                 );
             },
