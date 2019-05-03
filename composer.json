@@ -56,7 +56,7 @@
       "phpcs --standard=PSR1,PSR2 src tests"
     ],
     "fix": "phpcbf --standard=PSR1,PSR2 src tests",
-    "get-js-snippet": "curl -X GET https://raw.githubusercontent.com/rollbar/rollbar.js/v2.3.6/dist/rollbar.snippet.js > data/rollbar.snippet.js",
+    "get-js-snippet": "ROLLBAR_JS_TAG=$(curl -s https://api.github.com/repos/rollbar/rollbar.js/releases/latest | sed -n 's/\"tag_name\":.*\"\\(.*\\)\",/\\1/p' | sed 's/ *//'); curl -X GET https://raw.githubusercontent.com/rollbar/rollbar.js/$ROLLBAR_JS_TAG/dist/rollbar.snippet.js > data/rollbar.snippet.js",
     "performance": "phpunit --coverage-clover build/logs/clover.xml --testsuite 'Rollbar Performance Test Suite'"
   },
   
