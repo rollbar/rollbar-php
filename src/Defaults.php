@@ -238,9 +238,9 @@ class Defaults
         return $value !== null ? $value : $this->transmit;
     }
 
-    public function output($value = null)
+    public function logPayload($value = null)
     {
-        return $value !== null ? $value : $this->output;
+        return $value !== null ? $value : $this->logPayload;
     }
 
     public function verbose($value = null)
@@ -369,7 +369,7 @@ class Defaults
     private $customDataMethod = null;
     private $enabled = true;
     private $transmit = true;
-    private $output = false;
+    private $logPayload = false;
     private $verbose = \Rollbar\Config::VERBOSE_NONE;
     private $environment = 'production';
     private $fluentHost = '127.0.0.1';

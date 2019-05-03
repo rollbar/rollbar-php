@@ -81,26 +81,26 @@ class ConfigTest extends BaseRollbarTest
         $this->assertFalse($config->transmitting());
     }
 
-    public function testOutput()
+    public function testLogPayload()
     {
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
             'environment' => $this->env
         ));
-        $this->assertFalse($config->outputting());
+        $this->assertFalse($config->loggingPayload());
         
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
             'environment' => $this->env,
-            'output' => true
+            'log_payload' => true
         ));
-        $this->assertTrue($config->outputting());
+        $this->assertTrue($config->loggingPayload());
     }
 
-    public function testOutputting()
+    public function testLoggingPayload()
     {
-        $outputLoggerMock = $this->getMockBuilder('\Psr\Log\LoggerInterface')->getMock();
-        $outputLoggerMock->expects($this->once())
+        $logPayloadLoggerMock = $this->getMockBuilder('\Psr\Log\LoggerInterface')->getMock();
+        $logPayloadLoggerMock->expects($this->once())
                         ->method('debug')
                         ->with(
                             $this->matchesRegularExpression(
@@ -117,21 +117,21 @@ class ConfigTest extends BaseRollbarTest
         $config = new Config(array(
             "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php",
-            "output" => true,
-            "output_logger" => $outputLoggerMock,
+            "log_payload" => true,
+            "log_payload_logger" => $logPayloadLoggerMock,
             "sender" => $senderMock
         ));
         $config->send($payload, $this->getTestAccessToken());
     }
 
-    public function testConfigureOutputLogger()
+    public function testConfigureLogPayloadLogger()
     {
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
             'environment' => $this->env
         ));
-        $this->assertInstanceOf('\Monolog\Logger', $config->outputLogger());
-        $handlers = $config->outputLogger()->getHandlers();
+        $this->assertInstanceOf('\Monolog\Logger', $config->logPayloadLogger());
+        $handlers = $config->logPayloadLogger()->getHandlers();
         $handler = $handlers[0];
         $this->assertInstanceOf('\Monolog\Handler\ErrorLogHandler', $handler);
         $this->assertEquals(\Monolog\Logger::DEBUG, $handler->getLevel());
@@ -139,9 +139,9 @@ class ConfigTest extends BaseRollbarTest
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
             'environment' => $this->env,
-            'output_logger' => new \Psr\Log\NullLogger()
+            'log_payload_logger' => new \Psr\Log\NullLogger()
         ));
-        $this->assertInstanceOf('\Psr\Log\NullLogger', $config->outputLogger());
+        $this->assertInstanceOf('\Psr\Log\NullLogger', $config->logPayloadLogger());
     }
 
     public function testVerbose()

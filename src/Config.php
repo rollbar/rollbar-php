@@ -41,8 +41,8 @@ class Config
         'include_error_code_context',
         'include_exception_code_context',
         'included_errno',
-        'output',
-        'output_logger',
+        'log_payload',
+        'log_payload_logger',
         'person',
         'person_fn',
         'capture_ip',
@@ -85,19 +85,19 @@ class Config
     private $transmit;
 
     /**
-     * @var boolean $output If this is true then we output the payload to
+     * @var boolean $logPayload If this is true then we output the payload to
      * standard out or a configured logger right before transmitting.
      * Default: false
      */
-    private $output;
+    private $logPayload;
 
     /**
-     * @var \Psr\Log\Logger $outputLogger Logger responsible for logging request
+     * @var \Psr\Log\Logger $logPayloadLogger Logger responsible for logging request
      * payload and response dumps on. The messages logged can be controlled with
-     * `output` config options.
+     * `log_payload` config options.
      * Default: \Monolog\Logger with \Monolog\Handler\ErrorLogHandler
      */
-    private $outputLogger;
+    private $logPayloadLogger;
 
     /**
      * @var string $verbose If this is set to any of the \Psr\Log\LogLevel options
@@ -107,7 +107,7 @@ class Config
      * all the log levels of \Psr\Log\LogLevel
      * (https://github.com/php-fig/log/blob/master/Psr/Log/LogLevel.php) plus
      * an additional Rollbar\Config::VERBOSE_NONE option which makes the SDK quiet
-     * (excluding `output` option configured separetely).
+     * (excluding `log_payload` option configured separetely).
      * Essentially this option controls the level of verbosity of the default
      * `verbose_logger`. If you override the default `verbose_logger`, you need
      * to implement obeying the `verbose` config option yourself.
@@ -278,8 +278,8 @@ class Config
 
         $this->setEnabled($config);
         $this->setTransmit($config);
-        $this->setOutput($config);
-        $this->setOutputLogger($config);
+        $this->setLogPayload($config);
+        $this->setLogPayloadLogger($config);
         $this->setVerbose($config);
         $this->setVerboseLogger($config);
         $this->setAccessToken($config);
@@ -352,21 +352,21 @@ class Config
             \Rollbar\Defaults::get()->transmit();
     }
 
-    private function setOutput($config)
+    private function setLogPayload($config)
     {
-        $this->output = isset($config['output']) ?
-            $config['output'] :
-            \Rollbar\Defaults::get()->output();
+        $this->logPayload = isset($config['log_payload']) ?
+            $config['log_payload'] :
+            \Rollbar\Defaults::get()->logPayload();
     }
 
-    private function setOutputLogger($config)
+    private function setLogPayloadLogger($config)
     {
-        $this->outputLogger = isset($config['output_logger']) ?
-            $config['output_logger'] :
-            new \Monolog\Logger('rollbar.output', array(new \Monolog\Handler\ErrorLogHandler()));
+        $this->logPayloadLogger = isset($config['log_payload_logger']) ?
+            $config['log_payload_logger'] :
+            new \Monolog\Logger('rollbar.payload', array(new \Monolog\Handler\ErrorLogHandler()));
         
-        if (!($this->outputLogger instanceof \Psr\Log\LoggerInterface)) {
-            throw new \Exception('Output logger must implement \Psr\Log\LoggerInterface');
+        if (!($this->logPayloadLogger instanceof \Psr\Log\LoggerInterface)) {
+            throw new \Exception('Log Payload Logger must implement \Psr\Log\LoggerInterface');
         }
     }
 
@@ -529,9 +529,9 @@ class Config
         return $this->transmit;
     }
 
-    public function outputting()
+    public function loggingPayload()
     {
-        return $this->output;
+        return $this->logPayload;
     }
 
     public function verbose()
@@ -713,9 +713,9 @@ class Config
         }
     }
 
-    public function outputLogger()
+    public function logPayloadLogger()
     {
-        return $this->outputLogger;
+        return $this->logPayloadLogger;
     }
 
     public function verboseLogger()
@@ -1013,12 +1013,11 @@ class Config
             $this->verboseLogger()->warning($response->getInfo());
         }
 
-        if ($this->outputting()) {
-            $this->outputLogger()->debug(
+        if ($this->loggingPayload()) {
+            $this->logPayloadLogger()->debug(
                 'Sending payload with ' . get_class($this->sender) . ":\n" .
                 $payload
             );
-            // $this->outputLogger()->debug($response);
         }
 
         return $response;

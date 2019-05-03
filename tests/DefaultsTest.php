@@ -179,9 +179,9 @@ class DefaultsTest extends BaseRollbarTest
         $this->assertTrue($this->defaults->transmit());
     }
 
-    public function testOutput()
+    public function testLogPayload()
     {
-        $this->assertFalse($this->defaults->output());
+        $this->assertFalse($this->defaults->logPayload());
     }
     
     public function testEnvironment()
@@ -278,7 +278,7 @@ class DefaultsTest extends BaseRollbarTest
                 $option == 'proxy' ||
                 $option == 'include_raw_request_body' ||
                 $option == 'verbose_logger' ||
-                $option == 'output_logger') {
+                $option == 'log_payload_logger') {
                 continue;
             } elseif ($option == 'base_api_url') {
                 $option = 'endpoint';
