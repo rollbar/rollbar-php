@@ -488,7 +488,7 @@ class VerbosityTest extends BaseRollbarTest
             // verbosity expectations
                 $unitTest->expectLog(
                     0,
-                    '/Ignore due to includedErrno level/',
+                    '/Ignore due to included_errno level/',
                     \Psr\Log\LogLevel::DEBUG
                 );
             },
@@ -593,15 +593,28 @@ class VerbosityTest extends BaseRollbarTest
         $this->configurableObjectVerbosityTest(
 
             $config,
-            function () use ($config) {
+            function () use ($config, $unitTest) {
             // logic under test
-                $config->checkIgnored(null, null, null, null);
+                $dataMock = $unitTest->getMockBuilder('\Rollbar\Payload\Data')
+                    ->disableOriginalConstructor()
+                    ->getMock();
+                $dataMock->method('getLevel')->willReturn(\Rollbar\Payload\Level::INFO());
+                $payloadMock = $unitTest->getMockBuilder('\Rollbar\Payload\Payload')
+                    ->disableOriginalConstructor()
+                    ->getMock();
+                $payloadMock->method('getData')->willReturn($dataMock);
+                $config->checkIgnored(
+                    $payloadMock,
+                    $unitTest->getTestAccessToken(),
+                    $payloadMock,
+                    false
+                );
             },
             function () use ($unitTest) {
             // verbosity expectations
                 $unitTest->expectLog(
                     0,
-                    '/Occurrence ignored due to custom checkIgnore logic/',
+                    '/Occurrence ignored due to custom check_ignore logic/',
                     \Psr\Log\LogLevel::INFO
                 );
             }
