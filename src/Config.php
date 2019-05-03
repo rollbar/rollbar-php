@@ -1018,7 +1018,7 @@ class Config
                 'Sending payload with ' . get_class($this->sender) . ":\n" .
                 $payload
             );
-            $this->outputLogger()->debug($response);
+            // $this->outputLogger()->debug($response);
         }
 
         return $response;

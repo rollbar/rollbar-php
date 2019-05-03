@@ -97,6 +97,33 @@ class ConfigTest extends BaseRollbarTest
         $this->assertTrue($config->outputting());
     }
 
+    public function testOutputting()
+    {
+        $outputLoggerMock = $this->getMockBuilder('\Psr\Log\LoggerInterface')->getMock();
+        $outputLoggerMock->expects($this->once())
+                        ->method('debug')
+                        ->with(
+                            $this->matchesRegularExpression(
+                                '/Sending payload with .*:\n\{"data":/'
+                            )
+                        );
+        $senderMock = $this->getMockBuilder('\Rollbar\Senders\SenderInterface')
+                        ->getMock();
+        $senderMock->method('send')->willReturn(true);
+
+        $payload = new \Rollbar\Payload\EncodedPayload(array('data'=>array()));
+        $payload->encode();
+
+        $config = new Config(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => "testing-php",
+            "output" => true,
+            "output_logger" => $outputLoggerMock,
+            "sender" => $senderMock
+        ));
+        $config->send($payload, $this->getTestAccessToken());
+    }
+
     public function testConfigureOutputLogger()
     {
         $config = new Config(array(

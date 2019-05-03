@@ -143,29 +143,6 @@ class RollbarLoggerTest extends BaseRollbarTest
         $this->assertEquals(200, $response->getStatus());
     }
 
-    public function testOutputting()
-    {
-        $outputLoggerMock = $this->getMockBuilder('\Psr\Log\LoggerInterface')->getMock();
-        $outputLoggerMock->expects($this->exactly(2))
-                        ->method('debug')
-                        ->withConsecutive(
-                            array($this->matchesRegularExpression(
-                                '/Sending payload with .*:\n\{"data":/'
-                            )),
-                            array($this->isInstanceOf('\Rollbar\Response'))
-                        );
-
-        $logger = new RollbarLogger(array(
-            "access_token" => $this->getTestAccessToken(),
-            "environment" => "testing-php",
-            "output" => true,
-            "output_logger" => $outputLoggerMock
-        ));
-        $response = $logger->log(Level::WARNING, "Testing PHP Notifier");
-        
-        $this->assertEquals(200, $response->getStatus());
-    }
-
     public function testDefaultVerbose()
     {
         return $this->testNotVerbose();
