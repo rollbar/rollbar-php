@@ -8,6 +8,7 @@ abstract class BaseRollbarTest extends \PHPUnit_Framework_TestCase
     public function tearDown()
     {
         Rollbar::destroy();
+        parent::tearDown();
     }
     
     public function getTestAccessToken()

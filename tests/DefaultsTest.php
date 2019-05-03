@@ -173,6 +173,16 @@ class DefaultsTest extends BaseRollbarTest
     {
         $this->assertTrue($this->defaults->enabled());
     }
+
+    public function testTransmit()
+    {
+        $this->assertTrue($this->defaults->transmit());
+    }
+
+    public function testLogPayload()
+    {
+        $this->assertFalse($this->defaults->logPayload());
+    }
     
     public function testEnvironment()
     {
@@ -266,7 +276,9 @@ class DefaultsTest extends BaseRollbarTest
                 $option == 'person_fn' ||
                 $option == 'scrub_whitelist' ||
                 $option == 'proxy' ||
-                $option == 'include_raw_request_body') {
+                $option == 'include_raw_request_body' ||
+                $option == 'verbose_logger' ||
+                $option == 'log_payload_logger') {
                 continue;
             } elseif ($option == 'base_api_url') {
                 $option = 'endpoint';

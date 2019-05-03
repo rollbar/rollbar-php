@@ -13,6 +13,9 @@ if (!defined('ROLLBAR_INCLUDED_ERRNO_BITMASK')) {
 
 class Config
 {
+    const VERBOSE_NONE = 'none';
+    const VERBOSE_NONE_INT = 1000;
+
     private static $options = array(
         'access_token',
         'agent_log_location',
@@ -38,7 +41,8 @@ class Config
         'include_error_code_context',
         'include_exception_code_context',
         'included_errno',
-        'logger',
+        'log_payload',
+        'log_payload_logger',
         'person',
         'person_fn',
         'capture_ip',
@@ -48,6 +52,7 @@ class Config
         'scrub_fields',
         'scrub_whitelist',
         'timeout',
+        'transmit',
         'custom_truncation',
         'report_suppressed',
         'use_error_reporting',
@@ -58,14 +63,66 @@ class Config
         'max_nesting_depth',
         'max_items',
         'minimum_level',
+        'verbose',
+        'verbose_logger',
         'raise_on_error'
     );
     
     private $accessToken;
     /**
-     * @var string $enabled Enable / disable Rollbar SDK.
+     * @var boolean $enabled If this is false then do absolutely nothing,
+     * try to be as close to the scenario where Rollbar did not exist at
+     * all in the code.
+     * Default: true
      */
     private $enabled = true;
+
+    /**
+     * @var boolean $transmit If this is false then we do everything except
+     * make the post request at the end of the pipeline.
+     * Default: true
+     */
+    private $transmit;
+
+    /**
+     * @var boolean $logPayload If this is true then we output the payload to
+     * standard out or a configured logger right before transmitting.
+     * Default: false
+     */
+    private $logPayload;
+
+    /**
+     * @var \Psr\Log\Logger $logPayloadLogger Logger responsible for logging request
+     * payload and response dumps on. The messages logged can be controlled with
+     * `log_payload` config options.
+     * Default: \Monolog\Logger with \Monolog\Handler\ErrorLogHandler
+     */
+    private $logPayloadLogger;
+
+    /**
+     * @var string $verbose If this is set to any of the \Psr\Log\LogLevel options
+     * then we output messages related to the processing of items that might be
+     * useful to someone trying to understand what Rollbar is doing. The logged
+     * messages are dependent on the level of verbosity. The supported options are
+     * all the log levels of \Psr\Log\LogLevel
+     * (https://github.com/php-fig/log/blob/master/Psr/Log/LogLevel.php) plus
+     * an additional Rollbar\Config::VERBOSE_NONE option which makes the SDK quiet
+     * (excluding `log_payload` option configured separetely).
+     * Essentially this option controls the level of verbosity of the default
+     * `verbose_logger`. If you override the default `verbose_logger`, you need
+     * to implement obeying the `verbose` config option yourself.
+     * Default: Rollbar\Config::VERBOSE_NONE
+     */
+    private $verbose;
+
+    /**
+     * @var \Psr\Log\Logger $versbosity_logger The logger object used to log
+     * the internal messages of the SDK. The verbosity level of the default
+     * $verbosityLogger can be controlled with `verbose` config option.
+     * Default: \Rollbar\VerboseLogger
+     */
+    private $verboseLogger;
+
     /**
      * @var DataBuilder
      */
@@ -220,6 +277,11 @@ class Config
         $this->configArray = $config;
 
         $this->setEnabled($config);
+        $this->setTransmit($config);
+        $this->setLogPayload($config);
+        $this->setLogPayloadLogger($config);
+        $this->setVerbose($config);
+        $this->setVerboseLogger($config);
         $this->setAccessToken($config);
         $this->setDataBuilder($config);
         $this->setTransformer($config);
@@ -280,6 +342,53 @@ class Config
             } else {
                 $this->enable();
             }
+        }
+    }
+
+    private function setTransmit($config)
+    {
+        $this->transmit = isset($config['transmit']) ?
+            $config['transmit'] :
+            \Rollbar\Defaults::get()->transmit();
+    }
+
+    private function setLogPayload($config)
+    {
+        $this->logPayload = isset($config['log_payload']) ?
+            $config['log_payload'] :
+            \Rollbar\Defaults::get()->logPayload();
+    }
+
+    private function setLogPayloadLogger($config)
+    {
+        $this->logPayloadLogger = isset($config['log_payload_logger']) ?
+            $config['log_payload_logger'] :
+            new \Monolog\Logger('rollbar.payload', array(new \Monolog\Handler\ErrorLogHandler()));
+        
+        if (!($this->logPayloadLogger instanceof \Psr\Log\LoggerInterface)) {
+            throw new \Exception('Log Payload Logger must implement \Psr\Log\LoggerInterface');
+        }
+    }
+
+    private function setVerbose($config)
+    {
+        $this->verbose = isset($config['verbose']) ?
+            $config['verbose'] :
+            \Rollbar\Defaults::get()->verbose();
+    }
+
+    private function setVerboseLogger($config)
+    {
+        if (isset($config['verbose_logger'])) {
+            $this->verboseLogger = $config['verbose_logger'];
+        } else {
+            $handler = new \Monolog\Handler\ErrorLogHandler();
+            $handler->setLevel($this->verboseInteger());
+            $this->verboseLogger = new \Monolog\Logger('rollbar.verbose', array($handler));
+        }
+        
+        if (!($this->verboseLogger instanceof \Psr\Log\LoggerInterface)) {
+            throw new \Exception('Verbose logger must implement \Psr\Log\LoggerInterface');
         }
     }
     
@@ -413,6 +522,29 @@ class Config
     public function removeCustom($key)
     {
         $this->dataBuilder->removeCustom($key);
+    }
+
+    public function transmitting()
+    {
+        return $this->transmit;
+    }
+
+    public function loggingPayload()
+    {
+        return $this->logPayload;
+    }
+
+    public function verbose()
+    {
+        return $this->verbose;
+    }
+
+    public function verboseInteger()
+    {
+        if ($this->verbose == self::VERBOSE_NONE) {
+            return self::VERBOSE_NONE_INT;
+        }
+        return \Monolog\Logger::toMonologLevel($this->verbose);
     }
     
     public function getCustom()
@@ -581,6 +713,16 @@ class Config
         }
     }
 
+    public function logPayloadLogger()
+    {
+        return $this->logPayloadLogger;
+    }
+
+    public function verboseLogger()
+    {
+        return $this->verboseLogger;
+    }
+
     public function getRollbarData($level, $toLog, $context)
     {
         return $this->dataBuilder->makeData($level, $toLog, $context);
@@ -646,6 +788,7 @@ class Config
     public function transform($payload, $level, $toLog, $context)
     {
         if (count($this->custom) > 0) {
+            $this->verboseLogger()->debug("Adding custom data to the payload.");
             $data = $payload->getData();
             $custom = $data->getCustom();
             $custom = array_merge(array(), $this->custom, (array)$custom);
@@ -655,6 +798,9 @@ class Config
         if (is_null($this->transformer)) {
             return $payload;
         }
+
+        $this->verboseLogger()->debug("Applying transformer " . get_class($this->transformer) . " to the payload.");
+
         return $this->transformer->transform($payload, $level, $toLog, $context);
     }
 
@@ -683,20 +829,26 @@ class Config
         if (isset($this->checkIgnore)) {
             try {
                 if (call_user_func($this->checkIgnore, $isUncaught, $toLog, $payload)) {
+                    $this->verboseLogger()->info('Occurrence ignored due to custom check_ignore logic');
                     return true;
                 }
-            } catch (Exception $exception) {
-                // We should log that we are removing the custom checkIgnore
+            } catch (\Exception $exception) {
+                $this->verboseLogger()->error(
+                    'Exception occurred in the custom checkIgnore logic:' . $exception->getMessage()
+                );
                 $this->checkIgnore = null;
             }
         }
         
         if ($this->payloadLevelTooLow($payload)) {
+            $this->verboseLogger()->debug("Occurrence's level is too low");
             return true;
         }
 
         if (!is_null($this->filter)) {
-            return $this->filter->shouldSend($payload, $accessToken);
+            $filter = $this->filter->shouldSend($payload, $accessToken);
+            $this->verboseLogger()->debug("Custom filter result: " . var_export($filter, true));
+            return $filter;
         }
 
         return false;
@@ -705,10 +857,12 @@ class Config
     public function internalCheckIgnored($level, $toLog)
     {
         if ($this->shouldSuppress()) {
+            $this->verboseLogger()->debug('Ignoring (error reporting has been disabled in PHP config)');
             return true;
         }
 
         if ($this->levelTooLow($this->levelFactory->fromName($level))) {
+            $this->verboseLogger()->debug("Occurrence's level is too low");
             return true;
         }
 
@@ -735,11 +889,13 @@ class Config
     {
         if ($this->useErrorReporting && ($errno & error_reporting()) === 0) {
             // ignore due to error_reporting level
+            $this->verboseLogger()->debug("Ignore (error below allowed error_reporting level)");
             return true;
         }
 
         if ($this->includedErrno != -1 && ($errno & $this->includedErrno) != $errno) {
             // ignore
+            $this->verboseLogger()->debug("Ignore due to included_errno level");
             return true;
         }
 
@@ -749,6 +905,7 @@ class Config
             $float_rand = mt_rand() / ($this->mtRandmax + 1);
             if ($float_rand > $this->errorSampleRates[$errno]) {
                 // skip
+                $this->verboseLogger()->debug("Skip due to error sample rating");
                 return true;
             }
         }
@@ -777,13 +934,14 @@ class Config
      *
      * @return bool
      */
-    protected function shouldIgnoreException(\Exception $toLog)
+    public function shouldIgnoreException(\Exception $toLog)
     {
         // get a float in the range [0, 1)
         // mt_rand() is inclusive, so add 1 to mt_randmax
         $floatRand = mt_rand() / ($this->mtRandmax + 1);
         if ($floatRand > $this->exceptionSampleRate($toLog)) {
             // skip
+            $this->verboseLogger()->debug("Skip exception due to exception sample rating");
             return true;
         }
         
@@ -848,22 +1006,46 @@ class Config
 
     public function send(EncodedPayload $payload, $accessToken)
     {
-        return $this->sender->send($payload, $accessToken);
+        if ($this->transmitting()) {
+            $response = $this->sender->send($payload, $accessToken);
+        } else {
+            $response = new Response(0, "Not transmitting (transmitting disabled in configuration)");
+            $this->verboseLogger()->warning($response->getInfo());
+        }
+
+        if ($this->loggingPayload()) {
+            $this->logPayloadLogger()->debug(
+                'Sending payload with ' . get_class($this->sender) . ":\n" .
+                $payload
+            );
+        }
+
+        return $response;
     }
 
     public function sendBatch(&$batch, $accessToken)
     {
-        return $this->sender->sendBatch($batch, $accessToken);
+        if ($this->transmitting()) {
+            return $this->sender->sendBatch($batch, $accessToken);
+        } else {
+            $response = new Response(0, "Not transmitting (transmitting disabled in configuration)");
+            $this->verboseLogger()->warning($response->getInfo());
+            return $response;
+        }
     }
 
     public function wait($accessToken, $max = 0)
     {
-          $this->sender->wait($accessToken, $max);
+        $this->verboseLogger()->debug("Sender waiting...");
+        $this->sender->wait($accessToken, $max);
     }
 
     public function handleResponse($payload, $response)
     {
         if (!is_null($this->responseHandler)) {
+            $this->verboseLogger()->debug(
+                'Applying custom response handler: ' . get_class($this->responseHandler)
+            );
             $this->responseHandler->handleResponse($payload, $response);
         }
     }

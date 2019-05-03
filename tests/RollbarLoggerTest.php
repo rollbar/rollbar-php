@@ -1,5 +1,6 @@
 <?php namespace Rollbar;
 
+use \Mockery as m;
 use Rollbar\Payload\Level;
 use Rollbar\Payload\Payload;
 use Rollbar\TestHelpers\Exceptions\SilentExceptionSampleRate;
@@ -11,11 +12,13 @@ class RollbarLoggerTest extends BaseRollbarTest
     public function setUp()
     {
         $_SESSION = array();
+        parent::setUp();
     }
     
     public function tearDown()
     {
         Rollbar::destroy();
+        parent::tearDown();
     }
     
     public function testAddCustom()
@@ -123,6 +126,76 @@ class RollbarLoggerTest extends BaseRollbarTest
         $response = $l->log(Level::WARNING, "Testing PHP Notifier", array());
         $this->assertEquals(200, $response->getStatus());
     }
+
+    public function testNotLoggingPayload()
+    {
+        $logPayloadLoggerMock = $this->getMockBuilder('\Psr\Log\LoggerInterface')->getMock();
+        $logPayloadLoggerMock->expects($this->never())->method('debug');
+
+        $logger = new RollbarLogger(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => "testing-php",
+            "log_payload" => false,
+            "log_payload_logger" => $logPayloadLoggerMock
+        ));
+        $response = $logger->log(Level::WARNING, "Testing PHP Notifier");
+        
+        $this->assertEquals(200, $response->getStatus());
+    }
+
+    public function testDefaultVerbose()
+    {
+        return $this->testNotVerbose();
+    }
+
+    public function testNotVerbose()
+    {
+        $logger = new RollbarLogger(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => "testing-php",
+            "verbose" => \Rollbar\Config::VERBOSE_NONE
+        ));
+
+        $verboseLogger = $logger->verboseLogger();
+        $originalHandler = $verboseLogger->getHandlers();
+        $originalHandler = $originalHandler[0];
+
+        $handlerMock = $this->getMockBuilder('\Monolog\Handler\ErrorLogHandler')
+            ->setMethods(array('handle'))
+            ->getMock();
+
+        $handlerMock->setLevel($originalHandler->getLevel());
+        
+        $handlerMock->expects($this->never())->method('handle');
+
+        $verboseLogger->setHandlers(array($handlerMock));
+
+        $logger->info('Internal message');
+    }
+
+    public function testVerbose()
+    {
+        $logger = new RollbarLogger(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => "testing-php",
+            "verbose" => \Psr\Log\LogLevel::DEBUG
+        ));
+
+        $verboseLogger = $logger->verboseLogger();
+        $originalHandler = $verboseLogger->getHandlers();
+        $originalHandler = $originalHandler[0];
+
+        $handlerMock = $this->getMockBuilder('\Monolog\Handler\ErrorLogHandler')
+            ->setMethods(array('handle'))
+            ->getMock();
+        $handlerMock->setLevel($originalHandler->getLevel());
+
+        $handlerMock->expects($this->atLeastOnce())->method('handle');
+
+        $verboseLogger->setHandlers(array($handlerMock));
+
+        $logger->info('Internal message');
+    }
     
     public function testEnabled()
     {
@@ -130,6 +203,7 @@ class RollbarLoggerTest extends BaseRollbarTest
             "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php"
         ));
+
         $response = $logger->log(Level::WARNING, "Testing PHP Notifier", array());
         $this->assertEquals(200, $response->getStatus());
         
@@ -140,6 +214,60 @@ class RollbarLoggerTest extends BaseRollbarTest
         ));
         $response = $logger->log(Level::WARNING, "Testing PHP Notifier", array());
         $this->assertEquals(0, $response->getStatus());
+        $this->assertEquals("Disabled", $response->getInfo());
+    }
+
+    public function testTransmit()
+    {
+        $logger = new RollbarLogger(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => "testing-php"
+        ));
+        $response = $logger->log(Level::WARNING, "Testing PHP Notifier");
+        $this->assertEquals(200, $response->getStatus());
+
+        $logger = new RollbarLogger(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => "testing-php",
+            "transmit" => false
+        ));
+        $response = $logger->log(Level::WARNING, "Testing PHP Notifier");
+        $this->assertEquals(0, $response->getStatus());
+        $this->assertEquals("Not transmitting (transmitting disabled in configuration)", $response->getInfo());
+    }
+
+    public function testTransmitBatched()
+    {
+        $senderMock = $this->getMockBuilder('Rollbar\Senders\SenderInterface')->getMock();
+        $senderMock->expects($this->once())->method('sendBatch');
+
+        // transmit on (default)
+        $logger = new RollbarLogger(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => "testing-php",
+            "batched" => true,
+            "sender" => $senderMock
+        ));
+        $response = $logger->log(Level::WARNING, "Testing PHP Notifier");
+        $this->assertEquals(0, $response->getStatus());
+        $this->assertEquals("Pending", $response->getInfo());
+        $logger->flush();
+
+        // transmit off
+        $senderMock = $this->getMockBuilder('Rollbar\Senders\SenderInterface')->getMock();
+        $senderMock->expects($this->never())->method('sendBatch');
+
+        $logger->configure(array(
+            'transmit' => false,
+            'sender' => $senderMock
+        ));
+
+        $response = $logger->log(Level::WARNING, "Testing PHP Notifier");
+        $this->assertEquals(0, $response->getStatus());
+        $this->assertEquals("Pending", $response->getInfo());
+        $response = $logger->flush();
+        $this->assertEquals(0, $response->getStatus());
+        $this->assertEquals("Not transmitting (transmitting disabled in configuration)", $response->getInfo());
     }
     
     public function testLogMalformedPayloadData()
@@ -157,6 +285,32 @@ class RollbarLoggerTest extends BaseRollbarTest
         );
         
         $this->assertEquals(400, $response->getStatus());
+    }
+
+    public function testFlush()
+    {
+        $senderMock = $this->getMockBuilder('Rollbar\Senders\SenderInterface')->getMock();
+        $senderMock->expects($this->once())->method('sendBatch')->with(
+            $this->containsOnlyInstancesOf('Rollbar\Payload\EncodedPayload'),
+            $this->anything()
+        );
+
+        $logger = new RollbarLogger(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => "testing-php",
+            "batched" => true,
+            "sender" => $senderMock
+        ));
+
+        $response = $logger->flush();
+        $this->assertEquals(0, $response->getStatus());
+        $this->assertEquals("Queue empty", $response->getInfo());
+
+        $response = $logger->log(Level::INFO, "Batched message");
+        $this->assertEquals(0, $response->getStatus());
+        $this->assertEquals("Pending", $response->getInfo());
+
+        $response = $logger->flush();
     }
     
     public function testContext()
