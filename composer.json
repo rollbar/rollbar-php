@@ -32,7 +32,8 @@
 
   "require": {
     "ext-curl": "*",
-    "psr/log": "^1.0.1"
+    "psr/log": "^1",
+    "monolog/monolog": "^1"
   },
 
   "require-dev": {
@@ -41,8 +42,7 @@
     "squizlabs/php_codesniffer": "2.*",
     "codeclimate/php-test-reporter": "dev-master",
     "packfire/php5.3-compat": "*",
-    "phpmd/phpmd" : "@stable",
-    "monolog/monolog": "^1.24"
+    "phpmd/phpmd" : "@stable"
   },
 
   "suggest": {
