@@ -12,7 +12,7 @@
 
 namespace Rollbar\Monolog\Handler;
 
-require dirname(__FILE__) . '/../../../vendor/monolog/monolog/tests/Monolog/TestCase.php';
+require dirname(__FILE__) . '/../../../vendor/monolog/monolog/src/Monolog/Test/TestCase.php';
 
 use Exception;
 use Monolog\Test\TestCase;
