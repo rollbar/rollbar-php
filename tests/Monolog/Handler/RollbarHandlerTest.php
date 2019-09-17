@@ -15,7 +15,7 @@ namespace Rollbar\Monolog\Handler;
 require dirname(__FILE__) . '/../../../vendor/monolog/monolog/tests/Monolog/TestCase.php';
 
 use Exception;
-use Monolog\TestCase;
+use Monolog\Test\TestCase;
 use Monolog\Logger;
 use Rollbar\Monolog\Handler\RollbarHandler;
 use PHPUnit_Framework_MockObject_MockObject as MockObject;
