@@ -33,7 +33,7 @@
   "require": {
     "ext-curl": "*",
     "psr/log": "^1",
-    "monolog/monolog": "^1"
+    "monolog/monolog": "^1|^2"
   },
 
   "require-dev": {
