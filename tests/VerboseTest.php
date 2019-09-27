@@ -14,6 +14,7 @@ use \Rollbar\Payload\Level as Level;
  * The log mocking is achieved by mocking out the `handle`
  * method of the log handler used in the `verbose_logger`.
  *
+ * @requires PHPUnit 5
  * @package Rollbar
  * @author Artur Moczulski <artur.moczulski@gmail.com>
  * @author Rollbar, Inc.

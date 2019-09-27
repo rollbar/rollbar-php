@@ -143,11 +143,17 @@ class RollbarLoggerTest extends BaseRollbarTest
         $this->assertEquals(200, $response->getStatus());
     }
 
+    /**
+     * @requires PHPUnit 5
+     */
     public function testDefaultVerbose()
     {
         return $this->testNotVerbose();
     }
 
+    /**
+     * @requires PHPUnit 5
+     */
     public function testNotVerbose()
     {
         $logger = new RollbarLogger(array(
@@ -173,6 +179,9 @@ class RollbarLoggerTest extends BaseRollbarTest
         $logger->info('Internal message');
     }
 
+    /**
+     * @requires PHPUnit 5
+     */
     public function testVerbose()
     {
         $logger = new RollbarLogger(array(

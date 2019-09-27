@@ -167,6 +167,9 @@ class ConfigTest extends BaseRollbarTest
         $this->assertEquals($config->verboseInteger(), $handler->getLevel());
     }
 
+    /**
+     * @requires PHPUnit 5
+     */
     public function testVerboseInfo()
     {
         $config = new Config(array(
@@ -183,7 +186,7 @@ class ConfigTest extends BaseRollbarTest
 
         $config->verboseLogger()->setHandlers(array($handlerMock));
 
-        $this->assertTrue($config->verboseLogger()->info('Test trace'));
+        $config->verboseLogger()->info('Test trace');
     }
 
     public function testVerboseInteger()
