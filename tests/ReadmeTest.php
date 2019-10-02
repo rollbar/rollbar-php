@@ -144,6 +144,6 @@ class ReadmeTest extends BaseRollbarTest
         $log->pushHandler(new RollbarHandler(Rollbar::logger(), Logger::WARNING));
         
         // add records to the log
-        $log->addWarning('Foo');
+        $log->warning('Foo');
     }
 }

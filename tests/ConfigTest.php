@@ -183,7 +183,7 @@ class ConfigTest extends BaseRollbarTest
 
         $config->verboseLogger()->setHandlers(array($handlerMock));
 
-        $this->assertTrue($config->verboseLogger()->info('Test trace'));
+        $config->verboseLogger()->info('Test trace');
     }
 
     public function testVerboseInteger()
