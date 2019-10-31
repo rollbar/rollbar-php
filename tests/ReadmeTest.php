@@ -35,7 +35,7 @@ class ReadmeTest extends BaseRollbarTest
 
         // Message at level 'info'
         Rollbar::log(Level::INFO, 'testing info level');
-       
+
         // With extra data (3rd arg) and custom payload options (4th arg)
         Rollbar::log(
             Level::INFO,
@@ -97,7 +97,7 @@ class ReadmeTest extends BaseRollbarTest
                 'environment' => 'test'
             )
         );
-        
+
         try {
             do_something();
         } catch (\Exception $e) {
@@ -105,7 +105,7 @@ class ReadmeTest extends BaseRollbarTest
             // or
             $result2 = Rollbar::log(Level::ERROR, $e, array("my" => "extra", "data" => 42));
         }
-        
+
         $this->assertEquals(200, $result1->getStatus());
         $this->assertEquals(200, $result2->getStatus());
     }
@@ -118,14 +118,14 @@ class ReadmeTest extends BaseRollbarTest
                 'environment' => 'test'
             )
         );
-        
+
         $result1 = Rollbar::log(Level::WARNING, 'could not connect to mysql server');
         $result2 = Rollbar::log(
             Level::INFO,
             'Here is a message with some additional data',
             array('x' => 10, 'code' => 'blue')
         );
-        
+
         $this->assertEquals(200, $result1->getStatus());
         $this->assertEquals(200, $result2->getStatus());
     }
@@ -138,12 +138,14 @@ class ReadmeTest extends BaseRollbarTest
                 'environment' => 'development'
             )
         );
-        
+
         // create a log channel
         $log = new Logger('RollbarHandler');
         $log->pushHandler(new RollbarHandler(Rollbar::logger(), Logger::WARNING));
-        
+
         // add records to the log
         $log->warning('Foo');
+
+        $this->expectNotToPerformAssertions();
     }
 }

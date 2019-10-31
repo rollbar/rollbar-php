@@ -11,10 +11,11 @@ function microtime()
 
 class AgentTest extends Rollbar\BaseRollbarTest
 {
-    private $path = '/tmp/rollbar-php';
+    private $path;
 
     protected function setUp()
     {
+        $this->path = sys_get_temp_dir().'/rollbar-php';
         if (!file_exists($this->path)) {
             mkdir($this->path);
         }

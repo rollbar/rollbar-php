@@ -66,13 +66,13 @@ class UtilitiesTest extends BaseRollbarTest
 
     public function testValidateBooleanThrowsException()
     {
-        $this->setExpectedException(get_class(new \InvalidArgumentException()));
+        $this->expectException(\InvalidArgumentException::class);
         Utilities::validateBoolean(null, "foo", false);
     }
 
     public function testValidateBooleanWithInvalidBoolean()
     {
-        $this->setExpectedException(get_class(new \InvalidArgumentException()));
+        $this->expectException(\InvalidArgumentException::class);
         Utilities::validateBoolean("not a boolean");
     }
 
@@ -81,6 +81,7 @@ class UtilitiesTest extends BaseRollbarTest
         Utilities::validateBoolean(true, "foo", false);
         Utilities::validateBoolean(true);
         Utilities::validateBoolean(null);
+        $this->expectNotToPerformAssertions();
     }
 
     public function testSerializeForRollbar()
@@ -109,7 +110,7 @@ class UtilitiesTest extends BaseRollbarTest
         $this->assertArrayNotHasKey("myNullValue", $result);
         $this->assertArrayNotHasKey("my_null_value", $result);
     }
-    
+
     public function testSerializationCycleChecking()
     {
         $config = new Config(array("access_token"=>$this->getTestAccessToken()));
@@ -122,19 +123,19 @@ class UtilitiesTest extends BaseRollbarTest
             "serializedObj" => new ParentCycleCheckSerializable(),
         );
         $objectHashes = array();
-        
+
         $result = Utilities::serializeForRollbar($obj, null, $objectHashes);
-        
+
         $this->assertRegExp(
             '/<CircularReference.*/',
             $result["obj"]["value"]["child"]["value"]["parent"]
         );
-        
+
         $this->assertRegExp(
             '/<CircularReference.*/',
             $result["serializedObj"]["child"]["parent"]
         );
-        
+
         $this->assertRegExp(
             '/<CircularReference.*/',
             $result["payload"]["data"]["body"]["extra"][0]["value"]["child"]["value"]["parent"]
@@ -152,7 +153,7 @@ class UtilitiesTest extends BaseRollbarTest
                 ),
             ),
         );
-        
+
         $objectHashes = array();
         $result = Utilities::serializeForRollbar($obj, null, $objectHashes, 2);
         $this->assertArrayHasKey('one', $result);

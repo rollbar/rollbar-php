@@ -37,7 +37,7 @@ class ConfigTest extends BaseRollbarTest
         parent::tearDown();
         m::close();
     }
-    
+
     private $env = "rollbar-php-testing";
 
     public function testAccessToken()
@@ -56,7 +56,7 @@ class ConfigTest extends BaseRollbarTest
             'environment' => $this->env
         ));
         $this->assertTrue($config->enabled());
-        
+
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
             'environment' => $this->env,
@@ -72,7 +72,7 @@ class ConfigTest extends BaseRollbarTest
             'environment' => $this->env
         ));
         $this->assertTrue($config->transmitting());
-        
+
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
             'environment' => $this->env,
@@ -88,7 +88,7 @@ class ConfigTest extends BaseRollbarTest
             'environment' => $this->env
         ));
         $this->assertFalse($config->loggingPayload());
-        
+
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
             'environment' => $this->env,
@@ -159,7 +159,7 @@ class ConfigTest extends BaseRollbarTest
         $this->assertInstanceOf('\Monolog\Handler\ErrorLogHandler', $handler);
         // assert the appropriate default handler level
         $this->assertEquals($config->verboseInteger(), $handler->getLevel());
-        
+
         // assert the verbosity level in the handler matches the level in the config
         $config->configure(array('verbose' => \Psr\Log\LogLevel::DEBUG));
         $handlers = $config->verboseLogger()->getHandlers();
@@ -206,7 +206,7 @@ class ConfigTest extends BaseRollbarTest
             'environment' => $this->env
         ));
         $this->assertInstanceOf('\Monolog\Logger', $config->verboseLogger());
-        
+
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
             'environment' => $this->env,
@@ -306,34 +306,34 @@ class ConfigTest extends BaseRollbarTest
             'access_token' => $this->getTestAccessToken(),
             'environment' => $this->env
         ));
-        
+
         $this->assertPayloadNotIgnored($config, $this->prepareMockPayload(Level::DEBUG()));
-        
+
         $config->configure(array('minimum_level' => Level::WARNING()));
-        
+
         $this->assertPayloadIgnored($config, $this->prepareMockPayload(Level::DEBUG()));
         $this->assertPayloadNotIgnored($config, $this->prepareMockPayload(Level::WARNING()));
-        
+
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
             'environment' => $this->env,
             'minimumLevel' => Level::ERROR()
         ));
-        
+
         $this->assertPayloadIgnored($config, $this->prepareMockPayload(Level::WARNING()));
         $this->assertPayloadNotIgnored($config, $this->prepareMockPayload(Level::ERROR()));
     }
-    
+
     public function assertPayloadIgnored($config, $payload)
     {
         $this->assertTrue($config->checkIgnored($payload, null, $this->error, false));
     }
-    
+
     public function assertPayloadNotIgnored($config, $payload)
     {
         $this->assertFalse($config->checkIgnored($payload, null, $this->error, false));
     }
-    
+
     private function prepareMockPayload($level)
     {
         $data = m::mock("Rollbar\Payload\Data")
@@ -386,8 +386,10 @@ class ConfigTest extends BaseRollbarTest
             "sender" => $sender
         ));
         $c->send($p, $this->getTestAccessToken());
+        
+        $this->expectNotToPerformAssertions();
     }
-    
+
     public function testEndpoint()
     {
         $config = new Config(array(
@@ -395,7 +397,7 @@ class ConfigTest extends BaseRollbarTest
             "environment" => $this->env,
             "endpoint" => "http://localhost/api/1/"
         ));
-        
+
         $this->assertEquals(
             "http://localhost/api/1/item/",
             $config->getSender()->getEndpoint()
@@ -412,52 +414,52 @@ class ConfigTest extends BaseRollbarTest
                 "fuzz" => "buzz"
             )
         ));
-        
+
         $dataBuilder = $config->getDataBuilder();
-        
+
         $result = $dataBuilder->makeData(
             Level::INFO,
             "Test message with custom data added dynamically.",
             array()
         );
-        
+
         $custom = $result->getCustom();
-        
+
         $this->assertEquals("bar", $custom["foo"]);
         $this->assertEquals("buzz", $custom["fuzz"]);
     }
-    
+
     public function testMaxItems()
     {
         $config = new Config(array(
             "access_token" => $this->getTestAccessToken()
         ));
-        
+
         $this->assertEquals(Defaults::get()->maxItems(), $config->getMaxItems());
-        
+
         $config = new Config(array(
             "access_token" => $this->getTestAccessToken(),
             "max_items" => Defaults::get()->maxItems()+1
         ));
-        
+
         $this->assertEquals(Defaults::get()->maxItems()+1, $config->getMaxItems());
     }
-    
+
     public function testCustomDataMethod()
     {
         $logger = new RollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env,
             "custom_data_method" => function ($toLog, $customDataMethodContext) {
-                
+
                 return array(
                     'data_from_my_custom_method' => $customDataMethodContext['foo']
                 );
             }
         ));
-        
+
         $dataBuilder = $logger->getDataBuilder();
-        
+
         $result = $dataBuilder->makeData(
             Level::ERROR,
             new \Exception(),
@@ -465,7 +467,7 @@ class ConfigTest extends BaseRollbarTest
                 'custom_data_method_context' => array('foo' => 'bar')
             )
         )->getCustom();
-        
+
         $this->assertEquals('bar', $result['data_from_my_custom_method']);
     }
 
@@ -475,13 +477,13 @@ class ConfigTest extends BaseRollbarTest
             "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env
         ));
-        
+
         $this->assertEquals(
             "https://api.rollbar.com/api/1/item/",
             $config->getSender()->getEndpoint()
         );
     }
-    
+
     public function testBaseApiUrl()
     {
         $config = new Config(array(
@@ -489,26 +491,26 @@ class ConfigTest extends BaseRollbarTest
             "environment" => $this->env,
             "base_api_url" => "http://localhost/api/1/"
         ));
-        
+
         $this->assertEquals(
             "http://localhost/api/1/item/",
             $config->getSender()->getEndpoint()
         );
     }
-    
+
     public function testBaseApiUrlDefault()
     {
         $config = new Config(array(
             "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env
         ));
-        
+
         $this->assertEquals(
             "https://api.rollbar.com/api/1/item/",
             $config->getSender()->getEndpoint()
         );
     }
-    
+
     public function testRaiseOnError()
     {
         $config = new Config(array(
@@ -516,7 +518,7 @@ class ConfigTest extends BaseRollbarTest
             "environment" => $this->env,
             "raise_on_error" => true
         ));
-        
+
         $this->assertTrue($config->getRaiseOnError());
     }
 
@@ -527,14 +529,14 @@ class ConfigTest extends BaseRollbarTest
             "environment" => $this->env,
             "send_message_trace" => true
         ));
-        
+
         $this->assertTrue($c->getSendMessageTrace());
-        
+
         $c = new Config(array(
             "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env
         ));
-        
+
         $this->assertFalse($c->getSendMessageTrace());
     }
 
@@ -549,10 +551,10 @@ class ConfigTest extends BaseRollbarTest
             }
         ));
         $levelFactory = $config->getLevelFactory();
-        
+
         $data = new Data($this->env, new Body(new Message("test")));
         $data->setLevel($levelFactory->fromName(Level::ERROR));
-        
+
         $config->checkIgnored(
             new Payload(
                 $data,
@@ -571,7 +573,7 @@ class ConfigTest extends BaseRollbarTest
         $called = false;
         $isUncaughtPassed = null;
         $errorPassed = null;
-        
+
         $config = new Config(array(
             "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env,
@@ -588,12 +590,12 @@ class ConfigTest extends BaseRollbarTest
                 $errorPassed = $exc;
             }
         ));
-        
+
         $levelFactory = $config->getLevelFactory();
-        
+
         $data = new Data($this->env, new Body(new Message("test")));
         $data->setLevel($levelFactory->fromName(Level::ERROR));
-        
+
         $config->checkIgnored(
             new Payload(
                 $data,
@@ -608,7 +610,7 @@ class ConfigTest extends BaseRollbarTest
         $this->assertTrue($isUncaughtPassed);
         $this->assertEquals($this->error, $errorPassed);
     }
-    
+
     public function testCaptureErrorStacktraces()
     {
         $logger = new RollbarLogger(array(
@@ -616,15 +618,15 @@ class ConfigTest extends BaseRollbarTest
             "environment" => $this->env,
             "capture_error_stacktraces" => false
         ));
-        
+
         $dataBuilder = $logger->getDataBuilder();
-        
+
         $result = $dataBuilder->makeData(
             Level::ERROR,
             new \Exception(),
             array()
         );
-        
+
         $this->assertEmpty($result->getBody()->getValue()->getFrames());
     }
 
@@ -634,7 +636,7 @@ class ConfigTest extends BaseRollbarTest
     public function testUseErrorReporting($use_error_reporting, $error_reporting, $expected)
     {
         $called = false;
-        
+
         $config = new Config(array(
             "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env,
@@ -643,24 +645,24 @@ class ConfigTest extends BaseRollbarTest
             },
             "use_error_reporting" => $use_error_reporting
         ));
-        
+
         if ($error_reporting !== null) {
             $errorReportingTemp = error_reporting();
             error_reporting($error_reporting);
         }
-        
+
         $result = $config->internalCheckIgnored(
             Level::ERROR,
             $this->error
         );
-        
+
         $this->assertEquals($expected, $result);
-        
+
         if ($error_reporting) {
             error_reporting($errorReportingTemp);
         }
     }
-    
+
     public function useErrorReportingProvider()
     {
         return array(
@@ -681,7 +683,7 @@ class ConfigTest extends BaseRollbarTest
             )
         );
     }
-    
+
     /**
      * @dataProvider providerExceptionSampleRate
      */
@@ -694,12 +696,12 @@ class ConfigTest extends BaseRollbarTest
                 get_class($exception) => $expected
             )
         ));
-        
+
         $sampleRate = $config->exceptionSampleRate($exception);
-        
+
         $this->assertEquals($expected, $sampleRate);
     }
-    
+
     public function providerExceptionSampleRate()
     {
         return array(

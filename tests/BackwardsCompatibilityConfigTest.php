@@ -59,5 +59,7 @@ class BackwardsCompatibilityConfigTest extends BaseRollbarTest
                 'password' => 'my_password'
             )
         ));
+
+        $this->expectNotToPerformAssertions();
     }
 }

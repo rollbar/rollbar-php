@@ -19,22 +19,22 @@ if (\Monolog\Logger::API != 2) {
 use Exception;
 use Monolog\Test\TestCase;
 use Monolog\Logger;
+use PHPUnit\Framework\MockObject\MockObject;
 use Rollbar\Monolog\Handler\RollbarHandler;
-use PHPUnit_Framework_MockObject_MockObject as MockObject;
 use Rollbar\RollbarLogger;
 
 /**
  * @author Erik Johansson <erik.pm.johansson@gmail.com>
  * @see    https://rollbar.com/docs/notifier/rollbar-php/
  *
- * @coversDefaultClass Monolog\Handler\RollbarHandler
- * 
+ * @coversDefaultClass \Monolog\Handler\RollbarHandler
+ *
  * @requires PHP 7
  */
-class RollbarHandlerTest extends TestCase
+class RollbarHandlerMonolog2Test extends TestCase
 {
     /**
-     * @var MockObject
+     * @var MockObject|RollbarLogger
      */
     private $rollbarLogger;
 
@@ -69,8 +69,8 @@ class RollbarHandlerTest extends TestCase
             'access_token' => 'ad865e76e7fb496fab096ac07b1dbabb',
             'environment' => 'test'
         );
-        
-        $this->rollbarLogger = $this->getMockBuilder('Rollbar\RollbarLogger')
+
+        $this->rollbarLogger = $this->getMockBuilder(RollbarLogger::class)
             ->setConstructorArgs(array($config))
             ->setMethods(array('log'))
             ->getMock();

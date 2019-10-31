@@ -26,12 +26,12 @@ class RollbarLogger extends AbstractLogger
     
     public function enable()
     {
-        return $this->config->enable();
+        $this->config->enable();
     }
     
     public function disable()
     {
-        return $this->config->disable();
+        $this->config->disable();
     }
     
     public function enabled()
@@ -123,7 +123,7 @@ class RollbarLogger extends AbstractLogger
             $this->verboseLogger()->info('Occurrence successfully logged');
         }
         
-        if ((is_a($toLog, 'Throwable') || is_a($toLog, 'Exception')) && $this->config->getRaiseOnError()) {
+        if (($toLog instanceof \Throwable) && $this->config->getRaiseOnError()) {
             throw $toLog;
         }
         
@@ -202,6 +202,7 @@ class RollbarLogger extends AbstractLogger
         return $this->config->getDataBuilder();
     }
 
+    /** @deprecated  */
     public function outputLogger()
     {
         return $this->config->outputLogger();

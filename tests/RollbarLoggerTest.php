@@ -8,39 +8,39 @@ use Psr\Log\LogLevel as PsrLogLevel;
 
 class RollbarLoggerTest extends BaseRollbarTest
 {
-    
+
     public function setUp()
     {
         $_SESSION = array();
         parent::setUp();
     }
-    
+
     public function tearDown()
     {
         Rollbar::destroy();
         parent::tearDown();
     }
-    
+
     public function testAddCustom()
     {
         $logger = new RollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php"
         ));
-        
+
         $logger->addCustom("foo", "bar");
-        
+
         $dataBuilder = $logger->getDataBuilder();
-        
+
         $result = $dataBuilder->makeData(
             Level::INFO,
             "This test message should have custom data attached.",
             array()
         );
-        
+
         $customData = $result->getCustom();
         $this->assertEquals("bar", $customData["foo"]);
-        
+
         $logger = new RollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php",
@@ -48,21 +48,21 @@ class RollbarLoggerTest extends BaseRollbarTest
                 "baz" => "xyz"
             )
         ));
-        
+
         $logger->addCustom("foo", "bar");
-        
+
         $dataBuilder = $logger->getDataBuilder();
-        
+
         $result = $dataBuilder->makeData(
             Level::INFO,
             "This test message should have custom data attached.",
             array()
         );
-        
+
         $customData = $result->getCustom();
         $this->assertEquals("bar", $customData["foo"]);
     }
-    
+
     public function testRemoveCustom()
     {
         $logger = new RollbarLogger(array(
@@ -73,22 +73,22 @@ class RollbarLoggerTest extends BaseRollbarTest
                 "bar" => "xyz"
             )
         ));
-        
+
         $logger->removeCustom("foo");
-        
+
         $dataBuilder = $logger->getDataBuilder();
-        
+
         $result = $dataBuilder->makeData(
             Level::INFO,
             "This test message should have custom data attached.",
             array()
         );
-        
+
         $customData = $result->getCustom();
         $this->assertFalse(isset($customData["foo"]));
         $this->assertEquals("xyz", $customData["bar"]);
     }
-    
+
     public function testGetCustom()
     {
         $logger = new RollbarLogger(array(
@@ -99,9 +99,9 @@ class RollbarLoggerTest extends BaseRollbarTest
                 "bar" => "xyz"
             )
         ));
-        
+
         $custom = $logger->getCustom();
-        
+
         $this->assertEquals("bar", $custom["foo"]);
         $this->assertEquals("xyz", $custom["bar"]);
     }
@@ -139,7 +139,7 @@ class RollbarLoggerTest extends BaseRollbarTest
             "log_payload_logger" => $logPayloadLoggerMock
         ));
         $response = $logger->log(Level::WARNING, "Testing PHP Notifier");
-        
+
         $this->assertEquals(200, $response->getStatus());
     }
 
@@ -165,7 +165,7 @@ class RollbarLoggerTest extends BaseRollbarTest
             ->getMock();
 
         $handlerMock->setLevel($originalHandler->getLevel());
-        
+
         $handlerMock->expects($this->never())->method('handle');
 
         $verboseLogger->setHandlers(array($handlerMock));
@@ -196,7 +196,7 @@ class RollbarLoggerTest extends BaseRollbarTest
 
         $logger->info('Internal message');
     }
-    
+
     public function testEnabled()
     {
         $logger = new RollbarLogger(array(
@@ -206,7 +206,7 @@ class RollbarLoggerTest extends BaseRollbarTest
 
         $response = $logger->log(Level::WARNING, "Testing PHP Notifier", array());
         $this->assertEquals(200, $response->getStatus());
-        
+
         $logger = new RollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php",
@@ -269,7 +269,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         $this->assertEquals(0, $response->getStatus());
         $this->assertEquals("Not transmitting (transmitting disabled in configuration)", $response->getInfo());
     }
-    
+
     public function testLogMalformedPayloadData()
     {
         $logger = new RollbarLogger(array(
@@ -277,13 +277,13 @@ class RollbarLoggerTest extends BaseRollbarTest
             "environment" => "testing-php",
             "transformer" => '\Rollbar\TestHelpers\MalformedPayloadDataTransformer'
         ));
-        
+
         $response = $logger->log(
             Level::ERROR,
             "Forced payload's data to false value.",
             array()
         );
-        
+
         $this->assertEquals(400, $response->getStatus());
     }
 
@@ -312,7 +312,7 @@ class RollbarLoggerTest extends BaseRollbarTest
 
         $response = $logger->flush();
     }
-    
+
     public function testContext()
     {
         $l = new RollbarLogger(array(
@@ -328,7 +328,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         );
         $this->assertEquals(200, $response->getStatus());
     }
-    
+
     public function testLogStaticLevel()
     {
         $l = new RollbarLogger(array(
@@ -373,11 +373,11 @@ class RollbarLoggerTest extends BaseRollbarTest
             )
         ));
         $response = $l->log(Level::ERROR, new SilentExceptionSampleRate);
-        
+
         $this->assertEquals(0, $response->getStatus());
-        
+
         $response = $l->log(Level::ERROR, new \Exception);
-        
+
         $this->assertEquals(200, $response->getStatus());
     }
 
@@ -402,17 +402,17 @@ class RollbarLoggerTest extends BaseRollbarTest
         );
         $this->assertEquals(0, $response->getStatus());
     }
-    
+
     private function scrubTestHelper($config = array(), $context = array())
     {
         $scrubFields = array('sensitive');
-        
+
         $defaultConfig = array(
             'access_token' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'scrub_fields' => $scrubFields
         );
-        
+
         $config = new Config(array_replace_recursive($defaultConfig, $config));
 
         $dataBuilder = $config->getDataBuilder();
@@ -423,10 +423,10 @@ class RollbarLoggerTest extends BaseRollbarTest
         $scrubber = $config->getScrubber();
 
         $result = $scrubber->scrub($scrubbed);
-        
+
         return $result;
     }
-    
+
     /**
      * @param string $dataName Human-readable name of the type of data under test
      * @param array $result The result of the code under test
@@ -441,7 +441,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         $recursive = true,
         $replacement = '*'
     ) {
-    
+
         $this->assertEquals(
             str_repeat($replacement, 8),
             $result[$scrubField],
@@ -456,7 +456,7 @@ class RollbarLoggerTest extends BaseRollbarTest
             );
         }
     }
-    
+
     public function scrubDataProvider()
     {
         return array(
@@ -472,7 +472,7 @@ class RollbarLoggerTest extends BaseRollbarTest
             )
         );
     }
-    
+
     /**
      * @dataProvider scrubDataProvider
      */
@@ -482,8 +482,8 @@ class RollbarLoggerTest extends BaseRollbarTest
         $result = $this->scrubTestHelper();
         $this->scrubTestAssert('$_GET', $result['data']['request']['GET']);
     }
-    
-    
+
+
     /**
      * @dataProvider scrubDataProvider
      */
@@ -503,14 +503,14 @@ class RollbarLoggerTest extends BaseRollbarTest
         $result = $this->scrubTestHelper();
         $this->scrubTestAssert('$_SESSION', $result['data']['request']['session']);
     }
-    
+
     public function testGetScrubbedHeaders()
     {
         $_SERVER['HTTP_CONTENT_TYPE'] = 'text/html; charset=utf-8';
         $_SERVER['HTTP_SENSITIVE'] = 'Scrub this';
-        
+
         $scrubField = 'Sensitive';
-        
+
         $result = $this->scrubTestHelper(array('scrub_fields' => array($scrubField)));
         $this->scrubTestAssert(
             'Headers',
@@ -528,15 +528,15 @@ class RollbarLoggerTest extends BaseRollbarTest
         $extras = array(
             'extraField1' => $testData
         );
-        
+
         $result = $this->scrubTestHelper(array('requestExtras' => $extras));
-        
+
         $this->scrubTestAssert(
             "Request extras",
             $result['data']['request']['extraField1']
         );
     }
-    
+
     /**
      * @dataProvider scrubDataProvider
      */
@@ -545,15 +545,15 @@ class RollbarLoggerTest extends BaseRollbarTest
         $extras = array(
             'extraField1' => $testData
         );
-        
+
         $result = $this->scrubTestHelper(array('serverExtras' => $extras));
-        
+
         $this->scrubTestAssert(
             "Server extras",
             $result['data']['server']['extraField1']
         );
     }
-    
+
     /**
      * @dataProvider scrubDataProvider
      */
@@ -567,7 +567,7 @@ class RollbarLoggerTest extends BaseRollbarTest
             $result['data']['custom']
         );
     }
-    
+
     /**
      * @dataProvider scrubDataProvider
      */
@@ -582,20 +582,20 @@ class RollbarLoggerTest extends BaseRollbarTest
                 )
             )
         );
-        
+
         $this->assertEquals(
             str_repeat('*', 8),
             $result['data']['person']['sensitive'],
             "Person did not get scrubbed."
         );
-        
+
         $this->assertNotEquals(
             str_repeat('*', 8),
             $result['data']['person']['recursive']['sensitive'],
             "Person recursive.sensitive DID get scrubbed even though it's whitelisted."
         );
     }
-    
+
     /**
      * @dataProvider scrubDataProvider
      */
@@ -604,7 +604,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         $bodyContext = array(
             'context1' => $testData
         );
-        
+
         $result = $this->scrubTestHelper(
             array('custom' => $bodyContext),
             $bodyContext
@@ -615,18 +615,18 @@ class RollbarLoggerTest extends BaseRollbarTest
             $result['data']['body']['extra']['context1']
         );
     }
-    
+
     public function scrubQueryStringDataProvider()
     {
         $data = $this->scrubDataProvider();
-        
+
         foreach ($data as &$test) {
             $test[0] = http_build_query($test[0]);
         }
-        
+
         return $data;
     }
-    
+
     /**
      * @dataProvider scrubQueryStringDataProvider
      */
@@ -634,7 +634,7 @@ class RollbarLoggerTest extends BaseRollbarTest
     {
         $_SERVER['SERVER_NAME'] = 'localhost';
         $_SERVER['REQUEST_URI'] = "/index.php?$testData";
-        
+
         $result = $this->scrubTestHelper();
         $parsed = array();
         parse_str(parse_url($result['data']['request']['url'], PHP_URL_QUERY), $parsed);
@@ -647,18 +647,18 @@ class RollbarLoggerTest extends BaseRollbarTest
             'x' // query string is scrubbed with "x" rather than "*"
         );
     }
-    
+
     /**
      * @dataProvider scrubQueryStringDataProvider
      */
     public function testGetRequestScrubQueryString($testData)
     {
         $_SERVER['QUERY_STRING'] = "?$testData";
-        
+
         $result = $this->scrubTestHelper();
         $parsed = array();
         parse_str($result['data']['request']['query_string'], $parsed);
-        
+
         $this->scrubTestAssert(
             "Query string",
             $parsed,
@@ -677,6 +677,7 @@ class RollbarLoggerTest extends BaseRollbarTest
 
         // Test that no \Psr\Log\InvalidArgumentException is thrown
         $l->emergency("Testing PHP Notifier");
+        $this->expectNotToPerformAssertions();
     }
 
     public function testPsr3Alert()
@@ -688,6 +689,7 @@ class RollbarLoggerTest extends BaseRollbarTest
 
         // Test that no \Psr\Log\InvalidArgumentException is thrown
         $l->alert("Testing PHP Notifier");
+        $this->expectNotToPerformAssertions();
     }
 
     public function testPsr3Critical()
@@ -699,6 +701,7 @@ class RollbarLoggerTest extends BaseRollbarTest
 
         // Test that no \Psr\Log\InvalidArgumentException is thrown
         $l->critical("Testing PHP Notifier");
+        $this->expectNotToPerformAssertions();
     }
 
     public function testPsr3Error()
@@ -710,6 +713,7 @@ class RollbarLoggerTest extends BaseRollbarTest
 
         // Test that no \Psr\Log\InvalidArgumentException is thrown
         $l->error("Testing PHP Notifier");
+        $this->expectNotToPerformAssertions();
     }
 
     public function testPsr3Warning()
@@ -721,6 +725,7 @@ class RollbarLoggerTest extends BaseRollbarTest
 
         // Test that no \Psr\Log\InvalidArgumentException is thrown
         $l->warning("Testing PHP Notifier");
+        $this->expectNotToPerformAssertions();
     }
 
     public function testPsr3Notice()
@@ -732,6 +737,7 @@ class RollbarLoggerTest extends BaseRollbarTest
 
         // Test that no \Psr\Log\InvalidArgumentException is thrown
         $l->notice("Testing PHP Notifier");
+        $this->expectNotToPerformAssertions();
     }
 
     public function testPsr3Info()
@@ -743,6 +749,7 @@ class RollbarLoggerTest extends BaseRollbarTest
 
         // Test that no \Psr\Log\InvalidArgumentException is thrown
         $l->info("Testing PHP Notifier");
+        $this->expectNotToPerformAssertions();
     }
 
     public function testPsr3Debug()
@@ -754,8 +761,9 @@ class RollbarLoggerTest extends BaseRollbarTest
 
         // Test that no \Psr\Log\InvalidArgumentException is thrown
         $l->debug("Testing PHP Notifier");
+        $this->expectNotToPerformAssertions();
     }
-    
+
     /**
      * @dataProvider maxItemsProvider
      */
@@ -765,19 +773,19 @@ class RollbarLoggerTest extends BaseRollbarTest
         if ($maxItemsConfig !== null) {
             $config['max_items'] = $maxItemsConfig;
         }
-        
+
         Rollbar::init($config);
         $logger = Rollbar::logger();
-        
+
         $maxItems = $maxItemsConfig === null ? Defaults::get()->maxItems() : $maxItemsConfig;
-        
+
         for ($i = 0; $i < $maxItems; $i++) {
             $response = $logger->log(Level::INFO, 'testing info level');
             $this->assertEquals(200, $response->getStatus());
         }
-      
+
         $response = $logger->log(Level::INFO, 'testing info level');
-        
+
         $this->assertEquals(0, $response->getStatus());
         $this->assertEquals(
             "Maximum number of items per request has been reached. If you " .
@@ -786,7 +794,7 @@ class RollbarLoggerTest extends BaseRollbarTest
             $response->getInfo()
         );
     }
-    
+
     public function maxItemsProvider()
     {
         return array(
@@ -794,18 +802,17 @@ class RollbarLoggerTest extends BaseRollbarTest
             'use provided max_items' => array(3)
         );
     }
-    
-    /**
-     * @expectedException Exception
-     */
+
     public function testRaiseOnError()
     {
+        $this->expectException(\Exception::class);
+
         $logger = new RollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
             "environment" => 'test',
             "raise_on_error" => true
         ));
-        
+
         try {
             throw new \Exception();
         } catch (\Exception $ex) {

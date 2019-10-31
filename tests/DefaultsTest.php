@@ -128,47 +128,47 @@ class DefaultsTest extends BaseRollbarTest
         );
         $this->assertEquals($expected, $this->defaults->scrubFields());
     }
-    
+
     public function testSendMessageTrace()
     {
         $this->assertFalse($this->defaults->sendMessageTrace());
     }
-    
+
     public function testAgentLogLocation()
     {
         $this->assertEquals('/var/tmp', $this->defaults->agentLogLocation());
     }
-    
+
     public function testAllowExec()
     {
         $this->assertEquals(true, $this->defaults->allowExec());
     }
-    
+
     public function testEndpoint()
     {
         $this->assertEquals('https://api.rollbar.com/api/1/', $this->defaults->endpoint());
     }
-    
+
     public function testCaptureErrorStacktraces()
     {
         $this->assertTrue($this->defaults->captureErrorStacktraces());
     }
-    
+
     public function testCheckIgnore()
     {
         $this->assertNull($this->defaults->checkIgnore());
     }
-    
+
     public function testCodeVersion()
     {
         $this->assertEquals("", $this->defaults->codeVersion());
     }
-    
+
     public function testCustom()
     {
         $this->assertNull($this->defaults->custom());
     }
-    
+
     public function testEnabled()
     {
         $this->assertTrue($this->defaults->enabled());
@@ -183,47 +183,47 @@ class DefaultsTest extends BaseRollbarTest
     {
         $this->assertFalse($this->defaults->logPayload());
     }
-    
+
     public function testEnvironment()
     {
         $this->assertEquals('production', $this->defaults->environment());
     }
-    
+
     public function testErrorSampleRates()
     {
         $this->assertEmpty($this->defaults->errorSampleRates());
     }
-    
+
     public function testExceptionSampleRates()
     {
         $this->assertEmpty($this->defaults->exceptionSampleRates());
     }
-    
+
     public function testFluentHost()
     {
         $this->assertEquals('127.0.0.1', $this->defaults->fluentHost());
     }
-    
+
     public function testFluentPort()
     {
         $this->assertEquals(24224, $this->defaults->fluentPort());
     }
-    
+
     public function testFluentTag()
     {
         $this->assertEquals('rollbar', $this->defaults->fluentTag());
     }
-    
+
     public function testHandler()
     {
         $this->assertEquals('blocking', $this->defaults->handler());
     }
-    
+
     public function testHost()
     {
         $this->assertNull($this->defaults->host());
     }
-    
+
     public function testIncludedErrno()
     {
         $this->assertEquals(
@@ -231,42 +231,42 @@ class DefaultsTest extends BaseRollbarTest
             $this->defaults->includedErrno()
         );
     }
-    
+
     public function testTimeout()
     {
         $this->assertEquals(3, $this->defaults->timeout());
     }
-    
+
     public function testReportSuppressed()
     {
         $this->assertFalse($this->defaults->reportSuppressed());
     }
-    
+
     public function testUseErrorReporting()
     {
         $this->assertFalse($this->defaults->useErrorReporting());
     }
-    
+
     public function testCaptureEmail()
     {
         $this->assertFalse($this->defaults->captureEmail());
     }
-    
+
     public function testCaptureUsername()
     {
         $this->assertFalse($this->defaults->captureUsername());
     }
-    
+
     public function testMaxItems()
     {
         $this->assertEquals(10, $this->defaults->maxItems());
     }
-    
+
     public function testRaiseOnError()
     {
         $this->assertEquals(false, $this->defaults->raiseOnError());
     }
-    
+
     public function testDefaultsForConfigOptions()
     {
         foreach (\Rollbar\Config::listOptions() as $option) {
@@ -287,11 +287,13 @@ class DefaultsTest extends BaseRollbarTest
             } elseif ($option == 'root') {
                 $option = 'server_root';
             }
-            
+
             $this->defaults->fromSnakeCase($option);
         }
+
+        $this->expectNotToPerformAssertions();
     }
-    
+
     public function testFromSnakeCase()
     {
         $this->assertEquals(

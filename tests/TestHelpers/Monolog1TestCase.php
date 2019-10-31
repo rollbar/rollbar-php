@@ -19,8 +19,9 @@
 namespace Rollbar\Monolog;
 
 use Monolog\Logger;
+use PHPUnit\Framework\TestCase;
 
-class Monolog1TestCase extends \PHPUnit_Framework_TestCase
+abstract class Monolog1TestCase extends TestCase
 {
     /**
      * @return array Record
@@ -53,7 +54,7 @@ class Monolog1TestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return Monolog\Formatter\FormatterInterface
+     * @return \Monolog\Formatter\FormatterInterface
      */
     protected function getIdentityFormatter()
     {

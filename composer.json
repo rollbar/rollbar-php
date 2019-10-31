@@ -31,35 +31,36 @@
   },
 
   "require": {
+    "php": "^7.1",
     "ext-curl": "*",
     "psr/log": "^1",
     "monolog/monolog": "^1 || ^2"
   },
 
   "require-dev": {
-    "phpunit/phpunit": "4.8.* || ^5",
+    "phpunit/phpunit": "^7.0",
     "mockery/mockery": "0.9.*",
     "squizlabs/php_codesniffer": "2.*",
     "codeclimate/php-test-reporter": "dev-master",
-    "packfire/php5.3-compat": "*",
-    "phpmd/phpmd" : "@stable"
+    "phpmd/phpmd" : "@stable",
+    "composer/ca-bundle": "^1.2"
   },
 
   "suggest": {
-    "packfire/php5.3-compat": "for backward compatibility with PHP 5.3",
-    "fluent/logger": "Needed to use the 'fluent' handler for fluentd support"
+    "fluent/logger": "Needed to use the 'fluent' handler for fluentd support",
+    "composer/ca-bundle": "Use the Composer CA Bundle to manage certificate verification"
   },
 
   "scripts": {
     "test": [
-      "phpunit --coverage-clover build/logs/clover.xml --testsuite 'Rollbar Test Suite'",
+      "phpunit --coverage-clover build/logs/clover.xml --testsuite \"Rollbar Test Suite\"",
       "phpcs --standard=PSR1,PSR2 src tests"
     ],
     "fix": "phpcbf --standard=PSR1,PSR2 src tests",
     "get-js-snippet": "ROLLBAR_JS_TAG=$(curl -s https://api.github.com/repos/rollbar/rollbar.js/releases/latest | sed -n 's/\"tag_name\":.*\"\\(.*\\)\",/\\1/p' | sed 's/ *//'); curl -X GET https://raw.githubusercontent.com/rollbar/rollbar.js/$ROLLBAR_JS_TAG/dist/rollbar.snippet.js > data/rollbar.snippet.js",
     "performance": "phpunit --coverage-clover build/logs/clover.xml --testsuite 'Rollbar Performance Test Suite'"
   },
-  
+
   "config": {
     "process-timeout": 600
   }

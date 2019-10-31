@@ -116,7 +116,7 @@ class Config
     private $verbose;
 
     /**
-     * @var \Psr\Log\Logger $versbosity_logger The logger object used to log
+     * @var \Psr\Log\LoggerInterface $versbosity_logger The logger object used to log
      * the internal messages of the SDK. The verbosity level of the default
      * $verbosityLogger can be controlled with `verbose` config option.
      * Default: \Rollbar\VerboseLogger

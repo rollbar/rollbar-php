@@ -1,10 +1,13 @@
-<?php namespace Rollbar\Senders;
+<?php
+
+namespace Rollbar\Senders;
 
 /**
  * Adapted from:
  * https://github.com/segmentio/analytics-php/blob/master/lib/Segment/Consumer/Socket.php
  */
 
+use Composer\CaBundle\CaBundle;
 use Rollbar\Response;
 use Rollbar\Payload\Payload;
 use Rollbar\Payload\EncodedPayload;
@@ -50,6 +53,10 @@ class CurlSender implements SenderInterface
         if (array_key_exists('ca_cert_path', $opts)) {
             $this->caCertPath = $opts['ca_cert_path'];
         }
+
+        if (!$this->caCertPath && !ini_get('curl.cainfo') && class_exists(CaBundle::class)) {
+            $this->caCertPath = CaBundle::getBundledCaBundlePath();
+        }
     }
     
     public function getEndpoint()
@@ -72,7 +79,7 @@ class CurlSender implements SenderInterface
         curl_close($handle);
 
         $data = $payload->data();
-        $uuid = $data['data']['uuid'];
+        $uuid = $data['data']['uuid'] ?? null;
         
         return new Response($statusCode, $result, $uuid);
     }

@@ -1,6 +1,9 @@
-<?php namespace Rollbar;
+<?php
+namespace Rollbar;
 
-abstract class BaseRollbarTest extends \PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+abstract class BaseRollbarTest extends TestCase
 {
     
     const DEFAULT_ACCESS_TOKEN = 'ad865e76e7fb496fab096ac07b1dbabb';
