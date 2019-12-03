@@ -120,7 +120,7 @@ final class Utilities
             
             if ($customKeys !== null && in_array($key, $customKeys)) {
                 $returnVal[$key] = $val;
-            } elseif (!is_null($val)) {
+            } elseif (!is_null($val) && !is_object($key)) {
                 $returnVal[$key] = $val;
             }
         }
