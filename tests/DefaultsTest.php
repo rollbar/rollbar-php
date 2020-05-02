@@ -12,7 +12,7 @@ class DefaultsTest extends BaseRollbarTest
      */
     private $defaults;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->defaults = new Defaults(new Utilities());
     }

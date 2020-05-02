@@ -43,7 +43,7 @@ class RollbarHandlerTest extends TestCase
      */
     private $reportedExceptionArguments = null;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

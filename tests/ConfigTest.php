@@ -20,7 +20,7 @@ class ConfigTest extends BaseRollbarTest
 {
     private $error;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->error = new ErrorWrapper(
             E_ERROR,
@@ -32,7 +32,7 @@ class ConfigTest extends BaseRollbarTest
         );
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
         m::close();

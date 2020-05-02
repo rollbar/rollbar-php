@@ -5,7 +5,7 @@ class JsHelperTest extends BaseRollbarTest
     protected $jsHelper;
     protected $testSnippetPath;
     
-    public function setUp()
+    public function setUp(): void
     {
         $this->jsHelper = new RollbarJsHelper(array());
         $this->testSnippetPath = realpath(__DIR__ . "/../data/rollbar.snippet.js");

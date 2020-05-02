@@ -66,13 +66,13 @@ class UtilitiesTest extends BaseRollbarTest
 
     public function testValidateBooleanThrowsException()
     {
-        $this->setExpectedException(get_class(new \InvalidArgumentException()));
+        $this->expectException(get_class(new \InvalidArgumentException()));
         Utilities::validateBoolean(null, "foo", false);
     }
 
     public function testValidateBooleanWithInvalidBoolean()
     {
-        $this->setExpectedException(get_class(new \InvalidArgumentException()));
+        $this->expectException(get_class(new \InvalidArgumentException()));
         Utilities::validateBoolean("not a boolean");
     }
 

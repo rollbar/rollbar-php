@@ -26,7 +26,7 @@ class VerbosityTest extends BaseRollbarTest
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         $_SESSION = array();
         parent::setUp();
@@ -38,7 +38,7 @@ class VerbosityTest extends BaseRollbarTest
      *
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->verboseHandlerMock = null;
         Rollbar::destroy();
