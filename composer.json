@@ -61,6 +61,6 @@
   },
   
   "config": {
-    "process-timeout": 600,
+    "process-timeout": 600
   }
 }
