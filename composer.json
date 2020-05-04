@@ -37,7 +37,7 @@
   },
 
   "require-dev": {
-    "phpunit/phpunit": "4.8.* || ^8",
+    "phpunit/phpunit": "4.8.* || 6.5.* || ^8",
     "mockery/mockery": "1.*",
     "squizlabs/php_codesniffer": "2.*",
     "codeclimate/php-test-reporter": "dev-master",
@@ -61,6 +61,9 @@
   },
   
   "config": {
-    "process-timeout": 600
+    "process-timeout": 600,
+    "platform": {
+      "php": "7.1"
+    }
   }
 }
