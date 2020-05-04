@@ -75,7 +75,8 @@ class TruncationTest extends BaseRollbarTest
             $frames[$key] = $stringValue;
         }
 
-        $frames = &$framesTestData['truncate middle using trace_chain key'][0]['data']['body']['trace_chain'][0]['frames'];
+        $frames_body = &$framesTestData['truncate middle using trace_chain key'][0]['data']['body'];
+        $frames = $frames_body['trace_chain'][0]['frames'];
         foreach ($frames as $key => $data) {
             $frames[$key] = $stringValue;
         }
