@@ -62,8 +62,5 @@
   
   "config": {
     "process-timeout": 600,
-    "platform": {
-      "php": "7.1"
-    }
   }
 }
