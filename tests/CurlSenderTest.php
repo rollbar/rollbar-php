@@ -15,13 +15,14 @@ class CurlSenderTest extends BaseRollbarTest
             "endpoint" => "fake-endpoint"
         ));
         $response = $logger->log(Level::WARNING, "Testing PHP Notifier", array());
-        
+
         $this->assertTrue(
             in_array(
                 $response->getInfo(),
                 array(
                     "Couldn't resolve host 'fake-endpointitem'", // hack for PHP 5.3
                     "Could not resolve host: fake-endpointitem",
+                    "Could not resolve: fake-endpointitem (Domain name not found)",
                     "Empty reply from server"
                 )
             )
