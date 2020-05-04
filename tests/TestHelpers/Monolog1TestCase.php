@@ -21,7 +21,7 @@ namespace Rollbar\Monolog;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 
-class Monolog1TestCase extends TestCase
+abstract class Monolog1TestCase extends TestCase
 {
     /**
      * @return array Record
