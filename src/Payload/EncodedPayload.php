@@ -46,7 +46,7 @@ class EncodedPayload
     
     public function __toString()
     {
-        return $this->encoded();
+        return (string)$this->encoded();
     }
     
     public function encoded()
