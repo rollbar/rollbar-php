@@ -22,6 +22,7 @@ class CurlSenderTest extends BaseRollbarTest
                 array(
                     "Couldn't resolve host 'fake-endpointitem'", // hack for PHP 5.3
                     "Could not resolve host: fake-endpointitem",
+                    "Could not resolve: fake-endpointitem (Domain name not found)",
                     "Empty reply from server"
                 )
             )
