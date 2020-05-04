@@ -1135,7 +1135,7 @@ class DataBuilder implements DataBuilderInterface
             if ($fatalHandlerMethod ||
                  $fatalHandlerClassAndFunction ||
                  $errorHandlerMethod ||
-                 $errorHandlerClassAndFunction ) {
+                 $errorHandlerClassAndFunction) {
                 return array_slice($backTrace, $index+1);
             }
         }
