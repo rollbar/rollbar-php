@@ -1,8 +1,7 @@
 <?php namespace Rollbar;
 
-abstract class BaseRollbarTest extends \PHPUnit_Framework_TestCase
+abstract class BaseRollbarTest extends \PHPUnit\Framework\TestCase
 {
-    
     const DEFAULT_ACCESS_TOKEN = 'ad865e76e7fb496fab096ac07b1dbabb';
     
     public function tearDown(): void
