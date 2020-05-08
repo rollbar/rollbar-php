@@ -9,7 +9,7 @@ use \Rollbar\Payload\EncodedPayload;
 class TruncationTest extends BaseRollbarTest
 {
     
-    public function setUp()
+    public function setUp(): void
     {
         $config = new Config(array('access_token' => $this->getTestAccessToken()));
         $this->truncate = new \Rollbar\Truncation\Truncation($config);
@@ -74,12 +74,13 @@ class TruncationTest extends BaseRollbarTest
         foreach ($frames as $key => $data) {
             $frames[$key] = $stringValue;
         }
-        
-        $frames = &$framesTestData['truncate middle using trace_chain key'][0]['data']['body']['trace_chain']['frames'];
+
+        $frames_body = &$framesTestData['truncate middle using trace_chain key'][0]['data']['body'];
+        $frames = $frames_body['trace_chain'][0]['frames'];
         foreach ($frames as $key => $data) {
             $frames[$key] = $stringValue;
         }
-        
+
         $data = array_merge(
             $stringsTest->executeTruncateNothingProvider(),
             $stringsTest->executearrayProvider(),

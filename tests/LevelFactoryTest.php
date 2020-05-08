@@ -6,7 +6,7 @@ class LevelFactoryTest extends BaseRollbarTest
 {
     private $levelFactory;
     
-    public function setUp()
+    public function setUp(): void
     {
         $this->levelFactory = new LevelFactory();
     }

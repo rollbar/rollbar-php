@@ -9,7 +9,7 @@ class DataTest extends BaseRollbarTest
     private $body;
     private $data;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->body = m::mock("Rollbar\Payload\Body");
         $this->data = new Data("test", $this->body);

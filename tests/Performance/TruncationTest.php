@@ -16,7 +16,7 @@ use \Rollbar\BaseRollbarTest;
 class TruncationTest extends BaseRollbarTest
 {
     
-    public function setUp()
+    public function setUp(): void
     {
         $config = new Config(array('access_token' => $this->getTestAccessToken()));
         $this->truncate = new Truncation($config);
