@@ -1,4 +1,4 @@
-# Rollbar-PHP [![Build Status](https://api.travis-ci.org/rollbar/rollbar-php.png)](https://travis-ci.org/rollbar/rollbar-php)
+# Rollbar-PHP [![Build Status](https://travis-ci.org/rollbar/rollbar-php.svg?branch=master)](https://travis-ci.org/rollbar/rollbar-php)
 
 This library detects errors and exceptions in your application and reports them to [Rollbar](https://rollbar.com) for alerts, reporting, and analysis.
 
