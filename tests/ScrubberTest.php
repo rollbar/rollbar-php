@@ -24,23 +24,23 @@ class ScrubberTest extends BaseRollbarTest
     }
     
     /**
-     * @dataProvider scrubWhitelistProvider
+     * @dataProvider scrubSafelistProvider
      */
-    public function testScrubWhitelist($testData, $scrubFields, $whitelist, $expected)
+    public function testScrubSafelist($testData, $scrubFields, $safelist, $expected)
     {
         $scrubber = new Scrubber(array(
             'scrubFields' => $scrubFields,
-            'scrubWhitelist' => $whitelist
+            'scrubSafelist' => $safelist
         ));
         $result = $scrubber->scrub($testData);
         $this->assertEquals(
             $expected,
             $result,
-            "Looks like whitelisting is not working correctly."
+            "Looks like safelisting is not working correctly."
         );
     }
     
-    public function scrubWhitelistProvider()
+    public function scrubSafelistProvider()
     {
         return array(
             array(
