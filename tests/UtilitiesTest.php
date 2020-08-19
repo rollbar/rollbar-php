@@ -4,6 +4,7 @@ use Rollbar\TestHelpers\CycleCheck\ParentCycleCheck;
 use Rollbar\TestHelpers\CycleCheck\ChildCycleCheck;
 use Rollbar\TestHelpers\CycleCheck\ParentCycleCheckSerializable;
 use Rollbar\TestHelpers\CycleCheck\ChildCycleCheckSerializable;
+use Rollbar\TestHelpers\ObjectSerialization;
 
 class UtilitiesTest extends BaseRollbarTest
 {
@@ -109,7 +110,7 @@ class UtilitiesTest extends BaseRollbarTest
         $this->assertArrayNotHasKey("myNullValue", $result);
         $this->assertArrayNotHasKey("my_null_value", $result);
     }
-    
+
     public function testSerializationCycleChecking()
     {
         $config = new Config(array("access_token"=>$this->getTestAccessToken()));
@@ -122,19 +123,19 @@ class UtilitiesTest extends BaseRollbarTest
             "serializedObj" => new ParentCycleCheckSerializable(),
         );
         $objectHashes = array();
-        
+
         $result = Utilities::serializeForRollbar($obj, null, $objectHashes);
-        
+
         $this->assertRegExp(
             '/<CircularReference.*/',
             $result["obj"]["value"]["child"]["value"]["parent"]
         );
-        
+
         $this->assertRegExp(
             '/<CircularReference.*/',
             $result["serializedObj"]["child"]["parent"]
         );
-        
+
         $this->assertRegExp(
             '/<CircularReference.*/',
             $result["payload"]["data"]["body"]["extra"][0]["value"]["child"]["value"]["parent"]
@@ -152,7 +153,7 @@ class UtilitiesTest extends BaseRollbarTest
                 ),
             ),
         );
-        
+
         $objectHashes = array();
         $result = Utilities::serializeForRollbar($obj, null, $objectHashes, 2);
         $this->assertArrayHasKey('one', $result);
@@ -171,5 +172,38 @@ class UtilitiesTest extends BaseRollbarTest
         $this->assertArrayHasKey('two', $result['one']);
         $this->assertArrayHasKey('three', $result['one']['two']);
         $this->assertArrayHasKey('four', $result['one']['two']['three']);
+    }
+
+    public function testSerializeForRollbarObjectTypes()
+    {
+        $obj = array(
+            'toString' => new ObjectSerialization\ToString(),
+            '__toString' => new ObjectSerialization\MagicToString(),
+            'toArray' => new ObjectSerialization\ToArray(),
+            'JsonSerializable' => new ObjectSerialization\JsonSerializable(),
+            'Serializable' => new ObjectSerialization\Serializable(),
+            'PublicFields' => new ObjectSerialization\PublicFields(),
+            'Iterator' => (function () {
+                yield 1;
+            })(),
+        );
+
+        $result = Utilities::serializeForRollbar($obj);
+
+        $this->assertEquals(array(
+            'toString' => array('class' => ObjectSerialization\ToString::class, 'value' => 'toString'),
+            '__toString' => array('class' => ObjectSerialization\MagicToString::class, 'value' => '__toString'),
+            'toArray' => array('class' => ObjectSerialization\ToArray::class, 'value' => array('toArray')),
+            'JsonSerializable' => array(
+                'class' => ObjectSerialization\JsonSerializable::class,
+                'value' => array('jsonSerialize')
+            ),
+            'Serializable' => 'serializable',
+            'PublicFields' => array(
+                'class' => ObjectSerialization\PublicFields::class,
+                'value' => array('a' => 1, 'b' => '2', 'c' => array(3))
+            ),
+            'Iterator' => array('class' => 'Generator', 'value' => 'non-serializable'),
+        ), $result);
     }
 }

@@ -135,31 +135,47 @@ final class Utilities
         $maxDepth = -1,
         $depth = 0
     ) {
-        $serialized = null;
         
         if (self::serializedAlready($obj, $objectHashes)) {
-            $serialized = self::circularReferenceLabel($obj);
-        } else {
-            if ($obj instanceof \Serializable) {
-                self::markSerialized($obj, $objectHashes);
-                $serialized = $obj->serialize();
-            } else {
-                $serialized = array(
-                    'class' => get_class($obj)
-                );
-                
-                if ($obj instanceof \Iterator) {
-                    $serialized['value'] = 'non-serializable';
-                } else {
-                    $serialized['value'] = self::serializeForRollbar(
-                        $obj,
-                        $customKeys,
-                        $objectHashes,
-                        $maxDepth,
-                        $depth+1
-                    );
-                }
+            return self::circularReferenceLabel($obj);
+        }
+
+        if ($obj instanceof \Serializable) {
+            self::markSerialized($obj, $objectHashes);
+            return $obj->serialize();
+        }
+        
+        $serialized = array(
+            'class' => get_class($obj)
+        );
+        
+        if ($obj instanceof \Iterator) {
+            $serialized['value'] = 'non-serializable';
+            return $serialized;
+        }
+        
+        try {
+            if (method_exists($obj, 'toString')) {
+                $serialized['value'] = $obj->toString();
+            } elseif (method_exists($obj, '__toString')) {
+                $serialized['value'] = (string) $obj;
+            } elseif (method_exists($obj, 'toArray')) {
+                $serialized['value'] = $obj->toArray();
+            } elseif ($obj instanceof \JsonSerializable) {
+                $serialized['value'] = $obj->jsonSerialize();
             }
+        } catch (\Throwable $e) {
+            // silently fail if we can't serialize and just fallback to the standard serialization
+        }
+
+        if (!array_key_exists('value', $serialized)) {
+            $serialized['value'] = self::serializeForRollbar(
+                $obj,
+                $customKeys,
+                $objectHashes,
+                $maxDepth,
+                $depth+1
+            );
         }
         
         return $serialized;
