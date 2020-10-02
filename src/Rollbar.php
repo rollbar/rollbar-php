@@ -92,7 +92,9 @@ class Rollbar
         if (is_null(self::$logger)) {
             return self::getNotInitializedResponse();
         }
-        return self::$logger->log($level, $toLog, (array)$extra, $isUncaught);
+
+        $extra['isUncaught'] = $isUncaught;
+        return self::$logger->log($level, $toLog, (array)$extra);
     }
     
     public static function debug($toLog, $extra = array())

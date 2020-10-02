@@ -41,7 +41,7 @@ class FatalHandler extends AbstractHandler
                                 getDataBuilder()->
                                 generateErrorWrapper($errno, $errstr, $errfile, $errline);
                                 
-            $this->logger()->log(Level::CRITICAL, $exception, array(), true);
+            $this->logger()->log(Level::CRITICAL, $exception, array('isUncaught' => true));
         }
     }
     

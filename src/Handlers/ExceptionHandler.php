@@ -30,7 +30,7 @@ class ExceptionHandler extends AbstractHandler
         
         $exception = $args[0];
         
-        $this->logger()->log(Level::ERROR, $exception, array(), true);
+        $this->logger()->log(Level::ERROR, $exception, array('isUncaught' => true));
         
         if ($this->previousHandler) {
             restore_exception_handler();
