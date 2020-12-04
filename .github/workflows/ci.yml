@@ -52,7 +52,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ matrix.os }}-composer-${{ hashFiles('**/composer.lock') }}-${{ matrix.dependency-version }-
+          key: ${{ matrix.os }}-composer-${{ hashFiles('**/composer.json') }}-${{ matrix.dependency-version }-
           restore-keys: ${{ matrix.os }}-composer-${{ matrix.dependency-version }-
 
       - name: Install dependencies
