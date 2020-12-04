@@ -13,7 +13,7 @@ name: Rollbar-PHP CI
 on:
   push:
   schedule:
-    - cron: '2 42 * * *'
+    - cron: '42 2 * * *'
 
 jobs:
   # Check that this runs on PHP on all versions we claim to support, on both
