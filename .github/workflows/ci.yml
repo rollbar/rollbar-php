@@ -1,0 +1,88 @@
+# Primary CI checks for Rollbar-PHP.
+#
+# Test with act:
+#   brew install act
+#   act -P ubuntu-latest=shivammathur/node:latest
+#
+# @see https://github.com/nektos/act/issues/329
+name: Rollbar-PHP CI
+
+# Fire this action on pushes to main branch (master) as well as pull requests
+# (push: without any configuration assumes this). Also, run every day at 02:42
+# GMT -- this catches failures from dependencies that update indepdently.
+on:
+  push:
+  schedule:
+    - cron: '2 42 * * *'
+
+jobs:
+  # Check that this runs on PHP on all versions we claim to support, on both
+  # UNIX-like and Windows environments, and that use both the lowest possible
+  # compatible version as well as the most-recent stable version. This will
+  # fail-fast by default, so we include our edgiest versions (currently 7.4)
+  # first as they're most likely to fail.
+  # @seealso https://freek.dev/1546
+  # @seealso https://www.dereuromark.de/2019/01/04/test-composer-dependencies-with-prefer-lowest/
+  php-tests:
+    strategy:
+      matrix:
+        php-version: [7.4, 7.3, 7.2, 7.1, 5.6, 5.5, 5.4, 5.3]
+        dependency-version: [prefer-lowest, prefer-stable]
+        os: [ubuntu-latest, windows-latest]
+
+    name: PHP v${{ matrix.php-version }} on ${{ matrix.os }}, ${{ matrix.dependency-version }} dependencies
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v2
+
+      - name: Install PHP and composer environment
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: curl
+          ini-values: error_reporting=-1
+          coverage: none
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ matrix.os }}-composer-${{ hashFiles('**/composer.lock') }}-${{ matrix.dependency-version }-
+          restore-keys: ${{ matrix.os }}-composer-${{ matrix.dependency-version }-
+
+      - name: Install dependencies
+        run: composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction
+
+      - name: Execute tests
+        run: vendor/bin/phpunit
+
+      #- name: Notify maintainers by Slack
+        #uses: 8398a7/action-slack@v2
+        #if: always()
+        #with:
+            #status: ${{ job.status }}
+            #author_name: ${{ github.actor }}
+        #env:
+          #SLACK_WEBHOOK_URL: ${{ secrets.NOTIFY_SLACK_WEBHOOK }}
+          #GITHUB_TOKEN: ${{ secrets.NOTIFY_SLACK_GITHUB_TOKEN }}
+
+      #- name: Notify maintainers by email
+        #uses: dawidd6/action-send-mail@v2
+        #if: always()
+        #with:
+          #server_address: ${{ secrets.NOTIFY_EMAIL_SMTP_SERVER_ADDR }}
+          #server_port: ${{ secrets.NOTIFY_EMAIL_SMTP_SERVER_PORT }}
+          #username: ${{ secrets.NOTIFY_EMAIL_SMTP_USERNAME }}
+          #password: ${{ secrets.NOTIFY_EMAIL_SMTP_PASSWORD }}
+          #subject: [${{ github.repository }}] Workflow ${{ github.workflow }} ${{ job.status }}
+          #body: >
+            #Workflow ${{ github.workflow }}, triggered by ${{ github.event_name }},
+            #has completed with a status of ${{ job.status }}.
+            #${{ GITHUB_SERVER_URL }}/${{ github.repository }}/actions/runs/${{ github.run_number }}
+          #to: php-sdk-maintainers@rollbar.com
+          #from: GitHub Actions
