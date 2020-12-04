@@ -53,7 +53,7 @@ jobs:
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ matrix.os }}-composer-${{ hashFiles('**/composer.json') }}-${{ matrix.dependency-version }-
-          restore-keys: ${{ matrix.os }}-composer-${{ matrix.dependency-version }-
+          restore-keys: ${{ matrix.os }}-composer-${{ matrix.dependency-version }}-
 
       - name: Install dependencies
         run: composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction
