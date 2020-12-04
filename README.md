@@ -1,4 +1,8 @@
-# Rollbar-PHP [![Build Status](https://travis-ci.org/rollbar/rollbar-php.svg?branch=master)](https://travis-ci.org/rollbar/rollbar-php)
+# Rollbar-PHP
+
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/rollbar/rollbar.svg?style=flat-square)](https://packagist.org/packages/rollbar/rollbar)
+![Build Status](https://github.com/rollbar/rollbar-php/workflows/Rollbar-PHP%20CI/badge.svg)
+[![Total Downloads](https://img.shields.io/packagist/dt/rollbar/rollbar.svg?style=flat-square)](https://packagist.org/packages/rollbar/rollbar)
 
 This library detects errors and exceptions in your application and reports them to [Rollbar](https://rollbar.com) for alerts, reporting, and analysis.
 
