@@ -27,11 +27,11 @@ jobs:
     strategy:
       matrix:
         php-version: [7.4, 7.3, 7.2, 7.1, 5.6, 5.5, 5.4, 5.3]
-        dependency-version: [prefer-lowest, prefer-stable]
-        os: [ubuntu-latest, windows-latest]
+        dependency-version: [lowest, stable]
+        os: [ubuntu, windows]
 
-    name: PHP v${{ matrix.php-version }} on ${{ matrix.os }}, ${{ matrix.dependency-version }} dependencies
-    runs-on: ${{ matrix.os }}
+    name: PHP ${{ matrix.php-version }} on ${{ matrix.os }}, ${{ matrix.dependency-version }} dependencies preferred
+    runs-on: ${{ matrix.os }}-latest
     steps:
       - name: Checkout the code
         uses: actions/checkout@v2
@@ -56,10 +56,10 @@ jobs:
           restore-keys: ${{ matrix.os }}-composer-${{ matrix.dependency-version }}-
 
       - name: Install dependencies
-        run: composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction
+        run: composer update --prefer-${{ matrix.dependency-version }} --prefer-dist --no-interaction
 
       - name: Execute tests
-        run: vendor/bin/phpunit
+        run: composer test
 
       #- name: Notify maintainers by Slack
         #uses: 8398a7/action-slack@v2
