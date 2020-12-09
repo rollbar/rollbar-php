@@ -42,7 +42,7 @@ jobs:
           php-version: ${{ matrix.php-version }}
           extensions: curl
           ini-values: error_reporting=-1
-          coverage: none
+          coverage: xdebug
 
       - name: Get composer cache directory
         id: composer-cache
@@ -61,28 +61,6 @@ jobs:
       - name: Execute tests
         run: composer test
 
-      #- name: Notify maintainers by Slack
-        #uses: 8398a7/action-slack@v2
-        #if: always()
-        #with:
-            #status: ${{ job.status }}
-            #author_name: ${{ github.actor }}
-        #env:
-          #SLACK_WEBHOOK_URL: ${{ secrets.NOTIFY_SLACK_WEBHOOK }}
-          #GITHUB_TOKEN: ${{ secrets.NOTIFY_SLACK_GITHUB_TOKEN }}
-
-      #- name: Notify maintainers by email
-        #uses: dawidd6/action-send-mail@v2
-        #if: always()
-        #with:
-          #server_address: ${{ secrets.NOTIFY_EMAIL_SMTP_SERVER_ADDR }}
-          #server_port: ${{ secrets.NOTIFY_EMAIL_SMTP_SERVER_PORT }}
-          #username: ${{ secrets.NOTIFY_EMAIL_SMTP_USERNAME }}
-          #password: ${{ secrets.NOTIFY_EMAIL_SMTP_PASSWORD }}
-          #subject: [${{ github.repository }}] Workflow ${{ github.workflow }} ${{ job.status }}
-          #body: >
-            #Workflow ${{ github.workflow }}, triggered by ${{ github.event_name }},
-            #has completed with a status of ${{ job.status }}.
-            #${{ GITHUB_SERVER_URL }}/${{ github.repository }}/actions/runs/${{ github.run_number }}
-          #to: php-sdk-maintainers@rollbar.com
-          #from: GitHub Actions
+      - name: Report results
+        if: success()
+        run: ./vendor/bin/test-reporter
