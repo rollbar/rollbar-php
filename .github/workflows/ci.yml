@@ -26,11 +26,17 @@ jobs:
   php-tests:
     strategy:
       matrix:
-        php-version: [7.4, 7.3, 7.2, 7.1]
-        dependency-version: [stable]
+        php: [7.4, 7.3, 7.2, 7.1]
+        dependency: [stable]
         os: [ubuntu]
+        include:
+          # 7.4 introduced an engine wide flag that disables arguments in
+          # backtraces. The default in 7.4 is On. However, we have tests that
+          # rely on arguments being available, so we turn it Off.
+          - php: 7.4
+            ini: zend.exception_ignore_args=Off
 
-    name: PHP ${{ matrix.php-version }} on ${{ matrix.os }}, ${{ matrix.dependency-version }} dependencies preferred
+    name: PHP ${{ matrix.php }} on ${{ matrix.os }}, ${{ matrix.dependency }} dependencies preferred
     runs-on: ${{ matrix.os }}-latest
     steps:
       - name: Checkout the code
@@ -39,8 +45,9 @@ jobs:
       - name: Install PHP and composer environment
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-version }}
+          php-version: ${{ matrix.php }}
           extensions: curl
+          ini-values: ${{ matrix.ini }}
           coverage: xdebug
 
       - name: Get composer cache directory
@@ -51,11 +58,11 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ matrix.os }}-composer-${{ hashFiles('**/composer.json') }}-${{ matrix.dependency-version }}-
-          restore-keys: ${{ matrix.os }}-composer-${{ matrix.dependency-version }}-
+          key: ${{ matrix.os }}-composer-${{ hashFiles('**/composer.json') }}-${{ matrix.dependency }}-
+          restore-keys: ${{ matrix.os }}-composer-${{ matrix.dependency }}-
 
       - name: Install dependencies
-        run: composer update --prefer-${{ matrix.dependency-version }} --prefer-dist --no-interaction
+        run: composer update --prefer-${{ matrix.dependency }} --prefer-dist --no-interaction
 
       - name: Execute tests
         run: composer test
