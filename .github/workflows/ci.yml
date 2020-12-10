@@ -69,4 +69,6 @@ jobs:
 
       - name: Report results
         if: success()
+        env:
+          CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_REPO_TOKEN }}
         run: ./vendor/bin/test-reporter
