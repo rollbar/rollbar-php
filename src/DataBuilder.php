@@ -1131,7 +1131,7 @@ class DataBuilder implements DataBuilderInterface
 
         // in XDebug 3 and later, the function is defined but disabled unless
         // the xdebug mode parameter includes it
-        return -1 === strpos(ini_get('xdebug.mode'), 'develop') ? false : true;
+        return false === strpos(ini_get('xdebug.mode'), 'develop') ? false : true;
     }
     
     private function fetchErrorTrace()
