@@ -45,16 +45,15 @@ jobs:
           - php: 7.4
             ini: zend.exception_ignore_args=Off
         exclude:
-          # xdebug3-mode compatible only with PHP > 7.2, so exclude from earlier verions
+          # We only have XDebug 3 in PHP > 7.3, and the ini value will be ignored in
+          # all earlier versions. We can prune out one of them, because the result of
+          # both runs in these earlier versions are the same (because the ini directive
+          # is completely ignored, no matter its value).
           # @see https://xdebug.org/docs/compat
           - php: 7.2
             xdebug3-mode: "xdebug.mode=develop,coverage"
-          - php: 7.2
-            xdebug3-mode: "xdebug.mode=coverage"
           - php: 7.1
             xdebug3-mode: "xdebug.mode=develop,coverage"
-          - php: 7.1
-            xdebug3-mode: "xdebug.mode=coverage"
 
     name: PHP ${{ matrix.php }} on ${{ matrix.os }}, ${{ matrix.dependency }} dependencies preferred
     runs-on: ${{ matrix.os }}-latest
