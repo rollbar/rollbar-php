@@ -34,7 +34,7 @@ jobs:
           # backtraces. The default in 7.4 is On. However, we have tests that
           # rely on arguments being available, so we turn it Off.
           - php: 7.4
-            ini: zend.exception_ignore_args=Off
+            ini: zend.exception_ignore_args=Off xdebug.mode=develop,coverage
 
     name: PHP ${{ matrix.php }} on ${{ matrix.os }}, ${{ matrix.dependency }} dependencies preferred
     runs-on: ${{ matrix.os }}-latest
