@@ -26,15 +26,34 @@ jobs:
   php-tests:
     strategy:
       matrix:
-        php: [7.4, 7.3, 7.2, 7.1]
-        dependency: [stable]
-        os: [ubuntu]
+        # All the versions, OS, and dependency levels we want to support
+        php: [7.4, 7.3, 7.2, 7.1] # TODO: 8.0, 7.0, 5.6, 5.5
+        dependency: [stable]      # TODO: lowest
+        os: [ubuntu]              # TODO: windows, macos
+        # In XDebug 2 and earlier, if XDebug extension was present, the function
+        # xdebug_get_function_stack() was unconditionally available. Now in XDebug 3
+        # that function is present only when xdebug.mode includes "develop". Our code
+        # has paths for with- and without- XDebug, and we want to test both of them.
+        # However, we require XDebug for code coverage, so before XDebug 3 there was
+        # no way to test the without-XDebug code path. Now we can, so we do.
+        # @see https://xdebug.org/docs/all_settings#mode
+        xdebug3-mode: ["xdebug.mode=develop,coverage", "xdebug.mode=coverage"]
         include:
           # 7.4 introduced an engine wide flag that disables arguments in
           # backtraces. The default in 7.4 is On. However, we have tests that
           # rely on arguments being available, so we turn it Off.
           - php: 7.4
             ini: zend.exception_ignore_args=Off
+        exclude:
+          # We only have XDebug 3 in PHP > 7.3, and the ini value will be ignored in
+          # all earlier versions. We can prune out one of them, because the result of
+          # both runs in these earlier versions are the same (because the ini directive
+          # is completely ignored, no matter its value).
+          # @see https://xdebug.org/docs/compat
+          - php: 7.2
+            xdebug3-mode: "xdebug.mode=develop,coverage"
+          - php: 7.1
+            xdebug3-mode: "xdebug.mode=develop,coverage"
 
     name: PHP ${{ matrix.php }} on ${{ matrix.os }}, ${{ matrix.dependency }} dependencies preferred
     runs-on: ${{ matrix.os }}-latest
@@ -47,7 +66,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           extensions: curl
-          ini-values: ${{ matrix.ini }}
+          ini-values: ${{ matrix.ini }}, ${{ matrix.xdebug3-mode }}
           coverage: xdebug
 
       - name: Get composer cache directory
