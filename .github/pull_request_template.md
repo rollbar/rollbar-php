@@ -1,6 +1,7 @@
 ## Description of the change
 
 > Description here
+
 ## Type of change
 - [ ] Bug fix (non-breaking change that fixes an issue)
 - [ ] New feature (non-breaking change that adds functionality)
@@ -9,6 +10,7 @@
 ## Related issues
 
 > Fix [#1]() 
+
 ## Checklists
 
 ### Development
@@ -16,10 +18,14 @@
 - [ ] Lint rules pass locally
 - [ ] The code changed/added as part of this pull request has been covered with tests
 - [ ] All tests related to the changed code pass in development
+- [ ] The changes are consistent with our documented [Long-Term Support policy][lts]
 
 ### Code review 
 
-- [ ]  This pull request has a descriptive title and information useful to a reviewer. There may be a screenshot or screencast attached
+- [ ] This pull request has a descriptive title and information useful to a
+  reviewer. There may be a screenshot or screencast attached
 - [ ] "Ready for review" label attached to the PR and reviewers mentioned in a comment
-- [ ] Changes have been reviewed by at least one other engineer
+- [ ] Changes have been reviewed by at least one other maintainer
 - [ ] Issue from task tracker has a link to this pull request 
+
+[lts]:../SUPPORT.md
