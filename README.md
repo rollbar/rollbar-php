@@ -46,8 +46,7 @@ For detailed usage instructions and configuration reference, refer to our
 
 # Releases, Versions, and PHP Compatibility
 
-Refer to [CHANGELOG.md] for a complete history. Major releases of this library
-support major versions of PHP, as follows:
+Major releases of this library support major versions of PHP, as follows:
 
 * For PHP 8, choose the `master` branch.
 * For PHP 7, choose a `2.x` release.
@@ -66,6 +65,8 @@ $ composer require rollbar/rollbar-php:^2
 # for PHP 5 compatibility
 $ composer require rollbar/rollbar-php:^1
 ```
+
+Refer to [CHANGELOG.md] for a complete history.
 
 [CHANGELOG.md]: ./CHANGELOG.md
 [Releases]: https://github.com/rollbar/rollbar-php/releases
