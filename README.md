@@ -67,8 +67,11 @@ $ composer require rollbar/rollbar-php:^2
 $ composer require rollbar/rollbar-php:^1
 ```
 
+[CHANGELOG.md]: ./CHANGELOG.md
 [Releases]: https://github.com/rollbar/rollbar-php/releases
 
 # License
-Rollbar-PHP is free software released under the MIT License. See [LICENSE.txt]
+Rollbar-PHP is free software released under the MIT License. See [LICENSE]
 for details.
+
+[LICENSE]: ./LICENSE

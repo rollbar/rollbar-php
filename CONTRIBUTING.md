@@ -12,7 +12,7 @@ Alright, to get going:
 1. Push to the branch (`git push origin my-new-feature`).
 1. Create new Pull Request.
 
-[coc]: CODE_OF_CONDUCT.md
+[coc]: ./CODE_OF_CONDUCT.md
 
 ## Targeting earlier versions
 
@@ -55,7 +55,7 @@ $ echo '{ "path": "cz-conventional-changelog" }' >> ~/.czrc
 
 And then commit using `git cz`. You'll be prompted to describe your commit.
 
-[cc]:https://www.conventionalcommits.org
+[cc]: https://www.conventionalcommits.org
 
 # Testing
 
@@ -80,4 +80,4 @@ To fix code style issues: `composer fix`
 
 Ask in our [Discussion Q&amp;A][q-a]
 
-[q-a]:https://github.com/rollbar/rollbar-php/discussions/categories/q-a
+[q-a]: https://github.com/rollbar/rollbar-php/discussions/categories/q-a
