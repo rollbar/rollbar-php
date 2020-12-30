@@ -30,6 +30,19 @@ $ git checkout -b add-something-in-v2 next/2.x
 $ git checkout -b whiz-bang master
 ```
 
+### Fix and Feature Propagation
+
+Bug fixes should go into the lowest affected version, and then be patched
+into successively higher versions. For example, if a bug is found in version
+1.9.0; and it's found to exist in version 2.2.10, but not master; then it
+should be patched in `next/1.x` and `next/2.x` but not `master`. Likewise,
+if a bug is found in 2.2.10; but not 1.9.0 or master; then it should go into
+`next/2.x` only.
+
+Similarly, features propagate forward using the same process: patch them in
+the lowest version accepting features (currently `next/2.x`) and forward
+(currently to `master`).
+
 ## Conventional Commits
 
 This repository follows the [Conventional Commits][cc] guidelines. Go read
@@ -59,7 +72,7 @@ And then commit using `git cz`. You'll be prompted to describe your commit.
 
 # Testing
 
-Tests are in `tests`.
+Tests are in `tests/`.
 
 To run the tests: `composer test`
 
