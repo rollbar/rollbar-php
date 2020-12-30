@@ -1,10 +1,18 @@
 # Contributing
 
-1. Fork it
-1. Create your feature branch (`git checkout -b my-new-feature`)
-1. Commit your changes (See Conventional Commits below)
-1. Push to the branch (`git push origin my-new-feature`)
-1. Create new Pull Request
+Thank you for considering a contribution to our project! We welcome all
+fixes and improvements! Before contributing, please review our [code of
+conduct][coc].
+
+Alright, to get going:
+
+1. Fork this repository.
+1. Create your feature branch (`git checkout -b my-new-feature`).
+1. Commit your changes (see Conventional Commits below).
+1. Push to the branch (`git push origin my-new-feature`).
+1. Create new Pull Request.
+
+[coc]: CODE_OF_CONDUCT.md
 
 ## Targeting earlier versions
 
