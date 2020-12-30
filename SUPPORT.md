@@ -38,7 +38,7 @@ consult the [Supported Branches][php-sb] manifest.
 ### Support Calendar, by PHP Version
 
 The table below lists the PHP.net engine version, the support state, and the
-approximate date that state becomes active.
+dates the state changes.
 
 | PHP Version | Current Support | Features and Fixes Until | Fixes Only Until       |
 | ----------- | --------------- | ------------------------ | ---------------------- |
