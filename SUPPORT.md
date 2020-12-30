@@ -40,24 +40,24 @@ consult the [Supported Branches][php-sb] manifest.
 The table below lists the PHP.net engine version, the support state, and the
 approximate date that state becomes active.
 
-| PHP Version | Features and Fixes Until | Fixes Only Until       |
-| ----------- | ------------------------ | ---------------------- |
-| 8.0         | -                        | -                      |
-| 7.4         | 2024-11-28               | 2027-11-28             |
-| 7.3         | 2023-12-06               | 2026-12-06             |
-| 7.2         | 2022-11-30               | 2025-11-30             |
-| 7.1         | 2021-12-01               | 2024-12-01             |
-| 7.0         | 2021-01-10               | 2024-01-10             |
-| 5.6         | 2020-12-31<sup>†</sup>   | 2023-12-31             |
-| 5.5         | 2020-12-31<sup>†</sup>   | 2021-07-21             |
-| 5.4         | 2020-12-31<sup>†</sup>   | 2020-12-31<sup>‡</sup> |
-| 5.3         | 2020-12-31<sup>†</sup>   | 2020-12-31<sup>‡</sup> |
+| PHP Version | Current Support | Features and Fixes Until | Fixes Only Until       |
+| ----------- | --------------- | ------------------------ | ---------------------- |
+| 8.0         | Prototype       | -                        | -                      |
+| 7.4         | Features/Fixes  | 2024-11-28               | 2027-11-28             |
+| 7.3         | Features/Fixes  | 2023-12-06               | 2026-12-06             |
+| 7.2         | Features/Fixes  | 2022-11-30               | 2025-11-30             |
+| 7.1         | Features/Fixes  | 2021-12-01               | 2024-12-01             |
+| 7.0         | Features/Fixes  | 2021-01-10               | 2024-01-10             |
+| 5.6         | Fixes Only      | 2020-12-31<sup>†</sup>   | 2023-12-31             |
+| 5.5         | Fixes Only      | 2020-12-31<sup>†</sup>   | 2021-07-21             |
+| 5.4         | Unsupported     | 2020-12-31<sup>†</sup>   | 2020-12-31<sup>*</sup> |
+| 5.3         | Unsupported     | 2020-12-31<sup>†</sup>   | 2020-12-31<sup>*</sup> |
 
 <sup>†</sup> This support policy was adopted on 2020-12-31. By this date, PHP
 5.6, 5.5, 5.4, and 5.3 had all reached their end date for feature and fixes.
 Consequently, we adopt 2020-12-31 as their common end.
 
-<sup>‡</sup> This support policy was adopted on 2020-12-31. By this date, PHP
+<sup>*</sup> This support policy was adopted on 2020-12-31. By this date, PHP
 5.4 and 5.3 had both reached their end date for fixes. Consequently, we adopt
 2020-12-31 as their common end.
 
