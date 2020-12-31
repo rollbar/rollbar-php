@@ -7,16 +7,21 @@
 # @see https://github.com/nektos/act/issues/329
 name: CI for Rollbar-PHP, version 1.x
 
-# Fire this action on pushes to 1.x development branch (next/1.x) as well as
-# pull requests to that same branch. Also, run every day at 02:42 GMT -- this
-# catches failures from dependencies that update independently.
+# Fire this action on pushes to 1.x development branches (the official one, as
+# well as development branches within it -- hence the wildcard), and also 1.x
+# tags. Also, run every day at 02:42 GMT to catch failures from dependencies
+# that update independently.
 on:
   push:
     branches:
       - next/1.x
+      - next/1.x/**
+    tags:
+      - v1.*
   pull_requests:
     branches:
       - next/1.x
+      - next/1.x/**
   schedule:
     - cron: '42 2 * * *'
 

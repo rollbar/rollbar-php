@@ -7,11 +7,18 @@
 # @see https://github.com/nektos/act/issues/329
 name: CI for Rollbar-PHP, master
 
-# Fire this action on pushes to main branch (master) as well as pull requests
-# (push: without any configuration assumes this). Also, run every day at 02:42
-# GMT -- this catches failures from dependencies that update indepdently.
+# Fire this action on pushes to all branches except the development branches
+# for older versions of PHP. Thus, all branches assume to target master (and
+# will be checked accordingly) unless they begin with next/. Also, run every
+# day at 02:42 GMT to catch failures from dependencies that update
+# independently.
 on:
   push:
+    branches-ignore:
+      - next/**
+  pull_requests:
+    branches-ignore:
+      - next/**
   schedule:
     - cron: '42 2 * * *'
 
