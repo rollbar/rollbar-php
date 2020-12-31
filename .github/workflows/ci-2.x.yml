@@ -18,7 +18,7 @@ on:
       - next/2.x/**
     tags:
       - v2.*
-  pull_requests:
+  pull_request:
     branches:
       - next/2.x
       - next/2.x/**

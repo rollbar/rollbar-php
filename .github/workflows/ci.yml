@@ -16,7 +16,7 @@ on:
   push:
     branches-ignore:
       - next/**
-  pull_requests:
+  pull_request:
     branches-ignore:
       - next/**
   schedule:
