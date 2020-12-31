@@ -70,6 +70,44 @@ And then commit using `git cz`. You'll be prompted to describe your commit.
 
 [cc]: https://www.conventionalcommits.org
 
+### Possible Types and Scopes
+
+Type must be one of the following:
+
+| Type    | Description                                           |
+| ------- | ----------------------------------------------------- |
+| `ci`    | Changes to CI configuration files and scripts.        | 
+| `docs`  | Documentation only changes.                           |
+| `feat`  | A change that adds functionality not present before.  |
+| `fix`   | Repair to code or documentation so the two agree.     |
+| `perf`  | Changes that improve performance of code or build.    |
+| `refac` | A change that neither adds a feature nor fixes a bug. |
+| `style` | Changes not affecting code meaning.                   |
+| `test`  | Adding missing tests, or correcting existing tests.   |
+
+Scopes generally reflect the top-level directories under `src/`, and could be
+any of these:
+
+* `config`
+* `builder`
+* `handler`
+* `payload`
+* `response`
+* `scrubber`
+* `sender`
+* `truncation`
+* `util`
+
+If a change affects multiple classes under `src/`, then choose a scope that's
+most affected or relevant to the change at hand.
+
+### Guidelines for Writing Commit Messages
+
+Use the imperative voice, like "add" instead of "adds" or "added". In the
+subject line, use lowercase with no ending period and stick to fewer than 50
+characters. In the body, include the motivation for the change and contrast it
+with the prior behavior. Indicate "BREAKING CHANGE" in the footer.
+
 # Testing
 
 Tests are in `tests/`.
