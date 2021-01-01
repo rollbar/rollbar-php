@@ -51,7 +51,7 @@
 
   "scripts": {
     "test": [
-      "phpunit --coverage-clover build/logs/clover.xml --testsuite 'Rollbar Test Suite'",
+      "phpunit --coverage-clover build/logs/clover.xml --coverage-html build/logs/coverage --testsuite 'Rollbar Test Suite'",
       "phpcs --standard=PSR1,PSR2 src tests"
     ],
     "fix": "phpcbf --standard=PSR1,PSR2 src tests",
