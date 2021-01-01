@@ -14,13 +14,11 @@ name: CI for Rollbar-PHP, version 1.x
 on:
   push:
     branches:
-      - next/1.x
       - next/1.x/**
     tags:
       - v1.*
   pull_request:
     branches:
-      - next/1.x
       - next/1.x/**
   schedule:
     - cron: '42 2 * * *'
