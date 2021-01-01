@@ -17,31 +17,35 @@ Alright, to get going:
 ## Targeting earlier versions
 
 Feature branches made off of `master` target PHP 8. To target earlier
-releases and versions of PHP, checkout the next branch for that series:
+releases and versions of PHP, checkout the main branch for that series:
 
 ```sh
 # to target changes for the next release in the 1.x (PHP 5) series:
-$ git checkout -b fix-something-in-v1 next/1.x
+$ git checkout -b next/1.x/describe-the-fix next/1.x/main
 
 # to target changes for the next release in the 2.x (PHP 7) series:
-$ git checkout -b add-something-in-v2 next/2.x
+$ git checkout -b next/2.x/describe-the-fix next/2.x/main
 
 # to target changes for the next release in the 3.x (PHP 8) series:
 $ git checkout -b whiz-bang master
 ```
+
+Note that, technically, you don't have to name your feature branch with the
+"next/1.x/" or "next/2.x/" prefix. However, it's helpful for us when
+evaluating pull requests, because the intention is clear.
 
 ### Fix and Feature Propagation
 
 Bug fixes should go into the lowest affected version, and then be patched
 into successively higher versions. For example, if a bug is found in version
 1.9.0; and it's found to exist in version 2.2.10, but not master; then it
-should be patched in `next/1.x` and `next/2.x` but not `master`. Likewise,
-if a bug is found in 2.2.10; but not 1.9.0 or master; then it should go into
-`next/2.x` only.
+should be patched in `next/1.x/main` and `next/2.x/main` but not `master`.
+Likewise, if a bug is found in 2.2.10; but not 1.9.0 or master; then it should
+go into `next/2.x/main` only.
 
 Similarly, features propagate forward using the same process: patch them in
-the lowest version accepting features (currently `next/2.x`) and forward
-(currently to `master`).
+the lowest version accepting features (currently `next/2.x/main`) and patch
+them forward (currently to `master`).
 
 ## Conventional Commits
 
@@ -106,26 +110,42 @@ most affected or relevant to the change at hand.
 Use the imperative voice, like "add" instead of "adds" or "added". In the
 subject line, use lowercase with no ending period and stick to fewer than 50
 characters. In the body, include the motivation for the change and contrast it
-with the prior behavior. Indicate "BREAKING CHANGE" in the footer.
+with the prior behavior.
+
+Indicate "BREAKING CHANGE" in the footer when that's the case. If you're
+unsure if a change is breaking, assume it is and seek clarification via our
+[Discussion Q&amp;A][q-a].
 
 # Testing
 
-Tests are in `tests/`.
+New code should receive test coverage: add them in `tests/`.
 
 To run the tests: `composer test`
 
 To fix code style issues: `composer fix`
 
-# Tagging
+# Contribution Checklist
 
-1. `ROLLBAR_PHP_TAG=[version number]`
-1. `git checkout master`
-1. Update version numbers in `src/Payload/Notifier.php` and `tests/NotifierTest.php`.
-1. `git add .`
-1. `git commit -m"Bump version numbers"`.
-1. `git push origin master`
-1. `git tag v$ROLLBAR_PHP_TAG`
-1. `git push --tags`
+We appreciate all effort to improve the library! To ensure your contribution
+gets pulled in without delay, please:
+
+1. *[Discuss the change][discuss] before implementing.* It's easiest to change
+   code before it's written, and the best code comes from collaborative
+   ideation.
+1. *Target the change to the correct branches.* Remember: start at the lowest
+   affected branches and patch upwards. This means a bug fix may need three
+   branch patches and a feature may need two.
+1. *Follow the coding conventions.* That means code style, good variable names,
+   compact functions, etc. New things should look like old things, whenever
+   possible.
+1. *Include tests and fix failures.* No tests, no merge. If the CI automation
+   fails, fix that as well. A common mistake is to make a change that works
+   for a new version of PHP, but not the older ones we must support: automation
+   catches this.
+1. *Follow the code of conduct.* Do all of the above with grace and courtesy,
+   please. We're all volunteers here.
+
+[discuss]: https://github.com/rollbar/rollbar-php/discussions/
 
 # Need help?
 
