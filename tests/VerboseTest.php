@@ -358,7 +358,6 @@ class VerbosityTest extends BaseRollbarTest
         $errorReporting = \error_reporting();
 
         $this->configurableObjectVerbosityTest(
-
             $config,
             function () use ($config) {
             // logic under test
@@ -401,7 +400,6 @@ class VerbosityTest extends BaseRollbarTest
         ));
 
         $this->configurableObjectVerbosityTest(
-
             $config,
             function () use ($config) {
             // logic under test
@@ -436,7 +434,6 @@ class VerbosityTest extends BaseRollbarTest
         $errorReporting = \error_reporting();
 
         $this->configurableObjectVerbosityTest(
-
             $config,
             function () use ($config) {
             // logic under test
@@ -478,7 +475,6 @@ class VerbosityTest extends BaseRollbarTest
         $errorReporting = \error_reporting();
 
         $this->configurableObjectVerbosityTest(
-
             $config,
             function () use ($config) {
             // logic under test
@@ -521,7 +517,6 @@ class VerbosityTest extends BaseRollbarTest
         ));
 
         $this->configurableObjectVerbosityTest(
-
             $config,
             function () use ($config) {
             // logic under test
@@ -556,7 +551,6 @@ class VerbosityTest extends BaseRollbarTest
         ));
 
         $this->configurableObjectVerbosityTest(
-
             $config,
             function () use ($config) {
             // logic under test
@@ -591,7 +585,6 @@ class VerbosityTest extends BaseRollbarTest
         ));
 
         $this->configurableObjectVerbosityTest(
-
             $config,
             function () use ($config, $unitTest) {
             // logic under test
@@ -639,7 +632,6 @@ class VerbosityTest extends BaseRollbarTest
         ));
 
         $this->configurableObjectVerbosityTest(
-
             $config,
             function () use ($config, $unitTest) {
             // logic under test
@@ -674,7 +666,6 @@ class VerbosityTest extends BaseRollbarTest
         ));
 
         $this->configurableObjectVerbosityTest(
-
             $config,
             function () use ($config, $unitTest) {
             // logic under test
@@ -712,7 +703,6 @@ class VerbosityTest extends BaseRollbarTest
         ));
 
         $this->configurableObjectVerbosityTest(
-
             $config,
             function () use ($config, $unitTest) {
             // logic under test
@@ -747,7 +737,6 @@ class VerbosityTest extends BaseRollbarTest
         ));
 
         $this->configurableObjectVerbosityTest(
-
             $config,
             function () use ($config, $unitTest) {
             // logic under test
@@ -782,7 +771,6 @@ class VerbosityTest extends BaseRollbarTest
         ));
 
         $this->configurableObjectVerbosityTest(
-
             $config,
             function () use ($config) {
             // logic under test
@@ -817,7 +805,6 @@ class VerbosityTest extends BaseRollbarTest
         ));
 
         $this->configurableObjectVerbosityTest(
-
             $config,
             function () use ($config, $unitTest) {
             // logic under test
@@ -855,7 +842,6 @@ class VerbosityTest extends BaseRollbarTest
         ));
 
         $this->configurableObjectVerbosityTest(
-
             $rollbarLogger,
             function () use ($rollbarLogger) {
             // logic under test
