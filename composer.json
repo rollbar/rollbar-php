@@ -49,6 +49,8 @@
   },
 
   "scripts": {
+    "docker-build": "docker build -t rollbar/rollbar-php:3 .",
+    "docker-run": "docker run -it -v \"${PWD}\":/opt/rollbar/rollbar-php rollbar/rollbar-php:3",
     "test": [
       "phpunit --coverage-clover build/logs/clover.xml --testsuite 'Rollbar Test Suite'",
       "phpcs --standard=PSR1,PSR2 src tests"
