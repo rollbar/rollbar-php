@@ -1,24 +1,25 @@
-# CI checks for Rollbar-PHP, master branch.
+# CI checks for Rollbar-PHP, version 1.x
 #
 # Test with act:
 #   brew install act
 #   act -P ubuntu-latest=shivammathur/node:latest
 #
 # @see https://github.com/nektos/act/issues/329
-name: CI for Rollbar-PHP, master
+name: CI for Rollbar-PHP, version 1.x
 
-# Fire this action on pushes to all branches except the development branches
-# for older versions of PHP. Thus, all branches assume to target master (and
-# will be checked accordingly) unless they begin with next/. Also, run every
-# day at 02:42 GMT to catch failures from dependencies that update
-# independently.
+# Fire this action on pushes to 1.x development branches (the official one, as
+# well as development branches within it -- hence the wildcard), and also 1.x
+# tags. Also, run every day at 02:42 GMT to catch failures from dependencies
+# that update independently.
 on:
   push:
-    branches-ignore:
-      - next/**
+    branches:
+      - next/1.x/**
+    tags:
+      - v1.*
   pull_request:
-    branches-ignore:
-      - next/**
+    branches:
+      - next/1.x/**
   schedule:
     - cron: '42 2 * * *'
 
@@ -34,13 +35,9 @@ jobs:
     strategy:
       matrix:
         # All the versions, OS, and dependency levels we want to support
-        php: [8.0]
+        php: [5.6, 5.5]
         dependency: [stable] # TODO: lowest
         os: [ubuntu]         # TODO: windows, macos
-        # Our code has paths for with- and without- XDebug, and we want to test
-        # both of them.
-        # @see https://xdebug.org/docs/all_settings#mode
-        xdebug3-mode: ["xdebug.mode=develop,coverage", "xdebug.mode=coverage"]
 
     name: PHP ${{ matrix.php }} on ${{ matrix.os }}, ${{ matrix.dependency }} dependencies preferred
     runs-on: ${{ matrix.os }}-latest
@@ -53,7 +50,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           extensions: curl
-          ini-values: zend.exception_ignore_args=Off, ${{ matrix.xdebug3-mode }}
+          ini-values:
           coverage: xdebug
 
       - name: Get composer cache directory
