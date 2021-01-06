@@ -72,7 +72,10 @@ class CurlSender implements SenderInterface
         curl_close($handle);
 
         $data = $payload->data();
-        $uuid = $data['data']['uuid'];
+        $uuid = null;
+        if (isset($data['data']['uuid'])) {
+            $uuid = $data['data']['uuid'];
+        }
         
         return new Response($statusCode, $result, $uuid);
     }

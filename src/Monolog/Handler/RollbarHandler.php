@@ -2,7 +2,7 @@
 
 /*
  * !!! DEPRECATED AS OF 8/4/2018 !!!
- * 
+ *
  * Please, do not use this class anymore to use Rollbar with Monolog anymore.
  * The Monolog library includes a dedicated handler now here:
  * https://github.com/Seldaek/monolog/blob/master/src/Monolog/Handler/RollbarHandler.php
