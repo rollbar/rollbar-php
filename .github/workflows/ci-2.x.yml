@@ -31,6 +31,7 @@ jobs:
   # first as they're most likely to fail.
   # @seealso https://freek.dev/1546
   # @seealso https://www.dereuromark.de/2019/01/04/test-composer-dependencies-with-prefer-lowest/
+  # @seealso https://github.com/actions/starter-workflows/blob/main/ci/php.yml
   php-tests:
     strategy:
       matrix:
@@ -66,7 +67,14 @@ jobs:
     name: PHP ${{ matrix.php }} on ${{ matrix.os }}, ${{ matrix.dependency }} dependencies preferred
     runs-on: ${{ matrix.os }}-latest
     steps:
-      - name: Checkout the code
+      - name: Checkout the next/2.x/main branch during scheduled builds
+        if: github.ref == 'refs/heads/master'
+        uses: actions/checkout@v2
+        with:
+          ref: 'next/2.x/main'
+
+      - name: Checkout the pushed branch
+        if: github.ref != 'refs/heads/master'
         uses: actions/checkout@v2
 
       - name: Install PHP and composer environment
