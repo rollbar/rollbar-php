@@ -1,0 +1,79 @@
+# CI checks for Rollbar-PHP, version 1.x
+#
+# Test with act:
+#   brew install act
+#   act -P ubuntu-latest=shivammathur/node:latest
+#
+# @see https://github.com/nektos/act/issues/329
+name: CI for Rollbar-PHP, version 1.x
+
+# Fire this action on pushes to 1.x development branches (the official one, as
+# well as development branches within it -- hence the wildcard), and also 1.x
+# tags. Also, run every day at 02:42 GMT to catch failures from dependencies
+# that update independently.
+on:
+  push:
+    branches:
+      - next/1.x/**
+    tags:
+      - v1.*
+  pull_request:
+    branches:
+      - next/1.x/**
+  schedule:
+    - cron: '42 2 * * *'
+
+jobs:
+  # Check that this runs on PHP on all versions we claim to support, on both
+  # UNIX-like and Windows environments, and that use both the lowest possible
+  # compatible version as well as the most-recent stable version. This will
+  # fail-fast by default, so we include our edgiest versions (currently 7.4)
+  # first as they're most likely to fail.
+  # @seealso https://freek.dev/1546
+  # @seealso https://www.dereuromark.de/2019/01/04/test-composer-dependencies-with-prefer-lowest/
+  # @seealso https://github.com/actions/starter-workflows/blob/main/ci/php.yml
+  php-tests:
+    strategy:
+      matrix:
+        # All the versions, OS, and dependency levels we want to support
+        php: [5.6, 5.5]
+        dependency: [stable] # TODO: lowest
+        os: [ubuntu]         # TODO: windows, macos
+
+    name: PHP ${{ matrix.php }} on ${{ matrix.os }}, ${{ matrix.dependency }} dependencies preferred
+    runs-on: ${{ matrix.os }}-latest
+    steps:
+      - name: Checkout the next/1.x/main branch during scheduled builds
+        if: github.ref == 'refs/heads/master'
+        uses: actions/checkout@v2
+        with:
+          ref: 'next/1.x/main'
+
+      - name: Checkout the pushed branch
+        if: github.ref != 'refs/heads/master'
+        uses: actions/checkout@v2
+
+      - name: Install PHP and composer environment
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: curl
+          ini-values:
+          coverage: xdebug
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ matrix.os }}-composer-${{ hashFiles('**/composer.json') }}-${{ matrix.dependency }}-
+          restore-keys: ${{ matrix.os }}-composer-${{ matrix.dependency }}-
+
+      - name: Install dependencies
+        run: composer update --prefer-${{ matrix.dependency }} --prefer-dist --no-interaction
+
+      - name: Execute tests
+        run: composer test
