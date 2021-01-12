@@ -36,7 +36,7 @@ jobs:
     strategy:
       matrix:
         # All the versions, OS, and dependency levels we want to support
-        php: [7.4, 7.3, 7.2, 7.1]
+        php: [7.4, 7.3, 7.2, 7.1, 7.0]
         dependency: [stable] # TODO: lowest
         os: [ubuntu]         # TODO: windows, macos
         # In XDebug 2 and earlier, if XDebug extension was present, the function
