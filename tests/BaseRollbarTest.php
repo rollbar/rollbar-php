@@ -7,7 +7,7 @@ abstract class BaseRollbarTest extends TestCase
 
     const DEFAULT_ACCESS_TOKEN = 'ad865e76e7fb496fab096ac07b1dbabb';
     
-    public function tearDown(): void
+    public function tearDown()/*: void*/
     {
         Rollbar::destroy();
         parent::tearDown();

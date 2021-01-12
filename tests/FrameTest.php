@@ -8,7 +8,7 @@ class FrameTest extends BaseRollbarTest
     private $exception;
     private $frame;
 
-    public function setUp(): void
+    public function setUp()/*: void*/
     {
         $this->exception = m::mock("Rollbar\Payload\ExceptionInfo");
         $this->frame = new Frame("tests/FrameTest.php", $this->exception);

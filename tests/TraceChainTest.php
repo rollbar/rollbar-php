@@ -10,7 +10,7 @@ class TraceChainTest extends Rollbar\BaseRollbarTest
     private $trace1;
     private $trace2;
 
-    public function setUp(): void
+    public function setUp()/*: void*/
     {
         $this->trace1 = m::mock("Rollbar\Payload\Trace");
         $this->trace2 = m::mock("Rollbar\Payload\Trace");

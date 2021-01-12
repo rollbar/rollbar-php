@@ -9,13 +9,13 @@ use Psr\Log\LogLevel as PsrLogLevel;
 class RollbarLoggerTest extends BaseRollbarTest
 {
     
-    public function setUp(): void
+    public function setUp()/*: void*/
     {
         $_SESSION = array();
         parent::setUp();
     }
     
-    public function tearDown(): void
+    public function tearDown()/*: void*/
     {
         Rollbar::destroy();
         parent::tearDown();

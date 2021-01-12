@@ -12,7 +12,7 @@ use Rollbar\Payload\Level;
 class RollbarTest extends BaseRollbarTest
 {
     
-    public function setUp(): void
+    public function setUp()/*: void*/
     {
         self::$simpleConfig['access_token'] = $this->getTestAccessToken();
         self::$simpleConfig['environment'] = 'test';
@@ -20,7 +20,7 @@ class RollbarTest extends BaseRollbarTest
 
     private static $simpleConfig = array();
     
-    public static function setUpBeforeClass(): void
+    public static function setUpBeforeClass()/*: void*/
     {
         Rollbar::destroy();
     }

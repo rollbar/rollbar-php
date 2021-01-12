@@ -13,7 +13,7 @@ class AgentTest extends Rollbar\BaseRollbarTest
 {
     private $path = '/tmp/rollbar-php';
 
-    protected function setUp(): void
+    protected function setUp()/*: void*/
     {
         if (!file_exists($this->path)) {
             mkdir($this->path);
@@ -35,7 +35,7 @@ class AgentTest extends Rollbar\BaseRollbarTest
         $this->assertContains('this is a test', $line);
     }
 
-    public function tearDown(): void
+    public function tearDown()/*: void*/
     {
         parent::tearDown();
         $this->rrmdir($this->path);

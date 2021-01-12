@@ -13,7 +13,7 @@ class DataBuilderTest extends BaseRollbarTest
      */
     private $dataBuilder;
 
-    public function setUp(): void
+    public function setUp()/*: void*/
     {
         $_SESSION = array();
         

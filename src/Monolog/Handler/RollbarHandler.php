@@ -83,7 +83,7 @@ class RollbarHandler extends AbstractProcessingHandler
     /**
      * {@inheritdoc}
      */
-    protected function write(array $record): void
+    protected function write(array $record)/*: void*/
     {
         if (!$this->initialized) {
             // __destructor() doesn't get called on Fatal errors
@@ -123,7 +123,7 @@ class RollbarHandler extends AbstractProcessingHandler
     /**
      * {@inheritdoc}
      */
-    public function close(): void
+    public function close()/*: void*/
     {
         $this->flush();
     }
