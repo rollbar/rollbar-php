@@ -82,7 +82,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           extensions: curl
-          ini-values: ${{ matrix.ini }}, ${{ matrix.xdebug3-mode }}
+          ini-values: ${{ matrix.ini }}, "${{ matrix.xdebug3-mode }}"
           coverage: xdebug
 
       - name: Get composer cache directory
