@@ -375,6 +375,8 @@ class ConfigTest extends BaseRollbarTest
 
     public function testSender()
     {
+        $this->markTestSkipped('FIXME -- What assertions should we test here?');
+
         $p = m::mock("Rollbar\Payload\EncodedPayload");
         $sender = m::mock("Rollbar\Senders\SenderInterface")
             ->shouldReceive("send")
