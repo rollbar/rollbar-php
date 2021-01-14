@@ -163,23 +163,23 @@ class DataTest extends BaseRollbarTest
 
         $encoded = json_encode($data->serialize());
 
-        $this->assertContains("\"environment\":\"testing\"", $encoded);
-        $this->assertContains("\"body\":\"{BODY}\"", $encoded);
-        $this->assertContains("\"level\":\"{LEVEL}\"", $encoded);
-        $this->assertContains("\"timestamp\":$time", $encoded);
-        $this->assertContains("\"code_version\":\"v0.17.3\"", $encoded);
-        $this->assertContains("\"platform\":\"LAMP\"", $encoded);
-        $this->assertContains("\"language\":\"PHP 5.4\"", $encoded);
-        $this->assertContains("\"framework\":\"CakePHP\"", $encoded);
-        $this->assertContains("\"context\":\"AppController->updatePerson\"", $encoded);
-        $this->assertContains("\"request\":\"{REQUEST}\"", $encoded);
-        $this->assertContains("\"person\":\"{PERSON}\"", $encoded);
-        $this->assertContains("\"server\":\"{SERVER}\"", $encoded);
-        $this->assertContains("\"custom\":{\"x\":\"hello\",\"extra\":{\"key\":\"val\"}}", $encoded);
-        $this->assertContains("\"fingerprint\":\"big-fingerprint\"", $encoded);
-        $this->assertContains("\"title\":\"The Title\"", $encoded);
-        $this->assertContains("\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"", $encoded);
-        $this->assertContains("\"notifier\":\"{NOTIFIER}\"", $encoded);
+        $this->assertStringContainsString("\"environment\":\"testing\"", $encoded);
+        $this->assertStringContainsString("\"body\":\"{BODY}\"", $encoded);
+        $this->assertStringContainsString("\"level\":\"{LEVEL}\"", $encoded);
+        $this->assertStringContainsString("\"timestamp\":$time", $encoded);
+        $this->assertStringContainsString("\"code_version\":\"v0.17.3\"", $encoded);
+        $this->assertStringContainsString("\"platform\":\"LAMP\"", $encoded);
+        $this->assertStringContainsString("\"language\":\"PHP 5.4\"", $encoded);
+        $this->assertStringContainsString("\"framework\":\"CakePHP\"", $encoded);
+        $this->assertStringContainsString("\"context\":\"AppController->updatePerson\"", $encoded);
+        $this->assertStringContainsString("\"request\":\"{REQUEST}\"", $encoded);
+        $this->assertStringContainsString("\"person\":\"{PERSON}\"", $encoded);
+        $this->assertStringContainsString("\"server\":\"{SERVER}\"", $encoded);
+        $this->assertStringContainsString("\"custom\":{\"x\":\"hello\",\"extra\":{\"key\":\"val\"}}", $encoded);
+        $this->assertStringContainsString("\"fingerprint\":\"big-fingerprint\"", $encoded);
+        $this->assertStringContainsString("\"title\":\"The Title\"", $encoded);
+        $this->assertStringContainsString("\"uuid\":\"123e4567-e89b-12d3-a456-426655440000\"", $encoded);
+        $this->assertStringContainsString("\"notifier\":\"{NOTIFIER}\"", $encoded);
     }
 
     private function mockSerialize($mock, $returnVal)
