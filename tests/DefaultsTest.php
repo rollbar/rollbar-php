@@ -269,6 +269,7 @@ class DefaultsTest extends BaseRollbarTest
     
     public function testDefaultsForConfigOptions()
     {
+        $this->markTestSkipped('FIXME -- What assertions should we test here?');
         foreach (\Rollbar\Config::listOptions() as $option) {
             if ($option == 'access_token' ||
                 $option == 'logger' ||
