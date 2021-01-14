@@ -21,7 +21,7 @@ class ChildCycleCheckSerializable implements \Serializable
         );
     }
     
-    public function unserialize($serialized)
+    public function unserialize(string $serialized)
     {
     }
 }
