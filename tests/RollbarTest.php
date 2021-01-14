@@ -30,7 +30,7 @@ class RollbarTest extends BaseRollbarTest
         Rollbar::init(self::$simpleConfig);
         
         $this->assertInstanceOf('Rollbar\RollbarLogger', Rollbar::logger());
-        $this->assertAttributeEquals(new Config(self::$simpleConfig), 'config', Rollbar::logger());
+        $this->assertEquals(new Config(self::$simpleConfig), Rollbar::logger()->getConfig());
     }
     
     public function testInitWithLogger()
