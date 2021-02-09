@@ -4,93 +4,75 @@
 ![Build Status](https://github.com/rollbar/rollbar-php/workflows/Rollbar-PHP%20CI/badge.svg)
 [![Total Downloads](https://img.shields.io/packagist/dt/rollbar/rollbar.svg?style=flat-square)](https://packagist.org/packages/rollbar/rollbar)
 
-This library detects errors and exceptions in your application and reports them to [Rollbar](https://rollbar.com) for alerts, reporting, and analysis.
+This library detects errors and exceptions in your application and sends them
+to [Rollbar] for alerts, reporting, and analysis.
 
-Supported PHP versions: 5.3, 5.4, 5.5, 5.6, 7, 7.1, 7.2, 7.3, 7.4
-Supported HHVM versions: 3.6, 3.18, 3.21, 3.24, 3.27
+[Rollbar]: https://rollbar.com
 
-# Setup Instructions
+# Quickstart
 
-1. [Sign up for a Rollbar account](https://rollbar.com/signup)
-2. Follow the [Quick Start](https://docs.rollbar.com/v1.0.0/docs/php#section-quick-start) instructions in our [PHP SDK docs](https://docs.rollbar.com/docs/php) to install rollbar-php and configure it for your platform.
+If you've never used Rollbar before, [sign up for a Rollbar account][signup]
+and follow the simple, three-step tour. In no time, you'll be capturing errors
+and exceptions thrown in your code.
 
-# Usage and Reference
+If you already have a Rollbar account, [log in to your Rollbar account][login].
+From the Settings > Project Access Token menu, click Create New Access Token.
+Copy the `post_client_item` value and paste it into the code below.
 
-For complete usage instructions and configuration reference, see our [PHP SDK docs](https://docs.rollbar.com/docs/php).
-  
-# Release History & Changelog
+```php
+require 'vendor/autoload.php'; // composer require rollbar/rollbar:^2
 
-See our [Releases](https://github.com/rollbar/rollbar-php/releases) page for a list of all releases, including changes.
-
-# Related projects
-
-A range of examples of using Rollbar PHP is available here: [Rollbar PHP Examples](https://github.com/rollbar/rollbar-php-examples).
-
-A Wordpress Plugin is available through Wordpress Admin Panel or through Wordpress Plugin directory: [Rollbar Wordpress](https://wordpress.org/plugins/rollbar/)
-
-A Laravel-specific package is available for integrating with Laravel: [Rollbar Laravel](https://github.com/rollbar/rollbar-php-laravel)
-
-A CakePHP-specific package is avaliable for integrating with CakePHP 2.x:
-[CakeRollbar](https://github.com/tranfuga25s/CakeRollbar)
-
-A Flow-specific package is available for integrating with Neos Flow: [m12/flow-rollbar](https://packagist.org/packages/m12/flow-rollbar)
-
-Yii package: [baibaratsky/yii-rollbar](https://github.com/baibaratsky/yii-rollbar)
-
-Yii2 package: [baibaratsky/yii2-rollbar](https://github.com/baibaratsky/yii2-rollbar)
-
-# Help / Support
-
-If you run into any issues, please email us at [support@rollbar.com](mailto:support@rollbar.com)
-
-For bug reports, please [open an issue on GitHub](https://github.com/rollbar/rollbar-php/issues/new).
-
-# Contributing
-
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (See Conventional Commits below)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
-
-### Conventional Commits
-This repository follows the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0-beta.4/) guidelines.
-Commit messages should include a prefix describing the commit before the short description.
-Recognized prefixes include: feat, fix, doc, style, refactor, perf, test, build, chore, revert.
-Breaking changes should include 'BREAKING CHANGE'.
-
-Example:
-```
-git commit -m 'feat(bars): add foo support for all bars
-
-fix #123
-BREAKING CHANGE: bars supporting foo break bars supporting qwerty'
+\Rollbar\Rollbar::init(
+  [ 'access_token' => '***', 'environment' => 'development' ]
+);
 ```
 
-Optionally, you can use commitizen to format your commit messages.
+For detailed usage instructions and configuration reference, refer to our
+[PHP SDK docs][sdkdoc].
+
+[login]: https://rollbar.com/login/
+[sdkdoc]:https://docs.rollbar.com/docs/php
+[signup]: https://rollbar.com/signup
+
+# Getting Help
+
+* If you have a question, ask in our [Discussion Q&amp;A][q-a]
+* To report a bug, raise [an issue][issue]
+* For account service, reach out to [support@rollbar.com][support]
+
+[issue]:https://github.com/rollbar/rollbar-php/issues
+[q-a]:https://github.com/rollbar/rollbar-php/discussions/categories/q-a
+[support]:mailto:support@rollbar.com
+
+# Releases, Versions, and PHP Compatibility
+
+Major releases of this library support major versions of PHP, as follows:
+
+* For PHP 8, choose the `master` branch.
+* For PHP 7, choose a `2.x` release.
+* For PHP 5, choose a `1.x` release.
+
+To obtain a release, download an archive from the [Releases] page or use
+composer:
+
+```sh
+# for PHP 8 compatibility
+$ composer require rollbar/rollbar-php:dev-master
+
+# for PHP 7 compatibility
+$ composer require rollbar/rollbar-php:^2
+
+# for PHP 5 compatibility
+$ composer require rollbar/rollbar-php:^1
 ```
-npm install -g commitizen
-npm install -g cz-conventional-changelog
-echo '{ "path": "cz-conventional-changelog" }' > ~/.czrc
-```
 
-And then commit using `git cz`. You'll be prompted for information describing your commit.
+Refer to [CHANGELOG.md] for a complete history.
 
-# Testing
-Tests are in `tests`.
-To run the tests: `composer test`
-To fix code style issues: `composer fix`
-
-# Tagging
-
-1. `ROLLBAR_PHP_TAG=[version number]`
-2. `git checkout master`
-3. Update version numbers in `src/Payload/Notifier.php` and `tests/NotifierTest.php`.
-4. `git add .`
-5. `git commit -m"Bump version numbers"`.
-6. `git push origin master`
-7. `git tag v$ROLLBAR_PHP_TAG`
-8. `git push --tags`
+[CHANGELOG.md]: ./CHANGELOG.md
+[Releases]: https://github.com/rollbar/rollbar-php/releases
 
 # License
-Rollbar-PHP is free software released under the MIT License. See [LICENSE.txt](LICENSE.txt) for details.
+Rollbar-PHP is free software released under the MIT License. See [LICENSE]
+for details.
+
+[LICENSE]: ./LICENSE
