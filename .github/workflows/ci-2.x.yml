@@ -1,0 +1,104 @@
+# CI checks for Rollbar-PHP, version 2.x
+#
+# Test with act:
+#   brew install act
+#   act -P ubuntu-latest=shivammathur/node:latest
+#
+# @see https://github.com/nektos/act/issues/329
+name: CI for Rollbar-PHP, version 2.x
+
+# Fire this action on pushes to 2.x development branches (the official one, as
+# well as development branches within it -- hence the wildcard), and also 2.x
+# tags. Also, run every day at 02:42 GMT to catch failures from dependencies
+# that update independently.
+on:
+  push:
+    branches:
+      - next/2.x/**
+    tags:
+      - v2.*
+  pull_request:
+    branches:
+      - next/2.x/**
+  schedule:
+    - cron: '42 2 * * *'
+
+jobs:
+  # Check that this runs on PHP on all versions we claim to support, on both
+  # UNIX-like and Windows environments, and that use both the lowest possible
+  # compatible version as well as the most-recent stable version. This will
+  # fail-fast by default, so we include our edgiest versions (currently 7.4)
+  # first as they're most likely to fail.
+  # @seealso https://freek.dev/1546
+  # @seealso https://www.dereuromark.de/2019/01/04/test-composer-dependencies-with-prefer-lowest/
+  # @seealso https://github.com/actions/starter-workflows/blob/main/ci/php.yml
+  php-tests:
+    strategy:
+      matrix:
+        # All the versions, OS, and dependency levels we want to support
+        php: [7.4, 7.3, 7.2, 7.1, 7.0]
+        dependency: [stable] # TODO: lowest
+        os: [ubuntu]         # TODO: windows, macos
+        # In XDebug 2 and earlier, if XDebug extension was present, the function
+        # xdebug_get_function_stack() was unconditionally available. Now in XDebug 3
+        # that function is present only when xdebug.mode includes "develop". Our code
+        # has paths for with- and without- XDebug, and we want to test both of them.
+        # However, we require XDebug for code coverage, so before XDebug 3 there was
+        # no way to test the without-XDebug code path. Now we can, so we do.
+        # Note: INI values with embedded commas need to have their value quoted.
+        # @see https://xdebug.org/docs/all_settings#mode
+        xdebug3-mode: ["xdebug.mode='develop,coverage'", "xdebug.mode=coverage"]
+        include:
+          # 7.4 introduced an engine wide flag that disables arguments in
+          # backtraces. The default in 7.4 is On. However, we have tests that
+          # rely on arguments being available, so we turn it Off.
+          - php: 7.4
+            ini: zend.exception_ignore_args=Off
+        exclude:
+          # We only have XDebug 3 in PHP > 7.3, and the ini value will be ignored in
+          # all earlier versions. We can prune out one of them, because the result of
+          # both runs in these earlier versions are the same (because the ini directive
+          # is completely ignored, no matter its value).
+          # @see https://xdebug.org/docs/compat
+          - php: 7.2
+            xdebug3-mode: "xdebug.mode=develop,coverage"
+          - php: 7.1
+            xdebug3-mode: "xdebug.mode=develop,coverage"
+
+    name: PHP ${{ matrix.php }} on ${{ matrix.os }}, ${{ matrix.dependency }} dependencies preferred
+    runs-on: ${{ matrix.os }}-latest
+    steps:
+      - name: Checkout the next/2.x/main branch during scheduled builds
+        if: github.ref == 'refs/heads/master'
+        uses: actions/checkout@v2
+        with:
+          ref: 'next/2.x/main'
+
+      - name: Checkout the pushed branch
+        if: github.ref != 'refs/heads/master'
+        uses: actions/checkout@v2
+
+      - name: Install PHP and composer environment
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: curl
+          ini-values: ${{ matrix.ini }}, ${{ matrix.xdebug3-mode }}
+          coverage: xdebug
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ matrix.os }}-composer-${{ hashFiles('**/composer.json') }}-${{ matrix.dependency }}-
+          restore-keys: ${{ matrix.os }}-composer-${{ matrix.dependency }}-
+
+      - name: Install dependencies
+        run: composer update --prefer-${{ matrix.dependency }} --prefer-dist --no-interaction
+
+      - name: Execute tests
+        run: composer test
