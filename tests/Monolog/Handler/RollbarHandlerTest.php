@@ -12,14 +12,8 @@
 
 namespace Rollbar\Monolog\Handler;
 
-if (\Monolog\Logger::API != 1) {
-    return;
-}
-
-require_once dirname(__FILE__) . '/../../TestHelpers/Monolog1TestCase.php'; 
-
 use Exception;
-use Rollbar\Monolog\Monolog1TestCase;
+use Monolog\Test\TestCase;
 use Monolog\Logger;
 use Rollbar\Monolog\Handler\RollbarHandler;
 use PHPUnit_Framework_MockObject_MockObject as MockObject;
@@ -33,7 +27,7 @@ use Rollbar\RollbarLogger;
  * 
  * @requires PHP 7
  */
-class RollbarHandlerTest extends Monolog1TestCase
+class RollbarHandlerTest extends TestCase
 {
     /**
      * @var MockObject
