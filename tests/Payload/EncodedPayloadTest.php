@@ -49,30 +49,4 @@ class EncodedPayloadTest extends \Rollbar\BaseRollbarTest
             $this->assertNull($result['data']['body']['exception']['trace']['frames']);
         }
     }
-    
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Payload data could not be encoded to JSON format.
-     */
-    public function testEncodeMalformedDataPHP54()
-    {
-        if (version_compare(phpversion(), "5.4")) {
-            $this->markTestSkipped("PHP = 5.4");
-        }
-        
-        $encoded = new EncodedPayload(array(
-            'data' => array(
-                'body' => array(
-                    'exception' => array(
-                        'trace' => array(
-                            'frames' => fopen('/dev/null', 'r')
-                        ),
-                    ),
-                    'ecodable1' => true
-                ),
-                'ecodable2' => true
-            )
-        ));
-        $encoded->encode();
-    }
 }
