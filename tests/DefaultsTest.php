@@ -1,5 +1,6 @@
 <?php namespace Rollbar;
 
+use Exception;
 use Rollbar\Defaults;
 use Rollbar\Payload\Level;
 use Rollbar\Payload\Notifier;
@@ -266,38 +267,22 @@ class DefaultsTest extends BaseRollbarTest
     {
         $this->assertEquals(false, $this->defaults->raiseOnError());
     }
-    
-    public function testDefaultsForConfigOptions()
-    {
-        $this->markTestSkipped('FIXME -- What assertions should we test here?');
-        foreach (\Rollbar\Config::listOptions() as $option) {
-            if ($option == 'access_token' ||
-                $option == 'logger' ||
-                $option == 'person' ||
-                $option == 'person_fn' ||
-                $option == 'scrub_whitelist' ||
-                $option == 'proxy' ||
-                $option == 'include_raw_request_body' ||
-                $option == 'verbose_logger' ||
-                $option == 'log_payload_logger') {
-                continue;
-            } elseif ($option == 'base_api_url') {
-                $option = 'endpoint';
-            } elseif ($option == 'capture_ip') {
-                $option = 'captureIP';
-            } elseif ($option == 'root') {
-                $option = 'server_root';
-            }
-            
-            $this->defaults->fromSnakeCase($option);
-        }
-    }
-    
-    public function testFromSnakeCase()
+
+    /**
+     * @testWith ["message_level", "warning"]
+     *           ["MESSAGE_LEVEL", "warning"]
+     */
+    public function testFromSnakeCaseGetsExpectedValueForValidOption($option, $value)
     {
         $this->assertEquals(
-            'warning',
-            \Rollbar\Defaults::get()->fromSnakeCase('message_level')
+            $value,
+            \Rollbar\Defaults::get()->fromSnakeCase($option)
         );
+    }
+
+    public function testFromSnakeCaseThrowsOnInvalidOption()
+    {
+        $this->expectException(Exception::class);
+        \Rollbar\Defaults::get()->fromSnakeCase('no_such_option');
     }
 }
