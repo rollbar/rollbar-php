@@ -32,7 +32,7 @@ class AgentTest extends Rollbar\BaseRollbarTest
         $logger->info("this is a test");
         $file = fopen($this->path . '/rollbar-relay.' . getmypid() . '.' . microtime(true) . '.rollbar', 'r');
         $line = fgets($file);
-        $this->assertContains('this is a test', $line);
+        $this->assertStringContainsString('this is a test', $line);
     }
 
     public function tearDown(): void

@@ -668,7 +668,17 @@ class RollbarLoggerTest extends BaseRollbarTest
         );
     }
 
-    public function testPsr3Emergency()
+    /**
+     * @testWith ["emergency"]
+     *           ["alert"]
+     *           ["critical"]
+     *           ["error"]
+     *           ["warning"]
+     *           ["notice"]
+     *           ["info"]
+     *           ["debug"]
+     */
+    public function testPsr3MethodCallsDoNotCrash($method)
     {
         $l = new RollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
@@ -676,86 +686,10 @@ class RollbarLoggerTest extends BaseRollbarTest
         ));
 
         // Test that no \Psr\Log\InvalidArgumentException is thrown
-        $l->emergency("Testing PHP Notifier");
+        $l->$method("Testing PHP Notifier");
+        $this->assertTrue(true);
     }
 
-    public function testPsr3Alert()
-    {
-        $l = new RollbarLogger(array(
-            "access_token" => $this->getTestAccessToken(),
-            "environment" => "testing-php"
-        ));
-
-        // Test that no \Psr\Log\InvalidArgumentException is thrown
-        $l->alert("Testing PHP Notifier");
-    }
-
-    public function testPsr3Critical()
-    {
-        $l = new RollbarLogger(array(
-            "access_token" => $this->getTestAccessToken(),
-            "environment" => "testing-php"
-        ));
-
-        // Test that no \Psr\Log\InvalidArgumentException is thrown
-        $l->critical("Testing PHP Notifier");
-    }
-
-    public function testPsr3Error()
-    {
-        $l = new RollbarLogger(array(
-            "access_token" => $this->getTestAccessToken(),
-            "environment" => "testing-php"
-        ));
-
-        // Test that no \Psr\Log\InvalidArgumentException is thrown
-        $l->error("Testing PHP Notifier");
-    }
-
-    public function testPsr3Warning()
-    {
-        $l = new RollbarLogger(array(
-            "access_token" => $this->getTestAccessToken(),
-            "environment" => "testing-php"
-        ));
-
-        // Test that no \Psr\Log\InvalidArgumentException is thrown
-        $l->warning("Testing PHP Notifier");
-    }
-
-    public function testPsr3Notice()
-    {
-        $l = new RollbarLogger(array(
-            "access_token" => $this->getTestAccessToken(),
-            "environment" => "testing-php"
-        ));
-
-        // Test that no \Psr\Log\InvalidArgumentException is thrown
-        $l->notice("Testing PHP Notifier");
-    }
-
-    public function testPsr3Info()
-    {
-        $l = new RollbarLogger(array(
-            "access_token" => $this->getTestAccessToken(),
-            "environment" => "testing-php"
-        ));
-
-        // Test that no \Psr\Log\InvalidArgumentException is thrown
-        $l->info("Testing PHP Notifier");
-    }
-
-    public function testPsr3Debug()
-    {
-        $l = new RollbarLogger(array(
-            "access_token" => $this->getTestAccessToken(),
-            "environment" => "testing-php"
-        ));
-
-        // Test that no \Psr\Log\InvalidArgumentException is thrown
-        $l->debug("Testing PHP Notifier");
-    }
-    
     /**
      * @dataProvider maxItemsProvider
      */
@@ -795,9 +729,6 @@ class RollbarLoggerTest extends BaseRollbarTest
         );
     }
     
-    /**
-     * @expectedException Exception
-     */
     public function testRaiseOnError()
     {
         $logger = new RollbarLogger(array(
@@ -806,6 +737,7 @@ class RollbarLoggerTest extends BaseRollbarTest
             "raise_on_error" => true
         ));
         
+        $this->expectException(\Exception::class);
         try {
             throw new \Exception();
         } catch (\Exception $ex) {

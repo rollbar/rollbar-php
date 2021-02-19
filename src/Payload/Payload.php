@@ -52,7 +52,7 @@ class Payload implements \Serializable
         return $this->utilities->serializeForRollbar($result, null, $objectHashes, $maxDepth);
     }
     
-    public function unserialize($serialized)
+    public function unserialize(string $serialized)
     {
         throw new \Exception('Not implemented yet.');
     }

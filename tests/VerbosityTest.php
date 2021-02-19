@@ -62,16 +62,15 @@ class VerbosityTest extends BaseRollbarTest
             ),
             function () use ($unitTest) {
             // verbosity expectations
-                $unitTest->expectLog(
+                $unitTest->expectConsecutiveLog([
                     0,
                     '/Attempting to log: \[warning\] Testing PHP Notifier/',
                     \Psr\Log\LogLevel::INFO
-                );
-                $unitTest->expectLog(
+                ], [
                     1,
                     '/Occurrence/',
                     \Psr\Log\LogLevel::INFO
-                );
+                ]);
             }
         );
     }
@@ -116,7 +115,16 @@ class VerbosityTest extends BaseRollbarTest
             // verbosity expectations
                 $unitTest->expectLog(0, '/Invalid log level \'nolevel\'\./', \Psr\Log\LogLevel::ERROR);
             },
-            'nolevel' // rollbar message level
+            'nolevel', // rollbar message level
+            function () use ($unitTest) {
+                // We expect the logging library to throw this exception when
+                // given the bogus level, so we have to tell the test to expect
+                // it. We do so here in the "pre" test block because the
+                // "verbose expectations" block only applies to the scenario for
+                // verbose logging -- it would not catch the exception from
+                // the quiet scenario.
+                $unitTest->expectException(\Psr\Log\InvalidArgumentException::class);
+            }
         );
     }
 
@@ -962,6 +970,57 @@ class VerbosityTest extends BaseRollbarTest
     }
 
     /**
+     * Convenience method for asserting a log record is in a valid format.
+     */
+    private function withLog()
+    {
+        return $this->callback(function ($record) {
+            return is_array($record);
+        });
+    }
+
+    /**
+     * Convenience method to expect verbose log messages in a certain order
+     * on the verbose log handler mock.
+     */
+    public function expectConsecutiveLog(array ...$constraints): void
+    {
+        // We need an ordered array of expectations. The constraints we are
+        // given may not be ordered or contiguous. First step is to build a
+        // (potentially) sparse array of the given expectations, and then fill
+        // the gaps in the array with generic expectations. Finally, we'll
+        // sort it to ensure a total ordering.
+
+        // ... Create a sparse array of custom expectations.
+        $matchers = [];
+        foreach ($constraints as [ $at, $messageRegEx, $level ]) {
+            assert(0 <= $at, 'Cannot expect a message at negative index in the log stack');
+            assert(! array_key_exists($at, $matchers), 'Cannot override an already set expectation');
+            // ensure the message at this index matches the given regex and verbosity level
+            $matchers[$at] = [ $this->withLogParams($messageRegEx, $level) ];
+        }
+
+        // ... Fill in the gaps
+        for ($i = 0; $i < max(array_keys($matchers)); $i++) {
+            if (! array_key_exists($i, $matchers)) {
+                // ensure the message at this index has the right format, regardless of content
+                $matchers[$i] = [ $this->withLog() ];
+            }
+        }
+
+        // ... Order the now-filled array.
+        ksort($matchers);
+
+        // Finally, wire up the mock with those ordered expectations.
+        $this->verboseHandlerMock
+            ->expects($this->atLeast(count($matchers)))
+            ->method('handle')
+            ->withConsecutive(...$matchers)
+            ->willReturn(true)
+        ;
+    }
+
+    /**
      * Convenience method to expect verbose log messages
      * on the verbose log handler mock.
      *
@@ -976,16 +1035,7 @@ class VerbosityTest extends BaseRollbarTest
      */
     public function expectLog($at, $messageRegEx, $level, $handlerMock = null)
     {
-        if ($handlerMock === null) {
-            $handlerMock = $this->verboseHandlerMock;
-        }
-
-        $handlerMock
-            ->expects($this->at($at))
-            ->method('handle')
-            ->with(
-                $this->withLogParams($messageRegEx, $level)
-            );
+        $this->expectConsecutiveLog([ $at, $messageRegEx, $level ]);
     }
 
     /**
@@ -1108,10 +1158,7 @@ class VerbosityTest extends BaseRollbarTest
         $this->configurableObjectVerbosityTest(
             $rollbarLogger,
             function () use ($rollbarLogger, $messageLevel) {
-                try {
-                    $rollbarLogger->log($messageLevel, "Testing PHP Notifier", array());
-                } catch (\Exception $exception) {
-                } // discard exceptions - that's what's under test here
+                $rollbarLogger->log($messageLevel, "Testing PHP Notifier", array());
             },
             $expectations,
             $pre,
