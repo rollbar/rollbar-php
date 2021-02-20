@@ -1,4 +1,6 @@
-<?php namespace Rollbar\Senders;
+<?php declare(strict_types=1);
+
+namespace Rollbar\Senders;
 
 use Rollbar\Payload\Payload;
 use Rollbar\Payload\EncodedPayload;

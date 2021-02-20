@@ -1,4 +1,6 @@
-<?php namespace Rollbar\Payload;
+<?php declare(strict_types=1);
+
+namespace Rollbar\Payload;
 
 class EncodedPayload
 {
