@@ -113,7 +113,9 @@ class Scrubber implements ScrubberInterface
                 return;
             }
 
-            if (isset($fields[strtolower($key)])) {
+            // $key may be an integer (proper), such as when scrubbing
+            // backtraces -- coerce to string to satisfy strict types
+            if (isset($fields[strtolower((string)$key)])) {
                 $val = $replacement;
             } else {
                 $val = $scrubber->internalScrub($val, $fields, $replacement, $current);
