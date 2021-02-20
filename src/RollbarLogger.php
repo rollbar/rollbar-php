@@ -85,6 +85,9 @@ class RollbarLogger extends AbstractLogger
         return $this->config->getCustom();
     }
 
+    /**
+     * @var Level|string $level
+     */
     public function log($level, $toLog, array $context = array())
     {
         if ($this->disabled()) {
@@ -92,7 +95,16 @@ class RollbarLogger extends AbstractLogger
             return new Response(0, "Disabled");
         }
         
-        if (!$this->levelFactory->isValidLevel($level)) {
+        // Convert a Level proper into a string proper, as the code paths that
+        // follow have allowed both only by virtue that a Level downcasts to a
+        // string. With strict types, that no longer happens. We should consider
+        // tightening the boundary so that we convert from string to Level 
+        // enum here, and work with Level enum through protected level.
+        // This is the fastest way to 
+        // expected a string, but worked in e
+        if ($level instanceof Level) {
+            $level = (string)$level;
+        } elseif (!$this->levelFactory->isValidLevel($level)) {
             $exception = new \Psr\Log\InvalidArgumentException("Invalid log level '$level'.");
             $this->verboseLogger()->error($exception->getMessage());
             throw $exception;
