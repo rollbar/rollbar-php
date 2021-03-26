@@ -5,13 +5,14 @@ use Rollbar\Payload\Level;
 
 class LevelTest extends BaseRollbarTest
 {
-    /**
-     * @expectedException \Exception
-     */
+    public function testInvalidLevelThrowsAnException()
+    {
+        $this->expectException(\Exception::class);
+        $level = Level::TEST();
+    }
+
     public function testLevel()
     {
-        $level = Level::TEST();
-
         $level = Level::CRITICAL();
         $this->assertNotNull($level);
         $this->assertSame(Level::CRITICAL(), $level);

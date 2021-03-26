@@ -1,6 +1,7 @@
 <?php namespace Rollbar;
 
 use \Mockery as m;
+use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Rollbar\FakeDataBuilder;
 use Rollbar\Payload\Body;
 use Rollbar\Payload\Data;
@@ -18,6 +19,8 @@ use Rollbar\TestHelpers\Exceptions\VerboseExceptionSampleRate;
 
 class ConfigTest extends BaseRollbarTest
 {
+    use MockeryPHPUnitIntegration;
+
     private $error;
 
     public function setUp(): void

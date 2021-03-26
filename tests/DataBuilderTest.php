@@ -436,9 +436,8 @@ class DataBuilderTest extends BaseRollbarTest
         );
     }
     
-    public function testExceptionTraceArguments()
+    public function testStackFramesAreUnavailableWhenLocalVarsDumpConfigUnset()
     {
-        // Negative test
         $dataBuilder = new DataBuilder(array(
             'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
@@ -451,8 +450,16 @@ class DataBuilderTest extends BaseRollbarTest
             $frames[count($frames)-1]->getArgs(),
             "Frames arguments available in trace when they should not be."
         );
+    }
         
-        // Positive test
+    /**
+     * @testWith [0]
+     *           [1]
+     */
+    public function testStackFramesAreAvailableWhenLocalVarsDumpRequested($valueOfZendExceptionIgnoreArgs)
+    {
+        ini_set('zend.exception_ignore_args', $valueOfZendExceptionIgnoreArgs);
+
         $dataBuilder = new DataBuilder(array(
             'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
@@ -879,12 +886,13 @@ class DataBuilderTest extends BaseRollbarTest
             'levelFactory' => new LevelFactory,
             'utilities' => new Utilities
         ));
-        $frames = $dataBuilder->makeFrames(new \Exception(), false);
+        $frames = $dataBuilder->makeFrames(new \Exception(), false); // A
         $this->assertStringEndsWith(
             'tests/DataBuilderTest.php',
             $frames[count($frames)-1]->getFilename()
         );
-        $this->assertEquals(882, $frames[count($frames)-1]->getLineno());
+        // 889 is the line number where the comment "// A" is found
+        $this->assertEquals(889, $frames[count($frames)-1]->getLineno());
         $this->assertEquals('Rollbar\DataBuilderTest::testFramesOrder', $frames[count($frames)-2]->getMethod());
     }
     

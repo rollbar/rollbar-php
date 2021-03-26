@@ -64,15 +64,15 @@ class UtilitiesTest extends BaseRollbarTest
         }
     }
 
-    public function testValidateBooleanThrowsException()
+    public function testValidateBooleanThrowsExceptionOnNullWhenNullAreNotAllowed()
     {
-        $this->expectException(get_class(new \InvalidArgumentException()));
+        $this->expectException(\InvalidArgumentException::class);
         Utilities::validateBoolean(null, "foo", false);
     }
 
     public function testValidateBooleanWithInvalidBoolean()
     {
-        $this->expectException(get_class(new \InvalidArgumentException()));
+        $this->expectException(\InvalidArgumentException::class);
         Utilities::validateBoolean("not a boolean");
     }
 
@@ -81,6 +81,7 @@ class UtilitiesTest extends BaseRollbarTest
         Utilities::validateBoolean(true, "foo", false);
         Utilities::validateBoolean(true);
         Utilities::validateBoolean(null);
+        $this->expectNotToPerformAssertions();
     }
 
     public function testSerializeForRollbar()
@@ -125,17 +126,17 @@ class UtilitiesTest extends BaseRollbarTest
         
         $result = Utilities::serializeForRollbar($obj, null, $objectHashes);
         
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             '/<CircularReference.*/',
             $result["obj"]["value"]["child"]["value"]["parent"]
         );
         
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             '/<CircularReference.*/',
             $result["serializedObj"]["child"]["parent"]
         );
         
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             '/<CircularReference.*/',
             $result["payload"]["data"]["body"]["extra"][0]["value"]["child"]["value"]["parent"]
         );

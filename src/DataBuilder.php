@@ -175,6 +175,10 @@ class DataBuilder implements DataBuilderInterface
     {
         $fromConfig = isset($config['local_vars_dump']) ? $config['local_vars_dump'] : null;
         $this->localVarsDump = self::$defaults->localVarsDump($fromConfig);
+        if ($this->localVarsDump && !empty(ini_get('zend.exception_ignore_args'))) {
+            ini_set('zend.exception_ignore_args', 'Off');
+            assert(empty(ini_get('zend.exception_ignore_args')));
+        }
     }
     
     protected function setCaptureErrorStacktraces($config)
@@ -1101,10 +1105,42 @@ class DataBuilder implements DataBuilderInterface
         
         return $backTrace;
     }
+
+    /**
+     * Check if this PHP install has the `xdebug_get_function_stack` function.
+     *
+     * @return bool
+     */
+    private function hasXdebugGetFunctionStack()
+    {
+        // TBD: allow the consumer to disable use of Xdebug even if it's
+        // TBD: installed in the consumer's runtime environment?
+
+        // if the function doesn't exist, we're obviously unable to use it
+        if (! function_exists('xdebug_get_function_stack')) {
+            return false;
+        }
+
+        // if the function's not provided by Xdebug, we can't guarantee an
+        // API conformance so we refuse to use it
+        $version = phpversion('xdebug');
+        if (false === $version) {
+            return false;
+        }
+
+        // in XDebug 2 and prior, existence of the function implied usability
+        if (version_compare($version, '3.0.0', '<')) {
+            return true;
+        }
+
+        // in XDebug 3 and later, the function is defined but disabled unless
+        // the xdebug mode parameter includes it
+        return false === strpos(ini_get('xdebug.mode'), 'develop') ? false : true;
+    }
     
     private function fetchErrorTrace()
     {
-        if (function_exists('xdebug_get_function_stack')) {
+        if ($this->hasXdebugGetFunctionStack()) {
             return array_reverse(\xdebug_get_function_stack());
         } else {
             return debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS);

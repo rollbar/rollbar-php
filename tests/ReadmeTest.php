@@ -13,10 +13,6 @@ function do_something()
 
 class ReadmeTest extends BaseRollbarTest
 {
-
-    /**
-     * @expectedException \Exception
-     */
     public function testQuickStart()
     {
         // installs global error and exception handlers
@@ -53,6 +49,7 @@ class ReadmeTest extends BaseRollbarTest
         // $foo = $bar;
 
         // will be reported by the exception handler
+        $this->expectException(\Exception::class);
         throw new \Exception('testing exception handler');
     }
 
@@ -128,22 +125,5 @@ class ReadmeTest extends BaseRollbarTest
         
         $this->assertEquals(200, $result1->getStatus());
         $this->assertEquals(200, $result2->getStatus());
-    }
-
-    public function testMonolog()
-    {
-        Rollbar::init(
-            array(
-                'access_token' => $this->getTestAccessToken(),
-                'environment' => 'development'
-            )
-        );
-        
-        // create a log channel
-        $log = new Logger('RollbarHandler');
-        $log->pushHandler(new RollbarHandler(Rollbar::logger(), Logger::WARNING));
-        
-        // add records to the log
-        $log->warning('Foo');
     }
 }
