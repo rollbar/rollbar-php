@@ -10,12 +10,12 @@ class Defaults
     public static function get()
     {
         if (is_null(self::$singleton)) {
-            self::$singleton = new Defaults(new Utilities());
+            self::$singleton = new Defaults;
         }
         return self::$singleton;
     }
 
-    public function __construct($utilities)
+    public function __construct()
     {
         $this->psrLevels = array(
             LogLevel::EMERGENCY => "critical",
@@ -68,8 +68,6 @@ class Defaults
         $this->baseException = version_compare(phpversion(), '7.0', '<') ? '\Exception' : '\Throwable';
         $this->errorSampleRates = array();
         $this->exceptionSampleRates = array();
-        
-        $this->utilities = $utilities;
     }
     
     public function fromSnakeCase($option)
@@ -84,7 +82,6 @@ class Defaults
         }
     }
     
-    private $utilities;
     private $data;
     private static $singleton = null;
     
