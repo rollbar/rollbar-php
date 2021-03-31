@@ -8,19 +8,15 @@
  */
 class Person implements \Serializable
 {
-    private $id;
-    private $username;
-    private $email;
-    private $extra;
     private $utilities;
 
-    public function __construct($id, $username = null, $email = null, array $extra = null)
-    {
+    public function __construct(
+        private $id,
+        private $username = null,
+        private $email = null,
+        private array $extra = []
+    ) {
         $this->utilities = new \Rollbar\Utilities();
-        $this->setId($id);
-        $this->setUsername($username);
-        $this->setEmail($email);
-        $this->extra = $extra == null ? array() : $extra;
     }
 
     public function getId()
