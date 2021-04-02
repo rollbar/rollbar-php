@@ -1,14 +1,15 @@
 <?php namespace Rollbar\Payload;
 
+use Rollbar\UtilitiesTrait;
+
 class Message implements ContentInterface
 {
-    private $utilities;
+    use UtilitiesTrait;
 
     public function __construct(
         private $body,
         private $backtrace = null
     ) {
-        $this->utilities = new \Rollbar\Utilities();
     }
 
     public function getKey()
@@ -44,7 +45,7 @@ class Message implements ContentInterface
             "body" => $this->getBody(),
             "backtrace" => $this->getBacktrace()
         );
-        return $this->utilities->serializeForRollbar($toSerialize);
+        return $this->utilities()->serializeForRollbar($toSerialize);
     }
     
     public function unserialize($serialized)

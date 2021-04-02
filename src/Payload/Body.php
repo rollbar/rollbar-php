@@ -1,14 +1,15 @@
 <?php namespace Rollbar\Payload;
 
+use Rollbar\UtilitiesTrait;
+
 class Body implements \Serializable
 {
-    private $utilities;
+    use UtilitiesTrait;
 
     public function __construct(
         private ContentInterface $value,
         private array $extra = array()
     ) {
-        $this->utilities = new \Rollbar\Utilities();
     }
 
     public function getValue()
@@ -44,7 +45,7 @@ class Body implements \Serializable
         
         $objectHashes = \Rollbar\Utilities::getObjectHashes();
         
-        return $this->utilities->serializeForRollbar(
+        return $this->utilities()->serializeForRollbar(
             $result,
             array('extra'),
             $objectHashes

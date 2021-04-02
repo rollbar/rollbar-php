@@ -2,7 +2,8 @@
 
 use Rollbar\Payload\Level;
 use Rollbar\Payload\Payload;
-use \Rollbar\Payload\EncodedPayload;
+use Rollbar\Payload\EncodedPayload;
+use Rollbar\UtilitiesTrait;
 
 if (!defined('ROLLBAR_INCLUDED_ERRNO_BITMASK')) {
     define(
@@ -13,6 +14,8 @@ if (!defined('ROLLBAR_INCLUDED_ERRNO_BITMASK')) {
 
 class Config
 {
+    use UtilitiesTrait;
+
     const VERBOSE_NONE = 'none';
     const VERBOSE_NONE_INT = 1000;
 
@@ -69,6 +72,7 @@ class Config
     );
     
     private $accessToken;
+
     /**
      * @var boolean $enabled If this is false then do absolutely nothing,
      * try to be as close to the scenario where Rollbar did not exist at
@@ -133,11 +137,6 @@ class Config
      * @var LevelFactory
      */
     private $levelFactory;
-    
-    /**
-     * @var Utilities
-     */
-    private $utilities;
     
     /**
      * @var TransformerInterface
@@ -222,7 +221,6 @@ class Config
         $this->includedErrno = \Rollbar\Defaults::get()->includedErrno();
         
         $this->levelFactory = new LevelFactory();
-        $this->utilities = new Utilities();
         
         $this->updateConfig($configArray);
 
@@ -328,7 +326,7 @@ class Config
         if (isset($_ENV['ROLLBAR_ACCESS_TOKEN']) && !isset($config['access_token'])) {
             $config['access_token'] = $_ENV['ROLLBAR_ACCESS_TOKEN'];
         }
-        $this->utilities->validateString($config['access_token'], "config['access_token']", 32, false);
+        $this->utilities()->validateString($config['access_token'], "config['access_token']", 32, false);
         $this->accessToken = $config['access_token'];
     }
 
@@ -409,7 +407,7 @@ class Config
         }
         
         if (!isset($config['utilities'])) {
-            $config['utilities'] = $this->utilities;
+            $config['utilities'] = $this->utilities();
         }
         
         $exp = "Rollbar\DataBuilderInterface";

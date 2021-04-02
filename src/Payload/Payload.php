@@ -2,14 +2,14 @@
 
 use Rollbar\DataBuilder;
 use Rollbar\Config;
+use Rollbar\UtilitiesTrait;
 
 class Payload implements \Serializable
 {
-    private $utilities;
+    use UtilitiesTrait;
 
     public function __construct(private Data $data, private $accessToken)
     {
-        $this->utilities = new \Rollbar\Utilities();
     }
 
     /**
@@ -45,7 +45,7 @@ class Payload implements \Serializable
             "access_token" => $this->accessToken,
         );
 
-        return $this->utilities->serializeForRollbar($result, null, $objectHashes, $maxDepth);
+        return $this->utilities()->serializeForRollbar($result, null, $objectHashes, $maxDepth);
     }
     
     public function unserialize(string $serialized)

@@ -1,14 +1,15 @@
 <?php namespace Rollbar\Payload;
 
+use Rollbar\UtilitiesTrait;
+
 class Trace implements ContentInterface
 {
-    private $utilities;
+    use UtilitiesTrait;
 
     public function __construct(
         private array $frames,
         private ExceptionInfo $exception
     ) {
-        $this->utilities = new \Rollbar\Utilities();
     }
 
     public function getKey()
@@ -44,7 +45,7 @@ class Trace implements ContentInterface
             "frames" => $this->frames,
             "exception" => $this->exception,
         );
-        return $this->utilities->serializeForRollbar($result);
+        return $this->utilities()->serializeForRollbar($result);
     }
     
     public function unserialize($serialized)

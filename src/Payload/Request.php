@@ -1,7 +1,11 @@
 <?php namespace Rollbar\Payload;
 
+use Rollbar\UtilitiesTrait;
+
 class Request implements \Serializable
 {
+    use UtilitiesTrait;
+
     private $url;
     private $method;
     private $headers;
@@ -12,11 +16,9 @@ class Request implements \Serializable
     private $body;
     private $userIp;
     private $extra = array();
-    private $utilities;
 
     public function __construct()
     {
-        $this->utilities = new \Rollbar\Utilities();
     }
 
     public function getUrl()
@@ -152,7 +154,7 @@ class Request implements \Serializable
         
         $objectHashes = \Rollbar\Utilities::getObjectHashes();
         
-        return $this->utilities->serializeForRollbar($result, array_keys($this->extra), $objectHashes);
+        return $this->utilities()->serializeForRollbar($result, array_keys($this->extra), $objectHashes);
     }
     
     public function unserialize(string $serialized)
