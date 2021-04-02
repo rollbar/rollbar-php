@@ -10,15 +10,11 @@ class Notifier implements \Serializable
         return new Notifier(self::NAME, self::VERSION);
     }
 
-    private $name;
-    private $version;
     private $utilities;
 
-    public function __construct($name, $version)
+    public function __construct(private $name, private $version)
     {
         $this->utilities = new \Rollbar\Utilities();
-        $this->setName($name);
-        $this->setVersion($version);
     }
 
     public function getName()

@@ -2,15 +2,11 @@
 
 class Context implements \Serializable
 {
-    private $pre;
-    private $post;
     private $utilities;
 
-    public function __construct($pre, $post)
+    public function __construct(private $pre, private $post)
     {
         $this->utilities = new \Rollbar\Utilities();
-        $this->setPre($pre);
-        $this->setPost($post);
     }
 
     public function getPre()

@@ -2,17 +2,13 @@
 
 class Message implements ContentInterface
 {
-    private $body;
-    private $backtrace;
     private $utilities;
 
     public function __construct(
-        $body,
-        $backtrace = null
+        private $body,
+        private $backtrace = null
     ) {
         $this->utilities = new \Rollbar\Utilities();
-        $this->setBody($body);
-        $this->setBacktrace($backtrace);
     }
 
     public function getKey()

@@ -2,18 +2,13 @@
 
 class Body implements \Serializable
 {
-    /**
-     * @var ContentInterface
-     */
-    private $value;
     private $utilities;
-    private $extra;
 
-    public function __construct(ContentInterface $value, array $extra = array())
-    {
+    public function __construct(
+        private ContentInterface $value,
+        private array $extra = array()
+    ) {
         $this->utilities = new \Rollbar\Utilities();
-        $this->setValue($value);
-        $this->setExtra($extra);
     }
 
     public function getValue()

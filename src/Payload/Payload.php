@@ -5,15 +5,11 @@ use Rollbar\Config;
 
 class Payload implements \Serializable
 {
-    private $data;
-    private $accessToken;
     private $utilities;
 
-    public function __construct(Data $data, $accessToken)
+    public function __construct(private Data $data, private $accessToken)
     {
         $this->utilities = new \Rollbar\Utilities();
-        $this->setData($data);
-        $this->setAccessToken($accessToken);
     }
 
     /**

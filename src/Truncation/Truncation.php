@@ -6,17 +6,14 @@ use \Rollbar\Config;
 class Truncation
 {
     const MAX_PAYLOAD_SIZE = 131072; // 128 * 1024
-    private $config;
  
     protected static $truncationStrategies = array(
         "Rollbar\Truncation\FramesStrategy",
         "Rollbar\Truncation\StringsStrategy"
     );
     
-    public function __construct(Config $config)
+    public function __construct(private Config $config)
     {
-        $this->config = $config;
-
         if ($custom = $config->getCustomTruncation()) {
             $this->registerStrategy($custom);
         }

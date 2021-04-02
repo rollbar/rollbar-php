@@ -30,27 +30,15 @@ class ErrorWrapper extends \Exception
         return isset(self::$constName[$const]) ? self::$constName[$const] : null;
     }
 
-    public $errorLevel;
-    public $errorMessage;
-    public $errorFile;
-    public $errorLine;
-    public $backTrace;
-
     public function __construct(
-        $errorLevel,
-        $errorMessage,
-        $errorFile,
-        $errorLine,
-        $backTrace,
+        public $errorLevel,
+        public $errorMessage,
+        public $errorFile,
+        public $errorLine,
+        public $backTrace,
         $utilities
     ) {
-    
-        parent::__construct($errorMessage, $errorLevel);
-        $this->errorLevel = $errorLevel;
-        $this->errorMessage = $errorMessage;
-        $this->errorFile = $errorFile;
-        $this->errorLine = $errorLine;
-        $this->backTrace = $backTrace;
+        parent::__construct($this->errorMessage, $this->errorLevel);
         $this->utilities = $utilities;
     }
 

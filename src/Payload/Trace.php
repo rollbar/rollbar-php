@@ -2,15 +2,13 @@
 
 class Trace implements ContentInterface
 {
-    private $frames;
-    private $exception;
     private $utilities;
 
-    public function __construct(array $frames, ExceptionInfo $exception)
-    {
+    public function __construct(
+        private array $frames,
+        private ExceptionInfo $exception
+    ) {
         $this->utilities = new \Rollbar\Utilities();
-        $this->setFrames($frames);
-        $this->setException($exception);
     }
 
     public function getKey()

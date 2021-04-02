@@ -2,7 +2,6 @@
 
 class Frame implements \Serializable
 {
-    private $filename;
     private $lineno;
     private $colno;
     private $method;
@@ -11,10 +10,9 @@ class Frame implements \Serializable
     private $args;
     private $utilities;
 
-    public function __construct($filename)
+    public function __construct(private $filename)
     {
         $this->utilities = new \Rollbar\Utilities();
-        $this->setFilename($filename);
     }
 
     public function getFilename()

@@ -2,17 +2,14 @@
 
 class ExceptionInfo implements \Serializable
 {
-    private $class;
-    private $message;
-    private $description;
     private $utilities;
 
-    public function __construct($class, $message, $description = null)
-    {
+    public function __construct(
+        private $class,
+        private $message,
+        private $description = null
+    ) {
         $this->utilities = new \Rollbar\Utilities();
-        $this->setClass($class);
-        $this->setMessage($message);
-        $this->setDescription($description);
     }
 
     public function getClass()
