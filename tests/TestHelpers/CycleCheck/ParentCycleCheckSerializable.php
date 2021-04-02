@@ -11,13 +11,8 @@ class ParentCycleCheckSerializable implements \Serializable
     
     public function serialize()
     {
-        $objectHashes = \Rollbar\Utilities::GetObjectHashes();
         return array(
-            "child" => \Rollbar\Utilities::serializeForRollbar(
-                $this->child,
-                null,
-                $objectHashes
-            )
+            "child" => \Rollbar\Utilities::serializeForRollbarInternal($this->child)
         );
     }
     

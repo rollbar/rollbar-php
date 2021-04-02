@@ -87,9 +87,7 @@ class Server implements \Serializable
             $result[$key] = $val;
         }
         
-        $objectHashes = \Rollbar\Utilities::getObjectHashes();
-        
-        return $this->utilities()->serializeForRollbar($result, array_keys($this->extra), $objectHashes);
+        return $this->utilities()->serializeForRollbarInternal($result, array_keys($this->extra));
     }
     
     public function unserialize(string $serialized)

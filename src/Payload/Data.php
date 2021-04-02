@@ -248,9 +248,7 @@ class Data implements \Serializable
             "notifier" => $this->notifier,
         );
         
-        $objectHashes = \Rollbar\Utilities::getObjectHashes();
-        
-        return $this->utilities()->serializeForRollbar($result, null, $objectHashes);
+        return $this->utilities()->serializeForRollbarInternal($result);
     }
     
     public function unserialize(string $serialized)

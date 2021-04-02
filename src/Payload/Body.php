@@ -43,13 +43,7 @@ class Body implements \Serializable
             $result['extra'] = $this->extra;
         }
         
-        $objectHashes = \Rollbar\Utilities::getObjectHashes();
-        
-        return $this->utilities()->serializeForRollbar(
-            $result,
-            array('extra'),
-            $objectHashes
-        );
+        return $this->utilities()->serializeForRollbarInternal($result, array('extra'));
     }
     
     public function unserialize(string $serialized)

@@ -47,9 +47,7 @@ class Notifier implements \Serializable
             "version" => $this->version,
         );
         
-        $objectHashes = \Rollbar\Utilities::getObjectHashes();
-        
-        return $this->utilities()->serializeForRollbar($result, null, $objectHashes);
+        return $this->utilities()->serializeForRollbarInternal($result);
     }
     
     public function unserialize(string $serialized)
