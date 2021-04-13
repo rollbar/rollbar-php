@@ -1,5 +1,7 @@
 <?php namespace Rollbar\Payload;
 
+use Rollbar\UtilitiesTrait;
+
 /**
  * Suppress PHPMD.ShortVariable for this class, since using property $id is
  * intended.
@@ -8,19 +10,14 @@
  */
 class Person implements \Serializable
 {
-    private $id;
-    private $username;
-    private $email;
-    private $extra;
-    private $utilities;
+    use UtilitiesTrait;
 
-    public function __construct($id, $username = null, $email = null, array $extra = null)
-    {
-        $this->utilities = new \Rollbar\Utilities();
-        $this->setId($id);
-        $this->setUsername($username);
-        $this->setEmail($email);
-        $this->extra = $extra == null ? array() : $extra;
+    public function __construct(
+        private $id,
+        private $username = null,
+        private $email = null,
+        private array $extra = []
+    ) {
     }
 
     public function getId()
@@ -77,9 +74,7 @@ class Person implements \Serializable
             $result[$key] = $val;
         }
         
-        $objectHashes = \Rollbar\Utilities::getObjectHashes();
-        
-        return $this->utilities->serializeForRollbar($result, array_keys($this->extra), $objectHashes);
+        return $this->utilities()->serializeForRollbarInternal($result, array_keys($this->extra));
     }
     
     public function unserialize(string $serialized)

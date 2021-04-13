@@ -1,18 +1,16 @@
 <?php namespace Rollbar\Payload;
 
+use Rollbar\UtilitiesTrait;
+
 class ExceptionInfo implements \Serializable
 {
-    private $class;
-    private $message;
-    private $description;
-    private $utilities;
+    use UtilitiesTrait;
 
-    public function __construct($class, $message, $description = null)
-    {
-        $this->utilities = new \Rollbar\Utilities();
-        $this->setClass($class);
-        $this->setMessage($message);
-        $this->setDescription($description);
+    public function __construct(
+        private $class,
+        private $message,
+        private $description = null
+    ) {
     }
 
     public function getClass()
@@ -56,9 +54,7 @@ class ExceptionInfo implements \Serializable
             "description" => $this->description,
         );
         
-        $objectHashes = \Rollbar\Utilities::getObjectHashes();
-        
-        return $this->utilities->serializeForRollbar($result, null, $objectHashes);
+        return $this->utilities()->serializeForRollbarInternal($result);
     }
     
     public function unserialize(string $serialized)

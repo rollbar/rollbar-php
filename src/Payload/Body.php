@@ -1,19 +1,15 @@
 <?php namespace Rollbar\Payload;
 
+use Rollbar\UtilitiesTrait;
+
 class Body implements \Serializable
 {
-    /**
-     * @var ContentInterface
-     */
-    private $value;
-    private $utilities;
-    private $extra;
+    use UtilitiesTrait;
 
-    public function __construct(ContentInterface $value, array $extra = array())
-    {
-        $this->utilities = new \Rollbar\Utilities();
-        $this->setValue($value);
-        $this->setExtra($extra);
+    public function __construct(
+        private ContentInterface $value,
+        private array $extra = array()
+    ) {
     }
 
     public function getValue()
@@ -47,13 +43,7 @@ class Body implements \Serializable
             $result['extra'] = $this->extra;
         }
         
-        $objectHashes = \Rollbar\Utilities::getObjectHashes();
-        
-        return $this->utilities->serializeForRollbar(
-            $result,
-            array('extra'),
-            $objectHashes
-        );
+        return $this->utilities()->serializeForRollbarInternal($result, array('extra'));
     }
     
     public function unserialize(string $serialized)

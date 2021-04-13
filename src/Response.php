@@ -2,15 +2,11 @@
 
 class Response
 {
-    private $status;
-    private $info;
-    private $uuid;
-
-    public function __construct($status, $info, $uuid = null)
-    {
-        $this->status = $status;
-        $this->info = $info;
-        $this->uuid = $uuid;
+    public function __construct(
+        private $status,
+        private $info,
+        private $uuid = null
+    ) {
     }
 
     public function getStatus()

@@ -5,13 +5,11 @@ namespace Rollbar\Senders;
 use Fluent\Logger\FluentLogger;
 use Rollbar\Response;
 use Rollbar\Payload\EncodedPayload;
+use Rollbar\UtilitiesTrait;
 
 class FluentSender implements SenderInterface
 {
-    /**
-     * @var Utilities
-     */
-    private $utilities;
+    use UtilitiesTrait;
 
     /**
      * @var FluentLogger FluentLogger instance
@@ -44,19 +42,18 @@ class FluentSender implements SenderInterface
         $this->fluentPort = \Rollbar\Defaults::get()->fluentPort();
         $this->fluentTag = \Rollbar\Defaults::get()->fluentTag();
         
-        $this->utilities = new \Rollbar\Utilities();
         if (isset($opts['fluentHost'])) {
-            $this->utilities->validateString($opts['fluentHost'], 'opts["fluentHost"]', null, false);
+            $this->utilities()->validateString($opts['fluentHost'], 'opts["fluentHost"]', null, false);
             $this->fluentHost = $opts['fluentHost'];
         }
 
         if (isset($opts['fluentPort'])) {
-            $this->utilities->validateInteger($opts['fluentPort'], 'opts["fluentPort"]', null, null, false);
+            $this->utilities()->validateInteger($opts['fluentPort'], 'opts["fluentPort"]', null, null, false);
             $this->fluentPort = $opts['fluentPort'];
         }
 
         if (isset($opts['fluentTag'])) {
-            $this->utilities->validateString($opts['fluentTag'], 'opts["fluentTag"]', null, false);
+            $this->utilities()->validateString($opts['fluentTag'], 'opts["fluentTag"]', null, false);
             $this->fluentTag = $opts['fluentTag'];
         }
     }

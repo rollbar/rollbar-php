@@ -8,13 +8,11 @@ abstract class AbstractHandler
 {
     protected $registered = false;
     
-    protected $logger = null;
-    
     protected $previousHandler = null;
     
-    public function __construct(RollbarLogger $logger)
-    {
-        $this->logger = $logger;
+    public function __construct(
+        protected RollbarLogger $logger
+    ) {
     }
     
     public function logger()

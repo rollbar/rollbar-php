@@ -2,11 +2,8 @@
 
 class TraceChain implements ContentInterface
 {
-    private $traces;
-
-    public function __construct(array $traces)
+    public function __construct(private array $traces)
     {
-        $this->setTraces($traces);
     }
 
     public function getKey()
