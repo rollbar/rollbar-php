@@ -57,8 +57,9 @@ class ErrorHandler extends AbstractHandler
         $exception = $this->logger()->
                             getDataBuilder()->
                             generateErrorWrapper($errno, $errstr, $errfile, $errline);
-
-        $this->logger()->log(Level::ERROR, $exception, array(), true);
+        $exception->isUncaught = true;
+        $this->logger()->log(Level::ERROR, $exception, array());
+        unset($exception->isUncaught);
 
         return false;
     }
