@@ -826,7 +826,8 @@ class Config
     {
         if (isset($this->checkIgnore)) {
             try {
-                if (call_user_func($this->checkIgnore, $isUncaught, $toLog, $payload)) {
+                $ok = ($this->checkIgnore)($isUncaught, $toLog, $payload);
+                if ($ok) {
                     $this->verboseLogger()->info('Occurrence ignored due to custom check_ignore logic');
                     return true;
                 }
