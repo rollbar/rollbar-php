@@ -25,7 +25,7 @@ abstract class AbstractHandler
         return $this->registered;
     }
     
-    public function handle()
+    public function handle(...$args)
     {
         if (!$this->registered()) {
             throw new \Exception(get_class($this) . ' has not been set up.');
