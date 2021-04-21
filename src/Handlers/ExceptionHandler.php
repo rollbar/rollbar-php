@@ -33,6 +33,6 @@ class ExceptionHandler extends AbstractHandler
 
         // otherwise we overrode a previous handler, so restore it and call it
         restore_exception_handler();
-        return ($this->previousHandler)($exception);
+        ($this->previousHandler)($exception);
     }
 }
