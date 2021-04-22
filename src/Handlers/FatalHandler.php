@@ -21,14 +21,10 @@ class FatalHandler extends AbstractHandler
         parent::register();
     }
     
-    public function handle()
+    public function handle(...$args)
     {
+        parent::handle(...$args);
         
-        parent::handle();
-        
-        if (is_null($this->logger())) {
-            return;
-        }
         $lastError = error_get_last();
         
         if ($this->isFatal($lastError)) {
@@ -56,7 +52,7 @@ class FatalHandler extends AbstractHandler
     protected function isFatal($lastError)
     {
         return
-            !is_null($lastError) &&
+            null !== $lastError &&
             in_array($lastError['type'], self::$fatalErrors, true) &&
             // don't log uncaught exceptions as they were handled by exceptionHandler()
             !(isset($lastError['message']) &&
