@@ -42,7 +42,7 @@ class AgentSender implements SenderInterface
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function sendBatch($batch, $accessToken)
+    public function sendBatch(array $batch, $accessToken): void
     {
         if (empty($this->agentLog)) {
             $this->loadAgentFile();

@@ -85,13 +85,12 @@ class FluentSender implements SenderInterface
         return new Response($status, $info, $uuid);
     }
 
-    public function sendBatch($batch, $accessToken)
+    public function sendBatch(array $batch, $accessToken, &$responses = array ()): void
     {
         $responses = array();
         foreach ($batch as $payload) {
             $responses[] = $this->send($payload, $accessToken);
         }
-        return $responses;
     }
 
     /**

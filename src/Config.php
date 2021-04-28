@@ -1024,7 +1024,7 @@ class Config
         return $response;
     }
 
-    public function sendBatch(&$batch, $accessToken)
+    public function sendBatch(array $batch, $accessToken): ?Response
     {
         if ($this->transmitting()) {
             return $this->sender->sendBatch($batch, $accessToken);
