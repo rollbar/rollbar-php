@@ -1,16 +1,13 @@
 <?php namespace Rollbar\Payload;
 
+use Rollbar\UtilitiesTrait;
+
 class Context implements \Serializable
 {
-    private $pre;
-    private $post;
-    private $utilities;
+    use UtilitiesTrait;
 
-    public function __construct($pre, $post)
+    public function __construct(private $pre, private $post)
     {
-        $this->utilities = new \Rollbar\Utilities();
-        $this->setPre($pre);
-        $this->setPost($post);
     }
 
     public function getPre()
@@ -42,9 +39,7 @@ class Context implements \Serializable
             "post" => $this->post,
         );
         
-        $objectHashes = \Rollbar\Utilities::getObjectHashes();
-        
-        return $this->utilities->serializeForRollbar($result, null, $objectHashes);
+        return $this->utilities()->serializeForRollbarInternal($result);
     }
     
     public function unserialize(string $serialized)

@@ -87,12 +87,25 @@ class Rollbar
         return self::$logger->scope($config);
     }
 
-    public static function log($level, $toLog, $extra = array(), $isUncaught = false)
+    public static function log($level, $toLog, $extra = array())
     {
         if (is_null(self::$logger)) {
             return self::getNotInitializedResponse();
         }
-        return self::$logger->log($level, $toLog, (array)$extra, $isUncaught);
+        return self::$logger->log($level, $toLog, (array)$extra);
+    }
+
+    /**
+     * @since 3.0.0
+     */
+    public static function logUncaught($level, Throwable $toLog, $extra = array())
+    {
+        if (is_null(self::$logger)) {
+            return self::getNotInitializedResponse();
+        }
+        $toLog->isUncaught = true;
+        return self::$logger->log($level, $toLog, (array)$extra);
+        unset($toLog->isUncaught);
     }
     
     public static function debug($toLog, $extra = array())

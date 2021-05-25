@@ -1,17 +1,19 @@
 <?php namespace Rollbar\Payload;
 
+use Rollbar\UtilitiesTrait;
+
 class Server implements \Serializable
 {
+    use UtilitiesTrait;
+
     private $host;
     private $root;
     private $branch;
     private $codeVersion;
     private $extra = array();
-    private $utilities;
 
     public function __construct()
     {
-        $this->utilities = new \Rollbar\Utilities();
     }
 
     public function getHost()
@@ -85,9 +87,7 @@ class Server implements \Serializable
             $result[$key] = $val;
         }
         
-        $objectHashes = \Rollbar\Utilities::getObjectHashes();
-        
-        return $this->utilities->serializeForRollbar($result, array_keys($this->extra), $objectHashes);
+        return $this->utilities()->serializeForRollbarInternal($result, array_keys($this->extra));
     }
     
     public function unserialize(string $serialized)

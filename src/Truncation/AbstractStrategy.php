@@ -4,11 +4,8 @@ use \Rollbar\Payload\EncodedPayload;
 
 class AbstractStrategy implements IStrategy
 {
-    protected $truncation;
-    
-    public function __construct($truncation)
+    public function __construct(protected $truncation)
     {
-        $this->truncation = $truncation;
     }
     
     public function execute(EncodedPayload $payload)

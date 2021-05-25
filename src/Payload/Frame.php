@@ -1,20 +1,20 @@
 <?php namespace Rollbar\Payload;
 
+use Rollbar\UtilitiesTrait;
+
 class Frame implements \Serializable
 {
-    private $filename;
+    use UtilitiesTrait;
+
     private $lineno;
     private $colno;
     private $method;
     private $code;
     private $context;
     private $args;
-    private $utilities;
 
-    public function __construct($filename)
+    public function __construct(private $filename)
     {
-        $this->utilities = new \Rollbar\Utilities();
-        $this->setFilename($filename);
     }
 
     public function getFilename()
@@ -106,9 +106,7 @@ class Frame implements \Serializable
             "args" => $this->args
         );
         
-        $objectHashes = \Rollbar\Utilities::getObjectHashes();
-        
-        return $this->utilities->serializeForRollbar($result, null, $objectHashes);
+        return $this->utilities()->serializeForRollbarInternal($result);
     }
     
     public function unserialize(string $serialized)

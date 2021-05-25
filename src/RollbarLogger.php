@@ -1,5 +1,6 @@
 <?php namespace Rollbar;
 
+use Throwable;
 use Psr\Log\AbstractLogger;
 use Rollbar\Payload\Payload;
 use Rollbar\Payload\Level;
@@ -81,7 +82,7 @@ class RollbarLogger extends AbstractLogger
         return $this->config->getCustom();
     }
 
-    public function log($level, $toLog, array $context = array(), $isUncaught = false)
+    public function log($level, $toLog, array $context = array())
     {
         if ($this->disabled()) {
             $this->verboseLogger()->notice('Rollbar is disabled');
@@ -104,6 +105,7 @@ class RollbarLogger extends AbstractLogger
         $accessToken = $this->getAccessToken();
         $payload = $this->getPayload($accessToken, $level, $toLog, $context);
         
+        $isUncaught = $this->isUncaughtLogData($toLog);
         if ($this->config->checkIgnored($payload, $accessToken, $toLog, $isUncaught)) {
             $this->verboseLogger()->info('Occurrence ignored');
             $response = new Response(0, "Ignored");
@@ -253,5 +255,21 @@ class RollbarLogger extends AbstractLogger
         $encoded = new EncodedPayload($payload);
         $encoded->encode();
         return $encoded;
+    }
+
+    /**
+     * Check whether the data to log represents an uncaught error, exception,
+     * or fatal error. This works in concert with src/Handlers/, which sets
+     * the `isUncaught` property on the `Throwable` representation of data.
+     */
+    protected function isUncaughtLogData(mixed $toLog): bool
+    {
+        if (! $toLog instanceof Throwable) {
+            return false;
+        }
+        if (! isset($toLog->isUncaught)) {
+            return false;
+        }
+        return $toLog->isUncaught === true;
     }
 }

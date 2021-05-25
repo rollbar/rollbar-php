@@ -5,19 +5,19 @@ namespace Rollbar\Senders;
 use Rollbar\Response;
 use Rollbar\Payload\Payload;
 use Rollbar\Payload\EncodedPayload;
+use Rollbar\UtilitiesTrait;
 
 class AgentSender implements SenderInterface
 {
-    private $utilities;
+    use UtilitiesTrait;
     private $agentLog;
     private $agentLogLocation;
 
     public function __construct($opts)
     {
         $this->agentLogLocation = \Rollbar\Defaults::get()->agentLogLocation();
-        $this->utilities = new \Rollbar\Utilities();
         if (array_key_exists('agentLogLocation', $opts)) {
-            $this->utilities->validateString($opts['agentLogLocation'], 'opts["agentLogLocation"]', null, false);
+            $this->utilities()->validateString($opts['agentLogLocation'], 'opts["agentLogLocation"]', null, false);
             $this->agentLogLocation = $opts['agentLogLocation'];
         }
     }

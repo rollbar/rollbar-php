@@ -4,11 +4,6 @@ final class Utilities
 {
     private static $ObjectHashes;
     
-    public static function getObjectHashes()
-    {
-        return self::$ObjectHashes;
-    }
-    
     public static function isWindows()
     {
         return php_uname('s') == 'Windows NT';
@@ -75,6 +70,15 @@ final class Utilities
         if (!is_null($maxValue) && $input > $maxValue) {
             throw new \InvalidArgumentException("\$$name must be <= $maxValue");
         }
+    }
+
+    /**
+     * Serialize all, or the given keys, from the given object and store it
+     * in this class's internal store (see self::$ObjectHashes).
+     */
+    public static function serializeForRollbarInternal($obj, array $customKeys = null)
+    {
+        return self::serializeForRollbar($obj, $customKeys, self::$ObjectHashes);
     }
 
     public static function serializeForRollbar(

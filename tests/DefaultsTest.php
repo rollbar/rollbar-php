@@ -15,7 +15,7 @@ class DefaultsTest extends BaseRollbarTest
 
     public function setUp(): void
     {
-        $this->defaults = new Defaults(new Utilities());
+        $this->defaults = new Defaults;
     }
 
     public function testGet()
@@ -90,7 +90,7 @@ class DefaultsTest extends BaseRollbarTest
     public function testServerRoot()
     {
         $_ENV["HEROKU_APP_DIR"] = "abc123";
-        $defaults = new Defaults(new Utilities);
+        $defaults = new Defaults;
         $this->assertEquals("abc123", $defaults->serverRoot());
     }
 

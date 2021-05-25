@@ -45,16 +45,10 @@ class Level implements \Serializable
         return $level;
     }
 
-    /**
-     * @var string
-     */
-    private $level;
-    private $val;
-
-    public function __construct($level, $val)
-    {
-        $this->level = $level;
-        $this->val = $val;
+    public function __construct(
+        private $level,
+        private $val
+    ) {
     }
 
     public function __toString()

@@ -57,13 +57,13 @@ composer:
 
 ```sh
 # for PHP 8 compatibility
-$ composer require rollbar/rollbar-php:dev-master
+$ composer require rollbar/rollbar:dev-master
 
 # for PHP 7 compatibility
-$ composer require rollbar/rollbar-php:^2
+$ composer require rollbar/rollbar:^2
 
 # for PHP 5 compatibility
-$ composer require rollbar/rollbar-php:^1
+$ composer require rollbar/rollbar:^1
 ```
 
 Refer to [CHANGELOG.md] for a complete history.

@@ -1,11 +1,12 @@
 <?php namespace Rollbar\Payload;
 
 use Rollbar\Defaults;
+use Rollbar\UtilitiesTrait;
 
 class Data implements \Serializable
 {
-    private $environment;
-    private $body;
+    use UtilitiesTrait;
+
     private $level;
     private $timestamp;
     private $codeVersion;
@@ -21,13 +22,9 @@ class Data implements \Serializable
     private $title;
     private $uuid;
     private $notifier;
-    private $utilities;
 
-    public function __construct($environment, Body $body)
+    public function __construct(private $environment, private Body $body)
     {
-        $this->utilities = new \Rollbar\Utilities();
-        $this->setEnvironment($environment);
-        $this->setBody($body);
     }
 
     public function getEnvironment()
@@ -251,9 +248,7 @@ class Data implements \Serializable
             "notifier" => $this->notifier,
         );
         
-        $objectHashes = \Rollbar\Utilities::getObjectHashes();
-        
-        return $this->utilities->serializeForRollbar($result, null, $objectHashes);
+        return $this->utilities()->serializeForRollbarInternal($result);
     }
     
     public function unserialize(string $serialized)

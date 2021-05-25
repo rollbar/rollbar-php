@@ -6,7 +6,6 @@ use Rollbar\Payload\Level;
 
 class ExceptionHandler extends AbstractHandler
 {
-    
     public function register()
     {
         $this->previousHandler = set_exception_handler(array($this, 'handle'));
@@ -14,31 +13,26 @@ class ExceptionHandler extends AbstractHandler
         parent::register();
     }
     
-    public function handle()
+    public function handle(...$args)
     {
-        parent::handle();
-        
-        /**
-         * Overloading methods with different parameters is not supported in PHP
-         * through language structures. This hack allows to simulate that.
-         */
-        $args = func_get_args();
-        
-        if (!isset($args[0])) {
+        parent::handle(...$args);
+
+        if (count($args) < 1) {
             throw new \Exception('No exception to be passed to the exception handler.');
         }
         
         $exception = $args[0];
+        $exception->isUncaught = true;
+        $this->logger()->log(Level::ERROR, $exception, array());
+        unset($exception->isUncaught);
         
-        $this->logger()->log(Level::ERROR, $exception, array(), true);
-        
-        if ($this->previousHandler) {
-            restore_exception_handler();
-            call_user_func($this->previousHandler, $exception);
-            return;
+        // if there was no prior handler, then we toss that exception
+        if ($this->previousHandler === null) {
+            throw $exception;
         }
 
-
-        throw $exception;
+        // otherwise we overrode a previous handler, so restore it and call it
+        restore_exception_handler();
+        ($this->previousHandler)($exception);
     }
 }
