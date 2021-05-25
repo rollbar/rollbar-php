@@ -32,10 +32,13 @@ class ResponseTest extends BaseRollbarTest
         $this->assertFalse($response->wasSuccessful());
     }
 
-    public function testUrl()
+    /**
+     * @testWith ["abc123", "https://rollbar.com/occurrence/uuid/?uuid=abc123"]
+     *           ["a bar", "https://rollbar.com/occurrence/uuid/?uuid=a+bar"]
+     */
+    public function testUrl(string $uuid, string $expectedOccurrenceUrl)
     {
-        $expected = "https://rollbar.com/occurrence/uuid/?uuid=abc123";
-        $response = new Response(200, "fake", "abc123");
-        $this->assertEquals($expected, $response->getOccurrenceUrl());
+        $response = new Response(200, "fake", $uuid);
+        $this->assertEquals($expectedOccurrenceUrl, $response->getOccurrenceUrl());
     }
 }

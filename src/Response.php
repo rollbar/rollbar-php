@@ -37,7 +37,7 @@ class Response
         if (!$this->wasSuccessful()) {
             return null;
         }
-        return "https://rollbar.com/occurrence/uuid/?uuid=" . $this->uuid;
+        return "https://rollbar.com/occurrence/uuid/?uuid=" . urlencode($this->uuid);
     }
 
     public function __toString()
