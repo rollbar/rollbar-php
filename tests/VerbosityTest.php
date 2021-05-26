@@ -2,7 +2,9 @@
 
 namespace Rollbar;
 
-use \Rollbar\Payload\Level as Level;
+use Rollbar\Payload\Level;
+use Rollbar\Payload\Payload;
+use Rollbar\Response;
 
 /**
  * \Rollbar\VerboseTest tests the verbosity of the SDK.
@@ -816,10 +818,10 @@ class VerbosityTest extends BaseRollbarTest
             $config,
             function () use ($config, $unitTest) {
             // logic under test
-                $payloadMock = $unitTest->getMockBuilder('\Rollbar\Payload')
+                $payloadMock = $unitTest->getMockBuilder(Payload::class)
                     ->disableOriginalConstructor()
                     ->getMock();
-                $responseMock = $unitTest->getMockBuilder('\Rollbar\Response')
+                $responseMock = $unitTest->getMockBuilder(Response::class)
                     ->disableOriginalConstructor()
                     ->getMock();
                 $config->handleResponse($payloadMock, $responseMock);
