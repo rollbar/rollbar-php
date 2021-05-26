@@ -113,7 +113,7 @@ class ConfigTest extends BaseRollbarTest
                         );
         $senderMock = $this->getMockBuilder('\Rollbar\Senders\SenderInterface')
                         ->getMock();
-        $senderMock->method('send')->willReturn(true);
+        $senderMock->method('send')->willReturn(null);
 
         $payload = new \Rollbar\Payload\EncodedPayload(array('data'=>array()));
         $payload->encode();
@@ -293,7 +293,7 @@ class ConfigTest extends BaseRollbarTest
         $transformer = m::mock("Rollbar\TransformerInterface");
         $transformer->shouldReceive('transform')
             ->once()
-            ->with($p, "error", "message", "extra_data")
+            ->with($p, "error", "message", [ "extra_data" ])
             ->andReturn($pPrime)
             ->mock();
         $config = new Config(array(
@@ -301,7 +301,7 @@ class ConfigTest extends BaseRollbarTest
             "environment" => $this->env,
             "transformer" => $transformer
         ));
-        $this->assertEquals($pPrime, $config->transform($p, "error", "message", "extra_data"));
+        $this->assertEquals($pPrime, $config->transform($p, "error", "message", [ "extra_data" ]));
     }
 
     public function testMinimumLevel()
@@ -330,12 +330,12 @@ class ConfigTest extends BaseRollbarTest
     
     public function assertPayloadIgnored($config, $payload)
     {
-        $this->assertTrue($config->checkIgnored($payload, null, $this->error, false));
+        $this->assertTrue($config->checkIgnored($payload, 'access-token', $this->error, false));
     }
     
     public function assertPayloadNotIgnored($config, $payload)
     {
-        $this->assertFalse($config->checkIgnored($payload, null, $this->error, false));
+        $this->assertFalse($config->checkIgnored($payload, 'access-token', $this->error, false));
     }
     
     private function prepareMockPayload($level)

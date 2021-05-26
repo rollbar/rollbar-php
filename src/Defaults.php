@@ -1,4 +1,6 @@
-<?php namespace Rollbar;
+<?php declare(strict_types=1);
+
+namespace Rollbar;
 
 use Monolog\Logger;
 use Rollbar\Payload\Notifier;

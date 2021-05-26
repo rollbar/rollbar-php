@@ -1,4 +1,6 @@
-<?php namespace Rollbar\Handlers;
+<?php declare(strict_types=1);
+
+namespace Rollbar\Handlers;
 
 use Rollbar\Rollbar;
 use Rollbar\RollbarLogger;

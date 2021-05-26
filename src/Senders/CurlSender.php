@@ -1,4 +1,6 @@
-<?php namespace Rollbar\Senders;
+<?php declare(strict_types=1);
+
+namespace Rollbar\Senders;
 
 /**
  * Adapted from:
@@ -78,7 +80,7 @@ class CurlSender implements SenderInterface
         return new Response($statusCode, $result, $uuid);
     }
 
-    public function sendBatch($batch, $accessToken)
+    public function sendBatch(array $batch, $accessToken): void
     {
         if ($this->multiHandle === null) {
             $this->multiHandle = curl_multi_init();

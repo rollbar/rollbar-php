@@ -1,4 +1,6 @@
-<?php
+<?php declare(strict_types=1);
+
+
 
 namespace Rollbar\Senders;
 
@@ -40,7 +42,7 @@ class AgentSender implements SenderInterface
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function sendBatch($batch, $accessToken)
+    public function sendBatch(array $batch, $accessToken): void
     {
         if (empty($this->agentLog)) {
             $this->loadAgentFile();
