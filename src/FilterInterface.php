@@ -4,5 +4,5 @@ namespace Rollbar;
 
 interface FilterInterface
 {
-    public function shouldSend($payload, $accessToken);
+    public function shouldSend($payload, string $accessToken);
 }

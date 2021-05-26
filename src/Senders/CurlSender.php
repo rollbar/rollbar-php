@@ -60,7 +60,7 @@ class CurlSender implements SenderInterface
         return $this->endpoint;
     }
 
-    public function send(EncodedPayload $payload, $accessToken)
+    public function send(EncodedPayload $payload, string $accessToken)
     {
         $handle = curl_init();
 
@@ -80,7 +80,7 @@ class CurlSender implements SenderInterface
         return new Response($statusCode, $result, $uuid);
     }
 
-    public function sendBatch(array $batch, $accessToken): void
+    public function sendBatch(array $batch, string $accessToken): void
     {
         if ($this->multiHandle === null) {
             $this->multiHandle = curl_multi_init();
@@ -95,7 +95,7 @@ class CurlSender implements SenderInterface
         $this->checkForCompletedRequests($accessToken);
     }
 
-    public function wait($accessToken, $max = 0)
+    public function wait(string $accessToken, int $max = 0)
     {
         if (count($this->inflightRequests) <= $max) {
             return;
@@ -109,7 +109,7 @@ class CurlSender implements SenderInterface
         }
     }
 
-    private function maybeSendMoreBatchRequests($accessToken)
+    private function maybeSendMoreBatchRequests(string $accessToken)
     {
         $max = $this->maxBatchRequests - count($this->inflightRequests);
         if ($max <= 0) {
@@ -128,7 +128,7 @@ class CurlSender implements SenderInterface
         $this->batchRequests = array_slice($this->batchRequests, $idx);
     }
 
-    public function setCurlOptions($handle, EncodedPayload $payload, $accessToken)
+    public function setCurlOptions($handle, EncodedPayload $payload, string $accessToken)
     {
         curl_setopt($handle, CURLOPT_URL, $this->endpoint);
         curl_setopt($handle, CURLOPT_POST, true);
@@ -156,7 +156,7 @@ class CurlSender implements SenderInterface
         }
     }
 
-    private function checkForCompletedRequests($accessToken)
+    private function checkForCompletedRequests(string $accessToken)
     {
         do {
             $curlResponse = curl_multi_exec($this->multiHandle, $active);
@@ -173,7 +173,7 @@ class CurlSender implements SenderInterface
         $this->removeFinishedRequests($accessToken);
     }
 
-    private function removeFinishedRequests($accessToken)
+    private function removeFinishedRequests(string $accessToken)
     {
         while ($info = curl_multi_info_read($this->multiHandle)) {
             $handle = $info['handle'];

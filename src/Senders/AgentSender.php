@@ -27,7 +27,7 @@ class AgentSender implements SenderInterface
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function send(EncodedPayload $payload, $accessToken)
+    public function send(EncodedPayload $payload, string $accessToken)
     {
         if (empty($this->agentLog)) {
             $this->loadAgentFile();
@@ -42,7 +42,7 @@ class AgentSender implements SenderInterface
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function sendBatch(array $batch, $accessToken): void
+    public function sendBatch(array $batch, string $accessToken): void
     {
         if (empty($this->agentLog)) {
             $this->loadAgentFile();
@@ -55,7 +55,7 @@ class AgentSender implements SenderInterface
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function wait($accessToken, $max)
+    public function wait(string $accessToken, int $max)
     {
         return;
     }

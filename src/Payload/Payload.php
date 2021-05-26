@@ -10,30 +10,30 @@ class Payload implements \Serializable
 {
     use UtilitiesTrait;
 
-    public function __construct(private Data $data, private $accessToken)
+    public function __construct(private Data $data, private string $accessToken)
     {
     }
 
     /**
      * @return Data
      */
-    public function getData()
+    public function getData(): Data
     {
         return $this->data;
     }
 
-    public function setData(Data $data)
+    public function setData(Data $data): self
     {
         $this->data = $data;
         return $this;
     }
 
-    public function getAccessToken()
+    public function getAccessToken(): string
     {
         return $this->accessToken;
     }
 
-    public function setAccessToken($accessToken)
+    public function setAccessToken(string $accessToken): self
     {
         $this->accessToken = $accessToken;
         return $this;
