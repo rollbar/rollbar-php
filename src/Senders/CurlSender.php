@@ -7,6 +7,7 @@ namespace Rollbar\Senders;
  * https://github.com/segmentio/analytics-php/blob/master/lib/Segment/Consumer/Socket.php
  */
 
+use CurlHandle;
 use Rollbar\Response;
 use Rollbar\Payload\Payload;
 use Rollbar\Payload\EncodedPayload;
@@ -128,7 +129,7 @@ class CurlSender implements SenderInterface
         $this->batchRequests = array_slice($this->batchRequests, $idx);
     }
 
-    public function setCurlOptions($handle, EncodedPayload $payload, string $accessToken)
+    public function setCurlOptions(CurlHandle $handle, EncodedPayload $payload, string $accessToken)
     {
         curl_setopt($handle, CURLOPT_URL, $this->endpoint);
         curl_setopt($handle, CURLOPT_POST, true);
