@@ -8,7 +8,6 @@ use Rollbar\Payload\Payload;
 use Rollbar\Payload\Level;
 use Rollbar\Truncation\Truncation;
 use Monolog\Logger as MonologLogger;
-use Monolog\Handler\StreamHandler;
 use Rollbar\Payload\EncodedPayload;
 
 class RollbarLogger extends AbstractLogger
