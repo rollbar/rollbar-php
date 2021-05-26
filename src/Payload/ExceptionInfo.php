@@ -9,40 +9,40 @@ class ExceptionInfo implements \Serializable
     use UtilitiesTrait;
 
     public function __construct(
-        private $class,
-        private $message,
-        private $description = null
+        private string $class,
+        private string $message,
+        private ?string $description = null
     ) {
     }
 
-    public function getClass()
+    public function getClass(): string
     {
         return $this->class;
     }
 
-    public function setClass($class)
+    public function setClass(string $class): self
     {
         $this->class = $class;
         return $this;
     }
 
-    public function getMessage()
+    public function getMessage(): string
     {
         return $this->message;
     }
 
-    public function setMessage($message)
+    public function setMessage(string $message): self
     {
         $this->message = $message;
         return $this;
     }
 
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    public function setDescription($description)
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
         return $this;

@@ -14,24 +14,24 @@ class Body implements \Serializable
     ) {
     }
 
-    public function getValue()
+    public function getValue(): ContentInterface
     {
         return $this->value;
     }
 
-    public function setValue(ContentInterface $value)
+    public function setValue(ContentInterface $value): self
     {
         $this->value = $value;
         return $this;
     }
     
-    public function setExtra(array $extra)
+    public function setExtra(array $extra): self
     {
         $this->extra = $extra;
         return $this;
     }
     
-    public function getExtra()
+    public function getExtra(): array
     {
         return $this->extra;
     }

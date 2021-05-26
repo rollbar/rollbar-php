@@ -8,27 +8,27 @@ class Context implements \Serializable
 {
     use UtilitiesTrait;
 
-    public function __construct(private $pre, private $post)
+    public function __construct(private ?array $pre, private ?array $post)
     {
     }
 
-    public function getPre()
+    public function getPre(): ?array
     {
         return $this->pre;
     }
 
-    public function setPre($pre)
+    public function setPre(array $pre): self
     {
         $this->pre = $pre;
         return $this;
     }
 
-    public function getPost()
+    public function getPost(): ?array
     {
         return $this->post;
     }
 
-    public function setPost($post)
+    public function setPost(array $post): self
     {
         $this->post = $post;
         return $this;

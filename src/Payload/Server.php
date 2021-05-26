@@ -8,73 +8,75 @@ class Server implements \Serializable
 {
     use UtilitiesTrait;
 
-    private $host;
-    private $root;
-    private $branch;
-    private $codeVersion;
-    private $extra = array();
+    private ?string $host = null;
+    private ?string $root = null;
+    private ?string $branch = null;
+    private ?string $codeVersion = null;
+    private array $extra = array();
 
     public function __construct()
     {
     }
 
-    public function getHost()
+    public function getHost(): ?string
     {
         return $this->host;
     }
 
-    public function setHost($host)
+    public function setHost(?string $host): self
     {
         $this->host = $host;
         return $this;
     }
 
-    public function getRoot()
+    public function getRoot(): ?string
     {
         return $this->root;
     }
 
-    public function setRoot($root)
+    public function setRoot(?string $root): self
     {
         $this->root = $root;
         return $this;
     }
 
-    public function getBranch()
+    public function getBranch(): ?string
     {
         return $this->branch;
     }
 
-    public function setBranch($branch)
+    public function setBranch(?string $branch): self
     {
         $this->branch = $branch;
         return $this;
     }
 
-    public function getCodeVersion()
+    public function getCodeVersion(): ?string
     {
         return $this->codeVersion;
     }
 
-    public function setCodeVersion($codeVersion)
+    public function setCodeVersion(?string $codeVersion): self
     {
         $this->codeVersion = $codeVersion;
         return $this;
     }
 
-    public function setExtras($extras)
+    public function setExtras(array $extras): self
     {
         $this->extra = $extras;
+        return $this;
     }
 
-    public function getExtras()
+    public function getExtras(): array
     {
         return $this->extra;
     }
 
-    public function setArgv($argv)
+    public function setArgv(array $argv): self
     {
         $this->extra['argv'] = $argv;
+        return $this;
     }
 
     public function serialize()

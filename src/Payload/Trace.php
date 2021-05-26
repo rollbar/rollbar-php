@@ -14,28 +14,28 @@ class Trace implements ContentInterface
     ) {
     }
 
-    public function getKey()
+    public function getKey(): string
     {
         return 'trace';
     }
 
-    public function getFrames()
+    public function getFrames(): array
     {
         return $this->frames;
     }
 
-    public function setFrames(array $frames)
+    public function setFrames(array $frames): self
     {
         $this->frames = $frames;
         return $this;
     }
 
-    public function getException()
+    public function getException(): ExceptionInfo
     {
         return $this->exception;
     }
 
-    public function setException(ExceptionInfo $exception)
+    public function setException(ExceptionInfo $exception): self
     {
         $this->exception = $exception;
         return $this;

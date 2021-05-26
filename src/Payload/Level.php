@@ -48,8 +48,8 @@ class Level implements \Serializable
     }
 
     public function __construct(
-        private $level,
-        private $val
+        private string $level,
+        private int $val
     ) {
     }
 
@@ -58,7 +58,7 @@ class Level implements \Serializable
         return $this->level;
     }
 
-    public function toInt()
+    public function toInt(): int
     {
         return $this->val;
     }
