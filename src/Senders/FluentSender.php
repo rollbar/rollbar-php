@@ -69,7 +69,7 @@ class FluentSender implements SenderInterface
      * @SuppressWarnings(PHPMD.UnusedFormalParameter) Unused parameter is
      * intended here to comply with SenderInterface
      */
-    public function send(EncodedPayload $payload, string $accessToken)
+    public function send(EncodedPayload $payload, string $accessToken): Response
     {
         if (empty($this->fluentLogger)) {
             $this->loadFluentLogger();

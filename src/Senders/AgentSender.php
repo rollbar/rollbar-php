@@ -27,7 +27,7 @@ class AgentSender implements SenderInterface
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function send(EncodedPayload $payload, string $accessToken)
+    public function send(EncodedPayload $payload, string $accessToken): Response
     {
         if (empty($this->agentLog)) {
             $this->loadAgentFile();
