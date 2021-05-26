@@ -783,7 +783,7 @@ class VerbosityTest extends BaseRollbarTest
             function () use ($config) {
             // logic under test
                 $batch = array();
-                $config->sendBatch($batch, null);
+                $config->sendBatch($batch, 'access-token');
             },
             function () use ($unitTest) {
             // verbosity expectations

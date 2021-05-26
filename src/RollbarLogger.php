@@ -1,4 +1,6 @@
-<?php namespace Rollbar;
+<?php declare(strict_types=1);
+
+namespace Rollbar;
 
 use Throwable;
 use Psr\Log\AbstractLogger;
@@ -82,6 +84,11 @@ class RollbarLogger extends AbstractLogger
         return $this->config->getCustom();
     }
 
+    /**
+     * @param Level|string $level
+     * @param mixed $toLog
+     * @param array $context
+     */
     public function log($level, $toLog, array $context = array())
     {
         if ($this->disabled()) {
@@ -89,7 +96,14 @@ class RollbarLogger extends AbstractLogger
             return new Response(0, "Disabled");
         }
         
-        if (!$this->levelFactory->isValidLevel($level)) {
+        // Convert a Level proper into a string proper, as the code paths that
+        // follow have allowed both only by virtue that a Level downcasts to a
+        // string. With strict types, that no longer happens. We should consider
+        // tightening the boundary so that we convert from string to Level
+        // enum here, and work with Level enum through protected level.
+        if ($level instanceof Level) {
+            $level = (string)$level;
+        } elseif (!$this->levelFactory->isValidLevel($level)) {
             $exception = new \Psr\Log\InvalidArgumentException("Invalid log level '$level'.");
             $this->verboseLogger()->error($exception->getMessage());
             throw $exception;
@@ -140,7 +154,7 @@ class RollbarLogger extends AbstractLogger
         return $response;
     }
 
-    public function flush()
+    public function flush(): ?Response
     {
         if ($this->getQueueSize() > 0) {
             $batch = $this->queue;
@@ -151,7 +165,7 @@ class RollbarLogger extends AbstractLogger
         return new Response(0, "Queue empty");
     }
 
-    public function flushAndWait()
+    public function flushAndWait(): void
     {
         $this->flush();
         $this->config->wait($this->getAccessToken());
@@ -162,12 +176,12 @@ class RollbarLogger extends AbstractLogger
         return $this->config->shouldIgnoreError($errno);
     }
 
-    public function getQueueSize()
+    public function getQueueSize(): int
     {
         return count($this->queue);
     }
 
-    protected function send(\Rollbar\Payload\EncodedPayload $payload, $accessToken)
+    protected function send(EncodedPayload $payload, $accessToken): Response
     {
         if ($this->reportCount >= $this->config->getMaxItems()) {
             $response = new Response(
