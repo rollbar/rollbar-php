@@ -8,17 +8,17 @@ class TraceChain implements ContentInterface
     {
     }
 
-    public function getKey()
+    public function getKey(): string
     {
         return 'trace_chain';
     }
 
-    public function getTraces()
+    public function getTraces(): array
     {
         return $this->traces;
     }
 
-    public function setTraces($traces)
+    public function setTraces(array $traces): self
     {
         $this->traces = $traces;
         return $this;

@@ -15,41 +15,41 @@ class Person implements \Serializable
     use UtilitiesTrait;
 
     public function __construct(
-        private $id,
-        private $username = null,
-        private $email = null,
+        private string $id,
+        private ?string $username = null,
+        private ?string $email = null,
         private array $extra = []
     ) {
     }
 
-    public function getId()
+    public function getId(): string
     {
         return $this->id;
     }
 
-    public function setId($id)
+    public function setId(string $id): self
     {
         $this->id = $id;
         return $this;
     }
 
-    public function getUsername()
+    public function getUsername(): ?string
     {
         return $this->username;
     }
 
-    public function setUsername($username)
+    public function setUsername(?string $username): self
     {
         $this->username = $username;
         return $this;
     }
 
-    public function getEmail()
+    public function getEmail(): ?string
     {
         return $this->email;
     }
 
-    public function setEmail($email)
+    public function setEmail(?string $email): self
     {
         $this->email = $email;
         return $this;
@@ -57,7 +57,7 @@ class Person implements \Serializable
 
     public function __get($name)
     {
-        return isset($this->extra[$name]) ? $this->extra[$name] : null;
+        return $this->extra[$name] ?? null;
     }
 
     public function __set($name, $val)

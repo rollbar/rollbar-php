@@ -2,7 +2,9 @@
 
 namespace Rollbar;
 
+use Rollbar\Payload\Payload;
+
 interface ResponseHandlerInterface
 {
-    public function handleResponse($payload, $response);
+    public function handleResponse(Payload $payload, mixed $response): void;
 }

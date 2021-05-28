@@ -2,7 +2,9 @@
 
 namespace Rollbar;
 
+use Rollbar\Payload\Payload;
+
 interface FilterInterface
 {
-    public function shouldSend($payload, string $accessToken);
+    public function shouldSend(Payload $payload, string $accessToken);
 }

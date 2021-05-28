@@ -61,7 +61,7 @@ class CurlSender implements SenderInterface
         return $this->endpoint;
     }
 
-    public function send(EncodedPayload $payload, string $accessToken)
+    public function send(EncodedPayload $payload, string $accessToken): Response
     {
         $handle = curl_init();
 

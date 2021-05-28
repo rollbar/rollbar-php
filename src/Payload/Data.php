@@ -9,220 +9,208 @@ class Data implements \Serializable
 {
     use UtilitiesTrait;
 
-    private $level;
-    private $timestamp;
-    private $codeVersion;
-    private $platform;
-    private $language;
-    private $framework;
-    private $context;
-    private $request;
-    private $person;
-    private $server;
-    private $custom;
-    private $fingerprint;
-    private $title;
-    private $uuid;
-    private $notifier;
+    private Level|string|null $level = null;
+    private ?int $timestamp = null;
+    private ?string $codeVersion = null;
+    private ?string $platform = null;
+    private ?string $language = null;
+    private ?string $framework = null;
+    private ?string $context = null;
+    private ?Request $request = null;
+    private ?Person $person = null;
+    private ?Server $server = null;
+    private ?array $custom = null;
+    private ?string $fingerprint = null;
+    private ?string $title = null;
+    private ?string $uuid = null;
+    private ?Notifier $notifier = null;
 
-    public function __construct(private $environment, private Body $body)
+    public function __construct(private string $environment, private Body $body)
     {
     }
 
-    public function getEnvironment()
+    public function getEnvironment(): string
     {
         return $this->environment;
     }
 
-    public function setEnvironment($environment)
+    public function setEnvironment(string $environment): self
     {
         $this->environment = $environment;
         return $this;
     }
 
-    public function getBody()
+    public function getBody(): Body
     {
         return $this->body;
     }
 
-    public function setBody(Body $body)
+    public function setBody(Body $body): self
     {
         $this->body = $body;
         return $this;
     }
 
-    /**
-     * @return Level
-     */
-    public function getLevel()
+    public function getLevel(): Level|string|null
     {
         return $this->level;
     }
 
-    public function setLevel($level)
+    public function setLevel(Level|string|null $level): self
     {
         $this->level = $level;
         return $this;
     }
 
-    public function getTimestamp()
+    public function getTimestamp(): ?int
     {
         return $this->timestamp;
     }
 
-    public function setTimestamp($timestamp)
+    public function setTimestamp(?int $timestamp): self
     {
         $this->timestamp = $timestamp;
         return $this;
     }
 
-    public function getCodeVersion()
+    public function getCodeVersion(): ?string
     {
         return $this->codeVersion;
     }
 
-    public function setCodeVersion($codeVersion)
+    public function setCodeVersion(?string $codeVersion): self
     {
         $this->codeVersion = $codeVersion;
         return $this;
     }
 
-    public function getPlatform()
+    public function getPlatform(): ?string
     {
         return $this->platform;
     }
 
-    public function setPlatform($platform)
+    public function setPlatform(?string $platform): self
     {
         $this->platform = $platform;
         return $this;
     }
 
-    public function getLanguage()
+    public function getLanguage(): ?string
     {
         return $this->language;
     }
 
-    public function setLanguage($language)
+    public function setLanguage(?string $language): self
     {
         $this->language = $language;
         return $this;
     }
 
-    public function getFramework()
+    public function getFramework(): ?string
     {
         return $this->framework;
     }
 
-    public function setFramework($framework)
+    public function setFramework(?string $framework): self
     {
         $this->framework = $framework;
         return $this;
     }
 
-    public function getContext()
+    public function getContext(): ?string
     {
         return $this->context;
     }
 
-    public function setContext($context)
+    public function setContext(?string $context): self
     {
         $this->context = $context;
         return $this;
     }
 
-    /**
-     * @return Request
-     */
-    public function getRequest()
+    public function getRequest(): ?Request
     {
         return $this->request;
     }
 
-    public function setRequest(Request $request = null)
+    public function setRequest(?Request $request = null): self
     {
         $this->request = $request;
         return $this;
     }
 
-    /**
-     * @return Person
-     */
-    public function getPerson()
+    public function getPerson(): ?Person
     {
         return $this->person;
     }
 
-    public function setPerson(Person $person = null)
+    public function setPerson(?Person $person = null): self
     {
         $this->person = $person;
         return $this;
     }
 
-    /**
-     * @return Server
-     */
-    public function getServer()
+    public function getServer(): ?Server
     {
         return $this->server;
     }
 
-    public function setServer(Server $server = null)
+    public function setServer(?Server $server = null): self
     {
         $this->server = $server;
         return $this;
     }
 
-    public function getCustom()
+    public function getCustom(): ?array
     {
         return $this->custom;
     }
 
-    public function setCustom(array $custom = null)
+    public function setCustom(?array $custom = null): self
     {
         $this->custom = $custom;
         return $this;
     }
 
-    public function getFingerprint()
+    public function getFingerprint(): ?string
     {
         return $this->fingerprint;
     }
 
-    public function setFingerprint($fingerprint)
+    public function setFingerprint(?string $fingerprint): self
     {
         $this->fingerprint = $fingerprint;
         return $this;
     }
 
-    public function getTitle()
+    public function getTitle(): ?string
     {
         return $this->title;
     }
 
-    public function setTitle($title)
+    public function setTitle(?string $title): self
     {
         $this->title = $title;
         return $this;
     }
 
-    public function getUuid()
+    public function getUuid(): ?string
     {
         return $this->uuid;
     }
 
-    public function setUuid($uuid)
+    public function setUuid(?string $uuid): self
     {
         $this->uuid = $uuid;
         return $this;
     }
 
-    public function getNotifier()
+    public function getNotifier(): ?Notifier
     {
         return $this->notifier;
     }
 
-    public function setNotifier(Notifier $notifier)
+    public function setNotifier(Notifier $notifier): self
     {
         $this->notifier = $notifier;
         return $this;

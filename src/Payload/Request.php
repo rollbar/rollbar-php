@@ -8,133 +8,135 @@ class Request implements \Serializable
 {
     use UtilitiesTrait;
 
-    private $url;
-    private $method;
-    private $headers;
-    private $params;
-    private $get;
-    private $queryString;
-    private $post;
-    private $body;
-    private $userIp;
-    private $extra = array();
+    private ?string $url = null;
+    private ?string $method = null;
+    private ?array $headers = null;
+    private ?array $params = null;
+    private ?array $get = null;
+    private ?string $queryString = null;
+    private ?array $post = null;
+    private ?string $body = null;
+    private ?string $userIp = null;
+    private array $extra = array();
 
     public function __construct()
     {
     }
 
-    public function getUrl()
+    public function getUrl(): ?string
     {
         return $this->url;
     }
 
-    public function setUrl($url)
+    public function setUrl(?string $url): self
     {
         $this->url = $url;
         return $this;
     }
 
-    public function getMethod()
+    public function getMethod(): ?string
     {
         return $this->method;
     }
 
-    public function setMethod($method)
+    public function setMethod(?string $method): self
     {
         $this->method = $method;
         return $this;
     }
 
-    public function getHeaders()
+    public function getHeaders(): ?array
     {
         return $this->headers;
     }
 
-    public function setHeaders(array $headers = null)
+    public function setHeaders(?array $headers = null): self
     {
         $this->headers = $headers;
         return $this;
     }
 
-    public function getParams()
+    public function getParams(): ?array
     {
         return $this->params;
     }
 
-    public function setParams(array $params = null)
+    public function setParams(?array $params = null): self
     {
         $this->params = $params;
         return $this;
     }
 
-    public function getGet()
+    public function getGet(): ?array
     {
         return $this->get;
     }
 
-    public function setGet(array $get = null)
+    public function setGet(?array $get = null): self
     {
         $this->get = $get;
         return $this;
     }
 
-    public function getQueryString()
+    public function getQueryString(): ?string
     {
         return $this->queryString;
     }
 
-    public function setQueryString($queryString)
+    public function setQueryString(?string $queryString): self
     {
         $this->queryString = $queryString;
         return $this;
     }
 
-    public function getPost()
+    public function getPost(): ?array
     {
         return $this->post;
     }
 
-    public function setPost(array $post = null)
+    public function setPost(?array $post = null): self
     {
         $this->post = $post;
         return $this;
     }
 
-    public function getBody()
+    public function getBody(): ?string
     {
         return $this->body;
     }
 
-    public function setBody($body)
+    public function setBody(?string $body): self
     {
         $this->body = $body;
         return $this;
     }
 
-    public function getUserIp()
+    public function getUserIp(): ?string
     {
         return $this->userIp;
     }
 
-    public function setUserIp($userIp)
+    public function setUserIp(?string $userIp): self
     {
         $this->userIp = $userIp;
         return $this;
     }
 
-    public function getExtras()
+    public function getExtras(): array
     {
         return $this->extra;
     }
 
-    public function setExtras($extras)
+    public function setExtras(array $extras): self
     {
         $this->extra = $extras;
+        return $this;
     }
 
-    public function setSession($session)
+    public function setSession(array $session): self
     {
         $this->extra['session'] = $session;
+        return $this;
     }
 
     public function serialize()

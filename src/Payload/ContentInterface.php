@@ -4,5 +4,5 @@ namespace Rollbar\Payload;
 
 interface ContentInterface extends \Serializable
 {
-    public function getKey();
+    public function getKey(): string;
 }

@@ -11,22 +11,22 @@ class EncodedPayload
     {
     }
     
-    public function data()
+    public function data(): array
     {
         return $this->data;
     }
     
-    public function size()
+    public function size(): int
     {
         return $this->size;
     }
     
-    public function decreaseSize($amount)
+    public function decreaseSize(int $amount): void
     {
         $this->size -= $amount;
     }
     
-    public function encode($data = null)
+    public function encode(?array $data = null): void
     {
         if ($data !== null) {
             $this->data = $data;
@@ -49,7 +49,7 @@ class EncodedPayload
         return (string)$this->encoded();
     }
     
-    public function encoded()
+    public function encoded(): ?string
     {
         return $this->encoded;
     }

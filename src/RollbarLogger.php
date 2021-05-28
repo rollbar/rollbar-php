@@ -236,7 +236,7 @@ class RollbarLogger extends AbstractLogger
         return $this->config->verboseLogger();
     }
 
-    protected function handleResponse($payload, $response)
+    protected function handleResponse(Payload $payload, mixed $response): void
     {
         $this->config->handleResponse($payload, $response);
     }
@@ -245,7 +245,7 @@ class RollbarLogger extends AbstractLogger
      * @param array $serializedPayload
      * @return array
      */
-    protected function scrub(array &$serializedPayload)
+    protected function scrub(array &$serializedPayload): array
     {
         $serializedPayload['data'] = $this->config->getScrubber()->scrub($serializedPayload['data']);
         return $serializedPayload;

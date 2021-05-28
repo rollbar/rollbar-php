@@ -855,7 +855,7 @@ class Config
         return false;
     }
 
-    public function internalCheckIgnored($level, $toLog)
+    public function internalCheckIgnored(string $level, mixed $toLog): bool
     {
         if ($this->shouldSuppress()) {
             $this->verboseLogger()->debug('Ignoring (error reporting has been disabled in PHP config)');
@@ -886,7 +886,7 @@ class Config
      *
      * @return bool
      */
-    public function shouldIgnoreError($errno): bool
+    public function shouldIgnoreError(int $errno): bool
     {
         if ($this->useErrorReporting && ($errno & error_reporting()) === 0) {
             // ignore due to error_reporting level
@@ -922,7 +922,7 @@ class Config
      *
      * @return bool
      */
-    protected function shouldIgnoreErrorWrapper(ErrorWrapper $toLog)
+    protected function shouldIgnoreErrorWrapper(ErrorWrapper $toLog): bool
     {
         return $this->shouldIgnoreError($toLog->errorLevel);
     }
@@ -935,7 +935,7 @@ class Config
      *
      * @return bool
      */
-    public function shouldIgnoreException(\Exception $toLog)
+    public function shouldIgnoreException(\Exception $toLog): bool
     {
         // get a float in the range [0, 1)
         // mt_rand() is inclusive, so add 1 to mt_randmax
@@ -957,7 +957,7 @@ class Config
      *
      * @return float
      */
-    public function exceptionSampleRate(\Exception $toLog)
+    public function exceptionSampleRate(\Exception $toLog): float
     {
         $sampleRate = 1.0;
         if (count($this->exceptionSampleRates) == 0) {
@@ -986,7 +986,7 @@ class Config
      * @param Payload $payload
      * @return bool
      */
-    private function payloadLevelTooLow($payload)
+    private function payloadLevelTooLow(Payload $payload): bool
     {
         return $this->levelTooLow($payload->getData()->getLevel());
     }
@@ -995,7 +995,7 @@ class Config
      * @param Level $level
      * @return bool
      */
-    private function levelTooLow($level): bool
+    private function levelTooLow(Level $level): bool
     {
         return $level->toInt() < $this->minimumLevel;
     }
@@ -1041,7 +1041,7 @@ class Config
         $this->sender->wait($accessToken, $max);
     }
 
-    public function handleResponse($payload, $response): void
+    public function handleResponse(Payload $payload, mixed $response): void
     {
         if (!is_null($this->responseHandler)) {
             $this->verboseLogger()->debug(

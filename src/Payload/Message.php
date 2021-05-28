@@ -9,33 +9,33 @@ class Message implements ContentInterface
     use UtilitiesTrait;
 
     public function __construct(
-        private $body,
-        private $backtrace = null
+        private string $body,
+        private ?array $backtrace = null
     ) {
     }
 
-    public function getKey()
+    public function getKey(): string
     {
         return 'message';
     }
 
-    public function getBody()
+    public function getBody(): string
     {
         return $this->body;
     }
 
-    public function setBody($body)
+    public function setBody(string $body): self
     {
         $this->body = $body;
         return $this;
     }
     
-    public function getBacktrace()
+    public function getBacktrace(): ?array
     {
         return $this->backtrace;
     }
 
-    public function setBacktrace($backtrace)
+    public function setBacktrace(?array $backtrace): self
     {
         $this->backtrace = $backtrace;
         return $this;
