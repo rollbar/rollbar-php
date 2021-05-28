@@ -181,7 +181,7 @@ class RollbarLogger extends AbstractLogger
         return count($this->queue);
     }
 
-    protected function send(EncodedPayload $payload, $accessToken): Response
+    protected function send(EncodedPayload $payload, string $accessToken): Response
     {
         if ($this->reportCount >= $this->config->getMaxItems()) {
             $response = new Response(
@@ -209,14 +209,14 @@ class RollbarLogger extends AbstractLogger
         return $this->config->send($payload, $accessToken);
     }
 
-    protected function getPayload($accessToken, $level, $toLog, $context)
+    protected function getPayload(string $accessToken, $level, $toLog, $context)
     {
         $data = $this->config->getRollbarData($level, $toLog, $context);
         $payload = new Payload($data, $accessToken);
         return $this->config->transform($payload, $level, $toLog, $context);
     }
 
-    protected function getAccessToken()
+    protected function getAccessToken(): string
     {
         return $this->config->getAccessToken();
     }

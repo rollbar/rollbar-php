@@ -7,8 +7,8 @@ use Rollbar\Payload\EncodedPayload;
 
 interface SenderInterface
 {
-    public function send(EncodedPayload $payload, $accessToken);
-    public function sendBatch(array $batch, $accessToken): void;
-    public function wait($accessToken, $max);
+    public function send(EncodedPayload $payload, string $accessToken);
+    public function sendBatch(array $batch, string $accessToken): void;
+    public function wait(string $accessToken, int $max);
     public function toString();
 }

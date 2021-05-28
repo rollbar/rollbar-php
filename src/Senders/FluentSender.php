@@ -62,14 +62,14 @@ class FluentSender implements SenderInterface
 
 
     /**
-     * @param \Rollbar\Payload\EncodedPayload $scrubbedPayload
-     * @param $accessToken
+     * @param \Rollbar\Payload\EncodedPayload $payload
+     * @param string $accessToken
      * @return Response
      *
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter) Unsued parameter is
-     * intended here to comply to SenderInterface
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter) Unused parameter is
+     * intended here to comply with SenderInterface
      */
-    public function send(EncodedPayload $payload, $accessToken)
+    public function send(EncodedPayload $payload, string $accessToken)
     {
         if (empty($this->fluentLogger)) {
             $this->loadFluentLogger();
@@ -85,7 +85,7 @@ class FluentSender implements SenderInterface
         return new Response($status, $info, $uuid);
     }
 
-    public function sendBatch(array $batch, $accessToken, &$responses = array ()): void
+    public function sendBatch(array $batch, string $accessToken, &$responses = array ()): void
     {
         $responses = array();
         foreach ($batch as $payload) {
@@ -96,7 +96,7 @@ class FluentSender implements SenderInterface
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function wait($accessToken, $max)
+    public function wait(string $accessToken, int $max)
     {
         return;
     }
