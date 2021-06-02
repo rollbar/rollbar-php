@@ -16,6 +16,7 @@ use Rollbar\Payload\TraceChain;
 use Rollbar\Payload\ExceptionInfo;
 use Rollbar\Rollbar;
 use Rollbar\Exceptions\PersonFuncException;
+use Throwable;
 
 class DataBuilder implements DataBuilderInterface
 {
@@ -364,11 +365,11 @@ class DataBuilder implements DataBuilderInterface
 
     /**
      * @param string $level
-     * @param \Exception | \Throwable | string $toLog
+     * @param Throwable|string $toLog
      * @param $context
      * @return Data
      */
-    public function makeData($level, $toLog, $context)
+    public function makeData(string $level, Throwable|string $toLog, array $context): Data
     {
         $env = $this->getEnvironment();
         $body = $this->getBody($toLog, $context);
@@ -415,10 +416,10 @@ class DataBuilder implements DataBuilderInterface
     }
 
     /**
-     * @param \Throwable|\Exception $exc
+     * @param Throwable $exc
      * @return Trace|TraceChain
      */
-    public function getExceptionTrace($exc)
+    public function getExceptionTrace(Throwable $exc): Trace|TraceChain
     {
         $chain = array();
         $chain[] = $this->makeTrace($exc, $this->includeExcCodeContext);
@@ -442,12 +443,12 @@ class DataBuilder implements DataBuilderInterface
     }
 
     /**
-     * @param \Throwable|\Exception $exception
-     * @param Boolean $includeContext whether or not to include context
-     * @param string $classOverride
+     * @param Throwable $exception
+     * @param bool $includeContext whether or not to include context
+     * @param string|null $classOverride
      * @return Trace
      */
-    public function makeTrace($exception, $includeContext, $classOverride = null)
+    public function makeTrace(Throwable $exception, bool $includeContext, ?string $classOverride = null): Trace
     {
         if ($this->captureErrorStacktraces) {
             $frames = $this->makeFrames($exception, $includeContext);
