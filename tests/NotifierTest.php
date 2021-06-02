@@ -37,10 +37,15 @@ class NotifierTest extends BaseRollbarTest
     public function testDefaultNotifierVersionIsSemVerCompliant()
     {
         // https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
-        $semVerRegex = '/(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?/';
+        $semVerRegex = '/
+            (0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)
+            (?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)
+            (?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?
+            (?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?
+        /x';
         $this->assertMatchesRegularExpression(
-          $semVerRegex,
-          Notifier::defaultNotifier()->getVersion()
+            $semVerRegex,
+            Notifier::defaultNotifier()->getVersion()
         );
     }
 }
