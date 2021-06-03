@@ -5,6 +5,7 @@ use Rollbar\Defaults;
 use Rollbar\Payload\Level;
 use Rollbar\Payload\Notifier;
 use Psr\Log\LogLevel;
+use Throwable;
 
 class DefaultsTest extends BaseRollbarTest
 {
@@ -106,11 +107,7 @@ class DefaultsTest extends BaseRollbarTest
 
     public function testBaseException()
     {
-        if (version_compare(phpversion(), '7.0', '<')) {
-            $expected = "\Exception";
-        } else {
-            $expected = "\Throwable";
-        }
+        $expected = Throwable::class;
         $base = $this->defaults->baseException();
         $this->assertEquals($expected, $base);
     }

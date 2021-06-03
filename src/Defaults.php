@@ -5,6 +5,7 @@ namespace Rollbar;
 use Monolog\Logger;
 use Rollbar\Payload\Notifier;
 use Psr\Log\LogLevel;
+use Throwable;
 
 class Defaults
 {
@@ -67,7 +68,7 @@ class Defaults
         $this->serverRoot = isset($_ENV["HEROKU_APP_DIR"]) ? $_ENV["HEROKU_APP_DIR"] : null;
         $this->platform = php_uname('a');
         $this->notifier = Notifier::defaultNotifier();
-        $this->baseException = version_compare(phpversion(), '7.0', '<') ? '\Exception' : '\Throwable';
+        $this->baseException = Throwable::class;
         $this->errorSampleRates = array();
         $this->exceptionSampleRates = array();
     }

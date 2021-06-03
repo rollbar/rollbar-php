@@ -804,9 +804,6 @@ class DataBuilderTest extends BaseRollbarTest
         $requestBody = $output->getRequest()->getBody();
         
         $this->assertEquals($streamInput, $requestBody);
-        if (version_compare(PHP_VERSION, '5.6.0') < 0) {
-            $this->assertEquals($streamInput, $_SERVER['php://input']);
-        }
         
         stream_wrapper_restore("php");
     }
@@ -892,7 +889,11 @@ class DataBuilderTest extends BaseRollbarTest
             $frames[count($frames)-1]->getFilename()
         );
         // 889 is the line number where the comment "// A" is found
-        $this->assertEquals(889, $frames[count($frames)-1]->getLineno());
+        $this->assertEquals(
+            886,
+            $frames[count($frames)-1]->getLineno(),
+            "Possible false negative: did this file change? Check the line number for line with '// A' comment"
+        );
         $this->assertEquals('Rollbar\DataBuilderTest::testFramesOrder', $frames[count($frames)-2]->getMethod());
     }
     
