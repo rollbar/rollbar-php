@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0-RC2] - 2021-06-01
+### Added
+- Type signatures and strict type enforcement
+- Less member variable boilerplate via constructor property promotion
+### Changed
+- `AgentSender::sendBatch()` to return-by-reference the results as a new third
+  argument; before the results were returned by value, which was inconsistent
+  with the defined interface
+### Fixed
+- Missing URL encoding when internally calling the Rollbar `occurrences` API
+### Removed
+- Spurious use of `Monolog\StreamHandler`
+- `$isUncaught` parameter on `Rollbar::log`; replace with `Rollbar::logUncaught`
+- Use of `call_user_func` and `call_user_func_array` internally
+
+## [3.0.0-RC1] - 2021-02-18
+### Added
+- Support for PHP 8
+- Type signatures for Serialized handlers
+- Compatibility with [XDebug 3][xdebug3]
+- Docker containers for quick interaction: try `composer docker-build` and `composer docker-run`
+### Fixed
+- Uncaptured local variables when using the `zend.exception_ignore_args=Off` engine configuration
+- Missing historical entries to the changelog (this file)
+### Removed
+- Support for PHP 7 and earlier
+- Monolog 1 handler
+
+[xdebug3]:https://xdebug.org/announcements/2020-11-25
+
 ## [2.1.0] - 2020-07-01
 ### Added
 - Added support for PHP 7.3 and 7.4.
@@ -501,7 +531,9 @@ however this is for convenience only and the methods that have changed have been
 - Error handler function (`report_php_error`) now always returns false, so that the default php error handler still runs. This is a breaking change if your code relied on the old behavior where the error handler did *not* ever halt script execution.
 
 
-[Unreleased]: https://github.com/rollbar/rollbar-php/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/rollbar/rollbar-php/compare/v3.0.0-RC2...HEAD
+[3.0.0-RC2]: https://github.com/rollbar/rollbar-php/compare/v3.0.0-RC1...v3.0.0-RC2
+[3.0.0-RC1]: https://github.com/rollbar/rollbar-php/compare/v2.1.0...v3.0.0-RC1
 [2.1.0]: https://github.com/rollbar/rollbar-php/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/rollbar/rollbar-php/compare/v1.8.1...v2.0.0
 [1.8.1]: https://github.com/rollbar/rollbar-php/compare/v1.7.5...v1.8.1
