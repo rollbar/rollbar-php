@@ -833,7 +833,7 @@ class Config
                     $this->verboseLogger()->info('Occurrence ignored due to custom check_ignore logic');
                     return true;
                 }
-            } catch (\Exception $exception) {
+            } catch (Throwable $exception) {
                 $this->verboseLogger()->error(
                     'Exception occurred in the custom checkIgnore logic:' . $exception->getMessage()
                 );

@@ -2,7 +2,10 @@
 
 namespace Rollbar;
 
+use Rollbar\Payload\Data;
+use Throwable;
+
 interface DataBuilderInterface
 {
-    public function makeData($level, $toLog, $context);
+    public function makeData(string $level, Throwable|string $toLog, array $context): Data;
 }
