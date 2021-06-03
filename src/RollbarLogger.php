@@ -141,8 +141,9 @@ class RollbarLogger extends AbstractLogger
             $this->verboseLogger()->error('Occurrence rejected by the SDK: ' . $response);
         } elseif ($response->getStatus() >= 400) {
             $info = $response->getInfo();
-            $this->verboseLogger()->error('Occurrence rejected by the API: ' . (isset($info['message']) ?
-                    $info['message'] : 'mesage not set'));
+            $this->verboseLogger()->error(
+                'Occurrence rejected by the API: ' . ($info['message'] ?? 'message not set')
+            );
         } else {
             $this->verboseLogger()->info('Occurrence successfully logged');
         }
