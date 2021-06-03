@@ -25,10 +25,27 @@ class NotifierTest extends BaseRollbarTest
         $this->assertEquals($version2, $notifier->setVersion($version2)->getVersion());
     }
 
-    public function testEncode()
+    public function testDefaultNotifierIsRepresentableAsJson()
     {
-        $notifier = Notifier::defaultNotifier();
-        $encoded = json_encode($notifier->serialize());
-        $this->assertEquals('{"name":"rollbar-php","version":"2.1.0"}', $encoded);
+        $notifier = Notifier::defaultNotifier()->serialize();
+        $encoding = json_encode($notifier, flags: JSON_THROW_ON_ERROR|JSON_FORCE_OBJECT);
+        $decoding = json_decode($encoding, flags: JSON_THROW_ON_ERROR);
+        $this->assertObjectHasAttribute('name', $decoding);
+        $this->assertObjectHasAttribute('version', $decoding);
+    }
+
+    public function testDefaultNotifierVersionIsSemVerCompliant()
+    {
+        // https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
+        $semVerRegex = '/
+            (0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)
+            (?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)
+            (?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?
+            (?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?
+        /x';
+        $this->assertMatchesRegularExpression(
+            $semVerRegex,
+            Notifier::defaultNotifier()->getVersion()
+        );
     }
 }
