@@ -89,6 +89,23 @@ class StringsStrategyTest extends BaseRollbarTest
         
         return array($payload, $threshold);
     }
+
+    public function executeProvider()
+    {
+        $data = array();
+
+        $data["truncate nothing"] = array(
+            $this->payloadStructureProvider(str_repeat("A", 10)),
+            $this->payloadStructureProvider(str_repeat("A", 10))
+        );
+
+        $thresholds = StringsStrategy::getThresholds();
+        foreach ($thresholds as $threshold) {
+            $data['truncate strings to ' . $threshold] = $this->thresholdTestProvider($threshold);
+        }
+
+        return $data;
+    }
     
     public function payloadStructureProvider($message)
     {
