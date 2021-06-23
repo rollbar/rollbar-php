@@ -577,7 +577,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         $result = $this->scrubTestHelper(
             array(
                 'person' => $testData,
-                'scrub_whitelist' => array(
+                'scrub_safelist' => array(
                     'data.person.recursive.sensitive'
                 )
             )
@@ -592,7 +592,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         $this->assertNotEquals(
             str_repeat('*', 8),
             $result['data']['person']['recursive']['sensitive'],
-            "Person recursive.sensitive DID get scrubbed even though it's whitelisted."
+            "Person recursive.sensitive DID get scrubbed even though it's safelisted."
         );
     }
     

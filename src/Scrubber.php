@@ -6,13 +6,13 @@ class Scrubber implements ScrubberInterface
 {
     protected static $defaults;
     protected $scrubFields;
-    protected $whitelist;
+    protected $safelist;
 
     public function __construct($config)
     {
         self::$defaults = Defaults::get();
         $this->setScrubFields($config);
-        $this->setWhitelist($config);
+        $this->setSafelist($config);
     }
 
     protected function setScrubFields($config)
@@ -29,18 +29,18 @@ class Scrubber implements ScrubberInterface
         return $this->scrubFields;
     }
 
-    protected function setWhitelist($config)
+    protected function setSafelist($config)
     {
-        $fromConfig = isset($config['scrubWhitelist']) ? $config['scrubWhitelist'] : null;
+        $fromConfig = isset($config['scrubSafelist']) ? $config['scrubSafelist'] : null;
         if (!isset($fromConfig)) {
-            $fromConfig = isset($config['scrub_whitelist']) ? $config['scrub_whitelist'] : null;
+            $fromConfig = isset($config['scrub_safelist']) ? $config['scrub_safelist'] : null;
         }
-        $this->whitelist = $fromConfig ? $fromConfig : array();
+        $this->safelist = $fromConfig ? $fromConfig : array();
     }
 
-    public function getWhitelist()
+    public function getSafelist()
     {
-        return $this->whitelist;
+        return $this->safelist;
     }
 
     /**
@@ -109,7 +109,7 @@ class Scrubber implements ScrubberInterface
             $parent = $path;
             $current = !$path ? $key : $path . '.' . $key;
 
-            if (in_array($current, $scrubber->getWhitelist())) {
+            if (in_array($current, $scrubber->getSafelist())) {
                 return;
             }
 

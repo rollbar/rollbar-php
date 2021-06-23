@@ -66,7 +66,7 @@ class Config
         'capture_email',
         'root',
         'scrub_fields',
-        'scrub_whitelist',
+        'scrub_safelist',
         'timeout',
         'transmit',
         'custom_truncation',
