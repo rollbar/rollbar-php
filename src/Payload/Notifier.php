@@ -7,7 +7,7 @@ use Rollbar\UtilitiesTrait;
 class Notifier implements \Serializable
 {
     const NAME = "rollbar-php";
-    const VERSION = "3.0.0-RC2";
+    const VERSION = "3.0.0";
 
     use UtilitiesTrait;
 
