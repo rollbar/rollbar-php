@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0] - 2021-06-28
+### Changed
+- The new configuration option `scrub_safelist` replaces the deprecated
+  `scrub_whitelist` configuration option, which is now removed.
+- The `check_ignore` configuration option, if defined and containing the name
+  of an invocable function, will now catch thrown `\Error` -- division by zero,
+  parse and type errors, assertion failures, etc. Before, only thrown `\Exception`
+  would be caught.
+- In the event the API rejected an occurrence during a `log()` call, and no
+  message was available, the new default message reads "message not set": before
+  this was misspelled as "mesage not set".
+### Fixed
+- The performance test suite now runs to completion with assertions on the
+  expected run-time performance within GitHub actions. Running these on
+  different hardware configurations may not match the expectations, so care
+  should be taken to match test platform specifications when reporting
+  performance issues.  A future version may provide better direction as to the
+  required test platform specifications.
+
 ## [3.0.0-RC2] - 2021-06-01
 ### Added
 - Type signatures and strict type enforcement
@@ -531,7 +550,8 @@ however this is for convenience only and the methods that have changed have been
 - Error handler function (`report_php_error`) now always returns false, so that the default php error handler still runs. This is a breaking change if your code relied on the old behavior where the error handler did *not* ever halt script execution.
 
 
-[Unreleased]: https://github.com/rollbar/rollbar-php/compare/v3.0.0-RC2...HEAD
+[Unreleased]: https://github.com/rollbar/rollbar-php/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/rollbar/rollbar-php/compare/v3.0.0-RC2...v3.0.0
 [3.0.0-RC2]: https://github.com/rollbar/rollbar-php/compare/v3.0.0-RC1...v3.0.0-RC2
 [3.0.0-RC1]: https://github.com/rollbar/rollbar-php/compare/v2.1.0...v3.0.0-RC1
 [2.1.0]: https://github.com/rollbar/rollbar-php/compare/v2.0.0...v2.1.0
