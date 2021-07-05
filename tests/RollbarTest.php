@@ -112,6 +112,19 @@ class RollbarTest extends BaseRollbarTest
             $extra['some_key']
         );
     }
+
+    public function testLogUncaught()
+    {
+        Rollbar::init(self::$simpleConfig);
+      
+        try {
+            throw new \Exception('test exception');
+        } catch (\Exception $e) {
+            Rollbar::logUncaught(Level::ERROR, $e);
+        }
+        
+        $this->assertTrue(true);
+    }
     
     public function testDebug()
     {

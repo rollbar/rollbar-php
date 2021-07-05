@@ -6,6 +6,7 @@ use Rollbar\Payload\Level;
 use Rollbar\Handlers\FatalHandler;
 use Rollbar\Handlers\ErrorHandler;
 use Rollbar\Handlers\ExceptionHandler;
+use Throwable;
 
 class Rollbar
 {
