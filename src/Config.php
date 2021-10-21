@@ -444,11 +444,12 @@ class Config
 
     private function setReportSuppressed($config)
     {
-        $this->reportSuppressed = isset($config['reportSuppressed']) && $config['reportSuppressed'];
-        if (!isset($this->reportSuppressed)) {
-            $this->reportSuppressed = isset($config['report_suppressed']) && $config['report_suppressed'];
+        if (isset($config['reportSuppressed'])) {
+            $this->reportSuppressed = $config['reportSuppressed'];
+        } elseif (isset($config['report_suppressed'])) {
+            $this->reportSuppressed = $config['report_suppressed'];
         }
-        
+
         if (!isset($this->reportSuppressed)) {
             $this->reportSuppressed = \Rollbar\Defaults::get()->reportSuppressed();
         }
