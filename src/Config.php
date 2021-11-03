@@ -3,7 +3,6 @@
 use Rollbar\Payload\Level;
 use Rollbar\Payload\Payload;
 use \Rollbar\Payload\EncodedPayload;
-use Rollbar\TransformerInterface;
 
 if (!defined('ROLLBAR_INCLUDED_ERRNO_BITMASK')) {
     define(
