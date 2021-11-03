@@ -81,9 +81,10 @@ class Config
         'minimum_level',
         'verbose',
         'verbose_logger',
-        'raise_on_error'
+        'raise_on_error',
+        'transformer',
     );
-    
+
     private string $accessToken;
 
     /**
@@ -145,12 +146,12 @@ class Config
      */
     private $dataBuilder;
     private $configArray;
-    
+
     /**
      * @var LevelFactory
      */
     private $levelFactory;
-    
+
     /**
      * @var TransformerInterface
      */
@@ -159,12 +160,12 @@ class Config
      * @var FilterInterface
      */
     private $filter;
-    
+
     /**
      * @var int
      */
     private int $minimumLevel;
-    
+
     /**
      * @var ResponseHandlerInterface
      */
@@ -185,13 +186,13 @@ class Config
     private int $maxNestingDepth = 10;
 
     private array $custom = array();
-    
+
     /**
      * @var callable with parameters $toLog, $contextDataMethodContext. The return
      * value of the callable will be appended to the custom field of the item.
      */
     private $customDataMethod;
-    
+
     /**
      * @var callable
      */
@@ -202,27 +203,27 @@ class Config
 
     private $includedErrno;
     private bool $useErrorReporting = false;
-    
+
     /**
      * @var boolean Should debug_backtrace() data be sent with string messages
      * sent through RollbarLogger::log().
      */
     private bool $sendMessageTrace = false;
-    
+
     /**
      * @var string (fully qualified class name) The name of the your custom
      * truncation strategy class. The class should inherit from
      * Rollbar\Truncation\AbstractStrategy.
      */
     private $customTruncation;
-    
+
     /**
      * @var boolean Should the SDK raise an exception after logging an error.
      * This is useful in test and development enviroments.
      * https://github.com/rollbar/rollbar-php/issues/448
      */
     private bool $raiseOnError = false;
-    
+
     /**
      * @var int The maximum number of items reported to Rollbar within one
      * request.
@@ -232,16 +233,16 @@ class Config
     public function __construct(array $configArray)
     {
         $this->includedErrno = Defaults::get()->includedErrno();
-        
+
         $this->levelFactory = new LevelFactory();
-        
+
         $this->updateConfig($configArray);
 
         $this->errorSampleRates = Defaults::get()->errorSampleRates();
         if (isset($configArray['error_sample_rates'])) {
             $this->errorSampleRates = $configArray['error_sample_rates'];
         }
-        
+
         $this->exceptionSampleRates = Defaults::get()->exceptionSampleRates();
         if (isset($configArray['exception_sample_rates'])) {
             $this->exceptionSampleRates = $configArray['exception_sample_rates'];
@@ -262,7 +263,7 @@ class Config
         }
         $this->mtRandmax = mt_getrandmax();
     }
-    
+
     public static function listOptions(): array
     {
         return self::$options;
@@ -318,16 +319,16 @@ class Config
         if (isset($config['use_error_reporting'])) {
             $this->useErrorReporting = $config['use_error_reporting'];
         }
-        
+
         $this->maxItems = Defaults::get()->maxItems();
         if (isset($config['max_items'])) {
             $this->maxItems = $config['max_items'];
         }
-        
+
         if (isset($config['custom_truncation'])) {
             $this->customTruncation = $config['custom_truncation'];
         }
-        
+
         $this->customDataMethod = Defaults::get()->customDataMethod();
         if (isset($config['custom_data_method'])) {
             $this->customDataMethod = $config['custom_data_method'];
@@ -370,7 +371,7 @@ class Config
     {
         $this->logPayloadLogger = $config['log_payload_logger'] ??
             new \Monolog\Logger('rollbar.payload', array(new \Monolog\Handler\ErrorLogHandler()));
-        
+
         if (!($this->logPayloadLogger instanceof \Psr\Log\LoggerInterface)) {
             throw new \Exception('Log Payload Logger must implement \Psr\Log\LoggerInterface');
         }
@@ -390,17 +391,17 @@ class Config
             $handler->setLevel($this->verboseInteger());
             $this->verboseLogger = new \Monolog\Logger('rollbar.verbose', array($handler));
         }
-        
+
         if (!($this->verboseLogger instanceof \Psr\Log\LoggerInterface)) {
             throw new \Exception('Verbose logger must implement \Psr\Log\LoggerInterface');
         }
     }
-    
+
     public function enable(): void
     {
         $this->enabled = true;
     }
-    
+
     public function disable(): void
     {
         $this->enabled = false;
@@ -411,11 +412,11 @@ class Config
         if (!isset($config['levelFactory'])) {
             $config['levelFactory'] = $this->levelFactory;
         }
-        
+
         if (!isset($config['utilities'])) {
             $config['utilities'] = $this->utilities();
         }
-        
+
         $exp = DataBuilderInterface::class;
         $def = DataBuilder::class;
         $this->setupWithOptions($config, "dataBuilder", $exp, $def, true);
@@ -430,10 +431,10 @@ class Config
     private function setMinimumLevel(array $config): void
     {
         $this->minimumLevel = \Rollbar\Defaults::get()->minimumLevel();
-        
+
         $override = array_key_exists('minimum_level', $config) ? $config['minimum_level'] : null;
         $override = array_key_exists('minimumLevel', $config) ? $config['minimumLevel'] : $override;
-        
+
         if ($override instanceof Level) {
             $this->minimumLevel = $override->toInt();
         } elseif (is_string($override)) {
@@ -448,11 +449,12 @@ class Config
 
     private function setReportSuppressed(array $config): void
     {
-        $this->reportSuppressed = isset($config['reportSuppressed']) && $config['reportSuppressed'];
-        if (!isset($this->reportSuppressed)) {
-            $this->reportSuppressed = isset($config['report_suppressed']) && $config['report_suppressed'];
+        if (isset($config['reportSuppressed'])) {
+            $this->reportSuppressed = $config['reportSuppressed'];
+        } elseif (isset($config['report_suppressed'])) {
+            $this->reportSuppressed = $config['report_suppressed'];
         }
-        
+
         if (!isset($this->reportSuppressed)) {
             $this->reportSuppressed = \Rollbar\Defaults::get()->reportSuppressed();
         }
@@ -488,7 +490,7 @@ class Config
             $this->batched = $config['batched'];
         }
     }
-    
+
     private function setRaiseOnError(array $config): void
     {
         if (array_key_exists('raise_on_error', $config)) {
@@ -516,12 +518,12 @@ class Config
     {
         $this->dataBuilder->setCustom($config);
     }
-    
+
     public function addCustom($key, $data)
     {
         $this->dataBuilder->addCustom($key, $data);
     }
-    
+
     public function removeCustom($key)
     {
         $this->dataBuilder->removeCustom($key);
@@ -549,22 +551,22 @@ class Config
         }
         return \Monolog\Logger::toMonologLevel($this->verbose);
     }
-    
+
     public function getCustom()
     {
         return $this->dataBuilder->getCustom();
     }
-    
+
     public function getAllowedCircularReferenceTypes()
     {
         return $this->allowedCircularReferenceTypes;
     }
-    
+
     public function setCustomTruncation($type)
     {
         $this->customTruncation = $type;
     }
-    
+
     public function getCustomTruncation()
     {
         return $this->customTruncation;
@@ -640,7 +642,7 @@ class Config
         if (isset($config['checkIgnore'])) {
             $this->checkIgnore = $config['checkIgnore'];
         }
-        
+
         if (isset($config['check_ignore'])) {
             $this->checkIgnore = $config['check_ignore'];
         }
@@ -735,12 +737,12 @@ class Config
     {
         return $this->dataBuilder;
     }
-    
+
     public function getLevelFactory()
     {
         return $this->levelFactory;
     }
-    
+
     public function getSender()
     {
         return $this->sender;
@@ -765,7 +767,7 @@ class Config
     {
         return $this->maxNestingDepth;
     }
-    
+
     public function getMaxItems(): int
     {
         return $this->maxItems;
@@ -775,7 +777,7 @@ class Config
     {
         return $this->minimumLevel;
     }
-    
+
     public function getRaiseOnError(): bool
     {
         return $this->raiseOnError;
@@ -813,7 +815,7 @@ class Config
     {
         return $this->enabled === true;
     }
-    
+
     public function disabled(): bool
     {
         return !$this->enabled();
@@ -840,7 +842,7 @@ class Config
                 $this->checkIgnore = null;
             }
         }
-        
+
         if ($this->payloadLevelTooLow($payload)) {
             $this->verboseLogger()->debug("Occurrence's level is too low");
             return true;
@@ -870,11 +872,11 @@ class Config
         if ($toLog instanceof ErrorWrapper) {
             return $this->shouldIgnoreErrorWrapper($toLog);
         }
-        
+
         if ($toLog instanceof \Exception) {
             return $this->shouldIgnoreException($toLog);
         }
-        
+
         return false;
     }
 
@@ -910,7 +912,7 @@ class Config
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -926,7 +928,7 @@ class Config
     {
         return $this->shouldIgnoreError($toLog->errorLevel);
     }
-    
+
     /**
      * Check if the exception should be ignored due to configured exception
      * sample rates.
@@ -945,10 +947,10 @@ class Config
             $this->verboseLogger()->debug("Skip exception due to exception sample rating");
             return true;
         }
-        
+
         return false;
     }
-    
+
     /**
      * Calculate what's the chance of logging this exception according to
      * exception sampling.
@@ -963,22 +965,22 @@ class Config
         if (count($this->exceptionSampleRates) == 0) {
             return $sampleRate;
         }
-        
+
         $exceptionClasses = array();
-        
+
         $class = get_class($toLog);
         while ($class) {
             $exceptionClasses []= $class;
             $class = get_parent_class($class);
         }
         $exceptionClasses = array_reverse($exceptionClasses);
-        
+
         foreach ($exceptionClasses as $exceptionClass) {
             if (isset($this->exceptionSampleRates["$exceptionClass"])) {
                 $sampleRate = $this->exceptionSampleRates["$exceptionClass"];
             }
         }
-        
+
         return $sampleRate;
     }
 
