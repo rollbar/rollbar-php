@@ -1001,6 +1001,11 @@ class Config
         return $level->toInt() < $this->minimumLevel;
     }
 
+    /**
+     * Decides if a given log message should be suppressed by policy.
+     * If so, then a debug message is emitted: "Ignoring (error reporting has been disabled in PHP config"
+     * @since 3.0.1
+     */
     public function shouldSuppress(): bool
     {
         return error_reporting() === 0 && !$this->reportSuppressed;
