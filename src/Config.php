@@ -65,7 +65,8 @@ class Config
         'minimum_level',
         'verbose',
         'verbose_logger',
-        'raise_on_error'
+        'raise_on_error',
+        'transformer',
     );
     
     private $accessToken;
