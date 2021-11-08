@@ -450,11 +450,11 @@ class Config
     private function setReportSuppressed(array $config): void
     {
         $this->reportSuppressed = isset($config['reportSuppressed']) && $config['reportSuppressed'];
-        if (!isset($this->reportSuppressed)) {
+        if (!$this->reportSuppressed) {
             $this->reportSuppressed = isset($config['report_suppressed']) && $config['report_suppressed'];
         }
         
-        if (!isset($this->reportSuppressed)) {
+        if (!$this->reportSuppressed) {
             $this->reportSuppressed = \Rollbar\Defaults::get()->reportSuppressed();
         }
     }
