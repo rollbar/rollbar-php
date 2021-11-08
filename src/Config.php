@@ -453,7 +453,7 @@ class Config
         if (!$this->reportSuppressed) {
             $this->reportSuppressed = isset($config['report_suppressed']) && $config['report_suppressed'];
         }
-        
+
         if (!$this->reportSuppressed) {
             $this->reportSuppressed = \Rollbar\Defaults::get()->reportSuppressed();
         }
