@@ -271,14 +271,15 @@ class DefaultsTest extends BaseRollbarTest
     {
         foreach (\Rollbar\Config::listOptions() as $option) {
             if ($option == 'access_token' ||
+                $option == 'include_raw_request_body' ||
+                $option == 'log_payload_logger' ||
                 $option == 'logger' ||
                 $option == 'person' ||
                 $option == 'person_fn' ||
-                $option == 'scrub_whitelist' ||
                 $option == 'proxy' ||
-                $option == 'include_raw_request_body' ||
-                $option == 'verbose_logger' ||
-                $option == 'log_payload_logger') {
+                $option == 'scrub_whitelist' ||
+                $option == 'transformer' ||
+                $option == 'verbose_logger') {
                 continue;
             } elseif ($option == 'base_api_url') {
                 $option = 'endpoint';
