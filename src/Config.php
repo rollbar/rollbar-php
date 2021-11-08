@@ -1001,7 +1001,7 @@ class Config
         return $level->toInt() < $this->minimumLevel;
     }
 
-    private function shouldSuppress(): bool
+    public function shouldSuppress(): bool
     {
         return error_reporting() === 0 && !$this->reportSuppressed;
     }

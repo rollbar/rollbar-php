@@ -347,9 +347,37 @@ class ConfigTest extends BaseRollbarTest
         return new Payload($data, $this->getTestAccessToken());
     }
 
-    public function testReportSuppressed()
+    /**
+     * Test the shouldSuppress method, which is driven by the configuration
+     * given and the value of the PHP engine's error_reporting() setting.
+     *
+     *            - error reporting value
+     *            |  - configuration key
+     *            |  |                   - configuration value
+     *            |  |                   |      - shouldSuppress() result
+     *            v  v                   v      v
+     * @testWith [0, "reportSuppressed", false, true]
+     *           [0, "reportSuppressed", true,  false]
+     *           [1, "reportSuppressed", false, false]
+     *           [0, "report_suppressed", false, true]
+     *           [0, "report_suppressed", true,  false]
+     *           [1, "report_suppressed", false, false]
+     */
+    public function testReportSuppressed($errorReporting, $configKey, $configValue, $shouldSuppressExpect)
     {
-        $this->assertTrue(true, "Don't know how to unit test this. PRs welcome");
+        $oldErrorReporting = error_reporting($errorReporting);
+        try {
+            $config = new Config(array(
+                $configKey => $configValue
+            ));
+            $this->assertSame(
+                $shouldSuppressExpect,
+                $config->shouldSuppress(),
+                'shouldSuppress() did not return the expected value for the error_reporting and configuration given'
+            );
+        } finally {
+            error_reporting($oldErrorReporting);
+        }
     }
 
     public function testFilter()
