@@ -1,10 +1,12 @@
 <?php namespace Rollbar;
 
-use \Mockery as m;
+use Exception;
+use Mockery as m;
+use Psr\Log\LogLevel as PsrLogLevel;
 use Rollbar\Payload\Level;
 use Rollbar\Payload\Payload;
 use Rollbar\TestHelpers\Exceptions\SilentExceptionSampleRate;
-use Psr\Log\LogLevel as PsrLogLevel;
+use StdClass;
 
 class RollbarLoggerTest extends BaseRollbarTest
 {
@@ -743,5 +745,32 @@ class RollbarLoggerTest extends BaseRollbarTest
         } catch (\Exception $ex) {
             $logger->log(Level::ERROR, $ex);
         }
+    }
+
+    /**
+     * @dataProvider providesToLogEntityForUncaughtCheck
+     */
+    public function testIsUncaughtLogData(mixed $toLog, bool $expected, string $message)
+    {
+        $logger = new RollbarLogger(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => 'test',
+            "raise_on_error" => true
+        ));
+
+        $this->assertSame($logger->isUncaughtLogData($toLog), $expected, $message);
+    }
+
+    public static function providesToLogEntityForUncaughtCheck()
+    {
+        $uncaught = new Exception;
+        $uncaught->isUncaught = true;
+        return [
+            [ 'some string', false, 'String log data should not be seen as uncaught' ],
+            [ [], false, 'Array log data should not be seen as uncaught' ],
+            [ new StdClass, false, 'An object not deriving from Throwable should not be seen as uncaught' ],
+            [ new Exception, false, 'A raw exception is not seen as uncaught' ],
+            [ $uncaught, true, 'A Throwable-derived object marked as uncaught must be seen as uncaught' ],
+        ];
     }
 }
