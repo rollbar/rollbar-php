@@ -276,8 +276,10 @@ class RollbarLogger extends AbstractLogger
      * Check whether the data to log represents an uncaught error, exception,
      * or fatal error. This works in concert with src/Handlers/, which sets
      * the `isUncaught` property on the `Throwable` representation of data.
+     *
+     * @since 3.0.1
      */
-    protected function isUncaughtLogData(mixed $toLog): bool
+    public function isUncaughtLogData(mixed $toLog): bool
     {
         if (! $toLog instanceof Throwable) {
             return false;
