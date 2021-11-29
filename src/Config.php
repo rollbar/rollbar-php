@@ -449,13 +449,12 @@ class Config
 
     private function setReportSuppressed(array $config): void
     {
-        if (isset($config['reportSuppressed'])) {
-            $this->reportSuppressed = $config['reportSuppressed'];
-        } elseif (isset($config['report_suppressed'])) {
-            $this->reportSuppressed = $config['report_suppressed'];
+        $this->reportSuppressed = isset($config['reportSuppressed']) && $config['reportSuppressed'];
+        if (!$this->reportSuppressed) {
+            $this->reportSuppressed = isset($config['report_suppressed']) && $config['report_suppressed'];
         }
 
-        if (!isset($this->reportSuppressed)) {
+        if (!$this->reportSuppressed) {
             $this->reportSuppressed = \Rollbar\Defaults::get()->reportSuppressed();
         }
     }
@@ -1002,7 +1001,12 @@ class Config
         return $level->toInt() < $this->minimumLevel;
     }
 
-    private function shouldSuppress(): bool
+    /**
+     * Decides if a given log message should be suppressed by policy.
+     * If so, then a debug message is emitted: "Ignoring (error reporting has been disabled in PHP config"
+     * @since 3.0.1
+     */
+    public function shouldSuppress(): bool
     {
         return error_reporting() === 0 && !$this->reportSuppressed;
     }
