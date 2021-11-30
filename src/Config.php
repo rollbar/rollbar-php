@@ -18,13 +18,6 @@ use Rollbar\TransformerInterface;
 use Rollbar\UtilitiesTrait;
 use Throwable;
 
-if (!defined('ROLLBAR_INCLUDED_ERRNO_BITMASK')) {
-    define(
-        'ROLLBAR_INCLUDED_ERRNO_BITMASK',
-        E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR
-    );
-}
-
 class Config
 {
     use UtilitiesTrait;
