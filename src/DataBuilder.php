@@ -1085,7 +1085,7 @@ class DataBuilder implements DataBuilderInterface
      * @var string $errfile
      * @var string $errline
      *
-     * @return Rollbar\ErrorWrapper
+     * @return array
      */
     protected function buildErrorTrace($errfile, $errline)
     {
