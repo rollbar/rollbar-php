@@ -63,21 +63,13 @@ class DefaultsTest extends BaseRollbarTest
     {
         $expected = $this->defaultPsrLevels = array(
             LogLevel::EMERGENCY => "critical",
-            "emergency" => "critical",
             LogLevel::ALERT => "critical",
-            "alert" => "critical",
             LogLevel::CRITICAL => "critical",
-            "critical" => "critical",
             LogLevel::ERROR => "error",
-            "error" => "error",
             LogLevel::WARNING => "warning",
-            "warning" => "warning",
             LogLevel::NOTICE => "info",
-            "notice" => "info",
             LogLevel::INFO => "info",
-            "info" => "info",
             LogLevel::DEBUG => "debug",
-            "debug" => "debug"
         );
         $this->assertEquals($expected, $this->defaults->psrLevels());
     }
