@@ -41,7 +41,8 @@
     "phpunit/phpunit": "^9",
     "mockery/mockery": "^1",
     "squizlabs/php_codesniffer": "^3.6 || 3.x-dev",
-    "phpmd/phpmd" : "^2"
+    "phpmd/phpmd" : "^2",
+    "vimeo/psalm": "^4.13"
   },
 
   "suggest": {
@@ -53,6 +54,7 @@
     "docker-run": "docker run -it -v \"${PWD}\":/opt/rollbar/rollbar-php rollbar/rollbar-php:3",
     "test": [
       "phpcs --standard=PSR2 src tests",
+      "psalm",
       "phpunit --coverage-clover build/logs/clover.xml --testsuite 'Rollbar Test Suite'"
     ],
     "fix": "phpcbf --standard=PSR2 src tests",
