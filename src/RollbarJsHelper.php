@@ -40,7 +40,7 @@ class RollbarJsHelper
      * headers_list() used to verify if nonce should be added to script
      * tags based on Content-Security-Policy
      * @param string $nonce Content-Security-Policy nonce string if exists
-     * @param strong $customJs Additional JavaScript to add at the end of
+     * @param string $customJs Additional JavaScript to add at the end of
      * RollbarJs snippet
      *
      * @return string

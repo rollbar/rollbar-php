@@ -22,21 +22,13 @@ class Defaults
     {
         $this->psrLevels = array(
             LogLevel::EMERGENCY => "critical",
-            "emergency" => "critical",
             LogLevel::ALERT => "critical",
-            "alert" => "critical",
             LogLevel::CRITICAL => "critical",
-            "critical" => "critical",
             LogLevel::ERROR => "error",
-            "error" => "error",
             LogLevel::WARNING => "warning",
-            "warning" => "warning",
             LogLevel::NOTICE => "info",
-            "notice" => "info",
             LogLevel::INFO => "info",
-            "info" => "info",
             LogLevel::DEBUG => "debug",
-            "debug" => "debug"
         );
         $this->errorLevels = array(
             E_ERROR => "error",
@@ -71,6 +63,10 @@ class Defaults
         $this->baseException = Throwable::class;
         $this->errorSampleRates = array();
         $this->exceptionSampleRates = array();
+
+        if (defined('ROLLBAR_INCLUDED_ERRNO_BITMASK')) {
+            $this->includedErrno = ROLLBAR_INCLUDED_ERRNO_BITMASK;
+        }
     }
     
     public function fromSnakeCase($option)
@@ -355,7 +351,7 @@ class Defaults
     private $maxNestingDepth = -1;
     private $errorSampleRates = array();
     private $exceptionSampleRates = array();
-    private $includedErrno = ROLLBAR_INCLUDED_ERRNO_BITMASK;
+    private $includedErrno = E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR;
     private $includeErrorCodeContext = null;
     private $includeExceptionCodeContext = null;
     private $agentLogLocation = '/var/tmp';

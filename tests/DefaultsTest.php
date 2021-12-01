@@ -63,21 +63,13 @@ class DefaultsTest extends BaseRollbarTest
     {
         $expected = $this->defaultPsrLevels = array(
             LogLevel::EMERGENCY => "critical",
-            "emergency" => "critical",
             LogLevel::ALERT => "critical",
-            "alert" => "critical",
             LogLevel::CRITICAL => "critical",
-            "critical" => "critical",
             LogLevel::ERROR => "error",
-            "error" => "error",
             LogLevel::WARNING => "warning",
-            "warning" => "warning",
             LogLevel::NOTICE => "info",
-            "notice" => "info",
             LogLevel::INFO => "info",
-            "info" => "info",
             LogLevel::DEBUG => "debug",
-            "debug" => "debug"
         );
         $this->assertEquals($expected, $this->defaults->psrLevels());
     }
@@ -222,14 +214,36 @@ class DefaultsTest extends BaseRollbarTest
         $this->assertNull($this->defaults->host());
     }
     
-    public function testIncludedErrno()
+    public function testIncludedErrnoDefault()
     {
+        $expected = E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR;
         $this->assertEquals(
-            ROLLBAR_INCLUDED_ERRNO_BITMASK,
+            $expected,
             $this->defaults->includedErrno()
         );
     }
     
+    /**
+     * Test that a caller may set the errno to include in messages via the
+     * `ROLLBAR_INCLUDED_ERRNO_BITMASK` define. Because we don't want to set
+     * this and infect all other tests, we run this particular test in a
+     * separate process.
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testIncludedErrnoDefineOverride()
+    {
+        // unlike other tests that use `$this->defaults`, we must make our
+        // own Defaults object now, _after_ defining the bitmask: in the
+        // prior case, `$this->defaults` is constructed before the define.
+        define('ROLLBAR_INCLUDED_ERRNO_BITMASK', E_USER_WARNING);
+        $this->assertEquals(
+            E_USER_WARNING,
+            (new Defaults)->includedErrno()
+        );
+    }
+
     public function testTimeout()
     {
         $this->assertEquals(3, $this->defaults->timeout());
