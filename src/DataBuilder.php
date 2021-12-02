@@ -1218,9 +1218,9 @@ class DataBuilder implements DataBuilderInterface
         try {
             if (function_exists('shell_exec')) {
                 $stdRedirCmd = Utilities::isWindows() ? " > NUL" : " 2> /dev/null";
-                $output = rtrim(shell_exec('git rev-parse --abbrev-ref HEAD' . $stdRedirCmd));
+                $output = shell_exec('git rev-parse --abbrev-ref HEAD' . $stdRedirCmd);
                 if ($output) {
-                    return $output;
+                    return rtrim($output);
                 }
             }
             return null;
