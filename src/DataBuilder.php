@@ -468,13 +468,15 @@ class DataBuilder implements DataBuilderInterface
         $frames = array();
         
         foreach ($this->getTrace($exception) as $frameInfo) {
-            $filename = isset($frameInfo['file']) ? $frameInfo['file'] : null;
-            $lineno = isset($frameInfo['line']) ? $frameInfo['line'] : null;
-            $method = isset($frameInfo['function']) ? $frameInfo['function'] : null;
+            // filename and lineno may be missing in pathological cases, like
+            // register_shutdown_function(fn() => var_dump(debug_backtrace()));
+            $filename = $frameInfo['file'] ?? null;
+            $lineno = $frameInfo['line'] ?? null;
+            $method = $frameInfo['function'] ?? null;
             if (isset($frameInfo['class'])) {
                 $method = $frameInfo['class'] . "::" . $method;
             }
-            $args = isset($frameInfo['args']) ? $frameInfo['args'] : null;
+            $args = $frameInfo['args'] ?? null;
 
             $frame = new Frame($filename);
             $frame->setLineno($lineno)

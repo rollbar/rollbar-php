@@ -4,6 +4,11 @@ namespace Rollbar\Payload;
 
 use Rollbar\UtilitiesTrait;
 
+/**
+ * Represents a stack trace frame, as returned by debug_backtrace. Note that
+ * in the Zend engine, Throwable::getTrace() is a thin wrapper around
+ * debug_backtrace.
+ */
 class Frame implements \Serializable
 {
     use UtilitiesTrait;
@@ -15,16 +20,16 @@ class Frame implements \Serializable
     private ?Context $context = null;
     private ?array $args = null;
 
-    public function __construct(private string $filename)
+    public function __construct(private ?string $filename)
     {
     }
 
-    public function getFilename(): string
+    public function getFilename(): ?string
     {
         return $this->filename;
     }
 
-    public function setFilename(string $filename): self
+    public function setFilename(?string $filename): self
     {
         $this->filename = $filename;
         return $this;
