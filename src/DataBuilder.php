@@ -549,18 +549,25 @@ class DataBuilder implements DataBuilderInterface
 
     protected function getLevel($level, $toLog)
     {
-        if (is_null($level)) {
+        // resolve null level to default values, if we can
+        if ($level === null) {
             if ($toLog instanceof ErrorWrapper) {
-                $level = isset($this->errorLevels[$toLog->errorLevel]) ? $this->errorLevels[$toLog->errorLevel] : null;
+                $level = $this->errorLevels[$toLog->errorLevel] ?? null;
             } elseif ($toLog instanceof \Exception) {
                 $level = $this->exceptionLevel;
             } else {
                 $level = $this->messageLevel;
             }
         }
-        $level = strtolower($level);
-        $level = isset($this->psrLevels[$level]) ? $this->psrLevels[$level] : null;
-        return $this->levelFactory->fromName($level);
+        if ($level !== null) {
+            $level = strtolower($level);
+            $level = $this->psrLevels[$level] ?? null;
+            if ($level !== null) {
+                // this is a well-known PSR level: "error", "notice", "info", etc.
+                return $this->levelFactory->fromName($level);
+            }
+        }
+        return null;
     }
 
     protected function getTimestamp()
