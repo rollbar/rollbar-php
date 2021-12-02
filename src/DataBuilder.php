@@ -830,26 +830,34 @@ class DataBuilder implements DataBuilderInterface
         return $this->requestBody;
     }
 
-    /*
+    /**
+     * Get the user's IP, by inspecting the http header X-Real-IP, or if not
+     * that first address from the http header X-Forwarded-For, and if not that
+     * then the remote IP connecting to the web server, if available.
+     *
      * @SuppressWarnings(PHPMD.Superglobals)
      */
-    protected function getUserIp()
+    protected function getUserIp(): ?string
     {
         if (!isset($_SERVER) || $this->captureIP === false) {
             return null;
         }
         
-        $ipAddress = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
+        $ipAddress = $_SERVER['REMOTE_ADDR'] ?? null;
         
-        $forwardFor = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : null;
+        $forwardFor = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? null;
         if ($forwardFor) {
             // return everything until the first comma
             $parts = explode(',', $forwardFor);
             $ipAddress = $parts[0];
         }
-        $realIp = isset($_SERVER['HTTP_X_REAL_IP']) ? $_SERVER['HTTP_X_REAL_IP'] : null;
+        $realIp = $_SERVER['HTTP_X_REAL_IP'] ?? null;
         if ($realIp) {
             $ipAddress = $realIp;
+        }
+
+        if (null === $ipAddress) {
+            return null;
         }
         
         if ($this->captureIP === DataBuilder::ANONYMIZE_IP) {
