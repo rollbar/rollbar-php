@@ -1199,7 +1199,7 @@ class DataBuilder implements DataBuilderInterface
         return $backTrace;
     }
     
-    public function detectGitBranch($allowExec = true)
+    public function detectGitBranch($allowExec = true): ?string
     {
         if ($allowExec) {
             static $cachedValue;
@@ -1213,19 +1213,15 @@ class DataBuilder implements DataBuilderInterface
         return null;
     }
     
-    private static function getGitBranch()
+    private static function getGitBranch(): ?string
     {
-        try {
-            if (function_exists('shell_exec')) {
-                $stdRedirCmd = Utilities::isWindows() ? " > NUL" : " 2> /dev/null";
-                $output = shell_exec('git rev-parse --abbrev-ref HEAD' . $stdRedirCmd);
-                if ($output) {
-                    return rtrim($output);
-                }
+        if (function_exists('shell_exec')) {
+            $stdRedirCmd = Utilities::isWindows() ? ' > NUL' : ' 2> /dev/null';
+            $output = shell_exec('git rev-parse --abbrev-ref HEAD' . $stdRedirCmd);
+            if (is_string($output)) {
+                return rtrim($output);
             }
-            return null;
-        } catch (\Exception $e) {
-            return null;
         }
+        return null;
     }
 }
