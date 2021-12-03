@@ -631,7 +631,7 @@ class DataBuilder implements DataBuilderInterface
             $postData = array();
             $body = $request->getBody();
             if ($body !== null) {
-                parse_str($request->getBody(), $postData);
+                parse_str($body, $postData);
             }
             $request->setPost($postData);
         }
