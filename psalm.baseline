@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<files psalm-version="4.13.1@5cf660f63b548ccd4a56f62d916ee4d6028e01a3">
+  <file src="src/Rollbar.php">
+    <AssignmentToVoid occurrences="1">
+      <code>$result</code>
+    </AssignmentToVoid>
+  </file>
+  <file src="src/RollbarLogger.php">
+    <ParamNameMismatch occurrences="1">
+      <code>$toLog</code>
+    </ParamNameMismatch>
+  </file>
+  <file src="src/Senders/FluentSender.php">
+    <UndefinedClass occurrences="2">
+      <code>FluentLogger</code>
+      <code>FluentLogger</code>
+    </UndefinedClass>
+    <UndefinedDocblockClass occurrences="3">
+      <code>$this-&gt;fluentLogger</code>
+      <code>FluentLogger</code>
+      <code>private $fluentLogger = null;</code>
+    </UndefinedDocblockClass>
+  </file>
+</files>
