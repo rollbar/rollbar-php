@@ -58,6 +58,7 @@ class Config
         'capture_username',
         'capture_email',
         'root',
+        'scrubber',
         'scrub_fields',
         'scrub_safelist',
         'timeout',
