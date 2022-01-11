@@ -856,7 +856,7 @@ class DataBuilder implements DataBuilderInterface
             $ipAddress = $realIp;
         }
 
-        if (null === $ipAddress) {
+        if ($ipAddress === null) {
             return null;
         }
         
