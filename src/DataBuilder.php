@@ -468,13 +468,15 @@ class DataBuilder implements DataBuilderInterface
         $frames = array();
         
         foreach ($this->getTrace($exception) as $frameInfo) {
-            $filename = isset($frameInfo['file']) ? $frameInfo['file'] : null;
-            $lineno = isset($frameInfo['line']) ? $frameInfo['line'] : null;
-            $method = isset($frameInfo['function']) ? $frameInfo['function'] : null;
+            // filename and lineno may be missing in pathological cases, like
+            // register_shutdown_function(fn() => var_dump(debug_backtrace()));
+            $filename = $frameInfo['file'] ?? null;
+            $lineno = $frameInfo['line'] ?? null;
+            $method = $frameInfo['function'] ?? null;
             if (isset($frameInfo['class'])) {
                 $method = $frameInfo['class'] . "::" . $method;
             }
-            $args = isset($frameInfo['args']) ? $frameInfo['args'] : null;
+            $args = $frameInfo['args'] ?? null;
 
             $frame = new Frame($filename);
             $frame->setLineno($lineno)
@@ -547,18 +549,25 @@ class DataBuilder implements DataBuilderInterface
 
     protected function getLevel($level, $toLog)
     {
-        if (is_null($level)) {
+        // resolve null level to default values, if we can
+        if ($level === null) {
             if ($toLog instanceof ErrorWrapper) {
-                $level = isset($this->errorLevels[$toLog->errorLevel]) ? $this->errorLevels[$toLog->errorLevel] : null;
+                $level = $this->errorLevels[$toLog->errorLevel] ?? null;
             } elseif ($toLog instanceof \Exception) {
                 $level = $this->exceptionLevel;
             } else {
                 $level = $this->messageLevel;
             }
         }
-        $level = strtolower($level);
-        $level = isset($this->psrLevels[$level]) ? $this->psrLevels[$level] : null;
-        return $this->levelFactory->fromName($level);
+        if ($level !== null) {
+            $level = strtolower($level);
+            $level = $this->psrLevels[$level] ?? null;
+            if ($level !== null) {
+                // this is a well-known PSR level: "error", "notice", "info", etc.
+                return $this->levelFactory->fromName($level);
+            }
+        }
+        return null;
     }
 
     protected function getTimestamp()
@@ -620,7 +629,10 @@ class DataBuilder implements DataBuilderInterface
         
         if ($request->getMethod() === 'PUT') {
             $postData = array();
-            parse_str($request->getBody(), $postData);
+            $body = $request->getBody();
+            if ($body !== null) {
+                parse_str($body, $postData);
+            }
             $request->setPost($postData);
         }
         
@@ -818,26 +830,34 @@ class DataBuilder implements DataBuilderInterface
         return $this->requestBody;
     }
 
-    /*
+    /**
+     * Get the user's IP, by inspecting the http header X-Real-IP, or if not
+     * that first address from the http header X-Forwarded-For, and if not that
+     * then the remote IP connecting to the web server, if available.
+     *
      * @SuppressWarnings(PHPMD.Superglobals)
      */
-    protected function getUserIp()
+    protected function getUserIp(): ?string
     {
         if (!isset($_SERVER) || $this->captureIP === false) {
             return null;
         }
         
-        $ipAddress = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
+        $ipAddress = $_SERVER['REMOTE_ADDR'] ?? null;
         
-        $forwardFor = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : null;
+        $forwardFor = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? null;
         if ($forwardFor) {
             // return everything until the first comma
             $parts = explode(',', $forwardFor);
             $ipAddress = $parts[0];
         }
-        $realIp = isset($_SERVER['HTTP_X_REAL_IP']) ? $_SERVER['HTTP_X_REAL_IP'] : null;
+        $realIp = $_SERVER['HTTP_X_REAL_IP'] ?? null;
         if ($realIp) {
             $ipAddress = $realIp;
+        }
+
+        if ($ipAddress === null) {
+            return null;
         }
         
         if ($this->captureIP === DataBuilder::ANONYMIZE_IP) {
@@ -1179,7 +1199,7 @@ class DataBuilder implements DataBuilderInterface
         return $backTrace;
     }
     
-    public function detectGitBranch($allowExec = true)
+    public function detectGitBranch($allowExec = true): ?string
     {
         if ($allowExec) {
             static $cachedValue;
@@ -1193,19 +1213,15 @@ class DataBuilder implements DataBuilderInterface
         return null;
     }
     
-    private static function getGitBranch()
+    private static function getGitBranch(): ?string
     {
-        try {
-            if (function_exists('shell_exec')) {
-                $stdRedirCmd = Utilities::isWindows() ? " > NUL" : " 2> /dev/null";
-                $output = rtrim(shell_exec('git rev-parse --abbrev-ref HEAD' . $stdRedirCmd));
-                if ($output) {
-                    return $output;
-                }
+        if (function_exists('shell_exec')) {
+            $stdRedirCmd = Utilities::isWindows() ? ' > NUL' : ' 2> /dev/null';
+            $output = shell_exec('git rev-parse --abbrev-ref HEAD' . $stdRedirCmd);
+            if (is_string($output)) {
+                return rtrim($output);
             }
-            return null;
-        } catch (\Exception $e) {
-            return null;
         }
+        return null;
     }
 }

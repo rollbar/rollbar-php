@@ -25,6 +25,20 @@ class DataBuilderTest extends BaseRollbarTest
         ));
     }
 
+    /**
+     * We support passing level by well-known string ("error", "notice",
+     * "info"), etc. But if a bogus string is passed, we want that to come
+     * out as a null level.
+     *
+     * @testWith [ "bogus", null ]
+     *           [ "error", "error" ]
+     */
+    public function testMakeDataLevel($given, $resolved)
+    {
+        $output = $this->dataBuilder->makeData($given, "testing", array());
+        $this->assertEquals($resolved, $output->getLevel());
+    }
+
     public function testMakeData()
     {
         $output = $this->dataBuilder->makeData(Level::ERROR, "testing", array());
@@ -888,9 +902,9 @@ class DataBuilderTest extends BaseRollbarTest
             'tests/DataBuilderTest.php',
             $frames[count($frames)-1]->getFilename()
         );
-        // 889 is the line number where the comment "// A" is found
+        // 900 is the line number where the comment "// A" is found
         $this->assertEquals(
-            886,
+            900,
             $frames[count($frames)-1]->getLineno(),
             "Possible false negative: did this file change? Check the line number for line with '// A' comment"
         );

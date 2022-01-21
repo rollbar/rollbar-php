@@ -246,10 +246,7 @@ class Rollbar
      */
     public static function report_exception($exc, $extra_data = null, $payload_data = null)
     {
-        
-        if ($payload_data) {
-            $extra_data = array_merge($extra_data, $payload_data);
-        }
+        $extra_data = array_merge($extra_data ?? [], $payload_data ?? []);
         return self::log(Level::ERROR, $exc, $extra_data)->getUuid();
     }
 
@@ -267,11 +264,8 @@ class Rollbar
      */
     public static function report_message($message, $level = null, $extra_data = null, $payload_data = null)
     {
-        
-        $level = $level ? $level : Level::ERROR;
-        if ($payload_data) {
-            $extra_data = array_merge($extra_data, $payload_data);
-        }
+        $level = $level ?? Level::ERROR;
+        $extra_data = array_merge($extra_data ?? [], $payload_data ?? []);
         return self::log($level, $message, $extra_data)->getUuid();
     }
 
