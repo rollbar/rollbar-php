@@ -5,33 +5,33 @@ namespace Rollbar;
 class Response
 {
     public function __construct(
-        private $status,
-        private $info,
-        private $uuid = null
+        private int $status,
+        private mixed $info,
+        private ?string $uuid = null
     ) {
     }
 
-    public function getStatus()
+    public function getStatus(): int
     {
         return $this->status;
     }
 
-    public function getInfo()
+    public function getInfo(): mixed
     {
         return $this->info;
     }
 
-    public function getUuid()
+    public function getUuid(): string
     {
         return $this->uuid;
     }
 
-    public function wasSuccessful()
+    public function wasSuccessful(): bool
     {
         return $this->status >= 200 && $this->status < 300;
     }
 
-    public function getOccurrenceUrl()
+    public function getOccurrenceUrl(): ?string
     {
         if (is_null($this->uuid)) {
             return null;
