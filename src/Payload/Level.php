@@ -3,8 +3,9 @@
 namespace Rollbar\Payload;
 
 use Rollbar\LevelFactory;
+use Rollbar\SerializerInterface;
 
-class Level implements \Serializable
+class Level implements SerializerInterface
 {
     /**
      * Those are PSR-3 compatible loggin levels. They are mapped to Rollbar
@@ -66,10 +67,5 @@ class Level implements \Serializable
     public function serialize()
     {
         return $this->level;
-    }
-    
-    public function unserialize(string $serialized)
-    {
-        throw new \Exception('Not implemented yet.');
     }
 }

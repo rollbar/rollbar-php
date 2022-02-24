@@ -2,7 +2,9 @@
 
 namespace Rollbar\Payload;
 
-interface ContentInterface extends \Serializable
+use Rollbar\SerializerInterface;
+
+interface ContentInterface extends SerializerInterface
 {
     public function getKey(): string;
 }

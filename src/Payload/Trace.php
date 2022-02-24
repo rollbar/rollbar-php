@@ -49,9 +49,4 @@ class Trace implements ContentInterface
         );
         return $this->utilities()->serializeForRollbar($result);
     }
-    
-    public function unserialize($serialized)
-    {
-        throw new \Exception('Not implemented yet.');
-    }
 }

@@ -2,6 +2,7 @@
 
 namespace Rollbar\Payload;
 
+use Rollbar\SerializerInterface;
 use Rollbar\UtilitiesTrait;
 
 /**
@@ -9,7 +10,7 @@ use Rollbar\UtilitiesTrait;
  * in the Zend engine, Throwable::getTrace() is a thin wrapper around
  * debug_backtrace.
  */
-class Frame implements \Serializable
+class Frame implements SerializerInterface
 {
     use UtilitiesTrait;
 
@@ -114,10 +115,5 @@ class Frame implements \Serializable
         );
         
         return $this->utilities()->serializeForRollbarInternal($result);
-    }
-    
-    public function unserialize(string $serialized)
-    {
-        throw new \Exception('Not implemented yet.');
     }
 }

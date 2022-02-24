@@ -146,7 +146,7 @@ final class Utilities
         if (self::serializedAlready($obj, $objectHashes)) {
             $serialized = self::circularReferenceLabel($obj);
         } else {
-            if ($obj instanceof \Serializable) {
+            if ($obj instanceof \Serializable || $obj instanceof SerializerInterface) {
                 self::markSerialized($obj, $objectHashes);
                 $serialized = $obj->serialize();
             } else {

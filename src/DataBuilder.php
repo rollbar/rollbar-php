@@ -15,7 +15,6 @@ use Rollbar\Payload\Frame;
 use Rollbar\Payload\TraceChain;
 use Rollbar\Payload\ExceptionInfo;
 use Rollbar\Rollbar;
-use Rollbar\Exceptions\PersonFuncException;
 use Throwable;
 
 class DataBuilder implements DataBuilderInterface
@@ -982,7 +981,7 @@ class DataBuilder implements DataBuilderInterface
         $custom = $this->getCustom();
 
         // Make this an array if possible:
-        if ($custom instanceof \Serializable) {
+        if ($custom instanceof \Serializable || $custom instanceof SerializerInterface) {
             $custom = $custom->serialize();
         } elseif (is_null($custom)) {
             $custom = array();

@@ -2,9 +2,10 @@
 
 namespace Rollbar\Payload;
 
+use Rollbar\SerializerInterface;
 use Rollbar\UtilitiesTrait;
 
-class ExceptionInfo implements \Serializable
+class ExceptionInfo implements SerializerInterface
 {
     use UtilitiesTrait;
 
@@ -57,10 +58,5 @@ class ExceptionInfo implements \Serializable
         );
         
         return $this->utilities()->serializeForRollbarInternal($result);
-    }
-    
-    public function unserialize(string $serialized)
-    {
-        throw new \Exception('Not implemented yet.');
     }
 }

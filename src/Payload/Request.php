@@ -2,9 +2,10 @@
 
 namespace Rollbar\Payload;
 
+use Rollbar\SerializerInterface;
 use Rollbar\UtilitiesTrait;
 
-class Request implements \Serializable
+class Request implements SerializerInterface
 {
     use UtilitiesTrait;
 
@@ -157,10 +158,5 @@ class Request implements \Serializable
         }
         
         return $this->utilities()->serializeForRollbarInternal($result, array_keys($this->extra));
-    }
-    
-    public function unserialize(string $serialized)
-    {
-        throw new \Exception('Not implemented yet.');
     }
 }
