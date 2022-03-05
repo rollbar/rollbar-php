@@ -976,34 +976,70 @@ class DataBuilder implements DataBuilderInterface
         return $this->customDataMethod;
     }
 
-    protected function getCustomForPayload($toLog, $context)
+    /**
+     * Returns the processed custom value to be sent with the payload. If there
+     * is no custom value an empty array is returned.
+     *
+     * @param Throwable|string $toLog
+     * @param array            $context
+     *
+     * @return array
+     */
+    protected function getCustomForPayload(Throwable|string $toLog, array $context): array
     {
-        $custom = $this->getCustom();
+        $custom = $this->resolveCustomContent($this->getCustom());
 
-        // Make this an array if possible:
-        if ($custom instanceof \Serializable || $custom instanceof SerializerInterface) {
-            $custom = $custom->serialize();
-        } elseif (is_null($custom)) {
-            $custom = array();
-        } elseif (!is_array($custom)) {
-            $custom = get_object_vars($custom);
-        }
-        
         if ($customDataMethod = $this->getCustomDataMethod()) {
-            $customDataMethodContext = isset($context['custom_data_method_context']) ?
-                $context['custom_data_method_context'] :
-                null;
-                
+            $customDataMethodContext = $context['custom_data_method_context'] ?? null;
+
             $customDataMethodResult = $customDataMethod($toLog, $customDataMethodContext);
-            
+
             $custom = array_merge($custom, $customDataMethodResult);
         }
-        
+
         unset($context['custom_data_method_context']);
 
         return $custom;
     }
-    
+
+    /**
+     * This method transforms $custom into an array that can be processed and sent in the payload.
+     *
+     * @param mixed $custom
+     *
+     * @return array
+     * @throws \Exception If Serializable::serialize() returns an invalid type an exception can be thrown.
+     *                    This can be removed once support for Serializable has been removed.
+     */
+    protected function resolveCustomContent(mixed $custom): array
+    {
+        // This check is placed first because it should return a string|null, and we want to return an array.
+        if ($custom instanceof \Serializable) {
+            trigger_error("Using the Serializable interface has been deprecated.", E_USER_DEPRECATED);
+            // We don't return this value instead we run it through the rest of the checks. The same is true for the
+            // next check.
+            $custom = $custom->serialize();
+        } else {
+            if ($custom instanceof SerializerInterface) {
+                $custom = $custom->serialize();
+            }
+        }
+        // Values that resolve to false e.g. null, false, 0, 0.0, "", and [], we will ignore.
+        // Otherwise, after all other checks we will assign it to the "message" key.
+        if (!$custom) {
+            return [];
+        }
+        if (is_object($custom)) {
+            trigger_error("Using the an object that does not implement the Rollbar\SerializerInterface interface has been deprecated.",
+                E_USER_DEPRECATED);
+            return get_object_vars($custom);
+        }
+        if (is_array($custom)) {
+            return $custom;
+        }
+        return ['message' => $custom];
+    }
+
     public function addCustom($key, $data)
     {
         if ($this->custom === null) {

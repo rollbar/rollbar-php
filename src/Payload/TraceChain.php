@@ -29,7 +29,11 @@ class TraceChain implements SerializerInterface
     public function serialize()
     {
         $mapValue = function ($value) {
-            if ($value instanceof \Serializable || $value instanceof SerializerInterface) {
+            if ($value instanceof \Serializable) {
+                trigger_error("Using the Serializable interface has been deprecated.", E_USER_DEPRECATED);
+                return $value->serialize();
+            }
+            if ($value instanceof SerializerInterface) {
                 return $value->serialize();
             }
             return $value;
