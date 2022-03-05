@@ -150,7 +150,7 @@ final class Utilities
                 trigger_error("Using the Serializable interface has been deprecated.", E_USER_DEPRECATED);
                 self::markSerialized($obj, $objectHashes);
                 $serialized = $obj->serialize();
-            } else if ($obj instanceof SerializerInterface) {
+            } elseif ($obj instanceof SerializerInterface) {
                 self::markSerialized($obj, $objectHashes);
                 $serialized = $obj->serialize();
             } else {

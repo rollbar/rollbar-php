@@ -1030,8 +1030,11 @@ class DataBuilder implements DataBuilderInterface
             return [];
         }
         if (is_object($custom)) {
-            trigger_error("Using an object that does not implement the Rollbar\SerializerInterface interface has been deprecated.",
-                E_USER_DEPRECATED);
+            trigger_error(
+                "Using an object that does not implement the "
+                . "Rollbar\SerializerInterface interface has been deprecated.",
+                E_USER_DEPRECATED
+            );
             return get_object_vars($custom);
         }
         if (is_array($custom)) {
