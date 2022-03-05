@@ -44,7 +44,7 @@ class TraceTest extends BaseRollbarTest
 
     public function testEncode()
     {
-        $value = m::mock("Rollbar\Payload\ExceptionInfo, \Serializable")
+        $value = m::mock("Rollbar\Payload\ExceptionInfo, Rollbar\SerializerInterface")
             ->shouldReceive("serialize")
             ->andReturn("{EXCEPTION}")
             ->mock();
