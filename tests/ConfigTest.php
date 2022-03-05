@@ -11,6 +11,7 @@ use Rollbar\Payload\Payload;
 use Rollbar\RollbarLogger;
 use Rollbar\Defaults;
 
+use Rollbar\TestHelpers\CustomSerializable;
 use Rollbar\TestHelpers\Exceptions\SilentExceptionSampleRate;
 use Rollbar\TestHelpers\Exceptions\FiftyFiftyExceptionSampleRate;
 use Rollbar\TestHelpers\Exceptions\FiftyFityChildExceptionSampleRate;
@@ -436,27 +437,134 @@ class ConfigTest extends BaseRollbarTest
 
     public function testCustom()
     {
+        $expectedCustom = array(
+            "foo" => "bar",
+            "fuzz" => "buzz"
+        );
         $config = new Config(array(
             "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env,
-            "custom" => array(
-                "foo" => "bar",
-                "fuzz" => "buzz"
-            )
+            "custom" => $expectedCustom,
         ));
-        
-        $dataBuilder = $config->getDataBuilder();
-        
-        $result = $dataBuilder->makeData(
+
+        $result = $config->getDataBuilder()->makeData(
             Level::INFO,
             "Test message with custom data added dynamically.",
-            array()
+            array(),
         );
         
-        $custom = $result->getCustom();
+        $actualCustom = $result->getCustom();
         
-        $this->assertEquals("bar", $custom["foo"]);
-        $this->assertEquals("buzz", $custom["fuzz"]);
+        $this->assertSame($expectedCustom, $actualCustom);
+    }
+
+    public function testCustomPrimitive()
+    {
+        $config = new Config(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => $this->env,
+            "custom" => true,
+        ));
+
+        $result = $config->getDataBuilder()->makeData(
+            Level::INFO,
+            "Test message with custom data added dynamically.",
+            array(),
+        );
+
+        $custom = $result->getCustom();
+
+        $this->assertSame(array('message' => true), $custom);
+    }
+
+    public function testCustomPrimitiveFalsy()
+    {
+        $config = new Config(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => $this->env,
+            "custom" => 0.0,
+        ));
+
+        $result = $config->getDataBuilder()->makeData(
+            Level::INFO,
+            "Test message with custom data added dynamically.",
+            array(),
+        );
+
+        $custom = $result->getCustom();
+
+        $this->assertSame(array(), $custom);
+    }
+
+    public function testCustomObject()
+    {
+        $expectedCustom = array(
+            "foo" => "bar",
+            "fuzz" => "buzz"
+        );
+        $config = new Config(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => $this->env,
+            "custom" => (object) $expectedCustom,
+        ));
+
+        // New error handler to make sure we get the deprecated notice
+        set_error_handler(function (
+            int $errno,
+            string $errstr,
+        ) : bool {
+            $this->assertStringContainsString("deprecated", $errstr);
+            return true;
+        }, E_USER_DEPRECATED);
+
+        $result = $config->getDataBuilder()->makeData(
+            Level::INFO,
+            "Test message with custom data added dynamically.",
+            array(),
+        );
+
+        // Clear the handler, so it does not mess with other tests.
+        restore_error_handler();
+
+        $actualCustom = $result->getCustom();
+
+        $this->assertSame($expectedCustom, $actualCustom);
+    }
+
+    public function testCustomSerializable()
+    {
+        $expectedCustom = array(
+            "foo" => "bar",
+            "fuzz" => "buzz"
+        );
+        $config = new Config(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => $this->env,
+            "custom" => new CustomSerializable($expectedCustom),
+        ));
+
+        // New error handler to make sure we get the deprecated notice
+        set_error_handler(function (
+            int $errno,
+            string $errstr,
+        ) : bool {
+            $this->assertStringContainsString("Serializable", $errstr);
+            $this->assertStringContainsString("deprecated", $errstr);
+            return true;
+        }, E_USER_DEPRECATED);
+
+        $result = $config->getDataBuilder()->makeData(
+            Level::INFO,
+            "Test message with custom data added dynamically.",
+            array(),
+        );
+
+        // Clear the handler, so it does not mess with other tests.
+        restore_error_handler();
+
+        $actualCustom = $result->getCustom();
+
+        $this->assertSame($expectedCustom, $actualCustom);
     }
     
     public function testMaxItems()
