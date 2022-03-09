@@ -2,9 +2,10 @@
 
 namespace Rollbar\Payload;
 
+use Rollbar\SerializerInterface;
 use Rollbar\UtilitiesTrait;
 
-class Body implements \Serializable
+class Body implements SerializerInterface
 {
     use UtilitiesTrait;
 
@@ -46,10 +47,5 @@ class Body implements \Serializable
         }
         
         return $this->utilities()->serializeForRollbarInternal($result, array('extra'));
-    }
-    
-    public function unserialize(string $serialized)
-    {
-        throw new \Exception('Not implemented yet.');
     }
 }

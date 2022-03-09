@@ -34,7 +34,7 @@ jobs:
     strategy:
       matrix:
         # All the versions, OS, and dependency levels we want to support
-        php: [8.0]
+        php: [8.0, 8.1]
         dependency: [stable] # TODO: lowest
         os: [ubuntu]         # TODO: windows, macos
         # Our code has paths for with- and without- XDebug, and we want to test

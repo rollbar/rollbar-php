@@ -2,9 +2,10 @@
 
 namespace Rollbar\Payload;
 
+use Rollbar\SerializerInterface;
 use Rollbar\UtilitiesTrait;
 
-class Notifier implements \Serializable
+class Notifier implements SerializerInterface
 {
     const NAME = "rollbar-php";
     const VERSION = "3.0.0";
@@ -50,10 +51,5 @@ class Notifier implements \Serializable
         );
         
         return $this->utilities()->serializeForRollbarInternal($result);
-    }
-    
-    public function unserialize(string $serialized)
-    {
-        throw new \Exception('Not implemented yet.');
     }
 }

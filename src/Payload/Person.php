@@ -2,6 +2,7 @@
 
 namespace Rollbar\Payload;
 
+use Rollbar\SerializerInterface;
 use Rollbar\UtilitiesTrait;
 
 /**
@@ -10,7 +11,7 @@ use Rollbar\UtilitiesTrait;
  *
  * @SuppressWarnings(PHPMD.ShortVariable)
  */
-class Person implements \Serializable
+class Person implements SerializerInterface
 {
     use UtilitiesTrait;
 
@@ -77,10 +78,5 @@ class Person implements \Serializable
         }
         
         return $this->utilities()->serializeForRollbarInternal($result, array_keys($this->extra));
-    }
-    
-    public function unserialize(string $serialized)
-    {
-        throw new \Exception('Not implemented yet.');
     }
 }

@@ -4,9 +4,10 @@ namespace Rollbar\Payload;
 
 use Rollbar\DataBuilder;
 use Rollbar\Config;
+use Rollbar\SerializerInterface;
 use Rollbar\UtilitiesTrait;
 
-class Payload implements \Serializable
+class Payload implements SerializerInterface
 {
     use UtilitiesTrait;
 
@@ -48,10 +49,5 @@ class Payload implements \Serializable
         );
 
         return $this->utilities()->serializeForRollbar($result, null, $objectHashes, $maxDepth);
-    }
-    
-    public function unserialize(string $serialized)
-    {
-        throw new \Exception('Not implemented yet.');
     }
 }

@@ -185,7 +185,7 @@ class DataTest extends BaseRollbarTest
     private function mockSerialize($mock, $returnVal)
     {
         if (is_string($mock)) {
-            $mock = m::mock("$mock, \Serializable");
+            $mock = m::mock("$mock, Rollbar\SerializerInterface");
         }
         return $mock->shouldReceive("serialize")
             ->andReturn($returnVal)

@@ -49,9 +49,4 @@ class Message implements ContentInterface
         );
         return $this->utilities()->serializeForRollbar($toSerialize);
     }
-    
-    public function unserialize($serialized)
-    {
-        throw new \Exception('Not implemented yet.');
-    }
 }
