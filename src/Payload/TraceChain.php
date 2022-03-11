@@ -4,7 +4,7 @@ namespace Rollbar\Payload;
 
 use Rollbar\SerializerInterface;
 
-class TraceChain implements SerializerInterface
+class TraceChain implements ContentInterface
 {
     public function __construct(private array $traces)
     {
