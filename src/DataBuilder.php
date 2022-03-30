@@ -900,7 +900,7 @@ class DataBuilder implements DataBuilderInterface
             return null;
         }
 
-        $identifier = $personData['id'];
+        $identifier = (string)$personData['id'];
 
         $email = null;
         if ($this->captureEmail && isset($personData['email'])) {
