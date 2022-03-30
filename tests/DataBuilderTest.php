@@ -762,6 +762,25 @@ class DataBuilderTest extends BaseRollbarTest
         $output = $dataBuilder->makeData(Level::ERROR, "testing", array());
         $this->assertEquals('123', $output->getPerson()->getId());
     }
+
+    public function testPersonIntID()
+    {
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => $this->getTestAccessToken(),
+            'environment' => 'tests',
+            'person' => array(
+                'id' => 123,
+                'username' => 'tester',
+                'email' => 'test@test.com'
+            ),
+            'levelFactory' => new LevelFactory,
+            'utilities' => new Utilities
+        ));
+        $output = $dataBuilder->makeData(Level::ERROR, "testing", array());
+        $this->assertEquals('123', $output->getPerson()->getId());
+        $this->assertNull($output->getPerson()->getUsername());
+        $this->assertNull($output->getPerson()->getEmail());
+    }
     
     public function testPersonFuncException()
     {
@@ -904,7 +923,7 @@ class DataBuilderTest extends BaseRollbarTest
         );
         // 900 is the line number where the comment "// A" is found
         $this->assertEquals(
-            900,
+            919,
             $frames[count($frames)-1]->getLineno(),
             "Possible false negative: did this file change? Check the line number for line with '// A' comment"
         );

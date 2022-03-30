@@ -7,6 +7,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.2] - 2022-03-30
+This release is a patch to fix a regression in functionality that was introduced
+in v3.0.0.
+### Fixed
+* Fixed https://github.com/rollbar/rollbar-php-laravel/issues/134 Person ID not 
+  cast to string by @danielmorell in #562
+
+## [3.1.1] - 2022-03-11
+This release is a patch to fix a bug in the TraceChain class that was introduced 
+in v3.1.0.
+### Fixed
+* Tracechain must implements ContentInterface to be part of Body. by @stephpy 
+  in #560
+
+## [3.1.0] - 2022-03-09
+Aside from some needed maintenance and bug fixes, this release resolves some 
+issues needed to support PHP 8.1. It also updates our support for `psr/log` to 
+v2! The other significant update is the addition of the `transformer` option.
+
+One of the important changes is in what types can be passed to `custom` argument 
+in `Rollbar\Rollbar::init()`. Passing in an object or class instance that does 
+not implement the new `Rollbar\SerializerInterface` has been deprecated. This 
+helps us ensure any custom values in your payload are serializable, and they can 
+be sent to Rollbar serves without error.
+### Added
+- Added transformer option by @danielroehrig in #543
+- Allow `psr/log` v2 by @Jean85 in #536
+- Added psalm static analysis by @bishopb in #550, and #551
+- Added `Rollbar\SerializerInterface` to describe serialization behavior @danielmorell in #558
+### Fixed
+- Fixed `report_suppressed` isset check by @trsteel88 and @bishopb in #539, and $546.
+- Fixed missed cleanup of synthetic member variable by @bishopb in #547
+- Fixed possibly null argument by @bishopb in #552
+- Fixed deprecation warnings on PHP 8.1 @danielmorell in #558
+### Changed
+* Update PR template by @bxsx in #549
+
 ## [3.0.0] - 2021-06-28
 ### Changed
 - The new configuration option `scrub_safelist` replaces the deprecated
@@ -550,7 +587,10 @@ however this is for convenience only and the methods that have changed have been
 - Error handler function (`report_php_error`) now always returns false, so that the default php error handler still runs. This is a breaking change if your code relied on the old behavior where the error handler did *not* ever halt script execution.
 
 
-[Unreleased]: https://github.com/rollbar/rollbar-php/compare/v3.0.0...HEAD
+[Unreleased]: https://github.com/rollbar/rollbar-php/compare/v3.1.2...HEAD
+[3.1.2]: https://github.com/rollbar/rollbar-php/compare/v3.1.1...v3.1.2
+[3.1.1]: https://github.com/rollbar/rollbar-php/compare/v3.1.0...v3.1.1
+[3.1.0]: https://github.com/rollbar/rollbar-php/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/rollbar/rollbar-php/compare/v3.0.0-RC2...v3.0.0
 [3.0.0-RC2]: https://github.com/rollbar/rollbar-php/compare/v3.0.0-RC1...v3.0.0-RC2
 [3.0.0-RC1]: https://github.com/rollbar/rollbar-php/compare/v2.1.0...v3.0.0-RC1
