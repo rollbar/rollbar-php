@@ -381,6 +381,16 @@ class ConfigTest extends BaseRollbarTest
         }
     }
 
+    public function testReportSuppressedActuallySuppressed()
+    {
+        $config = new Config(array(
+            'report_suppressed' => false,
+            "access_token" => $this->getTestAccessToken()
+        ));
+        $this->assertFalse($config->shouldSuppress());
+        $this->assertTrue(@$config->shouldSuppress());
+    }
+
     public function testFilter()
     {
         $d = m::mock("Rollbar\Payload\Data")
