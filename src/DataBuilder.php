@@ -178,7 +178,7 @@ class DataBuilder implements DataBuilderInterface
         $fromConfig = isset($config['local_vars_dump']) ? $config['local_vars_dump'] : null;
         $this->localVarsDump = self::$defaults->localVarsDump($fromConfig);
         if ($this->localVarsDump && !empty(ini_get('zend.exception_ignore_args'))) {
-            ini_set('zend.exception_ignore_args', 'Off');
+            ini_set('zend.exception_ignore_args', '0');
             assert(empty(ini_get('zend.exception_ignore_args')));
         }
     }
