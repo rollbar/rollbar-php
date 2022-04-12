@@ -80,7 +80,8 @@ class Scrubber implements ScrubberInterface
                     $data
                 );
             } else {
-                parse_str($data, $parsedData);
+                // PHP reports warning if parse_str() detects more than max_input_vars items.
+                @parse_str($data, $parsedData);
                 if (http_build_query($parsedData) === $data) {
                     $data = $this->scrubQueryString($data, $fields);
                 }
@@ -131,7 +132,8 @@ class Scrubber implements ScrubberInterface
 
     protected function scrubQueryString($query, $fields, $replacement = 'xxxxxxxx')
     {
-        parse_str($query, $parsed);
+        // PHP reports warning if parse_str() detects more than max_input_vars items.
+        @parse_str($query, $parsed);
         $scrubbed = $this->internalScrub($parsed, $fields, $replacement, '');
         return http_build_query($scrubbed);
     }

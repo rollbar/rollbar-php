@@ -630,7 +630,8 @@ class DataBuilder implements DataBuilderInterface
             $postData = array();
             $body = $request->getBody();
             if ($body !== null) {
-                parse_str($body, $postData);
+                // PHP reports warning if parse_str() detects more than max_input_vars items.
+                @parse_str($body, $postData);
             }
             $request->setPost($postData);
         }
