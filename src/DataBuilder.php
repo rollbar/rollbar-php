@@ -1015,10 +1015,14 @@ class DataBuilder implements DataBuilderInterface
     {
         // This check is placed first because it should return a string|null, and we want to return an array.
         if ($custom instanceof \Serializable) {
-            trigger_error("Using the Serializable interface has been deprecated.", E_USER_DEPRECATED);
             // We don't return this value instead we run it through the rest of the checks. The same is true for the
             // next check.
-            $custom = $custom->serialize();
+            if (method_exists($custom, '__serialize')) {
+                $custom = $custom->__serialize();
+            } else {
+                trigger_error("Using the Serializable interface has been deprecated.", E_USER_DEPRECATED);
+                $custom = $custom->serialize();
+            }
         } else {
             if ($custom instanceof SerializerInterface) {
                 $custom = $custom->serialize();
