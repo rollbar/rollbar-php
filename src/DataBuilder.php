@@ -114,109 +114,109 @@ class DataBuilder implements DataBuilderInterface
 
     protected function setCaptureIP($config)
     {
-        $fromConfig = isset($config['capture_ip']) ? $config['capture_ip'] : null;
+        $fromConfig = $config['capture_ip'] ?? null;
         $this->captureIP = self::$defaults->captureIP($fromConfig);
     }
     
     protected function setCaptureEmail($config)
     {
-        $fromConfig = isset($config['capture_email']) ? $config['capture_email'] : null;
+        $fromConfig = $config['capture_email'] ?? null;
         $this->captureEmail = self::$defaults->captureEmail($fromConfig);
     }
     
     protected function setCaptureUsername($config)
     {
-        $fromConfig = isset($config['capture_username']) ? $config['capture_username'] : null;
+        $fromConfig = $config['capture_username'] ?? null;
         $this->captureUsername = self::$defaults->captureUsername($fromConfig);
     }
 
     protected function setEnvironment($config)
     {
-        $fromConfig = isset($config['environment']) ? $config['environment'] : self::$defaults->get()->environment();
+        $fromConfig = $config['environment'] ?? self::$defaults->get()->environment();
         $this->utilities->validateString($fromConfig, "config['environment']", null, false);
         $this->environment = $fromConfig;
     }
 
     protected function setDefaultMessageLevel($config)
     {
-        $fromConfig = isset($config['messageLevel']) ? $config['messageLevel'] : null;
+        $fromConfig = $config['messageLevel'] ?? null;
         $this->messageLevel = self::$defaults->messageLevel($fromConfig);
     }
 
     protected function setDefaultExceptionLevel($config)
     {
-        $fromConfig = isset($config['exceptionLevel']) ? $config['exceptionLevel'] : null;
+        $fromConfig = $config['exceptionLevel'] ?? null;
         $this->exceptionLevel = self::$defaults->exceptionLevel($fromConfig);
     }
 
     protected function setDefaultPsrLevels($config)
     {
-        $fromConfig = isset($config['psrLevels']) ? $config['psrLevels'] : null;
+        $fromConfig = $config['psrLevels'] ?? null;
         $this->psrLevels = self::$defaults->psrLevels($fromConfig);
     }
 
     protected function setErrorLevels($config)
     {
-        $fromConfig = isset($config['errorLevels']) ? $config['errorLevels'] : null;
+        $fromConfig = $config['errorLevels'] ?? null;
         $this->errorLevels = self::$defaults->errorLevels($fromConfig);
     }
 
     protected function setSendMessageTrace($config)
     {
-        $fromConfig = isset($config['send_message_trace']) ? $config['send_message_trace'] : null;
+        $fromConfig = $config['send_message_trace'] ?? null;
         $this->sendMessageTrace = self::$defaults->sendMessageTrace($fromConfig);
     }
     
     protected function setRawRequestBody($config)
     {
-        $fromConfig = isset($config['include_raw_request_body']) ? $config['include_raw_request_body'] : null;
+        $fromConfig = $config['include_raw_request_body'] ?? null;
         $this->rawRequestBody = self::$defaults->rawRequestBody($fromConfig);
     }
 
     protected function setLocalVarsDump($config)
     {
-        $fromConfig = isset($config['local_vars_dump']) ? $config['local_vars_dump'] : null;
+        $fromConfig = $config['local_vars_dump'] ?? null;
         $this->localVarsDump = self::$defaults->localVarsDump($fromConfig);
         if ($this->localVarsDump && !empty(ini_get('zend.exception_ignore_args'))) {
             ini_set('zend.exception_ignore_args', 'Off');
-            assert(empty(ini_get('zend.exception_ignore_args')));
+            assert(empty(ini_get('zend.exception_ignore_args')) ||  ini_get('zend.exception_ignore_args') === "Off");
         }
     }
     
     protected function setCaptureErrorStacktraces($config)
     {
-        $fromConfig = isset($config['capture_error_stacktraces']) ? $config['capture_error_stacktraces'] : null;
+        $fromConfig = $config['capture_error_stacktraces'] ?? null;
         $this->captureErrorStacktraces = self::$defaults->captureErrorStacktraces($fromConfig);
     }
 
     protected function setCodeVersion($config)
     {
-        $fromConfig = isset($config['codeVersion']) ? $config['codeVersion'] : null;
+        $fromConfig = $config['codeVersion'] ?? null;
         if (!isset($fromConfig)) {
-            $fromConfig = isset($config['code_version']) ? $config['code_version'] : null;
+            $fromConfig = $config['code_version'] ?? null;
         }
         $this->codeVersion = self::$defaults->codeVersion($fromConfig);
     }
 
     protected function setPlatform($config)
     {
-        $fromConfig = isset($config['platform']) ? $config['platform'] : null;
+        $fromConfig = $config['platform'] ?? null;
         $this->platform = self::$defaults->platform($fromConfig);
     }
 
     protected function setFramework($config)
     {
-        $this->framework = isset($config['framework']) ? $config['framework'] : null;
+        $this->framework = $config['framework'] ?? null;
     }
 
     protected function setContext($config)
     {
-        $this->context = isset($config['context']) ? $config['context'] : null;
+        $this->context = $config['context'] ?? null;
     }
 
     protected function setRequestParams($config)
     {
-        $this->requestParams = isset($config['requestParams']) ? $config['requestParams'] : null;
+        $this->requestParams = $config['requestParams'] ?? null;
     }
 
     /*
@@ -225,7 +225,7 @@ class DataBuilder implements DataBuilderInterface
     protected function setRequestBody($config)
     {
         
-        $this->requestBody = isset($config['requestBody']) ? $config['requestBody'] : null;
+        $this->requestBody = $config['requestBody'] ?? null;
         
         if (!$this->requestBody && $this->rawRequestBody) {
             $this->requestBody = file_get_contents("php://input");
@@ -234,46 +234,42 @@ class DataBuilder implements DataBuilderInterface
 
     protected function setRequestExtras($config)
     {
-        $this->requestExtras = isset($config["requestExtras"]) ? $config["requestExtras"] : null;
+        $this->requestExtras = $config["requestExtras"] ?? null;
     }
 
     protected function setPerson($config)
     {
-        $this->person = isset($config['person']) ? $config['person'] : null;
+        $this->person = $config['person'] ?? null;
     }
 
     protected function setPersonFunc($config)
     {
-        $this->personFunc = isset($config['person_fn']) ? $config['person_fn'] : null;
+        $this->personFunc = $config['person_fn'] ?? null;
     }
 
     protected function setServerRoot($config)
     {
-        $fromConfig = isset($config['serverRoot']) ? $config['serverRoot'] : null;
+        $fromConfig = $config['serverRoot'] ?? null;
         if (!isset($fromConfig)) {
-            $fromConfig = isset($config['root']) ? $config['root'] : null;
+            $fromConfig = $config['root'] ?? null;
         }
         $this->serverRoot = self::$defaults->serverRoot($fromConfig);
     }
 
     protected function setServerBranch($config)
     {
-        $fromConfig = isset($config['serverBranch']) ? $config['serverBranch'] : null;
+        $fromConfig = $config['serverBranch'] ?? null;
         if (!isset($fromConfig)) {
-            $fromConfig = isset($config['branch']) ? $config['branch'] : null;
+            $fromConfig = $config['branch'] ?? null;
         }
             
         $this->serverBranch = self::$defaults->branch($fromConfig);
         
         if ($this->serverBranch === null) {
-            $autodetectBranch = isset($config['autodetect_branch']) ?
-                $config['autodetect_branch'] :
-                self::$defaults->autodetectBranch();
+            $autodetectBranch = $config['autodetect_branch'] ?? self::$defaults->autodetectBranch();
             
             if ($autodetectBranch) {
-                $allowExec = isset($config['allow_exec']) ?
-                    $config['allow_exec'] :
-                    self::$defaults->allowExec();
+                $allowExec = $config['allow_exec'] ?? self::$defaults->allowExec();
                     
                 $this->serverBranch = $this->detectGitBranch($allowExec);
             }
@@ -282,64 +278,62 @@ class DataBuilder implements DataBuilderInterface
 
     protected function setServerCodeVersion($config)
     {
-        $this->serverCodeVersion = isset($config['serverCodeVersion']) ? $config['serverCodeVersion'] : null;
+        $this->serverCodeVersion = $config['serverCodeVersion'] ?? null;
     }
 
     protected function setServerExtras($config)
     {
-        $this->serverExtras = isset($config['serverExtras']) ? $config['serverExtras'] : null;
+        $this->serverExtras = $config['serverExtras'] ?? null;
     }
 
     public function setCustom($config)
     {
-        $this->custom = isset($config['custom']) ? $config['custom'] : \Rollbar\Defaults::get()->custom();
+        $this->custom = $config['custom'] ?? \Rollbar\Defaults::get()->custom();
     }
     
     public function setCustomDataMethod($config)
     {
-        $this->customDataMethod = isset($config['custom_data_method']) ?
-            $config['custom_data_method'] :
-            \Rollbar\Defaults::get()->customDataMethod();
+        $this->customDataMethod = $config['custom_data_method'] ?? \Rollbar\Defaults::get()->customDataMethod();
     }
 
     protected function setFingerprint($config)
     {
-        $this->fingerprint = isset($config['fingerprint']) ? $config['fingerprint'] : null;
+        $this->fingerprint = $config['fingerprint'] ?? null;
     }
 
     protected function setTitle($config)
     {
-        $this->title = isset($config['title']) ? $config['title'] : null;
+        $this->title = $config['title'] ?? null;
     }
 
     protected function setNotifier($config)
     {
-        $fromConfig = isset($config['notifier']) ? $config['notifier'] : null;
+        $fromConfig = $config['notifier'] ?? null;
         $this->notifier = self::$defaults->notifier($fromConfig);
     }
 
     protected function setBaseException($config)
     {
-        $fromConfig = isset($config['baseException']) ? $config['baseException'] : null;
+        $fromConfig = $config['baseException'] ?? null;
         $this->baseException = self::$defaults->baseException($fromConfig);
     }
 
     protected function setIncludeCodeContext($config)
     {
-        $fromConfig = isset($config['include_error_code_context']) ? $config['include_error_code_context'] : null;
+        $fromConfig = $config['include_error_code_context'] ?? null;
         $this->includeCodeContext = self::$defaults->includeCodeContext($fromConfig);
     }
 
     protected function setIncludeExcCodeContext($config)
     {
         $fromConfig =
-            isset($config['include_exception_code_context']) ? $config['include_exception_code_context'] : null;
+            $config['include_exception_code_context'] ?? null;
         $this->includeExcCodeContext = self::$defaults->includeExcCodeContext($fromConfig);
     }
     
     protected function setLevelFactory($config)
     {
-        $this->levelFactory = isset($config['levelFactory']) ? $config['levelFactory'] : null;
+        $this->levelFactory = $config['levelFactory'] ?? null;
         if (!$this->levelFactory) {
             throw new \InvalidArgumentException(
                 'Missing dependency: LevelFactory not provided to the DataBuilder.'
@@ -349,7 +343,7 @@ class DataBuilder implements DataBuilderInterface
     
     protected function setUtilities($config)
     {
-        $this->utilities = isset($config['utilities']) ? $config['utilities'] : null;
+        $this->utilities = $config['utilities'] ?? null;
         if (!$this->utilities) {
             throw new \InvalidArgumentException(
                 'Missing dependency: Utilities not provided to the DataBuilder.'
@@ -359,7 +353,7 @@ class DataBuilder implements DataBuilderInterface
 
     protected function setHost($config)
     {
-        $this->host = isset($config['host']) ? $config['host'] : self::$defaults->host();
+        $this->host = $config['host'] ?? self::$defaults->host();
     }
 
     /**
@@ -615,8 +609,8 @@ class DataBuilder implements DataBuilderInterface
             ->setUserIp($this->getUserIp());
       
         if (isset($_SERVER)) {
-            $request->setMethod(isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : null)
-                ->setQueryString(isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : null);
+            $request->setMethod($_SERVER['REQUEST_METHOD'] ?? null)
+                ->setQueryString($_SERVER['QUERY_STRING'] ?? null);
         }
       
         if (isset($_GET)) {
@@ -682,11 +676,11 @@ class DataBuilder implements DataBuilderInterface
                     
                     if (stripos($fpPart, 'for=') !== false) {
                         // Parse 'for' forwarded pair
-                        $result['for'] = isset($result['for']) ? $result['for'] : array();
+                        $result['for'] = $result['for'] ?? array();
                         $result['for'][] = substr($fpPart, strlen('for='));
                     } elseif (stripos($fpPart, 'by=') !== false) {
                         // Parse 'by' forwarded pair
-                        $result['by'] = isset($result['by']) ? $result['by'] : array();
+                        $result['by'] = $result['by'] ?? array();
                         $result['by'][] = substr($fpPart, strlen('by='));
                     }
                 }
@@ -784,7 +778,7 @@ class DataBuilder implements DataBuilderInterface
         }
 
         if (isset($_SERVER)) {
-            $path = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '/';
+            $path = $_SERVER['REQUEST_URI'] ?? '/';
             $url .= $path;
         }
 
@@ -940,10 +934,7 @@ class DataBuilder implements DataBuilderInterface
 
     protected function getHost()
     {
-        if (isset($this->host)) {
-            return $this->host;
-        }
-        return gethostname();
+        return $this->host ?? gethostname();
     }
 
     protected function getServerRoot()
@@ -1065,7 +1056,7 @@ class DataBuilder implements DataBuilderInterface
 
     protected function getFingerprint($context)
     {
-        return isset($context['fingerprint']) ? $context['fingerprint'] : $this->fingerprint;
+        return $context['fingerprint'] ?? $this->fingerprint;
     }
 
     protected function getTitle()
@@ -1193,7 +1184,7 @@ class DataBuilder implements DataBuilderInterface
 
         // in XDebug 3 and later, the function is defined but disabled unless
         // the xdebug mode parameter includes it
-        return false === strpos(ini_get('xdebug.mode'), 'develop') ? false : true;
+        return !str_contains(ini_get('xdebug.mode'), 'develop') ? false : true;
     }
     
     private function fetchErrorTrace()

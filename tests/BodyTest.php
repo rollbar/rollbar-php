@@ -1,23 +1,24 @@
 <?php namespace Rollbar;
 
-use \Mockery as m;
+use Mockery as m;
 use Rollbar\Payload\Body;
+use Rollbar\Payload\ContentInterface;
 
 class BodyTest extends BaseRollbarTest
 {
-    public function testBodyValue()
+    public function testBodyValue(): void
     {
-        $value = m::mock("Rollbar\Payload\ContentInterface");
+        $value = m::mock(ContentInterface::class);
         $body = new Body($value);
         $this->assertEquals($value, $body->getValue());
 
-        $mock2 = m::mock("Rollbar\Payload\ContentInterface");
+        $mock2 = m::mock(ContentInterface::class);
         $this->assertEquals($mock2, $body->setValue($mock2)->getValue());
     }
 
-    public function testExtra()
+    public function testExtra(): void
     {
-        $value = m::mock("Rollbar\Payload\ContentInterface")
+        $value = m::mock(ContentInterface::class)
             ->shouldReceive("serialize")
             ->andReturn("{CONTENT}")
             ->shouldReceive("getKey")
@@ -30,9 +31,9 @@ class BodyTest extends BaseRollbarTest
         $this->assertEquals($body->getExtra(), $expected);
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
-        $value = m::mock("Rollbar\Payload\ContentInterface")
+        $value = m::mock(ContentInterface::class)
             ->shouldReceive("serialize")
             ->andReturn("{CONTENT}")
             ->shouldReceive("getKey")

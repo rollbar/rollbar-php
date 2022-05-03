@@ -3,15 +3,15 @@
 namespace Rollbar\Truncation;
 
 use Rollbar\Payload\EncodedPayload;
-use \Rollbar\Config;
-use \Rollbar\BaseRollbarTest;
+use Rollbar\Config;
+use Rollbar\BaseRollbarTest;
 
 class FramesStrategyTest extends BaseRollbarTest
 {
     /**
      * @dataProvider executeProvider
      */
-    public function testExecute($data, $expected)
+    public function testExecute($data, $expected): void
     {
         $config = new Config(array('access_token' => $this->getTestAccessToken()));
         $truncation = new Truncation($config);
@@ -26,7 +26,7 @@ class FramesStrategyTest extends BaseRollbarTest
         $this->assertEquals($expected, $result->data());
     }
     
-    public function executeProvider()
+    public function executeProvider(): array
     {
         $data = array(
             'nothing to truncate using trace key' => array(

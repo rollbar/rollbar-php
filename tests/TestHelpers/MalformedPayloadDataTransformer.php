@@ -1,7 +1,8 @@
 <?php namespace Rollbar\TestHelpers;
 
-use \Rollbar\Payload\Level;
-use \Rollbar\Payload\Payload;
+use Rollbar\Payload\Level;
+use Rollbar\Payload\Payload;
+use Rollbar\Payload\Data;
 
 class MalformedPayloadDataTransformer implements \Rollbar\TransformerInterface
 {
@@ -11,7 +12,7 @@ class MalformedPayloadDataTransformer implements \Rollbar\TransformerInterface
         mixed $toLog,
         array $context = array()
     ): ?Payload {
-        $mock = \Mockery::mock('\Rollbar\Payload\Data')->makePartial();
+        $mock = \Mockery::mock(Data::class)->makePartial();
         $mock->shouldReceive("serialize")->andReturn(false);
         $levelFactory = new \Rollbar\LevelFactory();
         $mock->setLevel($levelFactory->fromName($level));

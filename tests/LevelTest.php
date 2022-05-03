@@ -1,17 +1,17 @@
 <?php namespace Rollbar;
 
-use \Mockery as m;
+use Mockery as m;
 use Rollbar\Payload\Level;
 
 class LevelTest extends BaseRollbarTest
 {
-    public function testInvalidLevelThrowsAnException()
+    public function testInvalidLevelThrowsAnException(): void
     {
         $this->expectException(\Exception::class);
         $level = Level::TEST();
     }
 
-    public function testLevel()
+    public function testLevel(): void
     {
         $level = Level::CRITICAL();
         $this->assertNotNull($level);

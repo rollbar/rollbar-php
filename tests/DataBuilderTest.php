@@ -7,11 +7,10 @@ use Rollbar\TestHelpers\MockPhpStream;
 
 class DataBuilderTest extends BaseRollbarTest
 {
-
     /**
      * @var DataBuilder
      */
-    private $dataBuilder;
+    private DataBuilder $dataBuilder;
 
     public function setUp(): void
     {
@@ -33,13 +32,13 @@ class DataBuilderTest extends BaseRollbarTest
      * @testWith [ "bogus", null ]
      *           [ "error", "error" ]
      */
-    public function testMakeDataLevel($given, $resolved)
+    public function testMakeDataLevel($given, $resolved): void
     {
         $output = $this->dataBuilder->makeData($given, "testing", array());
         $this->assertEquals($resolved, $output->getLevel());
     }
 
-    public function testMakeData()
+    public function testMakeData(): void
     {
         $output = $this->dataBuilder->makeData(Level::ERROR, "testing", array());
         $this->assertEquals('tests', $output->getEnvironment());
@@ -48,7 +47,7 @@ class DataBuilderTest extends BaseRollbarTest
     /**
      * @dataProvider getUrlProvider
      */
-    public function testGetUrl($protoData, $hostData, $portData)
+    public function testGetUrl($protoData, $hostData, $portData): void
     {
         // Set up proto
         $pre_SERVER = $_SERVER;
@@ -82,7 +81,7 @@ class DataBuilderTest extends BaseRollbarTest
         $this->assertEquals($expected, $result);
     }
     
-    public function getUrlProvider()
+    public function getUrlProvider(): array
     {
         $protoData = $this->getUrlProtoProvider();
         $hostData = $this->getUrlHostProvider();
@@ -116,13 +115,13 @@ class DataBuilderTest extends BaseRollbarTest
     /**
      * @dataProvider parseForwardedStringProvider
      */
-    public function testParseForwardedString($forwaded, $expected)
+    public function testParseForwardedString($forwaded, $expected): void
     {
         $output = $this->dataBuilder->parseForwardedString($forwaded);
         $this->assertEquals($expected, $output);
     }
     
-    public function parseForwardedStringProvider()
+    public function parseForwardedStringProvider(): array
     {
         return array(
             array( // test 1
@@ -174,7 +173,7 @@ class DataBuilderTest extends BaseRollbarTest
     /**
      * @dataProvider getUrlProtoProvider
      */
-    public function testGetUrlProto($data, $expected)
+    public function testGetUrlProto($data, $expected): void
     {
         $pre_SERVER = $_SERVER;
         $_SERVER = array_merge($_SERVER, $data);
@@ -186,7 +185,7 @@ class DataBuilderTest extends BaseRollbarTest
         $_SERVER = $pre_SERVER;
     }
     
-    public function getUrlProtoProvider()
+    public function getUrlProtoProvider(): array
     {
         return array(
             array( // test 1: HTTP_FORWARDED
@@ -229,7 +228,7 @@ class DataBuilderTest extends BaseRollbarTest
     /**
      * @dataProvider getUrlHostProvider
      */
-    public function testGetUrlHost($data, $expected)
+    public function testGetUrlHost($data, $expected): void
     {
         $pre_SERVER = $_SERVER;
         $_SERVER = array_merge($_SERVER, $data);
@@ -241,7 +240,7 @@ class DataBuilderTest extends BaseRollbarTest
         $this->assertEquals($expected, $output);
     }
     
-    public function getUrlHostProvider()
+    public function getUrlHostProvider(): array
     {
         return array(
             array( // test 1: HTTP_FORWARDED
@@ -281,7 +280,7 @@ class DataBuilderTest extends BaseRollbarTest
         );
     }
 
-    public function testGetHeaders()
+    public function testGetHeaders(): void
     {
         $pre_SERVER = $_SERVER;
         $_SERVER = array(
@@ -301,13 +300,13 @@ class DataBuilderTest extends BaseRollbarTest
     /**
      * @dataProvider getUrlPortProvider
      */
-    public function testGetUrlPort($data, $expected)
+    public function testGetUrlPort($data, $expected): void
     {
         $pre_SERVER = $_SERVER;
         $_SERVER = array_merge($_SERVER, $data);
         
         $output = $this->dataBuilder->getUrlPort(
-            isset($_SERVER['$proto']) ? $_SERVER['$proto'] : null
+            $_SERVER['$proto'] ?? null
         );
         
         $_SERVER = $pre_SERVER;
@@ -315,7 +314,7 @@ class DataBuilderTest extends BaseRollbarTest
         $this->assertEquals($expected, $output);
     }
     
-    public function getUrlPortProvider()
+    public function getUrlPortProvider(): array
     {
         return array(
             array( // test 1: HTTP_X_FORWARDED
@@ -343,7 +342,7 @@ class DataBuilderTest extends BaseRollbarTest
         );
     }
 
-    public function testBranchKey()
+    public function testBranchKey(): void
     {
         $dataBuilder = new DataBuilder(array(
             'accessToken' => $this->getTestAccessToken(),
@@ -357,7 +356,7 @@ class DataBuilderTest extends BaseRollbarTest
         $this->assertEquals('test-branch', $output->getServer()->getBranch());
     }
 
-    public function testCodeVersion()
+    public function testCodeVersion(): void
     {
         $dataBuilder = new DataBuilder(array(
             'accessToken' => $this->getTestAccessToken(),
@@ -370,7 +369,7 @@ class DataBuilderTest extends BaseRollbarTest
         $this->assertEquals('3.4.1', $output->getCodeVersion());
     }
 
-    public function testHost()
+    public function testHost(): void
     {
         $dataBuilder = new DataBuilder(array(
             'accessToken' => $this->getTestAccessToken(),
@@ -383,7 +382,7 @@ class DataBuilderTest extends BaseRollbarTest
         $this->assertEquals('my host', $output->getServer()->getHost());
     }
     
-    public function testGetMessage()
+    public function testGetMessage(): void
     {
         $dataBuilder = new DataBuilder(array(
             'accessToken' => $this->getTestAccessToken(),
@@ -396,7 +395,7 @@ class DataBuilderTest extends BaseRollbarTest
         $this->assertNull($result->getBody()->getValue()->getBacktrace());
     }
     
-    public function testGetMessageSendMessageTrace()
+    public function testGetMessageSendMessageTrace(): void
     {
         
         $dataBuilder = new DataBuilder(array(
@@ -411,7 +410,7 @@ class DataBuilderTest extends BaseRollbarTest
         $this->assertNotEmpty($result->getBody()->getValue()->getBacktrace());
     }
     
-    public function testGetMessageTraceArguments()
+    public function testGetMessageTraceArguments(): void
     {
         // Negative test
         $c = new Config(array(
@@ -450,7 +449,7 @@ class DataBuilderTest extends BaseRollbarTest
         );
     }
     
-    public function testStackFramesAreUnavailableWhenLocalVarsDumpConfigUnset()
+    public function testStackFramesAreUnavailableWhenLocalVarsDumpConfigUnset(): void
     {
         $dataBuilder = new DataBuilder(array(
             'accessToken' => $this->getTestAccessToken(),
@@ -470,7 +469,7 @@ class DataBuilderTest extends BaseRollbarTest
      * @testWith [0]
      *           [1]
      */
-    public function testStackFramesAreAvailableWhenLocalVarsDumpRequested($valueOfZendExceptionIgnoreArgs)
+    public function testStackFramesAreAvailableWhenLocalVarsDumpRequested($valueOfZendExceptionIgnoreArgs): void
     {
         ini_set('zend.exception_ignore_args', $valueOfZendExceptionIgnoreArgs);
 
@@ -501,12 +500,12 @@ class DataBuilderTest extends BaseRollbarTest
      *
      * @return \Exception
      */
-    private function exceptionTraceArgsHelper($message)
+    private function exceptionTraceArgsHelper(string $message): \Exception
     {
         return new \Exception($message);
     }
 
-    public function testExceptionFramesWithoutContext()
+    public function testExceptionFramesWithoutContext(): void
     {
         $dataBuilder = new DataBuilder(array(
             'accessToken' => $this->getTestAccessToken(),
@@ -520,7 +519,7 @@ class DataBuilderTest extends BaseRollbarTest
         $this->assertNull($output[1]->getContext());
     }
 
-    public function testExceptionFramesWithoutContextDefault()
+    public function testExceptionFramesWithoutContextDefault(): void
     {
         $dataBuilder = new DataBuilder(array(
             'accessToken' => $this->getTestAccessToken(),
@@ -532,7 +531,7 @@ class DataBuilderTest extends BaseRollbarTest
         $this->assertNull($output[1]->getContext());
     }
 
-    public function testExceptionFramesWithContext()
+    public function testExceptionFramesWithContext(): void
     {
         $dataBuilder = new DataBuilder(array(
             'accessToken' => $this->getTestAccessToken(),
@@ -545,7 +544,7 @@ class DataBuilderTest extends BaseRollbarTest
         $this->assertNotEmpty($output[count($output)-1]->getContext());
     }
 
-    public function testFramesWithoutContext()
+    public function testFramesWithoutContext(): void
     {
         $utilities = new Utilities;
         
@@ -584,7 +583,7 @@ class DataBuilderTest extends BaseRollbarTest
         $this->assertNull($output[0]->getContext());
     }
 
-    public function testFramesWithContext()
+    public function testFramesWithContext(): void
     {
         $utilities = new Utilities;
 
@@ -616,10 +615,10 @@ class DataBuilderTest extends BaseRollbarTest
             $lineNumber++;
             $line = fgets($file);
 
-            if ($line == '    public function testFramesWithoutContext()
+            if ($line === '    public function testFramesWithoutContext(): void
 ') {
                 $backTrace[0]['line'] = $lineNumber;
-            } elseif ($line == '    public function testFramesWithContext()
+            } elseif ($line === '    public function testFramesWithContext()
 ') {
                 $backTrace[1]['line'] = $lineNumber;
             }
@@ -651,7 +650,7 @@ class DataBuilderTest extends BaseRollbarTest
         );
     }
 
-    public function testFramesWithoutContextDefault()
+    public function testFramesWithoutContextDefault(): void
     {
         $testFilePath = __DIR__ . '/DataBuilderTest.php';
         
@@ -704,7 +703,7 @@ class DataBuilderTest extends BaseRollbarTest
         $this->assertNull($output[0]->getContext());
     }
 
-    public function testPerson()
+    public function testPerson(): void
     {
         $dataBuilder = new DataBuilder(array(
             'accessToken' => $this->getTestAccessToken(),
@@ -723,7 +722,7 @@ class DataBuilderTest extends BaseRollbarTest
         $this->assertNull($output->getPerson()->getEmail());
     }
     
-    public function testPersonCaptureEmailUsername()
+    public function testPersonCaptureEmailUsername(): void
     {
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
@@ -745,7 +744,7 @@ class DataBuilderTest extends BaseRollbarTest
         $this->assertEquals('test@test.com', $output->getPerson()->getEmail());
     }
 
-    public function testPersonFunc()
+    public function testPersonFunc(): void
     {
         $dataBuilder = new DataBuilder(array(
             'accessToken' => $this->getTestAccessToken(),
@@ -763,7 +762,7 @@ class DataBuilderTest extends BaseRollbarTest
         $this->assertEquals('123', $output->getPerson()->getId());
     }
 
-    public function testPersonIntID()
+    public function testPersonIntID(): void
     {
         $dataBuilder = new DataBuilder(array(
             'accessToken' => $this->getTestAccessToken(),
@@ -782,7 +781,7 @@ class DataBuilderTest extends BaseRollbarTest
         $this->assertNull($output->getPerson()->getEmail());
     }
     
-    public function testPersonFuncException()
+    public function testPersonFuncException(): void
     {
         \Rollbar\Rollbar::init(array(
             'access_token' => $this->getTestAccessToken(),
@@ -802,7 +801,7 @@ class DataBuilderTest extends BaseRollbarTest
         }
     }
 
-    public function testRoot()
+    public function testRoot(): void
     {
         $dataBuilder = new DataBuilder(array(
             'accessToken' => $this->getTestAccessToken(),
@@ -815,14 +814,14 @@ class DataBuilderTest extends BaseRollbarTest
         $this->assertEquals('/var/www/app', $output->getServer()->getRoot());
     }
 
-    public function testSetRequestBody()
+    public function testSetRequestBody(): void
     {
         $_POST['arg1'] = "val1";
         $_POST['arg2'] = "val2";
         $streamInput = http_build_query($_POST);
         
         stream_wrapper_unregister("php");
-        stream_wrapper_register("php", "\Rollbar\TestHelpers\MockPhpStream");
+        stream_wrapper_register("php", MockPhpStream::class);
 
         file_put_contents('php://input', $streamInput);
         
@@ -841,7 +840,7 @@ class DataBuilderTest extends BaseRollbarTest
         stream_wrapper_restore("php");
     }
     
-    public function testPostDataPutRequest()
+    public function testPostDataPutRequest(): void
     {
         $_SERVER['REQUEST_METHOD'] = 'PUT';
         
@@ -851,7 +850,7 @@ class DataBuilderTest extends BaseRollbarTest
         ));
         
         stream_wrapper_unregister("php");
-        stream_wrapper_register("php", "\Rollbar\TestHelpers\MockPhpStream");
+        stream_wrapper_register("php", MockPhpStream::class);
 
         file_put_contents('php://input', $streamInput);
         
@@ -874,11 +873,11 @@ class DataBuilderTest extends BaseRollbarTest
         stream_wrapper_restore("php");
     }
     
-    public function testGenerateErrorWrapper()
+    public function testGenerateErrorWrapper(): void
     {
         $result = $this->dataBuilder->generateErrorWrapper(E_ERROR, 'bork', null, null);
         
-        $this->assertTrue($result instanceof ErrorWrapper);
+        $this->assertInstanceOf(ErrorWrapper::class, $result);
     }
 
     /**
@@ -887,7 +886,8 @@ class DataBuilderTest extends BaseRollbarTest
     public function testCaptureErrorStacktracesException(
         $captureErrorStacktraces,
         $expected
-    ) {
+    ): void
+    {
     
         $dataBuilder = new DataBuilder(array(
             'accessToken' => $this->getTestAccessToken(),
@@ -907,7 +907,7 @@ class DataBuilderTest extends BaseRollbarTest
         $this->assertEquals($expected, count($frames) === 0);
     }
     
-    public function testFramesOrder()
+    public function testFramesOrder(): void
     {
         $dataBuilder = new DataBuilder(array(
             'accessToken' => $this->getTestAccessToken(),
@@ -936,7 +936,8 @@ class DataBuilderTest extends BaseRollbarTest
     public function testCaptureErrorStacktracesError(
         $captureErrorStacktraces,
         $expected
-    ) {
+    ): void
+    {
     
         $dataBuilder = new DataBuilder(array(
             'accessToken' => $this->getTestAccessToken(),
@@ -952,7 +953,7 @@ class DataBuilderTest extends BaseRollbarTest
         $this->assertEquals($expected, count($frames) == 0);
     }
     
-    public function captureErrorStacktracesProvider()
+    public function captureErrorStacktracesProvider(): array
     {
         return array(
             array(false,true),
@@ -963,7 +964,7 @@ class DataBuilderTest extends BaseRollbarTest
     /**
      * @dataProvider getUserIpProvider
      */
-    public function testGetUserIp($ipAddress, $expected, $captureIP)
+    public function testGetUserIp($ipAddress, $expected, $captureIP): void
     {
         $_SERVER['REMOTE_ADDR'] = $ipAddress;
         
@@ -1002,7 +1003,7 @@ class DataBuilderTest extends BaseRollbarTest
         unset($_SERVER['HTTP_X_REAL_IP']);
     }
     
-    public function getUserIpProvider()
+    public function getUserIpProvider(): array
     {
         return array(
             array('127.0.0.1', '127.0.0.1', null),
@@ -1021,7 +1022,7 @@ class DataBuilderTest extends BaseRollbarTest
         );
     }
 
-    public function testGitBranch()
+    public function testGitBranch(): void
     {
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
@@ -1034,7 +1035,7 @@ class DataBuilderTest extends BaseRollbarTest
         $this->assertEquals($val, $dataBuilder->detectGitBranch());
     }
 
-    public function testGitBranchNoExec()
+    public function testGitBranchNoExec(): void
     {
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),

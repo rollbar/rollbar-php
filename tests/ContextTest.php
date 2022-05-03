@@ -1,11 +1,11 @@
 <?php namespace Rollbar;
 
-use \Mockery as m;
+use Mockery as m;
 use Rollbar\Payload\Context;
 
 class ContextTest extends BaseRollbarTest
 {
-    public function testContextPre()
+    public function testContextPre(): void
     {
         $pre = array("hello", "world");
         $context = new Context($pre, array());
@@ -15,7 +15,7 @@ class ContextTest extends BaseRollbarTest
         $this->assertEquals($pre2, $context->setPre($pre2)->getPre());
     }
 
-    public function testContextPost()
+    public function testContextPost(): void
     {
         $post = array("four", "five");
         $context = new Context(array(), $post);
@@ -25,7 +25,7 @@ class ContextTest extends BaseRollbarTest
         $this->assertEquals($post2, $context->setPost($post2)->getPost());
     }
 
-    public function testEncode()
+    public function testEncode(): void
     {
         $context = new Context(array(), array());
         $encoded = json_encode($context->serialize());

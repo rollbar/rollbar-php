@@ -1,15 +1,16 @@
 <?php namespace Rollbar;
 
-use \Mockery as m;
+use Mockery as m;
 use Rollbar\Payload\Trace;
 use Rollbar\Payload\Frame;
+use Rollbar\Payload\ExceptionInfo;
 
 class TraceTest extends BaseRollbarTest
 {
-    public function testTraceConstructor()
+    public function testTraceConstructor(): void
     {
-        $exc = m::mock("Rollbar\Payload\ExceptionInfo");
-        $frames = array(m::mock("Rollbar\Payload\Frame"));
+        $exc = m::mock(ExceptionInfo::class);
+        $frames = array(m::mock(Frame::class));
         $badFrames = array(1);
 
         $trace = new Trace(array(), $exc);
@@ -21,28 +22,28 @@ class TraceTest extends BaseRollbarTest
         $this->assertEquals($exc, $trace->getException());
     }
 
-    public function testFrames()
+    public function testFrames(): void
     {
         $frames = array(
             new Frame("one.php"),
             new Frame("two.php")
         );
-        $exc = m::mock("Rollbar\Payload\ExceptionInfo");
+        $exc = m::mock(ExceptionInfo::class);
         $trace = new Trace(array(), $exc);
         $this->assertEquals($frames, $trace->setFrames($frames)->getFrames());
     }
 
-    public function testException()
+    public function testException(): void
     {
-        $exc = m::mock("Rollbar\Payload\ExceptionInfo");
+        $exc = m::mock(ExceptionInfo::class);
         $trace = new Trace(array(), $exc);
         $this->assertEquals($exc, $trace->getException());
 
-        $exc2 = m::mock("Rollbar\Payload\ExceptionInfo");
+        $exc2 = m::mock(ExceptionInfo::class);
         $this->assertEquals($exc2, $trace->setException($exc2)->getException());
     }
 
-    public function testEncode()
+    public function testEncode(): void
     {
         $value = m::mock("Rollbar\Payload\ExceptionInfo, Rollbar\SerializerInterface")
             ->shouldReceive("serialize")
@@ -53,9 +54,9 @@ class TraceTest extends BaseRollbarTest
         $this->assertEquals("{\"frames\":[],\"exception\":\"{EXCEPTION}\"}", $encoded);
     }
 
-    public function testTraceKey()
+    public function testTraceKey(): void
     {
-        $trace = new Trace(array(), m::mock("Rollbar\Payload\ExceptionInfo"));
+        $trace = new Trace(array(), m::mock(ExceptionInfo::class));
         $this->assertEquals("trace", $trace->getKey());
     }
 }

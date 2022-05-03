@@ -5,7 +5,7 @@ namespace Rollbar\TestHelpers;
 class MockPhpStream
 {
     
-    protected static $index = 0;
+    protected static int $index = 0;
     protected static $length = null;
 
     /**
@@ -13,21 +13,21 @@ class MockPhpStream
      * there are multiple instances of MockPhpStream being used in PHP
      * to deal with the stream wrapper.
      */
-    protected static $data = '';
+    protected static string|Data $data = '';
     
     // @codingStandardsIgnoreStart
     
-    public function stream_open()
+    public function stream_open(): bool
     {
         return true;
     }
     
-    public function stream_stat()
+    public function stream_stat(): array
     {
         return array();
     }
     
-    public function stream_read($count)
+    public function stream_read($count): string
     {
         if (is_null(self::$length) === true) {
             $this->length = strlen(self::$data);
@@ -38,12 +38,12 @@ class MockPhpStream
         return $data;
     }
     
-    public function stream_eof()
+    public function stream_eof(): bool
     {
         return (self::$index >= self::$length ? true : false);
     }
     
-    public function stream_write($data)
+    public function stream_write($data): ?int
     {
         self::$data = $data;
         self::$length = strlen(self::$data);

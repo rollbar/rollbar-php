@@ -1,15 +1,18 @@
 <?php namespace Rollbar;
 
-use \Mockery as m;
+use Mockery as m;
 use Rollbar\Payload\Payload;
 use Rollbar\Payload\Level;
+use Rollbar\DataBuilder;
+use Rollbar\Config;
+use Rollbar\Payload\Data;
 
 class PayloadTest extends BaseRollbarTest
 {
-    public function testPayloadData()
+    public function testPayloadData(): void
     {
-        $data = m::mock("Rollbar\Payload\Data");
-        $config = m::mock("Rollbar\Config")
+        $data = m::mock(Data::class);
+        $config = m::mock(Config::class)
                     ->shouldReceive('getAccessToken')
                     ->andReturn('012345678901234567890123456789ab')
                     ->mock();
@@ -18,15 +21,15 @@ class PayloadTest extends BaseRollbarTest
 
         $this->assertEquals($data, $payload->getData());
 
-        $data2 = m::mock("Rollbar\Payload\Data");
+        $data2 = m::mock(Data::class);
         $this->assertEquals($data2, $payload->setData($data2)->getData());
     }
 
-    public function testPayloadAccessToken()
+    public function testPayloadAccessToken(): void
     {
         $accessToken = "012345678901234567890123456789ab";
-        $data = m::mock("Rollbar\Payload\Data");
-        $config = m::mock("Rollbar\Config")
+        $data = m::mock(Data::class);
+        $config = m::mock(Config::class)
                     ->shouldReceive('getAccessToken')
                     ->andReturn($accessToken)
                     ->mock();
@@ -35,7 +38,7 @@ class PayloadTest extends BaseRollbarTest
         $this->assertEquals($accessToken, $payload->getAccessToken());
 
         $accessToken = "012345678901234567890123456789ab";
-        $config = m::mock("Rollbar\Config")
+        $config = m::mock(Config::class)
                     ->shouldReceive('getAccessToken')
                     ->andReturn($accessToken)
                     ->mock();
@@ -46,14 +49,14 @@ class PayloadTest extends BaseRollbarTest
         $this->assertEquals($at2, $payload->setAccessToken($at2)->getAccessToken());
     }
 
-    public function testEncode()
+    public function testEncode(): void
     {
         $accessToken = $this->getTestAccessToken();
         $data = m::mock('Rollbar\Payload\Data, Rollbar\SerializerInterface')
             ->shouldReceive('serialize')
             ->andReturn(new \ArrayObject())
             ->mock();
-        m::mock('Rollbar\DataBuilder')
+        m::mock(DataBuilder::class)
             ->shouldReceive('getScrubFields')
             ->andReturn(array())
             ->shouldReceive('scrub')

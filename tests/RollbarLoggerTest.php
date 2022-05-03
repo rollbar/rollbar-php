@@ -7,6 +7,11 @@ use Rollbar\Payload\Level;
 use Rollbar\Payload\Payload;
 use Rollbar\TestHelpers\Exceptions\SilentExceptionSampleRate;
 use StdClass;
+use Rollbar\Payload\EncodedPayload;
+use Rollbar\Senders\SenderInterface;
+use Rollbar\TestHelpers\MalformedPayloadDataTransformer;
+use Monolog\Handler\ErrorLogHandler;
+use Psr\Log\LoggerInterface;
 
 class RollbarLoggerTest extends BaseRollbarTest
 {
@@ -23,7 +28,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         parent::tearDown();
     }
     
-    public function testAddCustom()
+    public function testAddCustom(): void
     {
         $logger = new RollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
@@ -65,7 +70,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         $this->assertEquals("bar", $customData["foo"]);
     }
     
-    public function testRemoveCustom()
+    public function testRemoveCustom(): void
     {
         $logger = new RollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
@@ -91,7 +96,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         $this->assertEquals("xyz", $customData["bar"]);
     }
     
-    public function testGetCustom()
+    public function testGetCustom(): void
     {
         $logger = new RollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
@@ -108,7 +113,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         $this->assertEquals("xyz", $custom["bar"]);
     }
 
-    public function testConfigure()
+    public function testConfigure(): void
     {
         $l = new RollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
@@ -119,7 +124,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         $this->assertEquals(15, $extended['extraData']);
     }
 
-    public function testLog()
+    public function testLog(): void
     {
         $l = new RollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
@@ -129,9 +134,9 @@ class RollbarLoggerTest extends BaseRollbarTest
         $this->assertEquals(200, $response->getStatus());
     }
 
-    public function testNotLoggingPayload()
+    public function testNotLoggingPayload(): void
     {
-        $logPayloadLoggerMock = $this->getMockBuilder('\Psr\Log\LoggerInterface')->getMock();
+        $logPayloadLoggerMock = $this->getMockBuilder(LoggerInterface::class)->getMock();
         $logPayloadLoggerMock->expects($this->never())->method('debug');
 
         $logger = new RollbarLogger(array(
@@ -145,12 +150,12 @@ class RollbarLoggerTest extends BaseRollbarTest
         $this->assertEquals(200, $response->getStatus());
     }
 
-    public function testDefaultVerbose()
+    public function testDefaultVerbose(): void
     {
-        return $this->testNotVerbose();
+        $this->testNotVerbose();
     }
 
-    public function testNotVerbose()
+    public function testNotVerbose(): void
     {
         $logger = new RollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
@@ -162,7 +167,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         $originalHandler = $verboseLogger->getHandlers();
         $originalHandler = $originalHandler[0];
 
-        $handlerMock = $this->getMockBuilder('\Monolog\Handler\ErrorLogHandler')
+        $handlerMock = $this->getMockBuilder(ErrorLogHandler::class)
             ->setMethods(array('handle'))
             ->getMock();
 
@@ -175,7 +180,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         $logger->info('Internal message');
     }
 
-    public function testVerbose()
+    public function testVerbose(): void
     {
         $logger = new RollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
@@ -187,7 +192,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         $originalHandler = $verboseLogger->getHandlers();
         $originalHandler = $originalHandler[0];
 
-        $handlerMock = $this->getMockBuilder('\Monolog\Handler\ErrorLogHandler')
+        $handlerMock = $this->getMockBuilder(ErrorLogHandler::class)
             ->setMethods(array('handle'))
             ->getMock();
         $handlerMock->setLevel($originalHandler->getLevel());
@@ -199,7 +204,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         $logger->info('Internal message');
     }
     
-    public function testEnabled()
+    public function testEnabled(): void
     {
         $logger = new RollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
@@ -219,7 +224,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         $this->assertEquals("Disabled", $response->getInfo());
     }
 
-    public function testTransmit()
+    public function testTransmit(): void
     {
         $logger = new RollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
@@ -238,9 +243,9 @@ class RollbarLoggerTest extends BaseRollbarTest
         $this->assertEquals("Not transmitting (transmitting disabled in configuration)", $response->getInfo());
     }
 
-    public function testTransmitBatched()
+    public function testTransmitBatched(): void
     {
-        $senderMock = $this->getMockBuilder('Rollbar\Senders\SenderInterface')->getMock();
+        $senderMock = $this->getMockBuilder(SenderInterface::class)->getMock();
         $senderMock->expects($this->once())->method('sendBatch');
 
         // transmit on (default)
@@ -256,7 +261,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         $logger->flush();
 
         // transmit off
-        $senderMock = $this->getMockBuilder('Rollbar\Senders\SenderInterface')->getMock();
+        $senderMock = $this->getMockBuilder(SenderInterface::class)->getMock();
         $senderMock->expects($this->never())->method('sendBatch');
 
         $logger->configure(array(
@@ -272,12 +277,12 @@ class RollbarLoggerTest extends BaseRollbarTest
         $this->assertEquals("Not transmitting (transmitting disabled in configuration)", $response->getInfo());
     }
     
-    public function testLogMalformedPayloadData()
+    public function testLogMalformedPayloadData(): void
     {
         $logger = new RollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php",
-            "transformer" => '\Rollbar\TestHelpers\MalformedPayloadDataTransformer'
+            "transformer" => MalformedPayloadDataTransformer::class
         ));
         
         $response = $logger->log(
@@ -289,11 +294,11 @@ class RollbarLoggerTest extends BaseRollbarTest
         $this->assertEquals(400, $response->getStatus());
     }
 
-    public function testFlush()
+    public function testFlush(): void
     {
-        $senderMock = $this->getMockBuilder('Rollbar\Senders\SenderInterface')->getMock();
+        $senderMock = $this->getMockBuilder(SenderInterface::class)->getMock();
         $senderMock->expects($this->once())->method('sendBatch')->with(
-            $this->containsOnlyInstancesOf('Rollbar\Payload\EncodedPayload'),
+            $this->containsOnlyInstancesOf(EncodedPayload::class),
             $this->anything()
         );
 
@@ -315,7 +320,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         $response = $logger->flush();
     }
     
-    public function testContext()
+    public function testContext(): void
     {
         $l = new RollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
@@ -331,7 +336,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         $this->assertEquals(200, $response->getStatus());
     }
     
-    public function testLogStaticLevel()
+    public function testLogStaticLevel(): void
     {
         $l = new RollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
@@ -341,7 +346,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         $this->assertEquals(200, $response->getStatus());
     }
 
-    public function testErrorSampleRates()
+    public function testErrorSampleRates(): void
     {
         $l = new RollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
@@ -365,13 +370,13 @@ class RollbarLoggerTest extends BaseRollbarTest
         $this->assertEquals(0, $response->getStatus());
     }
 
-    public function testExceptionSampleRates()
+    public function testExceptionSampleRates(): void
     {
         $l = new RollbarLogger(array(
             "access_token" => "ad865e76e7fb496fab096ac07b1dbabb",
             "environment" => "testing-php",
             "exception_sample_rates" => array(
-                'Rollbar\TestHelpers\Exceptions\SilentExceptionSampleRate' => 0.0
+                SilentExceptionSampleRate::class => 0.0
             )
         ));
         $response = $l->log(Level::ERROR, new SilentExceptionSampleRate);
@@ -383,7 +388,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         $this->assertEquals(200, $response->getStatus());
     }
 
-    public function testIncludedErrNo()
+    public function testIncludedErrNo(): void
     {
         $l = new RollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
@@ -437,12 +442,13 @@ class RollbarLoggerTest extends BaseRollbarTest
      * @param string $replacement Character used for scrubbing
      */
     private function scrubTestAssert(
-        $dataName,
-        $result,
-        $scrubField = 'sensitive',
-        $recursive = true,
-        $replacement = '*'
-    ) {
+        string $dataName,
+        array  $result,
+        string $scrubField = 'sensitive',
+        bool   $recursive = true,
+        string $replacement = '*'
+    ): void
+    {
     
         $this->assertEquals(
             str_repeat($replacement, 8),
@@ -459,7 +465,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         }
     }
     
-    public function scrubDataProvider()
+    public function scrubDataProvider(): array
     {
         return array(
             array( // test 1
@@ -478,7 +484,7 @@ class RollbarLoggerTest extends BaseRollbarTest
     /**
      * @dataProvider scrubDataProvider
      */
-    public function testScrubGET($testData)
+    public function testScrubGET($testData): void
     {
         $_GET = $testData;
         $result = $this->scrubTestHelper();
@@ -489,7 +495,7 @@ class RollbarLoggerTest extends BaseRollbarTest
     /**
      * @dataProvider scrubDataProvider
      */
-    public function testGetRequestScrubPOST($testData)
+    public function testGetRequestScrubPOST($testData): void
     {
         $_POST = $testData;
         $result = $this->scrubTestHelper();
@@ -499,14 +505,14 @@ class RollbarLoggerTest extends BaseRollbarTest
     /**
      * @dataProvider scrubDataProvider
      */
-    public function testGetRequestScrubSession($testData)
+    public function testGetRequestScrubSession($testData): void
     {
         $_SESSION = $testData;
         $result = $this->scrubTestHelper();
         $this->scrubTestAssert('$_SESSION', $result['data']['request']['session']);
     }
     
-    public function testGetScrubbedHeaders()
+    public function testGetScrubbedHeaders(): void
     {
         $_SERVER['HTTP_CONTENT_TYPE'] = 'text/html; charset=utf-8';
         $_SERVER['HTTP_SENSITIVE'] = 'Scrub this';
@@ -525,7 +531,7 @@ class RollbarLoggerTest extends BaseRollbarTest
     /**
      * @dataProvider scrubDataProvider
      */
-    public function testGetRequestScrubExtras($testData)
+    public function testGetRequestScrubExtras($testData): void
     {
         $extras = array(
             'extraField1' => $testData
@@ -542,7 +548,7 @@ class RollbarLoggerTest extends BaseRollbarTest
     /**
      * @dataProvider scrubDataProvider
      */
-    public function testMakeDataScrubServerExtras($testData)
+    public function testMakeDataScrubServerExtras($testData): void
     {
         $extras = array(
             'extraField1' => $testData
@@ -559,7 +565,7 @@ class RollbarLoggerTest extends BaseRollbarTest
     /**
      * @dataProvider scrubDataProvider
      */
-    public function testMakeDataScrubCustom($testData)
+    public function testMakeDataScrubCustom($testData): void
     {
         $custom = $testData;
         $result = $this->scrubTestHelper(array('custom' => $custom));
@@ -573,7 +579,7 @@ class RollbarLoggerTest extends BaseRollbarTest
     /**
      * @dataProvider scrubDataProvider
      */
-    public function testMakeDataScrubPerson($testData)
+    public function testMakeDataScrubPerson($testData): void
     {
         $testData['id'] = '123';
         $result = $this->scrubTestHelper(
@@ -601,7 +607,7 @@ class RollbarLoggerTest extends BaseRollbarTest
     /**
      * @dataProvider scrubDataProvider
      */
-    public function testGetRequestScrubBodyContext($testData)
+    public function testGetRequestScrubBodyContext($testData): void
     {
         $bodyContext = array(
             'context1' => $testData
@@ -618,7 +624,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         );
     }
     
-    public function scrubQueryStringDataProvider()
+    public function scrubQueryStringDataProvider(): array
     {
         $data = $this->scrubDataProvider();
         
@@ -632,7 +638,7 @@ class RollbarLoggerTest extends BaseRollbarTest
     /**
      * @dataProvider scrubQueryStringDataProvider
      */
-    public function testGetUrlScrub($testData)
+    public function testGetUrlScrub($testData): void
     {
         $_SERVER['SERVER_NAME'] = 'localhost';
         $_SERVER['REQUEST_URI'] = "/index.php?$testData";
@@ -653,7 +659,7 @@ class RollbarLoggerTest extends BaseRollbarTest
     /**
      * @dataProvider scrubQueryStringDataProvider
      */
-    public function testGetRequestScrubQueryString($testData)
+    public function testGetRequestScrubQueryString($testData): void
     {
         $_SERVER['QUERY_STRING'] = "?$testData";
         
@@ -680,7 +686,7 @@ class RollbarLoggerTest extends BaseRollbarTest
      *           ["info"]
      *           ["debug"]
      */
-    public function testPsr3MethodCallsDoNotCrash($method)
+    public function testPsr3MethodCallsDoNotCrash($method): void
     {
         $l = new RollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
@@ -695,7 +701,7 @@ class RollbarLoggerTest extends BaseRollbarTest
     /**
      * @dataProvider maxItemsProvider
      */
-    public function testMaxItems($maxItemsConfig)
+    public function testMaxItems($maxItemsConfig): void
     {
         $config = array('access_token' => $this->getTestAccessToken());
         if ($maxItemsConfig !== null) {
@@ -705,7 +711,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         Rollbar::init($config);
         $logger = Rollbar::logger();
         
-        $maxItems = $maxItemsConfig === null ? Defaults::get()->maxItems() : $maxItemsConfig;
+        $maxItems = $maxItemsConfig ?? Defaults::get()->maxItems();
         
         for ($i = 0; $i < $maxItems; $i++) {
             $response = $logger->log(Level::INFO, 'testing info level');
@@ -723,7 +729,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         );
     }
     
-    public function maxItemsProvider()
+    public function maxItemsProvider(): array
     {
         return array(
             'use default max_items' => array(null),
@@ -731,7 +737,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         );
     }
     
-    public function testRaiseOnError()
+    public function testRaiseOnError(): void
     {
         $logger = new RollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
@@ -750,7 +756,7 @@ class RollbarLoggerTest extends BaseRollbarTest
     /**
      * @dataProvider providesToLogEntityForUncaughtCheck
      */
-    public function testIsUncaughtLogData(mixed $toLog, bool $expected, string $message)
+    public function testIsUncaughtLogData(mixed $toLog, bool $expected, string $message): void
     {
         $logger = new RollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
@@ -761,7 +767,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         $this->assertSame($logger->isUncaughtLogData($toLog), $expected, $message);
     }
 
-    public static function providesToLogEntityForUncaughtCheck()
+    public static function providesToLogEntityForUncaughtCheck(): array
     {
         $uncaught = new Exception;
         $uncaught->isUncaught = true;

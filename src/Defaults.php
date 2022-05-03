@@ -57,7 +57,7 @@ class Defaults
             'csrf_token',
             'access_token'
         );
-        $this->serverRoot = isset($_ENV["HEROKU_APP_DIR"]) ? $_ENV["HEROKU_APP_DIR"] : null;
+        $this->serverRoot = $_ENV["HEROKU_APP_DIR"] ?? null;
         $this->platform = php_uname('a');
         $this->notifier = Notifier::defaultNotifier();
         $this->baseException = Throwable::class;
@@ -86,252 +86,252 @@ class Defaults
     
     public function psrLevels($value = null)
     {
-        return $value !== null ? $value : $this->psrLevels;
+        return $value ?? $this->psrLevels;
     }
 
     public function errorLevels($value = null)
     {
-        return $value !== null ? $value : $this->errorLevels;
+        return $value ?? $this->errorLevels;
     }
 
     public function autodetectBranch($value = null)
     {
-        return $value !== null ? $value : $this->autodetectBranch;
+        return $value ?? $this->autodetectBranch;
     }
 
     public function branch($value = null)
     {
-        return $value !== null ? $value : $this->branch;
+        return $value ?? $this->branch;
     }
 
     public function serverRoot($value = null)
     {
-        return $value !== null ? $value : $this->serverRoot;
+        return $value ?? $this->serverRoot;
     }
 
     public function platform($value = null)
     {
-        return $value !== null ? $value : $this->platform;
+        return $value ?? $this->platform;
     }
 
     public function notifier($value = null)
     {
-        return $value !== null ? $value : $this->notifier;
+        return $value ?? $this->notifier;
     }
 
     public function baseException($value = null)
     {
-        return $value !== null ? $value : $this->baseException;
+        return $value ?? $this->baseException;
     }
 
     public function codeVersion($value = null)
     {
-        return $value !== null ? $value : $this->codeVersion;
+        return $value ?? $this->codeVersion;
     }
 
     public function sendMessageTrace($value = null)
     {
-        return $value !== null ? $value : $this->sendMessageTrace;
+        return $value ?? $this->sendMessageTrace;
     }
 
     public function includeCodeContext($value = null)
     {
-        return $value !== null ? $value : $this->includeCodeContext;
+        return $value ?? $this->includeCodeContext;
     }
 
     public function includeExcCodeContext($value = null)
     {
-        return $value !== null ? $value : $this->includeExcCodeContext;
+        return $value ?? $this->includeExcCodeContext;
     }
 
     public function rawRequestBody($value = null)
     {
-        return $value !== null ? $value : $this->rawRequestBody;
+        return $value ?? $this->rawRequestBody;
     }
 
     public function localVarsDump($value = null)
     {
-        return $value !== null ? $value : $this->localVarsDump;
+        return $value ?? $this->localVarsDump;
     }
 
     public function errorSampleRates($value = null)
     {
-        return $value !== null ? $value : $this->errorSampleRates;
+        return $value ?? $this->errorSampleRates;
     }
 
     public function exceptionSampleRates($value = null)
     {
-        return $value !== null ? $value : $this->exceptionSampleRates;
+        return $value ?? $this->exceptionSampleRates;
     }
 
     public function includedErrno($value = null)
     {
-        return $value !== null ? $value : $this->includedErrno;
+        return $value ?? $this->includedErrno;
     }
 
     public function includeErrorCodeContext($value = null)
     {
-        return $value !== null ? $value : $this->includeErrorCodeContext;
+        return $value ?? $this->includeErrorCodeContext;
     }
 
     public function includeExceptionCodeContext($value = null)
     {
-        return $value !== null ? $value : $this->includeExceptionCodeContext;
+        return $value ?? $this->includeExceptionCodeContext;
     }
 
     public function agentLogLocation($value = null)
     {
-        return $value !== null ? $value : $this->agentLogLocation;
+        return $value ?? $this->agentLogLocation;
     }
 
     public function allowExec($value = null)
     {
-        return $value !== null ? $value : $this->allowExec;
+        return $value ?? $this->allowExec;
     }
 
     public function messageLevel($value = null)
     {
-        return $value !== null ? $value : $this->messageLevel;
+        return $value ?? $this->messageLevel;
     }
 
     public function exceptionLevel($value = null)
     {
-        return $value !== null ? $value : $this->exceptionLevel;
+        return $value ?? $this->exceptionLevel;
     }
 
     public function endpoint($value = null)
     {
-        return $value !== null ? $value : $this->endpoint;
+        return $value ?? $this->endpoint;
     }
 
     public function captureErrorStacktraces($value = null)
     {
-        return $value !== null ? $value : $this->captureErrorStacktraces;
+        return $value ?? $this->captureErrorStacktraces;
     }
 
     public function checkIgnore($value = null)
     {
-        return $value !== null ? $value : $this->checkIgnore;
+        return $value ?? $this->checkIgnore;
     }
 
     public function custom($value = null)
     {
-        return $value !== null ? $value : $this->custom;
+        return $value ?? $this->custom;
     }
 
     public function customDataMethod($value = null)
     {
-        return $value !== null ? $value : $this->customDataMethod;
+        return $value ?? $this->customDataMethod;
     }
 
     public function enabled($value = null)
     {
-        return $value !== null ? $value : $this->enabled;
+        return $value ?? $this->enabled;
     }
 
     public function transmit($value = null)
     {
-        return $value !== null ? $value : $this->transmit;
+        return $value ?? $this->transmit;
     }
 
     public function logPayload($value = null)
     {
-        return $value !== null ? $value : $this->logPayload;
+        return $value ?? $this->logPayload;
     }
 
     public function verbose($value = null)
     {
-        return $value !== null ? $value : $this->verbose;
+        return $value ?? $this->verbose;
     }
 
     public function environment($value = null)
     {
-        return $value !== null ? $value : $this->environment;
+        return $value ?? $this->environment;
     }
 
     public function fluentHost($value = null)
     {
-        return $value !== null ? $value : $this->fluentHost;
+        return $value ?? $this->fluentHost;
     }
 
     public function fluentPort($value = null)
     {
-        return $value !== null ? $value : $this->fluentPort;
+        return $value ?? $this->fluentPort;
     }
 
     public function fluentTag($value = null)
     {
-        return $value !== null ? $value : $this->fluentTag;
+        return $value ?? $this->fluentTag;
     }
 
     public function handler($value = null)
     {
-        return $value !== null ? $value : $this->handler;
+        return $value ?? $this->handler;
     }
 
     public function host($value = null)
     {
-        return $value !== null ? $value : $this->host;
+        return $value ?? $this->host;
     }
 
     public function timeout($value = null)
     {
-        return $value !== null ? $value : $this->timeout;
+        return $value ?? $this->timeout;
     }
 
     public function reportSuppressed($value = null)
     {
-        return $value !== null ? $value : $this->reportSuppressed;
+        return $value ?? $this->reportSuppressed;
     }
 
     public function useErrorReporting($value = null)
     {
-        return $value !== null ? $value : $this->useErrorReporting;
+        return $value ?? $this->useErrorReporting;
     }
 
     public function captureIP($value = null)
     {
-        return $value !== null ? $value : $this->captureIP;
+        return $value ?? $this->captureIP;
     }
 
     public function captureEmail($value = null)
     {
-        return $value !== null ? $value : $this->captureEmail;
+        return $value ?? $this->captureEmail;
     }
 
     public function captureUsername($value = null)
     {
-        return $value !== null ? $value : $this->captureUsername;
+        return $value ?? $this->captureUsername;
     }
 
     public function scrubFields($value = null)
     {
-        return $value !== null ? $value : $this->scrubFields;
+        return $value ?? $this->scrubFields;
     }
 
     public function customTruncation($value = null)
     {
-        return $value !== null ? $value : $this->customTruncation;
+        return $value ?? $this->customTruncation;
     }
 
     public function maxNestingDepth($value = null)
     {
-        return $value !== null ? $value : $this->maxNestingDepth;
+        return $value ?? $this->maxNestingDepth;
     }
     
     public function maxItems($value = null)
     {
-        return $value !== null ? $value : $this->maxItems;
+        return $value ?? $this->maxItems;
     }
 
     public function minimumLevel($value = null)
     {
-        return $value !== null ? $value : $this->minimumLevel;
+        return $value ?? $this->minimumLevel;
     }
     
     public function raiseOnError($value = null)
     {
-        return $value !== null ? $value : $this->raiseOnError;
+        return $value ?? $this->raiseOnError;
     }
 
     private $psrLevels;

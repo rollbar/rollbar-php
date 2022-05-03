@@ -7,7 +7,7 @@ use Rollbar\TestHelpers\CycleCheck\ChildCycleCheckSerializable;
 
 class UtilitiesTest extends BaseRollbarTest
 {
-    public function testValidateString()
+    public function testValidateString(): void
     {
         Utilities::validateString("");
         Utilities::validateString("true");
@@ -18,25 +18,25 @@ class UtilitiesTest extends BaseRollbarTest
             Utilities::validateString(null, "null", null, false);
             $this->fail("Above should throw");
         } catch (\InvalidArgumentException $e) {
-            $this->assertEquals($e->getMessage(), "\$null must not be null");
+            $this->assertEquals("\$null must not be null", $e->getMessage());
         }
 
         try {
             Utilities::validateString(1, "number");
             $this->fail("Above should throw");
         } catch (\InvalidArgumentException $e) {
-            $this->assertEquals($e->getMessage(), "\$number must be a string");
+            $this->assertEquals("\$number must be a string", $e->getMessage());
         }
 
         try {
             Utilities::validateString("1", "str", 2);
             $this->fail("Above should throw");
         } catch (\InvalidArgumentException $e) {
-            $this->assertEquals($e->getMessage(), "\$str must be 2 characters long, was '1'");
+            $this->assertEquals("\$str must be 2 characters long, was '1'", $e->getMessage());
         }
     }
 
-    public function testValidateInteger()
+    public function testValidateInteger(): void
     {
         Utilities::validateInteger(null);
         Utilities::validateInteger(0);
@@ -46,37 +46,37 @@ class UtilitiesTest extends BaseRollbarTest
             Utilities::validateInteger(null, "null", null, null, false);
             $this->fail("Above should throw");
         } catch (\InvalidArgumentException $e) {
-            $this->assertEquals($e->getMessage(), "\$null must not be null");
+            $this->assertEquals("\$null must not be null", $e->getMessage());
         }
 
         try {
             Utilities::validateInteger(0, "zero", 1);
             $this->fail("Above should throw");
         } catch (\InvalidArgumentException $e) {
-            $this->assertEquals($e->getMessage(), "\$zero must be >= 1");
+            $this->assertEquals("\$zero must be >= 1", $e->getMessage());
         }
 
         try {
             Utilities::validateInteger(0, "zero", null, -1);
             $this->fail("Above should throw");
         } catch (\InvalidArgumentException $e) {
-            $this->assertEquals($e->getMessage(), "\$zero must be <= -1");
+            $this->assertEquals("\$zero must be <= -1", $e->getMessage());
         }
     }
 
-    public function testValidateBooleanThrowsExceptionOnNullWhenNullAreNotAllowed()
+    public function testValidateBooleanThrowsExceptionOnNullWhenNullAreNotAllowed(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         Utilities::validateBoolean(null, "foo", false);
     }
 
-    public function testValidateBooleanWithInvalidBoolean()
+    public function testValidateBooleanWithInvalidBoolean(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         Utilities::validateBoolean("not a boolean");
     }
 
-    public function testValidateBoolean()
+    public function testValidateBoolean(): void
     {
         Utilities::validateBoolean(true, "foo", false);
         Utilities::validateBoolean(true);
@@ -84,7 +84,7 @@ class UtilitiesTest extends BaseRollbarTest
         $this->expectNotToPerformAssertions();
     }
 
-    public function testSerializeForRollbar()
+    public function testSerializeForRollbar(): void
     {
         $obj = array(
             "one_two" => array(1, 2),
@@ -111,7 +111,7 @@ class UtilitiesTest extends BaseRollbarTest
         $this->assertArrayNotHasKey("my_null_value", $result);
     }
     
-    public function testSerializationCycleChecking()
+    public function testSerializationCycleChecking(): void
     {
         $config = new Config(array("access_token"=>$this->getTestAccessToken()));
         $data = $config->getRollbarData(\Rollbar\Payload\Level::WARNING, "String", array(new ParentCycleCheck()));
@@ -142,7 +142,7 @@ class UtilitiesTest extends BaseRollbarTest
         );
     }
 
-    public function testSerializeForRollbarNestingLevels()
+    public function testSerializeForRollbarNestingLevels(): void
     {
         $obj = array(
             "one" => array(

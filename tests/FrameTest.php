@@ -1,20 +1,22 @@
 <?php namespace Rollbar;
 
-use \Mockery as m;
+use Mockery as m;
 use Rollbar\Payload\Frame;
+use Rollbar\Payload\Context;
+use Rollbar\Payload\ExceptionInfo;
 
 class FrameTest extends BaseRollbarTest
 {
-    private $exception;
-    private $frame;
+    private m\LegacyMockInterface|m\MockInterface|ExceptionInfo $exception;
+    private Frame $frame;
 
     public function setUp(): void
     {
-        $this->exception = m::mock("Rollbar\Payload\ExceptionInfo");
-        $this->frame = new Frame("tests/FrameTest.php", $this->exception);
+        $this->exception = m::mock(ExceptionInfo::class);
+        $this->frame = new Frame("tests/FrameTest.php");
     }
 
-    public function testFilename()
+    public function testFilename(): void
     {
         $frame = new Frame("filename.php");
         $this->assertEquals("filename.php", $frame->getFilename());
@@ -22,38 +24,38 @@ class FrameTest extends BaseRollbarTest
         $this->assertEquals("other.php", $frame->getFilename());
     }
 
-    public function testLineno()
+    public function testLineno(): void
     {
         $this->frame->setLineno(5);
         $this->assertEquals(5, $this->frame->getLineno());
     }
 
-    public function testColno()
+    public function testColno(): void
     {
         $this->frame->setColno(5);
         $this->assertEquals(5, $this->frame->getColno());
     }
 
-    public function testMethod()
+    public function testMethod(): void
     {
         $this->frame->setMethod("method");
         $this->assertEquals("method", $this->frame->getMethod());
     }
 
-    public function testCode()
+    public function testCode(): void
     {
         $this->frame->setCode("code->whatever()");
         $this->assertEquals("code->whatever()", $this->frame->getCode());
     }
 
-    public function testContext()
+    public function testContext(): void
     {
-        $context = m::mock("Rollbar\Payload\Context");
+        $context = m::mock(Context::class);
         $this->frame->setContext($context);
         $this->assertEquals($context, $this->frame->getContext());
     }
 
-    public function testArgs()
+    public function testArgs(): void
     {
         $this->frame->setArgs(array());
         $this->assertEquals(array(), $this->frame->getArgs());
@@ -62,7 +64,7 @@ class FrameTest extends BaseRollbarTest
         $this->assertEquals(array(1, "hi"), $this->frame->getArgs());
     }
 
-    public function testEncode()
+    public function testEncode(): void
     {
         $context = m::mock("Rollbar\Payload\Context, Rollbar\SerializerInterface")
             ->shouldReceive("serialize")

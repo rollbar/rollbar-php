@@ -1,9 +1,9 @@
 <?php namespace Rollbar\Handlers;
 
-use \Rollbar\Rollbar;
-use \Rollbar\RollbarLogger;
-use \Rollbar\BaseRollbarTest;
-use \Rollbar\Handlers\ExceptionHandler;
+use Rollbar\Rollbar;
+use Rollbar\RollbarLogger;
+use Rollbar\BaseRollbarTest;
+use Rollbar\Handlers\ExceptionHandler;
 
 class ExceptionHandlerTest extends BaseRollbarTest
 {
@@ -16,7 +16,7 @@ class ExceptionHandlerTest extends BaseRollbarTest
         parent::__construct($name, $data, $dataName);
     }
 
-    private static $simpleConfig = array();
+    private static array $simpleConfig = array();
     
     /**
      * It's impossible to throw an uncaught exception with PHPUnit and thus
@@ -24,7 +24,7 @@ class ExceptionHandlerTest extends BaseRollbarTest
      * this test invokes the handle() methd manually with an assertion in the
      * previously set exception handler.
      */
-    public function testPreviousExceptionHandler()
+    public function testPreviousExceptionHandler(): void
     {
         $testCase = $this;
         
@@ -45,9 +45,9 @@ class ExceptionHandlerTest extends BaseRollbarTest
      * this test fetches the exception handler set by the setup method with
      * set_exception_handler() and invokes it manually with a mock expectation.
      */
-    public function testSetup()
+    public function testSetup(): void
     {
-        $handler = $this->getMockBuilder('Rollbar\\Handlers\\ExceptionHandler')
+        $handler = $this->getMockBuilder(ExceptionHandler::class)
                         ->setConstructorArgs(array(new RollbarLogger(self::$simpleConfig)))
                         ->setMethods(array('handle'))
                         ->getMock();
@@ -66,12 +66,12 @@ class ExceptionHandlerTest extends BaseRollbarTest
         $handler->$method();
     }
     
-    public function testHandle()
+    public function testHandle(): void
     {
         set_exception_handler(function () {
         });
         
-        $logger = $this->getMockBuilder('Rollbar\\RollbarLogger')
+        $logger = $this->getMockBuilder(RollbarLogger::class)
                         ->setConstructorArgs(array(self::$simpleConfig))
                         ->setMethods(array('log'))
                         ->getMock();

@@ -7,7 +7,7 @@ use Rollbar\Payload\Level;
 class FluentTest extends BaseRollbarTest
 {
 
-    public function testFluent()
+    public function testFluent(): void
     {
         if (!class_exists('Fluent\Logger\FluentLogger')) {
             $this->markTestSkipped(

@@ -1,11 +1,11 @@
 <?php namespace Rollbar;
 
-use \Mockery as m;
+use Mockery as m;
 use Rollbar\Payload\Person;
 
 class PersonTest extends BaseRollbarTest
 {
-    public function testId()
+    public function testId(): void
     {
         $id = "rollbar-php";
         $person = new Person($id);
@@ -15,7 +15,7 @@ class PersonTest extends BaseRollbarTest
         $this->assertEquals($id2, $person->setId($id2)->getId());
     }
 
-    public function testUsername()
+    public function testUsername(): void
     {
         $username = "user@rollbar.com";
         $person = new Person("15", $username);
@@ -25,7 +25,7 @@ class PersonTest extends BaseRollbarTest
         $this->assertEquals($username2, $person->setUsername($username2)->getUsername());
     }
 
-    public function testEmail()
+    public function testEmail(): void
     {
         $email = "1.0.0";
         $person = new Person("Rollbar_Master", null, $email);
@@ -35,14 +35,14 @@ class PersonTest extends BaseRollbarTest
         $this->assertEquals($email2, $person->setEmail($email2)->getEmail());
     }
 
-    public function testExtra()
+    public function testExtra(): void
     {
         $person = new Person("42");
         $person->test = "testing";
         $this->assertEquals("testing", $person->test);
     }
 
-    public function testEncode()
+    public function testEncode(): void
     {
         $person = new Person("1024");
         $person->setUsername("username")

@@ -2,10 +2,10 @@
 
 namespace Rollbar\Performance;
 
-use \Rollbar\Truncation\StringsStrategyTest;
-use \Rollbar\Truncation\FramesStrategyTest;
+use Rollbar\Truncation\StringsStrategyTest;
+use Rollbar\Truncation\FramesStrategyTest;
 
-use \Rollbar\Truncation\StringsStrategy;
+use Rollbar\Truncation\StringsStrategy;
 
 class MassivePayload
 {
