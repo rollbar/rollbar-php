@@ -7,9 +7,6 @@ use Rollbar\TestHelpers\MockPhpStream;
 
 class DataBuilderTest extends BaseRollbarTest
 {
-    /**
-     * @var DataBuilder
-     */
     private DataBuilder $dataBuilder;
 
     public function setUp(): void
@@ -886,8 +883,7 @@ class DataBuilderTest extends BaseRollbarTest
     public function testCaptureErrorStacktracesException(
         $captureErrorStacktraces,
         $expected
-    ): void
-    {
+    ): void {
     
         $dataBuilder = new DataBuilder(array(
             'accessToken' => $this->getTestAccessToken(),
@@ -921,9 +917,9 @@ class DataBuilderTest extends BaseRollbarTest
             'tests/DataBuilderTest.php',
             $frames[count($frames)-1]->getFilename()
         );
-        // 919 is the line number where the comment "// A" is found
+        // 915 is the line number where the comment "// A" is found
         $this->assertEquals(
-            919,
+            915,
             $frames[count($frames)-1]->getLineno(),
             "Possible false negative: did this file change? Check the line number for line with '// A' comment"
         );
@@ -936,8 +932,7 @@ class DataBuilderTest extends BaseRollbarTest
     public function testCaptureErrorStacktracesError(
         $captureErrorStacktraces,
         $expected
-    ): void
-    {
+    ): void {
     
         $dataBuilder = new DataBuilder(array(
             'accessToken' => $this->getTestAccessToken(),

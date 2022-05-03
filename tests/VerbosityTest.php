@@ -1079,8 +1079,7 @@ class VerbosityTest extends BaseRollbarTest
         callable             $verboseExpectations,
         callable             $pre = null,
         callable             $post = null
-    ): void
-    {
+    ): void {
         $unitTest = $this;
         // Quiet scenario
         $this->prepareForLogMocking(
@@ -1122,8 +1121,7 @@ class VerbosityTest extends BaseRollbarTest
         callable $expectations,
         callable $pre = null,
         callable $post = null
-    ): void
-    {
+    ): void {
         if ($pre !== null) {
             $pre();
         }
@@ -1158,8 +1156,7 @@ class VerbosityTest extends BaseRollbarTest
         string   $messageLevel = Level::WARNING,
         callable $pre = null,
         callable $post = null
-    ): void
-    {
+    ): void {
         $rollbarLogger = $this->verboseRollbarLogger($config);
 
         $this->configurableObjectVerbosityTest(

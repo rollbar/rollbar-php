@@ -447,8 +447,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         string $scrubField = 'sensitive',
         bool   $recursive = true,
         string $replacement = '*'
-    ): void
-    {
+    ): void {
     
         $this->assertEquals(
             str_repeat($replacement, 8),
