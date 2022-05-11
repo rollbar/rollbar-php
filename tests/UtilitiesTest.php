@@ -1,9 +1,12 @@
 <?php namespace Rollbar;
 
+use Rollbar\Payload\Level;
+use Rollbar\TestHelpers\CustomSerializable;
 use Rollbar\TestHelpers\CycleCheck\ParentCycleCheck;
 use Rollbar\TestHelpers\CycleCheck\ChildCycleCheck;
 use Rollbar\TestHelpers\CycleCheck\ParentCycleCheckSerializable;
 use Rollbar\TestHelpers\CycleCheck\ChildCycleCheckSerializable;
+use Rollbar\TestHelpers\DeprecatedSerializable;
 
 class UtilitiesTest extends BaseRollbarTest
 {
@@ -172,5 +175,60 @@ class UtilitiesTest extends BaseRollbarTest
         $this->assertArrayHasKey('two', $result['one']);
         $this->assertArrayHasKey('three', $result['one']['two']);
         $this->assertArrayHasKey('four', $result['one']['two']['three']);
+    }
+
+    public function testSerializationOfDeprecatedSerializable()
+    {
+        $data = ['foo' => 'bar'];
+
+        $obj = array(
+            "serializedObj" => new DeprecatedSerializable($data),
+        );
+        $objectHashes = array();
+
+        // Make sure the deprecation notice is sent if the object implements deprecated Serializable interface
+        set_error_handler(function (
+            int $errno,
+            string $errstr,
+        ) : bool {
+            $this->assertStringContainsString("Serializable", $errstr);
+            $this->assertStringContainsString("deprecated", $errstr);
+            return true;
+        }, E_USER_DEPRECATED);
+
+        $result = Utilities::serializeForRollbar($obj, null, $objectHashes);
+
+        // Clear the handler, so it does not mess with other tests.
+        restore_error_handler();
+
+        $this->assertEquals(['foo' => 'bar'], $result['serializedObj']);
+    }
+
+    public function testSerializationOfCustomSerializable()
+    {
+        $data = ['foo' => 'bar'];
+
+        $obj = array(
+            "serializedObj" => new CustomSerializable($data),
+        );
+        $objectHashes = array();
+
+        // Make sure the deprecation notice is NOT sent if the object implements Serializable but it's using
+        // __serialize and __unserialize properly
+        set_error_handler(function (
+            int $errno,
+            string $errstr,
+        ) : bool {
+            $this->assertStringNotContainsString("Serializable", $errstr);
+            $this->assertStringNotContainsString("deprecated", $errstr);
+            return true;
+        }, E_USER_DEPRECATED);
+
+        $result = Utilities::serializeForRollbar($obj, null, $objectHashes);
+
+        // Clear the handler, so it does not mess with other tests.
+        restore_error_handler();
+
+        $this->assertEquals(['foo' => 'bar'], $result['serializedObj']);
     }
 }
