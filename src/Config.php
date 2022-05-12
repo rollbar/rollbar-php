@@ -1001,7 +1001,28 @@ class Config
      */
     public function shouldSuppress(): bool
     {
-        return error_reporting() === 0 && !$this->reportSuppressed;
+        // report_suppressed option forces reporting regardless of PHP settings.
+        if ($this->reportSuppressed) {
+            return false;
+        }
+
+        $errorReporting = error_reporting();
+
+        // For error control operator of PHP 8:
+        // > Prior to PHP 8.0.0, the error_reporting() called inside the
+        // > custom error handler always returned 0 if the error was
+        // > suppressed by the @ operator. As of PHP 8.0.0, it returns
+        // > the value E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR |
+        // > E_USER_ERROR | E_RECOVERABLE_ERROR | E_PARSE.
+        // https://www.php.net/manual/en/language.operators.errorcontrol.php
+        if (version_compare(PHP_VERSION, '8.0', 'ge') && $errorReporting === (
+            E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR | E_PARSE
+        )) {
+            return true;
+        }
+
+        // PHP 7 or manually disabled case:
+        return $errorReporting === 0;
     }
 
     public function send(EncodedPayload $payload, string $accessToken): ?Response
