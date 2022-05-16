@@ -499,7 +499,7 @@ class DataBuilder implements DataBuilderInterface
 
     private function addCodeContextToFrame(Frame $frame, $filename, $line)
     {
-        if (!file_exists($filename)) {
+        if (null === $filename || !file_exists($filename)) {
             return;
         }
 
