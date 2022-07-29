@@ -12,6 +12,7 @@ use Rollbar\RollbarLogger;
 use Rollbar\Defaults;
 
 use Rollbar\TestHelpers\CustomSerializable;
+use Rollbar\TestHelpers\DeprecatedSerializable;
 use Rollbar\TestHelpers\Exceptions\SilentExceptionSampleRate;
 use Rollbar\TestHelpers\Exceptions\FiftyFiftyExceptionSampleRate;
 use Rollbar\TestHelpers\Exceptions\FiftyFityChildExceptionSampleRate;
@@ -390,6 +391,16 @@ class ConfigTest extends BaseRollbarTest
         }
     }
 
+    public function testReportSuppressedActuallySuppressed()
+    {
+        $config = new Config(array(
+            'report_suppressed' => false,
+            "access_token" => $this->getTestAccessToken()
+        ));
+        $this->assertFalse($config->shouldSuppress());
+        $this->assertTrue(@$config->shouldSuppress());
+    }
+
     public function testFilter(): void
     {
         $d = m::mock(Data::class)
@@ -540,7 +551,7 @@ class ConfigTest extends BaseRollbarTest
         $this->assertSame($expectedCustom, $actualCustom);
     }
 
-    public function testCustomSerializable(): void
+    public function testDeprecatedSerializable(): void
     {
         $expectedCustom = array(
             "foo" => "bar",
@@ -549,7 +560,7 @@ class ConfigTest extends BaseRollbarTest
         $config = new Config(array(
             "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env,
-            "custom" => new CustomSerializable($expectedCustom),
+            "custom" => new DeprecatedSerializable($expectedCustom),
         ));
 
         // New error handler to make sure we get the deprecated notice
@@ -575,7 +586,43 @@ class ConfigTest extends BaseRollbarTest
 
         $this->assertSame($expectedCustom, $actualCustom);
     }
-    
+
+    public function testCustomSerializable()
+    {
+        $expectedCustom = array(
+            "foo" => "bar",
+            "fuzz" => "buzz"
+        );
+        $config = new Config(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => $this->env,
+            "custom" => new CustomSerializable($expectedCustom),
+        ));
+
+        // Make sure the deprecation notice is not sent if the object implements __serializable as it should
+        set_error_handler(function (
+            int $errno,
+            string $errstr,
+        ) : bool {
+            $this->assertStringNotContainsString("Serializable", $errstr);
+            $this->assertStringNotContainsString("deprecated", $errstr);
+            return true;
+        }, E_USER_DEPRECATED);
+
+        $result = $config->getDataBuilder()->makeData(
+            Level::INFO,
+            "Test message with custom data added dynamically.",
+            array(),
+        );
+
+        // Clear the handler, so it does not mess with other tests.
+        restore_error_handler();
+
+        $actualCustom = $result->getCustom();
+
+        $this->assertSame($expectedCustom, $actualCustom);
+    }
+
     public function testMaxItems(): void
     {
         $config = new Config(array(

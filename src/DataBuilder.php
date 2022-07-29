@@ -178,8 +178,8 @@ class DataBuilder implements DataBuilderInterface
         $fromConfig = $config['local_vars_dump'] ?? null;
         $this->localVarsDump = self::$defaults->localVarsDump($fromConfig);
         if ($this->localVarsDump && !empty(ini_get('zend.exception_ignore_args'))) {
-            ini_set('zend.exception_ignore_args', 'Off');
-            assert(empty(ini_get('zend.exception_ignore_args')) ||  ini_get('zend.exception_ignore_args') === "Off");
+            ini_set('zend.exception_ignore_args', '0');
+            assert(empty(ini_get('zend.exception_ignore_args')) || ini_get('zend.exception_ignore_args') == "0");
         }
     }
     
@@ -493,7 +493,7 @@ class DataBuilder implements DataBuilderInterface
 
     private function addCodeContextToFrame(Frame $frame, $filename, $line)
     {
-        if (!file_exists($filename)) {
+        if (null === $filename || !file_exists($filename)) {
             return;
         }
 
@@ -624,7 +624,8 @@ class DataBuilder implements DataBuilderInterface
             $postData = array();
             $body = $request->getBody();
             if ($body !== null) {
-                parse_str($body, $postData);
+                // PHP reports warning if parse_str() detects more than max_input_vars items.
+                @parse_str($body, $postData);
             }
             $request->setPost($postData);
         }
@@ -1006,10 +1007,14 @@ class DataBuilder implements DataBuilderInterface
     {
         // This check is placed first because it should return a string|null, and we want to return an array.
         if ($custom instanceof \Serializable) {
-            trigger_error("Using the Serializable interface has been deprecated.", E_USER_DEPRECATED);
             // We don't return this value instead we run it through the rest of the checks. The same is true for the
             // next check.
-            $custom = $custom->serialize();
+            if (method_exists($custom, '__serialize')) {
+                $custom = $custom->__serialize();
+            } else {
+                trigger_error("Using the Serializable interface has been deprecated.", E_USER_DEPRECATED);
+                $custom = $custom->serialize();
+            }
         } else {
             if ($custom instanceof SerializerInterface) {
                 $custom = $custom->serialize();

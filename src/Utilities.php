@@ -147,9 +147,13 @@ final class Utilities
             $serialized = self::circularReferenceLabel($obj);
         } else {
             if ($obj instanceof \Serializable) {
-                trigger_error("Using the Serializable interface has been deprecated.", E_USER_DEPRECATED);
                 self::markSerialized($obj, $objectHashes);
-                $serialized = $obj->serialize();
+                if (method_exists($obj, '__serialize')) {
+                    $serialized = $obj->__serialize();
+                } else {
+                    trigger_error("Using the Serializable interface has been deprecated.", E_USER_DEPRECATED);
+                    $serialized = $obj->serialize();
+                }
             } elseif ($obj instanceof SerializerInterface) {
                 self::markSerialized($obj, $objectHashes);
                 $serialized = $obj->serialize();

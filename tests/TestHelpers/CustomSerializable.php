@@ -1,4 +1,6 @@
-<?php namespace Rollbar\TestHelpers;
+<?php
+
+namespace Rollbar\TestHelpers;
 
 class CustomSerializable implements \Serializable
 {
@@ -11,7 +13,7 @@ class CustomSerializable implements \Serializable
 
     public function serialize(): array
     {
-        return $this->data;
+        throw new \Exception("Not implemented");
     }
 
     public function unserialize(string $data): void
@@ -21,7 +23,7 @@ class CustomSerializable implements \Serializable
 
     public function __serialize(): array
     {
-        throw new \Exception("Not implemented");
+        return $this->data;
     }
 
     public function __unserialize(array $data): void
