@@ -15,8 +15,6 @@ abstract class BaseRollbarTest extends TestCase
 
     public function getTestAccessToken()
     {
-        return isset($_ENV['ROLLBAR_TEST_TOKEN']) ?
-            $_ENV['ROLLBAR_TEST_TOKEN'] :
-            static::DEFAULT_ACCESS_TOKEN;
+        return $_ENV['ROLLBAR_TEST_TOKEN'] ?? static::DEFAULT_ACCESS_TOKEN;
     }
 }

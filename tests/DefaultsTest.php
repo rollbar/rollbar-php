@@ -12,32 +12,32 @@ class DefaultsTest extends BaseRollbarTest
     /**
      * @var Defaults
      */
-    private $defaults;
+    private \Rollbar\Defaults $defaults;
 
     public function setUp(): void
     {
         $this->defaults = new Defaults;
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $defaults = Defaults::get();
-        $this->assertInstanceOf("Rollbar\Defaults", $defaults);
+        $this->assertInstanceOf(Defaults::class, $defaults);
     }
 
-    public function testMessageLevel()
+    public function testMessageLevel(): void
     {
         $this->assertEquals("warning", $this->defaults->messageLevel());
         $this->assertEquals("error", $this->defaults->messageLevel(Level::ERROR));
     }
 
-    public function testExceptionLevel()
+    public function testExceptionLevel(): void
     {
         $this->assertEquals("error", $this->defaults->exceptionLevel());
         $this->assertEquals("warning", $this->defaults->exceptionLevel(Level::WARNING));
     }
 
-    public function testErrorLevels()
+    public function testErrorLevels(): void
     {
         $expected = array(
             E_ERROR => "error",
@@ -59,7 +59,7 @@ class DefaultsTest extends BaseRollbarTest
         $this->assertEquals($expected, $this->defaults->errorLevels());
     }
 
-    public function testPsrLevels()
+    public function testPsrLevels(): void
     {
         $expected = $this->defaultPsrLevels = array(
             LogLevel::EMERGENCY => "critical",
@@ -74,37 +74,37 @@ class DefaultsTest extends BaseRollbarTest
         $this->assertEquals($expected, $this->defaults->psrLevels());
     }
 
-    public function testBranch()
+    public function testBranch(): void
     {
         $val = 'some-branch';
         $this->assertEquals($val, $this->defaults->branch($val));
     }
 
-    public function testServerRoot()
+    public function testServerRoot(): void
     {
         $_ENV["HEROKU_APP_DIR"] = "abc123";
         $defaults = new Defaults;
         $this->assertEquals("abc123", $defaults->serverRoot());
     }
 
-    public function testPlatform()
+    public function testPlatform(): void
     {
         $this->assertEquals(php_uname('a'), $this->defaults->platform());
     }
 
-    public function testNotifier()
+    public function testNotifier(): void
     {
         $this->assertEquals(Notifier::defaultNotifier(), $this->defaults->notifier());
     }
 
-    public function testBaseException()
+    public function testBaseException(): void
     {
         $expected = Throwable::class;
         $base = $this->defaults->baseException();
         $this->assertEquals($expected, $base);
     }
 
-    public function testScrubFields()
+    public function testScrubFields(): void
     {
         $expected = array(
             'passwd',
@@ -119,102 +119,102 @@ class DefaultsTest extends BaseRollbarTest
         $this->assertEquals($expected, $this->defaults->scrubFields());
     }
     
-    public function testSendMessageTrace()
+    public function testSendMessageTrace(): void
     {
         $this->assertFalse($this->defaults->sendMessageTrace());
     }
     
-    public function testAgentLogLocation()
+    public function testAgentLogLocation(): void
     {
         $this->assertEquals('/var/tmp', $this->defaults->agentLogLocation());
     }
     
-    public function testAllowExec()
+    public function testAllowExec(): void
     {
         $this->assertEquals(true, $this->defaults->allowExec());
     }
     
-    public function testEndpoint()
+    public function testEndpoint(): void
     {
         $this->assertEquals('https://api.rollbar.com/api/1/', $this->defaults->endpoint());
     }
     
-    public function testCaptureErrorStacktraces()
+    public function testCaptureErrorStacktraces(): void
     {
         $this->assertTrue($this->defaults->captureErrorStacktraces());
     }
     
-    public function testCheckIgnore()
+    public function testCheckIgnore(): void
     {
         $this->assertNull($this->defaults->checkIgnore());
     }
     
-    public function testCodeVersion()
+    public function testCodeVersion(): void
     {
         $this->assertEquals("", $this->defaults->codeVersion());
     }
     
-    public function testCustom()
+    public function testCustom(): void
     {
         $this->assertNull($this->defaults->custom());
     }
     
-    public function testEnabled()
+    public function testEnabled(): void
     {
         $this->assertTrue($this->defaults->enabled());
     }
 
-    public function testTransmit()
+    public function testTransmit(): void
     {
         $this->assertTrue($this->defaults->transmit());
     }
 
-    public function testLogPayload()
+    public function testLogPayload(): void
     {
         $this->assertFalse($this->defaults->logPayload());
     }
     
-    public function testEnvironment()
+    public function testEnvironment(): void
     {
         $this->assertEquals('production', $this->defaults->environment());
     }
     
-    public function testErrorSampleRates()
+    public function testErrorSampleRates(): void
     {
         $this->assertEmpty($this->defaults->errorSampleRates());
     }
     
-    public function testExceptionSampleRates()
+    public function testExceptionSampleRates(): void
     {
         $this->assertEmpty($this->defaults->exceptionSampleRates());
     }
     
-    public function testFluentHost()
+    public function testFluentHost(): void
     {
         $this->assertEquals('127.0.0.1', $this->defaults->fluentHost());
     }
     
-    public function testFluentPort()
+    public function testFluentPort(): void
     {
         $this->assertEquals(24224, $this->defaults->fluentPort());
     }
     
-    public function testFluentTag()
+    public function testFluentTag(): void
     {
         $this->assertEquals('rollbar', $this->defaults->fluentTag());
     }
     
-    public function testHandler()
+    public function testHandler(): void
     {
         $this->assertEquals('blocking', $this->defaults->handler());
     }
     
-    public function testHost()
+    public function testHost(): void
     {
         $this->assertNull($this->defaults->host());
     }
     
-    public function testIncludedErrnoDefault()
+    public function testIncludedErrnoDefault(): void
     {
         $expected = E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR;
         $this->assertEquals(
@@ -232,7 +232,7 @@ class DefaultsTest extends BaseRollbarTest
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      */
-    public function testIncludedErrnoDefineOverride()
+    public function testIncludedErrnoDefineOverride(): void
     {
         // unlike other tests that use `$this->defaults`, we must make our
         // own Defaults object now, _after_ defining the bitmask: in the
@@ -244,37 +244,37 @@ class DefaultsTest extends BaseRollbarTest
         );
     }
 
-    public function testTimeout()
+    public function testTimeout(): void
     {
         $this->assertEquals(3, $this->defaults->timeout());
     }
     
-    public function testReportSuppressed()
+    public function testReportSuppressed(): void
     {
         $this->assertFalse($this->defaults->reportSuppressed());
     }
     
-    public function testUseErrorReporting()
+    public function testUseErrorReporting(): void
     {
         $this->assertFalse($this->defaults->useErrorReporting());
     }
     
-    public function testCaptureEmail()
+    public function testCaptureEmail(): void
     {
         $this->assertFalse($this->defaults->captureEmail());
     }
     
-    public function testCaptureUsername()
+    public function testCaptureUsername(): void
     {
         $this->assertFalse($this->defaults->captureUsername());
     }
     
-    public function testMaxItems()
+    public function testMaxItems(): void
     {
         $this->assertEquals(10, $this->defaults->maxItems());
     }
     
-    public function testRaiseOnError()
+    public function testRaiseOnError(): void
     {
         $this->assertEquals(false, $this->defaults->raiseOnError());
     }
@@ -283,7 +283,7 @@ class DefaultsTest extends BaseRollbarTest
      * @testWith ["message_level", "warning"]
      *           ["MESSAGE_LEVEL", "warning"]
      */
-    public function testFromSnakeCaseGetsExpectedValueForValidOption($option, $value)
+    public function testFromSnakeCaseGetsExpectedValueForValidOption($option, $value): void
     {
         $this->assertEquals(
             $value,
@@ -291,7 +291,7 @@ class DefaultsTest extends BaseRollbarTest
         );
     }
 
-    public function testFromSnakeCaseThrowsOnInvalidOption()
+    public function testFromSnakeCaseThrowsOnInvalidOption(): void
     {
         $this->expectException(Exception::class);
         \Rollbar\Defaults::get()->fromSnakeCase('no_such_option');

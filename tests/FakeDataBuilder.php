@@ -8,8 +8,8 @@ use Throwable;
 
 class FakeDataBuilder implements DataBuilderInterface
 {
-    public static $args = array();
-    public static $logged = array();
+    public static array $args = array();
+    public static array $logged = array();
 
     public function __construct($arr)
     {
@@ -23,7 +23,7 @@ class FakeDataBuilder implements DataBuilderInterface
         return new Data('test', new Body(new Message('test')));
     }
     
-    public function setCustom()
+    public function setCustom(): void
     {
     }
 }

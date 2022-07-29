@@ -3,12 +3,12 @@
 namespace Rollbar\Truncation;
 
 use Rollbar\Payload\EncodedPayload;
-use \Rollbar\Config;
-use \Rollbar\BaseRollbarTest;
+use Rollbar\Config;
+use Rollbar\BaseRollbarTest;
 
 class RawStrategyTest extends BaseRollbarTest
 {
-    public function testExecute()
+    public function testExecute(): void
     {
         $payload = array('test' => 'test data');
 

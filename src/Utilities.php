@@ -63,7 +63,7 @@ final class Utilities
             return;
         }
 
-        if (!is_integer($input)) {
+        if (!is_int($input)) {
             throw new \InvalidArgumentException("\$$name must be an integer");
         }
         if (!is_null($minValue) && $input < $minValue) {

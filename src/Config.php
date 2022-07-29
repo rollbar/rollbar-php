@@ -17,6 +17,9 @@ use Rollbar\Senders\SenderInterface;
 use Rollbar\TransformerInterface;
 use Rollbar\UtilitiesTrait;
 use Throwable;
+use Rollbar\ResponseHandlerInterface;
+use Rollbar\Senders\FluentSender;
+use Rollbar\FilterInterface;
 
 class Config
 {
@@ -425,7 +428,7 @@ class Config
     {
         $this->minimumLevel = \Rollbar\Defaults::get()->minimumLevel();
 
-        $override = array_key_exists('minimum_level', $config) ? $config['minimum_level'] : null;
+        $override = $config['minimum_level'] ?? null;
         $override = array_key_exists('minimumLevel', $config) ? $config['minimumLevel'] : $override;
 
         if ($override instanceof Level) {
@@ -454,7 +457,7 @@ class Config
 
     private function setFilters(array $config): void
     {
-        $this->setupWithOptions($config, "filter", "Rollbar\FilterInterface");
+        $this->setupWithOptions($config, "filter", FilterInterface::class);
     }
 
     private function setSender(array $config): void
@@ -606,7 +609,7 @@ class Config
         if (!isset($config['handler']) || $config['handler'] != 'fluent') {
             return $default;
         }
-        $default = "Rollbar\Senders\FluentSender";
+        $default = FluentSender::class;
 
         if (isset($config['fluent_host'])) {
             $config['senderOptions']['fluentHost'] = $config['fluent_host'];
@@ -625,7 +628,7 @@ class Config
 
     private function setResponseHandler(array $config): void
     {
-        $this->setupWithOptions($config, "responseHandler", "Rollbar\ResponseHandlerInterface");
+        $this->setupWithOptions($config, "responseHandler", ResponseHandlerInterface::class);
     }
 
     private function setCheckIgnoreFunction(array $config): void
@@ -694,9 +697,7 @@ class Config
             if ($passWholeConfig) {
                 $options = $config;
             } else {
-                $options = isset($config[$keyName . "Options"]) ?
-                            $config[$keyName . "Options"] :
-                            array();
+                $options = $config[$keyName . "Options"] ?? array();
             }
             $this->$keyName = new $class($options);
         } else {

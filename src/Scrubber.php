@@ -17,9 +17,9 @@ class Scrubber implements ScrubberInterface
 
     protected function setScrubFields($config)
     {
-        $fromConfig = isset($config['scrubFields']) ? $config['scrubFields'] : null;
+        $fromConfig = $config['scrubFields'] ?? null;
         if (!isset($fromConfig)) {
-            $fromConfig = isset($config['scrub_fields']) ? $config['scrub_fields'] : null;
+            $fromConfig = $config['scrub_fields'] ?? null;
         }
         $this->scrubFields = self::$defaults->scrubFields($fromConfig);
     }
@@ -31,11 +31,11 @@ class Scrubber implements ScrubberInterface
 
     protected function setSafelist($config)
     {
-        $fromConfig = isset($config['scrubSafelist']) ? $config['scrubSafelist'] : null;
+        $fromConfig = $config['scrubSafelist'] ?? null;
         if (!isset($fromConfig)) {
-            $fromConfig = isset($config['scrub_safelist']) ? $config['scrub_safelist'] : null;
+            $fromConfig = $config['scrub_safelist'] ?? null;
         }
-        $this->safelist = $fromConfig ? $fromConfig : array();
+        $this->safelist = $fromConfig ?: array();
     }
 
     public function getSafelist()

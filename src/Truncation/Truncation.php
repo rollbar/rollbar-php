@@ -2,16 +2,19 @@
 
 namespace Rollbar\Truncation;
 
-use \Rollbar\Payload\EncodedPayload;
-use \Rollbar\Config;
+use Rollbar\Payload\EncodedPayload;
+use Rollbar\Config;
+use Rollbar\Truncation\AbstractStrategy;
+use Rollbar\Truncation\StringsStrategy;
+use Rollbar\Truncation\FramesStrategy;
 
 class Truncation
 {
     const MAX_PAYLOAD_SIZE = 131072; // 128 * 1024
  
     protected static $truncationStrategies = array(
-        "Rollbar\Truncation\FramesStrategy",
-        "Rollbar\Truncation\StringsStrategy"
+        FramesStrategy::class,
+        StringsStrategy::class
     );
     
     public function __construct(private Config $config)
@@ -23,7 +26,7 @@ class Truncation
     
     public function registerStrategy($type)
     {
-        if (!class_exists($type) || !is_subclass_of($type, "Rollbar\Truncation\AbstractStrategy")) {
+        if (!class_exists($type) || !is_subclass_of($type, AbstractStrategy::class)) {
             throw new \Exception(
                 "Truncation strategy '$type' doesn't exist or is not a subclass " .
                 "of Rollbar\Truncation\AbstractStrategy"

@@ -5,10 +5,10 @@ class Truncation extends \Rollbar\Truncation\Truncation
     protected $memoryUsage = 0;
     protected $timeUsage = 0;
     protected $payloadSize = 0;
-    protected $lastRunOutput = "";
-    protected $strategiesUsed = array();
+    protected string $lastRunOutput = "";
+    protected array $strategiesUsed = array();
     
-    public function truncate(\Rollbar\Payload\EncodedPayload $payload)
+    public function truncate(\Rollbar\Payload\EncodedPayload $payload): \Rollbar\Payload\EncodedPayload
     {
         $this->strategiesUsed = array();
         
@@ -33,7 +33,7 @@ class Truncation extends \Rollbar\Truncation\Truncation
         return $result;
     }
     
-    public function needsTruncating(\Rollbar\Payload\EncodedPayload $payload, $strategy)
+    public function needsTruncating(\Rollbar\Payload\EncodedPayload $payload, $strategy): bool
     {
         $result = parent::needsTruncating($payload, $strategy);
         
@@ -44,12 +44,12 @@ class Truncation extends \Rollbar\Truncation\Truncation
         return $result;
     }
     
-    public function getLastRun()
+    public function getLastRun(): string
     {
         return $this->lastRunOutput;
     }
     
-    public function composeLastRunOutput()
+    public function composeLastRunOutput(): string
     {
         $output = "\n";
         
@@ -58,7 +58,7 @@ class Truncation extends \Rollbar\Truncation\Truncation
                     round($this->payloadSize / 1024 / 1024, 2) . " MB \n";
                 
         $output .= "Strategies used: \n" .
-                    (count($this->strategiesUsed) ? join(", \n", $this->strategiesUsed) : "none") . "\n";
+                    (count($this->strategiesUsed) ? implode(", \n", $this->strategiesUsed) : "none") . "\n";
         
         $output .= "Encoding triggered: " .
                     \Rollbar\Performance\TestHelpers\EncodedPayload::getEncodingCount() . "\n";

@@ -4,19 +4,19 @@ namespace Rollbar\TestHelpers;
 
 class CustomSerializable implements \Serializable
 {
-    public $data;
+    public array $data;
 
     public function __construct($data)
     {
         $this->data = $data;
     }
 
-    public function serialize()
+    public function serialize(): array
     {
         throw new \Exception("Not implemented");
     }
 
-    public function unserialize(string $data)
+    public function unserialize(string $data): void
     {
         throw new \Exception("Not implemented");
     }

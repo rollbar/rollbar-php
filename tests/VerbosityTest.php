@@ -5,6 +5,10 @@ namespace Rollbar;
 use Rollbar\Payload\Level;
 use Rollbar\Payload\Payload;
 use Rollbar\Response;
+use Monolog\Handler\AbstractHandler;
+use Rollbar\ResponseHandlerInterface;
+use Rollbar\FilterInterface;
+use Rollbar\Payload\Data;
 
 /**
  * \Rollbar\VerboseTest tests the verbosity of the SDK.
@@ -53,7 +57,7 @@ class VerbosityTest extends BaseRollbarTest
      *
      * @return void
      */
-    public function testRollbarLoggerEnabled()
+    public function testRollbarLoggerEnabled(): void
     {
         $unitTest = $this;
         $this->rollbarLogTest(
@@ -83,7 +87,7 @@ class VerbosityTest extends BaseRollbarTest
      *
      * @return void
      */
-    public function testRollbarLoggerDisabled()
+    public function testRollbarLoggerDisabled(): void
     {
         $unitTest = $this;
         $this->rollbarLogTest(
@@ -105,7 +109,7 @@ class VerbosityTest extends BaseRollbarTest
      *
      * @return void
      */
-    public function testRollbarLoggerInvalidLogLevel()
+    public function testRollbarLoggerInvalidLogLevel(): void
     {
         $unitTest = $this;
         $this->rollbarLogTest(
@@ -136,7 +140,7 @@ class VerbosityTest extends BaseRollbarTest
      *
      * @return void
      */
-    public function testRollbarLoggerInternalCheckIgnored()
+    public function testRollbarLoggerInternalCheckIgnored(): void
     {
         $unitTest = $this;
         $errorReporting = \error_reporting();
@@ -167,7 +171,7 @@ class VerbosityTest extends BaseRollbarTest
      *
      * @return void
      */
-    public function testRollbarLoggerCheckIgnored()
+    public function testRollbarLoggerCheckIgnored(): void
     {
         $unitTest = $this;
         $this->rollbarLogTest(
@@ -192,7 +196,7 @@ class VerbosityTest extends BaseRollbarTest
      *
      * @return void
      */
-    public function testRollbarLoggerSendMaxItems()
+    public function testRollbarLoggerSendMaxItems(): void
     {
         $unitTest = $this;
         $this->rollbarLogTest(
@@ -219,7 +223,7 @@ class VerbosityTest extends BaseRollbarTest
      *
      * @return void
      */
-    public function testRollbarLoggerSendBatched()
+    public function testRollbarLoggerSendBatched(): void
     {
         $unitTest = $this;
         $this->rollbarLogTest(
@@ -245,7 +249,7 @@ class VerbosityTest extends BaseRollbarTest
      *
      * @return void
      */
-    public function testRollbarLoggerFlush()
+    public function testRollbarLoggerFlush(): void
     {
         $unitTest = $this;
         $rollbarLogger = $this->verboseRollbarLogger(array(
@@ -276,7 +280,7 @@ class VerbosityTest extends BaseRollbarTest
      *
      * @return void
      */
-    public function testRollbarLoggerResponseStatusZero()
+    public function testRollbarLoggerResponseStatusZero(): void
     {
         $unitTest = $this;
         $this->rollbarLogTest(
@@ -305,7 +309,7 @@ class VerbosityTest extends BaseRollbarTest
      *
      * @return void
      */
-    public function testRollbarLoggerResponseStatusError()
+    public function testRollbarLoggerResponseStatusError(): void
     {
         $unitTest = $this;
         $this->rollbarLogTest(
@@ -332,7 +336,7 @@ class VerbosityTest extends BaseRollbarTest
      *
      * @return void
      */
-    public function testRollbarLoggerResponseStatusSuccess()
+    public function testRollbarLoggerResponseStatusSuccess(): void
     {
         $unitTest = $this;
         $this->rollbarLogTest(
@@ -358,7 +362,7 @@ class VerbosityTest extends BaseRollbarTest
      *
      * @return void
      */
-    public function testRollbarConfigInternalCheckIgnoredShouldSuppress()
+    public function testRollbarConfigInternalCheckIgnoredShouldSuppress(): void
     {
         $unitTest = $this;
         $config = $this->verboseRollbarConfig(array( // config
@@ -400,7 +404,7 @@ class VerbosityTest extends BaseRollbarTest
      *
      * @return void
      */
-    public function testRollbarConfigInternalCheckIgnoredLevelTooLow()
+    public function testRollbarConfigInternalCheckIgnoredLevelTooLow(): void
     {
         $unitTest = $this;
         $config = $this->verboseRollbarConfig(array( // config
@@ -433,7 +437,7 @@ class VerbosityTest extends BaseRollbarTest
      *
      * @return void
      */
-    public function testRollbarConfigShouldIgnoreErrorErrorReporting()
+    public function testRollbarConfigShouldIgnoreErrorErrorReporting(): void
     {
         $unitTest = $this;
         $config = $this->verboseRollbarConfig(array( // config
@@ -474,7 +478,7 @@ class VerbosityTest extends BaseRollbarTest
      *
      * @return void
      */
-    public function testRollbarConfigShouldIgnoreErrorIncludedErrno()
+    public function testRollbarConfigShouldIgnoreErrorIncludedErrno(): void
     {
         $unitTest = $this;
         $config = $this->verboseRollbarConfig(array( // config
@@ -515,7 +519,7 @@ class VerbosityTest extends BaseRollbarTest
      *
      * @return void
      */
-    public function testRollbarConfigShouldIgnoreErrorErrorSampleRates()
+    public function testRollbarConfigShouldIgnoreErrorErrorSampleRates(): void
     {
         $unitTest = $this;
         $config = $this->verboseRollbarConfig(array( // config
@@ -549,7 +553,7 @@ class VerbosityTest extends BaseRollbarTest
      *
      * @return void
      */
-    public function testRollbarConfigShouldIgnoreException()
+    public function testRollbarConfigShouldIgnoreException(): void
     {
         $unitTest = $this;
         $config = $this->verboseRollbarConfig(array( // config
@@ -583,7 +587,7 @@ class VerbosityTest extends BaseRollbarTest
      *
      * @return void
      */
-    public function testRollbarConfigCheckIgnored()
+    public function testRollbarConfigCheckIgnored(): void
     {
         $unitTest = $this;
         $config = $this->verboseRollbarConfig(array( // config
@@ -598,11 +602,11 @@ class VerbosityTest extends BaseRollbarTest
             $config,
             function () use ($config, $unitTest) {
             // logic under test
-                $dataMock = $unitTest->getMockBuilder('\Rollbar\Payload\Data')
+                $dataMock = $unitTest->getMockBuilder(Data::class)
                     ->disableOriginalConstructor()
                     ->getMock();
                 $dataMock->method('getLevel')->willReturn(\Rollbar\Payload\Level::INFO());
-                $payloadMock = $unitTest->getMockBuilder('\Rollbar\Payload\Payload')
+                $payloadMock = $unitTest->getMockBuilder(Payload::class)
                     ->disableOriginalConstructor()
                     ->getMock();
                 $payloadMock->method('getData')->willReturn($dataMock);
@@ -630,7 +634,7 @@ class VerbosityTest extends BaseRollbarTest
      *
      * @return void
      */
-    public function testRollbarConfigCheckIgnoredException()
+    public function testRollbarConfigCheckIgnoredException(): void
     {
         $unitTest = $this;
         $config = $this->verboseRollbarConfig(array( // config
@@ -666,7 +670,7 @@ class VerbosityTest extends BaseRollbarTest
      *
      * @return void
      */
-    public function testRollbarConfigCheckIgnoredPayloadLevelTooLow()
+    public function testRollbarConfigCheckIgnoredPayloadLevelTooLow(): void
     {
         $unitTest = $this;
         $config = $this->verboseRollbarConfig(array( // config
@@ -700,10 +704,10 @@ class VerbosityTest extends BaseRollbarTest
      *
      * @return void
      */
-    public function testRollbarConfigCheckIgnoredFilter()
+    public function testRollbarConfigCheckIgnoredFilter(): void
     {
         $unitTest = $this;
-        $filterMock = $this->getMockBuilder('\Rollbar\FilterInterface')->getMock();
+        $filterMock = $this->getMockBuilder(FilterInterface::class)->getMock();
         $filterMock->method('shouldSend')->willReturn(true);
 
         $config = $this->verboseRollbarConfig(array( // config
@@ -737,7 +741,7 @@ class VerbosityTest extends BaseRollbarTest
      *
      * @return void
      */
-    public function testRollbarConfigSendTransmit()
+    public function testRollbarConfigSendTransmit(): void
     {
         $unitTest = $this;
         $config = $this->verboseRollbarConfig(array( // config
@@ -770,7 +774,7 @@ class VerbosityTest extends BaseRollbarTest
      *
      * @return void
      */
-    public function testRollbarConfigSendBatchTransmit()
+    public function testRollbarConfigSendBatchTransmit(): void
     {
         $unitTest = $this;
         $config = $this->verboseRollbarConfig(array( // config
@@ -804,10 +808,10 @@ class VerbosityTest extends BaseRollbarTest
      *
      * @return void
      */
-    public function testRollbarConfigHandleResponse()
+    public function testRollbarConfigHandleResponse(): void
     {
         $unitTest = $this;
-        $responseHandlerMock = $this->getMockBuilder('\Rollbar\ResponseHandlerInterface')->getMock();
+        $responseHandlerMock = $this->getMockBuilder(ResponseHandlerInterface::class)->getMock();
         $config = $this->verboseRollbarConfig(array( // config
             "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php",
@@ -843,7 +847,7 @@ class VerbosityTest extends BaseRollbarTest
      *
      * @return void
      */
-    public function testRollbarTruncation()
+    public function testRollbarTruncation(): void
     {
         $unitTest = $this;
         $rollbarLogger = $this->verboseRollbarLogger(array(
@@ -886,10 +890,10 @@ class VerbosityTest extends BaseRollbarTest
      *
      * @param array $config Config array used to configure
      * the $object.
-     * @param \Rollbar\RollbarLogger|\Rollbar\Config $object
+     * @param \Rollbar\Config|\Rollbar\RollbarLogger $object
      * Object to be set up for the test.
      */
-    private function prepareForLogMocking($config, $object)
+    private function prepareForLogMocking(array $config, Config|RollbarLogger $object): Config|RollbarLogger
     {
         $verboseLogger = new \Monolog\Logger('rollbar.verbose.test');
 
@@ -897,9 +901,7 @@ class VerbosityTest extends BaseRollbarTest
             'verbose_logger' => $verboseLogger
         )));
 
-        $verbose = isset($config['verbose']) ?
-            $config['verbose'] :
-            \Rollbar\Config::VERBOSE_NONE;
+        $verbose = $config['verbose'] ?? \Rollbar\Config::VERBOSE_NONE;
 
         if ($verbose == \Rollbar\Config::VERBOSE_NONE) {
             $verbose = \Rollbar\Config::VERBOSE_NONE_INT;
@@ -907,7 +909,7 @@ class VerbosityTest extends BaseRollbarTest
             $verbose = \Monolog\Logger::toMonologLevel($verbose);
         }
 
-        $handlerMock = $this->getMockBuilder('\Monolog\Handler\AbstractHandler')
+        $handlerMock = $this->getMockBuilder(AbstractHandler::class)
             ->setMethods(array('handle'))
             ->getMock();
         $handlerMock->setLevel($verbose);
@@ -928,7 +930,7 @@ class VerbosityTest extends BaseRollbarTest
      * @param array $config Configuration options for Rollbar
      * @return \Rollbar\Config
      */
-    private function verboseRollbarConfig($config)
+    private function verboseRollbarConfig(array $config): Config|RollbarLogger
     {
         return $this->prepareForLogMocking(
             $config,
@@ -945,7 +947,7 @@ class VerbosityTest extends BaseRollbarTest
      * @param array $config Configuration options for Rollbar
      * @return \Rollbar\RollbarLogger
      */
-    private function verboseRollbarLogger($config)
+    private function verboseRollbarLogger(array $config): Config|RollbarLogger
     {
         return $this->prepareForLogMocking(
             $config,
@@ -962,7 +964,7 @@ class VerbosityTest extends BaseRollbarTest
      * @param string $level The level of the log recorded which will
      * be asserted.
      */
-    private function withLogParams($messageRegEx, $level)
+    private function withLogParams(string $messageRegEx, string $level): \PHPUnit\Framework\Constraint\Callback
     {
         return $this->callback(function ($record) use ($messageRegEx, $level) {
             return
@@ -974,7 +976,7 @@ class VerbosityTest extends BaseRollbarTest
     /**
      * Convenience method for asserting a log record is in a valid format.
      */
-    private function withLog()
+    private function withLog(): \PHPUnit\Framework\Constraint\Callback
     {
         return $this->callback(function ($record) {
             return is_array($record);
@@ -1035,7 +1037,7 @@ class VerbosityTest extends BaseRollbarTest
      * @param mock|null $handlerMock (optional) The handler mock on which to set the
      * expectations.
      */
-    public function expectLog($at, $messageRegEx, $level, $handlerMock = null)
+    public function expectLog(int $at, string $messageRegEx, string $level, mock $handlerMock = null): void
     {
         $this->expectConsecutiveLog([ $at, $messageRegEx, $level ]);
     }
@@ -1046,7 +1048,7 @@ class VerbosityTest extends BaseRollbarTest
      * @param mock|null $handlerMock (optional) The handler mock on which to set the
      * expectations.
      */
-    public function expectQuiet($handlerMock = null)
+    public function expectQuiet(mock $handlerMock = null): void
     {
         if ($handlerMock === null) {
             $handlerMock = $this->verboseHandlerMock;
@@ -1063,21 +1065,21 @@ class VerbosityTest extends BaseRollbarTest
      * to the initial config is not needed as the method takes
      * care of performing assertions in both quiet and verbose scenarios.
      *
-     * @param \Rollbar\RollbarLogger|\Rollbar\Config $object Object under test.
+     * @param \Rollbar\Config|\Rollbar\RollbarLogger $object Object under test.
      * @param callback $test Logic under test
      * @param callback $verboseExpectations A callback with
      * expectations to be set on the verbose logger handler mock
      * in the verbose scenario.
-     * @param callback $pre (optional) Logic to be executed before test.
-     * @param callback $post (optional) Logic to be executed after the test
+     * @param callback|null $pre (optional) Logic to be executed before test.
+     * @param callback|null $post (optional) Logic to be executed after the test
      */
     private function configurableObjectVerbosityTest(
-        $object,
-        $test,
-        $verboseExpectations,
-        $pre = null,
-        $post = null
-    ) {
+        Config|RollbarLogger $object,
+        callable             $test,
+        callable             $verboseExpectations,
+        callable             $pre = null,
+        callable             $post = null
+    ): void {
         $unitTest = $this;
         // Quiet scenario
         $this->prepareForLogMocking(
@@ -1111,15 +1113,15 @@ class VerbosityTest extends BaseRollbarTest
      *
      * @param callback $test Logic under test.
      * @param callback $expectations Logic with expectations.
-     * @param callback $pre (optional) Test set up.
-     * @param callback $post (optional) Test tear down.
+     * @param callback|null $pre (optional) Test set up.
+     * @param callback|null $post (optional) Test tear down.
      */
     private function withTestLambdas(
-        $test,
-        $expectations,
-        $pre = null,
-        $post = null
-    ) {
+        callable $test,
+        callable $expectations,
+        callable $pre = null,
+        callable $post = null
+    ): void {
         if ($pre !== null) {
             $pre();
         }
@@ -1145,16 +1147,16 @@ class VerbosityTest extends BaseRollbarTest
      * set on the verbose logger handler mock.
      * @param string $messageLevel (optional) The level of the Rollbar log
      * message invoked.
-     * @param callback $pre (optional) Logic to be executed before test.
-     * @param callback $post (optional) Logic to be executed after the test
+     * @param callback|null $pre (optional) Logic to be executed before test.
+     * @param callback|null $post (optional) Logic to be executed after the test
      */
     private function rollbarLogTest(
-        $config,
-        $expectations,
-        $messageLevel = Level::WARNING,
-        $pre = null,
-        $post = null
-    ) {
+        array    $config,
+        callable $expectations,
+        string   $messageLevel = Level::WARNING,
+        callable $pre = null,
+        callable $post = null
+    ): void {
         $rollbarLogger = $this->verboseRollbarLogger($config);
 
         $this->configurableObjectVerbosityTest(

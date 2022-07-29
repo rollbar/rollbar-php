@@ -2,9 +2,10 @@
 
 namespace Rollbar\Truncation;
 
-use \Rollbar\Config;
-use \Rollbar\BaseRollbarTest;
-use \Rollbar\Payload\EncodedPayload;
+use Rollbar\Config;
+use Rollbar\BaseRollbarTest;
+use Rollbar\Payload\EncodedPayload;
+use Rollbar\TestHelpers\CustomTruncation;
 
 class TruncationTest extends BaseRollbarTest
 {
@@ -15,11 +16,11 @@ class TruncationTest extends BaseRollbarTest
         $this->truncate = new \Rollbar\Truncation\Truncation($config);
     }
     
-    public function testCustomTruncation()
+    public function testCustomTruncation(): void
     {
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
-            'custom_truncation' => 'Rollbar\TestHelpers\CustomTruncation'
+            'custom_truncation' => CustomTruncation::class
         ));
         $this->truncate = new \Rollbar\Truncation\Truncation($config);
         
@@ -38,13 +39,13 @@ class TruncationTest extends BaseRollbarTest
         
         $result = $this->truncate->truncate($data);
         
-        $this->assertFalse(strpos($data, 'Custom truncation test string') === false);
+        $this->assertNotFalse(str_contains($data, 'Custom truncation test string'));
     }
 
     /**
      * @dataProvider truncateProvider
      */
-    public function testTruncateNoPerformance($data)
+    public function testTruncateNoPerformance($data): void
     {
         
         $data = new \Rollbar\Payload\EncodedPayload($data);
@@ -60,7 +61,7 @@ class TruncationTest extends BaseRollbarTest
         );
     }
     
-    public function truncateProvider()
+    public function truncateProvider(): array
     {
         
         $stringsTest = new StringsStrategyTest();

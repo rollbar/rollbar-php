@@ -54,7 +54,7 @@ class Rollbar
             return;
         }
 
-        self::$logger = isset($logger) ? $logger : new RollbarLogger($configOrLogger);
+        self::$logger = $logger ?? new RollbarLogger($configOrLogger);
     }
     
     public static function enable()

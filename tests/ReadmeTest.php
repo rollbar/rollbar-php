@@ -13,7 +13,7 @@ function do_something()
 
 class ReadmeTest extends BaseRollbarTest
 {
-    public function testQuickStart()
+    public function testQuickStart(): void
     {
         // installs global error and exception handlers
         Rollbar::init(
@@ -53,7 +53,7 @@ class ReadmeTest extends BaseRollbarTest
         throw new \Exception('testing exception handler');
     }
 
-    public function testSetup1()
+    public function testSetup1(): void
     {
         $config = array(
             // required
@@ -68,7 +68,7 @@ class ReadmeTest extends BaseRollbarTest
         $this->assertTrue(true);
     }
 
-    public function testSetup2()
+    public function testSetup2(): void
     {
         $config = array(
             // required
@@ -86,7 +86,7 @@ class ReadmeTest extends BaseRollbarTest
         $this->assertTrue(true);
     }
 
-    public function testBasicUsage()
+    public function testBasicUsage(): void
     {
         Rollbar::init(
             array(
@@ -107,7 +107,7 @@ class ReadmeTest extends BaseRollbarTest
         $this->assertEquals(200, $result2->getStatus());
     }
 
-    public function testBasicUsage2()
+    public function testBasicUsage2(): void
     {
         Rollbar::init(
             array(

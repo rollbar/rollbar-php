@@ -2,7 +2,7 @@
 
 namespace Rollbar\Truncation;
 
-use \Rollbar\Payload\EncodedPayload;
+use Rollbar\Payload\EncodedPayload;
 
 class StringsStrategy extends AbstractStrategy
 {

@@ -1,22 +1,23 @@
 <?php namespace Rollbar\Payload\TraceChain;
 
-use \Mockery as m;
+use Mockery as m;
 use Rollbar\Payload\TraceChain;
 
 use Rollbar;
+use Rollbar\Payload\Trace;
 
 class TraceChainTest extends Rollbar\BaseRollbarTest
 {
-    private $trace1;
-    private $trace2;
+    private m\LegacyMockInterface|Trace|m\MockInterface $trace1;
+    private m\LegacyMockInterface|Trace|m\MockInterface $trace2;
 
     public function setUp(): void
     {
-        $this->trace1 = m::mock("Rollbar\Payload\Trace");
-        $this->trace2 = m::mock("Rollbar\Payload\Trace");
+        $this->trace1 = m::mock(Trace::class);
+        $this->trace2 = m::mock(Trace::class);
     }
 
-    public function testTraces()
+    public function testTraces(): void
     {
         $chain = array($this->trace1);
         $traceChain = new TraceChain($chain);
@@ -28,19 +29,19 @@ class TraceChainTest extends Rollbar\BaseRollbarTest
         $this->assertEquals($chain, $traceChain->getTraces());
     }
 
-    public function testKey()
+    public function testKey(): void
     {
         $chain = new TraceChain(array($this->trace1));
         $this->assertEquals("trace_chain", $chain->getKey());
     }
 
-    public function testEncode()
+    public function testEncode(): void
     {
-        $trace1 = m::mock("Rollbar\Payload\Trace")
+        $trace1 = m::mock(Trace::class)
             ->shouldReceive("serialize")
             ->andReturn("TRACE1")
             ->mock();
-        $trace2 = m::mock("Rollbar\Payload\Trace")
+        $trace2 = m::mock(Trace::class)
             ->shouldReceive("serialize")
             ->andReturn("TRACE2")
             ->mock();

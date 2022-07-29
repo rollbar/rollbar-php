@@ -4,14 +4,14 @@ namespace Rollbar\Senders; // in a different namespace, so we can monkey-patch m
 
 use Rollbar;
 
-function microtime()
+function microtime(): int
 {
     return 2;
 }
 
 class AgentTest extends Rollbar\BaseRollbarTest
 {
-    private $path = '/tmp/rollbar-php';
+    private string $path = '/tmp/rollbar-php';
 
     protected function setUp(): void
     {
@@ -20,7 +20,7 @@ class AgentTest extends Rollbar\BaseRollbarTest
         }
     }
 
-    public function testAgent()
+    public function testAgent(): void
     {
         Rollbar\Rollbar::init(array(
             'access_token' => $this->getTestAccessToken(),
@@ -30,7 +30,7 @@ class AgentTest extends Rollbar\BaseRollbarTest
         ), false, false, false);
         $logger = Rollbar\Rollbar::logger();
         $logger->info("this is a test");
-        $file = fopen($this->path . '/rollbar-relay.' . getmypid() . '.' . microtime(true) . '.rollbar', 'r');
+        $file = fopen($this->path . '/rollbar-relay.' . getmypid() . '.' . microtime() . '.rollbar', 'r');
         $line = fgets($file);
         $this->assertStringContainsString('this is a test', $line);
     }
@@ -41,7 +41,7 @@ class AgentTest extends Rollbar\BaseRollbarTest
         $this->rrmdir($this->path);
     }
 
-    private function rrmdir($dir)
+    private function rrmdir($dir): void
     {
         if (!is_dir($dir)) {
             return;

@@ -1,11 +1,11 @@
 <?php namespace Rollbar;
 
-use \Mockery as m;
+use Mockery as m;
 use Rollbar\Payload\Request;
 
 class RequestTest extends BaseRollbarTest
 {
-    public function testUrl()
+    public function testUrl(): void
     {
         $url = "www.rollbar.com";
         $request = new Request();
@@ -16,7 +16,7 @@ class RequestTest extends BaseRollbarTest
         $this->assertEquals($url2, $request->setUrl($url2)->getUrl());
     }
 
-    public function testMethod()
+    public function testMethod(): void
     {
         $method = "POST";
         $request = new Request();
@@ -27,7 +27,7 @@ class RequestTest extends BaseRollbarTest
         $this->assertEquals($method2, $request->setMethod($method2)->getMethod());
     }
 
-    public function testHeaders()
+    public function testHeaders(): void
     {
         $headers = array("Auth-X" => "abc352", "Hello" => "World");
         $request = new Request();
@@ -38,7 +38,7 @@ class RequestTest extends BaseRollbarTest
         $this->assertEquals($headers2, $request->setHeaders($headers2)->getHeaders());
     }
 
-    public function testParams()
+    public function testParams(): void
     {
         $params = array(
             "controller" => "project",
@@ -52,7 +52,7 @@ class RequestTest extends BaseRollbarTest
         $this->assertEquals($params2, $request->setParams($params2)->getParams());
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $get = array("query" => "where's waldo?", "page" => 15);
         $request = new Request();
@@ -63,7 +63,7 @@ class RequestTest extends BaseRollbarTest
         $this->assertEquals($get2, $request->setGet($get2)->getGet());
     }
 
-    public function testQueryString()
+    public function testQueryString(): void
     {
         $queryString = "?slug=Rollbar&update=true";
         $request = new Request();
@@ -75,7 +75,7 @@ class RequestTest extends BaseRollbarTest
         $this->assertEquals($queryString2, $actual);
     }
 
-    public function testPost()
+    public function testPost(): void
     {
         $post = array("Big" => "Data");
         $request = new Request();
@@ -91,7 +91,7 @@ class RequestTest extends BaseRollbarTest
         $this->assertEquals($post2, $request->setPost($post2)->getPost());
     }
 
-    public function testBody()
+    public function testBody(): void
     {
         $body = "a long string\nwith new lines and stuff";
         $request = new Request();
@@ -102,7 +102,7 @@ class RequestTest extends BaseRollbarTest
         $this->assertEquals($body2, $request->setBody($body2)->getBody());
     }
 
-    public function testUserIp()
+    public function testUserIp(): void
     {
         $userIp = "192.0.1.12";
         $request = new Request();
@@ -113,7 +113,7 @@ class RequestTest extends BaseRollbarTest
         $this->assertEquals($userIp2, $request->setUserIp($userIp2)->getUserIp());
     }
 
-    public function testExtra()
+    public function testExtra(): void
     {
         $request = new Request();
         $request->setExtras(array("test" => "testing"));
@@ -121,7 +121,7 @@ class RequestTest extends BaseRollbarTest
         $this->assertEquals("testing", $extras["test"]);
     }
 
-    public function testEncode()
+    public function testEncode(): void
     {
         $request = new Request();
         $request->setUrl("www.rollbar.com/account/project")

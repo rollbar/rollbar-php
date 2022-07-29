@@ -7,7 +7,7 @@ use Rollbar\TestHelpers\MockPhpStream;
 
 class ScrubberTest extends BaseRollbarTest
 {
-    public function scrubUrlDataProvider()
+    public function scrubUrlDataProvider(): array
     {
         return array(
             'nothing to scrub' => array(
@@ -26,7 +26,7 @@ class ScrubberTest extends BaseRollbarTest
     /**
      * @dataProvider scrubSafelistProvider
      */
-    public function testScrubSafelist($testData, $scrubFields, $safelist, $expected)
+    public function testScrubSafelist($testData, $scrubFields, $safelist, $expected): void
     {
         $scrubber = new Scrubber(array(
             'scrubFields' => $scrubFields,
@@ -40,7 +40,7 @@ class ScrubberTest extends BaseRollbarTest
         );
     }
     
-    public function scrubSafelistProvider()
+    public function scrubSafelistProvider(): array
     {
         return array(
             array(
@@ -87,7 +87,7 @@ class ScrubberTest extends BaseRollbarTest
     /**
      * @dataProvider scrubDataProvider
      */
-    public function testScrub($testData, $scrubFields, $expected)
+    public function testScrub($testData, $scrubFields, $expected): void
     {
         $scrubber = new Scrubber(array(
             'scrubFields' => $scrubFields
@@ -96,7 +96,7 @@ class ScrubberTest extends BaseRollbarTest
         $this->assertEquals($expected, $result, "Looks like some fields did not get scrubbed correctly.");
     }
     
-    public function scrubDataProvider()
+    public function scrubDataProvider(): array
     {
         return array_merge(array(
             'flat data array' =>
@@ -112,7 +112,7 @@ class ScrubberTest extends BaseRollbarTest
         ), $this->scrubUrlDataProvider(), $this->scrubJSONNumbersProvider());
     }
 
-    private function scrubJSONNumbersProvider()
+    private function scrubJSONNumbersProvider(): array
     {
         return array(
             'plain array' => array(
@@ -132,7 +132,7 @@ class ScrubberTest extends BaseRollbarTest
         );
     }
 
-    private function scrubFlatDataProvider()
+    private function scrubFlatDataProvider(): array
     {
         return array(
             array( // $testData
@@ -149,7 +149,7 @@ class ScrubberTest extends BaseRollbarTest
         );
     }
     
-    private function scrubRecursiveDataProvider()
+    private function scrubRecursiveDataProvider(): array
     {
         return array(
             array( // $testData
@@ -196,7 +196,7 @@ class ScrubberTest extends BaseRollbarTest
         );
     }
     
-    private function scrubFlatStringDataProvider()
+    private function scrubFlatStringDataProvider(): array
     {
         return array(
             // $testData
@@ -221,7 +221,7 @@ class ScrubberTest extends BaseRollbarTest
         );
     }
     
-    private function scrubRecursiveStringDataProvider()
+    private function scrubRecursiveStringDataProvider(): array
     {
         return array(
             // $testData
@@ -252,7 +252,7 @@ class ScrubberTest extends BaseRollbarTest
         );
     }
     
-    private function scrubRecursiveStringRecursiveDataProvider()
+    private function scrubRecursiveStringRecursiveDataProvider(): array
     {
         return array(
             array( // $testData
@@ -315,7 +315,7 @@ class ScrubberTest extends BaseRollbarTest
     /**
      * @dataProvider scrubArrayDataProvider
      */
-    public function testScrubArray($testData, $scrubFields, $expected)
+    public function testScrubArray($testData, $scrubFields, $expected): void
     {
         $scrubber = new Scrubber(array(
             'scrubFields' => $scrubFields
@@ -324,7 +324,7 @@ class ScrubberTest extends BaseRollbarTest
         $this->assertEquals($expected, $result, "Looks like some fields did not get scrubbed correctly.");
     }
 
-    public function scrubArrayDataProvider()
+    public function scrubArrayDataProvider(): array
     {
         return array(
             'flat data array' => array(
@@ -381,7 +381,7 @@ class ScrubberTest extends BaseRollbarTest
         );
     }
 
-    public function testScrubReplacement()
+    public function testScrubReplacement(): void
     {
         $testData = array('scrubit' => '123');
         

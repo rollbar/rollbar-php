@@ -4,7 +4,7 @@ use Rollbar\Payload\Level;
 
 class LevelFactoryTest extends BaseRollbarTest
 {
-    private $levelFactory;
+    private LevelFactory $levelFactory;
     
     public function setUp(): void
     {
@@ -14,7 +14,7 @@ class LevelFactoryTest extends BaseRollbarTest
     /**
      * @dataProvider isValidLevelProvider
      */
-    public function testIsValidLevelProvider($level, $expected)
+    public function testIsValidLevelProvider($level, $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -22,7 +22,7 @@ class LevelFactoryTest extends BaseRollbarTest
         );
     }
     
-    public function isValidLevelProvider()
+    public function isValidLevelProvider(): array
     {
         $data = $this->fromNameProvider();
         foreach ($data as &$testParams) {
@@ -35,15 +35,15 @@ class LevelFactoryTest extends BaseRollbarTest
     /**
      * @dataProvider fromNameProvider
      */
-    public function testFromName($level)
+    public function testFromName($level): void
     {
         $this->assertInstanceOf(
-            'Rollbar\Payload\Level',
+            Level::class,
             $this->levelFactory->fromName($level)
         );
     }
     
-    public function fromNameProvider()
+    public function fromNameProvider(): array
     {
         return array(
             array(Level::EMERGENCY),

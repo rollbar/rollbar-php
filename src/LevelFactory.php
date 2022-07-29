@@ -37,7 +37,7 @@ class LevelFactory
     {
         self::init();
         $name = strtolower($name);
-        return array_key_exists($name, self::$values) ? self::$values[$name] : null;
+        return self::$values[$name] ?? null;
     }
     
     /**

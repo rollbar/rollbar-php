@@ -4,7 +4,7 @@ use Rollbar\Payload\Server;
 
 class ServerTest extends BaseRollbarTest
 {
-    public function testHost()
+    public function testHost(): void
     {
         $val = "TEST";
         $server = new Server();
@@ -15,7 +15,7 @@ class ServerTest extends BaseRollbarTest
         $this->assertEquals($val2, $server->setHost($val2)->getHost());
     }
 
-    public function testRoot()
+    public function testRoot(): void
     {
         $val = "TEST";
         $server = new Server();
@@ -26,7 +26,7 @@ class ServerTest extends BaseRollbarTest
         $this->assertEquals($val2, $server->setRoot($val2)->getRoot());
     }
 
-    public function testBranch()
+    public function testBranch(): void
     {
         $val = "TEST";
         $server = new Server();
@@ -37,7 +37,7 @@ class ServerTest extends BaseRollbarTest
         $this->assertEquals($val2, $server->setBranch($val2)->getBranch());
     }
 
-    public function testCodeVersion()
+    public function testCodeVersion(): void
     {
         $val = "TEST";
         $server = new Server();
@@ -48,7 +48,7 @@ class ServerTest extends BaseRollbarTest
         $this->assertEquals($val2, $server->setCodeVersion($val2)->getCodeVersion());
     }
 
-    public function testExtra()
+    public function testExtra(): void
     {
         $server = new Server();
         $server->setExtras(array("test" => "testing"));
@@ -56,7 +56,7 @@ class ServerTest extends BaseRollbarTest
         $this->assertEquals("testing", $extras["test"]);
     }
 
-    public function testEncode()
+    public function testEncode(): void
     {
         $server = new Server();
         $server->setHost("server2-ec-us")

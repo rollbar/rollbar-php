@@ -11,7 +11,7 @@ class ChildCycleCheckSerializable implements SerializerInterface
         $this->parent = $parent;
     }
     
-    public function serialize()
+    public function serialize(): array
     {
         return array(
             "parent" => \Rollbar\Utilities::serializeForRollbarInternal($this->parent)

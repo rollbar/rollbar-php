@@ -58,6 +58,6 @@ class FatalHandler extends AbstractHandler
             in_array($lastError['type'], self::$fatalErrors, true) &&
             // don't log uncaught exceptions as they were handled by exceptionHandler()
             !(isset($lastError['message']) &&
-              strpos($lastError['message'], 'Uncaught') === 0);
+                str_starts_with($lastError['message'], 'Uncaught'));
     }
 }

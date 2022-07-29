@@ -2,12 +2,12 @@
 
 namespace Rollbar\TestHelpers;
 
-use \Rollbar\Truncation\AbstractStrategy;
-use \Rollbar\Payload\EncodedPayload;
+use Rollbar\Truncation\AbstractStrategy;
+use Rollbar\Payload\EncodedPayload;
 
 class CustomTruncation extends AbstractStrategy
 {
-    public function execute(EncodedPayload $payload)
+    public function execute(EncodedPayload $payload): EncodedPayload
     {
         $payload->encode(array(
             "data" => array(

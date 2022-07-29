@@ -4,7 +4,7 @@ use Rollbar\ErrorWrapper;
 
 class ErrorWrapperTest extends BaseRollbarTest
 {
-    public function testBacktrace()
+    public function testBacktrace(): void
     {
         $errWrapper = new ErrorWrapper(
             E_ERROR,
@@ -17,7 +17,7 @@ class ErrorWrapperTest extends BaseRollbarTest
         $this->assertEquals("FAKE BACKTRACE", $errWrapper->getBacktrace());
     }
 
-    public function testGetClassName()
+    public function testGetClassName(): void
     {
         $errWrapper = new ErrorWrapper(
             E_ERROR,
