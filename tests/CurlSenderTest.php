@@ -14,7 +14,7 @@ class CurlSenderTest extends BaseRollbarTest
             "environment" => "testing-php",
             "endpoint" => "fake-endpoint"
         ));
-        $response = $logger->log(Level::WARNING, "Testing PHP Notifier", array());
+        $response = $logger->report(Level::WARNING, "Testing PHP Notifier", array());
 
         $this->assertContains(
             $response->getInfo(),

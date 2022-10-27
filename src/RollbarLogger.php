@@ -2,6 +2,8 @@
 
 namespace Rollbar;
 
+use Psr\Log\InvalidArgumentException;
+use Stringable;
 use Throwable;
 use Psr\Log\AbstractLogger;
 use Rollbar\Payload\Payload;
@@ -85,17 +87,46 @@ class RollbarLogger extends AbstractLogger
     }
 
     /**
-     * @param Level|string $level
-     * @param mixed $toLog
-     * @param array $context
+     * Logs a message to the Rollbar service with the specified level.
+     *
+     * @param Level|string      $level   The severity level of the message.
+     *                                   Must be one of the levels as defined in
+     *                                   the {@see Level} constants.
+     * @param string|Stringable $message The log message.
+     * @param array             $context Arbitrary data.
+     *
+     * @return void
+     *
+     * @throws InvalidArgumentException If $level is not a valid level.
+     * @throws Throwable Rethrown $message if it is {@see Throwable} and {@see Config::raiseOnError} is true.
      */
-    public function log($level, $toLog, array $context = array())
+    public function log($level, string|Stringable $message, array $context = array()): void
+    {
+        $this->report($level, $message, $context);
+    }
+
+    /**
+     * Creates the {@see Response} object and reports the message to the Rollbar
+     * service.
+     *
+     * @param string|Level      $level   The severity level to send to Rollbar.
+     * @param string|Stringable $message The log message.
+     * @param array             $context Any additional context data.
+     *
+     * @return Response
+     *
+     * @throws InvalidArgumentException If $level is not a valid level.
+     * @throws Throwable Rethrown $message if it is {@see Throwable} and {@see Config::raiseOnError} is true.
+     *
+     * @since  4.0.0
+     */
+    public function report($level, string|Stringable $message, array $context = array()): Response
     {
         if ($this->disabled()) {
             $this->verboseLogger()->notice('Rollbar is disabled');
             return new Response(0, "Disabled");
         }
-        
+
         // Convert a Level proper into a string proper, as the code paths that
         // follow have allowed both only by virtue that a Level downcasts to a
         // string. With strict types, that no longer happens. We should consider
@@ -104,23 +135,23 @@ class RollbarLogger extends AbstractLogger
         if ($level instanceof Level) {
             $level = (string)$level;
         } elseif (!$this->levelFactory->isValidLevel($level)) {
-            $exception = new \Psr\Log\InvalidArgumentException("Invalid log level '$level'.");
+            $exception = new InvalidArgumentException("Invalid log level '$level'.");
             $this->verboseLogger()->error($exception->getMessage());
             throw $exception;
         }
 
-        $this->verboseLogger()->info("Attempting to log: [$level] " . $toLog);
+        $this->verboseLogger()->info("Attempting to log: [$level] " . $message);
 
-        if ($this->config->internalCheckIgnored($level, $toLog)) {
+        if ($this->config->internalCheckIgnored($level, $message)) {
             $this->verboseLogger()->info('Occurrence ignored');
             return new Response(0, "Ignored");
         }
 
         $accessToken = $this->getAccessToken();
-        $payload = $this->getPayload($accessToken, $level, $toLog, $context);
-        
-        $isUncaught = $this->isUncaughtLogData($toLog);
-        if ($this->config->checkIgnored($payload, $accessToken, $toLog, $isUncaught)) {
+        $payload     = $this->getPayload($accessToken, $level, $message, $context);
+
+        $isUncaught = $this->isUncaughtLogData($message);
+        if ($this->config->checkIgnored($payload, $accessToken, $message, $isUncaught)) {
             $this->verboseLogger()->info('Occurrence ignored');
             $response = new Response(0, "Ignored");
         } else {
@@ -131,10 +162,10 @@ class RollbarLogger extends AbstractLogger
             $encoded = $this->encode($scrubbed);
 
             $truncated = $this->truncate($encoded);
-            
+
             $response = $this->send($truncated, $accessToken);
         }
-        
+
         $this->handleResponse($payload, $response);
 
         if ($response->getStatus() === 0) {
@@ -147,11 +178,11 @@ class RollbarLogger extends AbstractLogger
         } else {
             $this->verboseLogger()->info('Occurrence successfully logged');
         }
-        
-        if ($toLog instanceof Throwable && $this->config->getRaiseOnError()) {
-            throw $toLog;
+
+        if ($message instanceof Throwable && $this->config->getRaiseOnError()) {
+            throw $message;
         }
-        
+
         return $response;
     }
 

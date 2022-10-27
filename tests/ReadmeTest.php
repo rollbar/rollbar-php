@@ -40,7 +40,7 @@ class ReadmeTest extends BaseRollbarTest
         );
 
         // If you want to check if logging with Rollbar was successful
-        $response = Rollbar::log(Level::INFO, 'testing wasSuccessful()');
+        $response = Rollbar::report((new LevelFactory)->fromName(Level::INFO), 'testing wasSuccessful()');
         if (!$response->wasSuccessful()) {
             throw new \Exception('logging with Rollbar failed');
         }
@@ -98,9 +98,9 @@ class ReadmeTest extends BaseRollbarTest
         try {
             do_something();
         } catch (\Exception $e) {
-            $result1 = Rollbar::log(Level::ERROR, $e);
+            $result1 = Rollbar::report(Level::ERROR, $e);
             // or
-            $result2 = Rollbar::log(Level::ERROR, $e, array("my" => "extra", "data" => 42));
+            $result2 = Rollbar::report(Level::ERROR, $e, array("my" => "extra", "data" => 42));
         }
         
         $this->assertEquals(200, $result1->getStatus());
@@ -116,8 +116,8 @@ class ReadmeTest extends BaseRollbarTest
             )
         );
         
-        $result1 = Rollbar::log(Level::WARNING, 'could not connect to mysql server');
-        $result2 = Rollbar::log(
+        $result1 = Rollbar::report(Level::WARNING, 'could not connect to mysql server');
+        $result2 = Rollbar::report(
             Level::INFO,
             'Here is a message with some additional data',
             array('x' => 10, 'code' => 'blue')

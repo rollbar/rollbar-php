@@ -1,9 +1,8 @@
 <?php namespace Rollbar;
 
-use Rollbar\Rollbar;
 use Rollbar\Payload\Payload;
 use Rollbar\Payload\Level;
-use Rollbar\RollbarLogger;
+use Rollbar\TestHelpers\ArrayLogger;
 
 /**
  * Usage of static method Rollbar::logger() is intended here.
@@ -12,15 +11,14 @@ use Rollbar\RollbarLogger;
  */
 class RollbarTest extends BaseRollbarTest
 {
-    
+    private static $simpleConfig = array();
+
     public function setUp(): void
     {
         self::$simpleConfig['access_token'] = $this->getTestAccessToken();
         self::$simpleConfig['environment'] = 'test';
     }
 
-    private static string|array $simpleConfig = array();
-    
     public static function setUpBeforeClass(): void
     {
         Rollbar::destroy();
@@ -82,7 +80,7 @@ class RollbarTest extends BaseRollbarTest
     {
         Rollbar::init(self::$simpleConfig);
       
-        $response = Rollbar::log(Level::INFO, 'testing info level');
+        Rollbar::log(Level::INFO, 'testing info level');
       
         $this->assertTrue(true);
     }
@@ -157,11 +155,17 @@ class RollbarTest extends BaseRollbarTest
     protected function shortcutMethodTestHelper($level): void
     {
         $message = "shortcutMethodTestHelper: $level";
-        
+
+        $verbose = new ArrayLogger();
+        Rollbar::init(array('verbose_logger' => $verbose));
+
         $result = Rollbar::$level($message);
-        $expected = Rollbar::log($level, $message);
-        
-        $this->assertEquals($expected, $result);
+        $this->assertEquals(1, $verbose->count(Level::INFO, "Attempting to log: [$level] " . $message));
+        $this->assertEquals(1, $verbose->count(Level::INFO, 'Occurrence successfully logged'));
+
+        $expected = Rollbar::report($level, $message);
+        $this->assertEquals(2, $verbose->count(Level::INFO, "Attempting to log: [$level] " . $message));
+        $this->assertEquals(2, $verbose->count(Level::INFO, 'Occurrence successfully logged'));
     }
 
     /**
