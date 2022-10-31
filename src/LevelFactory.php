@@ -6,49 +6,59 @@ use Rollbar\Payload\Level;
 
 class LevelFactory
 {
-    
-    private static $values;
+    /**
+     * Holds the list of log levels as [string => Level].
+     *
+     * @var array|null
+     */
+    private static ?array $levels = null;
 
-    private static function init()
+    /**
+     * Returns the array of levels as [string => Level].
+     *
+     * @return array
+     */
+    private static function getLevels(): array
     {
-        if (is_null(self::$values)) {
-            self::$values = array(
+        if (null === self::$levels) {
+            self::$levels = array(
                 Level::EMERGENCY => new Level("critical", 100000),
-                Level::ALERT => new Level("critical", 100000),
-                Level::CRITICAL => new Level("critical", 100000),
-                Level::ERROR => new Level("error", 10000),
-                Level::WARNING => new Level("warning", 1000),
-                Level::NOTICE => new Level("info", 100),
-                Level::INFO => new Level("info", 100),
-                Level::DEBUG => new Level("debug", 10),
-                Level::IGNORED => new Level("ignore", 0),
-                Level::IGNORE => new Level("ignore", 0)
-
+                Level::ALERT     => new Level("critical", 100000),
+                Level::CRITICAL  => new Level("critical", 100000),
+                Level::ERROR     => new Level("error", 10000),
+                Level::WARNING   => new Level("warning", 1000),
+                Level::NOTICE    => new Level("info", 100),
+                Level::INFO      => new Level("info", 100),
+                Level::DEBUG     => new Level("debug", 10),
             );
         }
+
+        return self::$levels;
     }
 
     /**
+     * Returns the {@see Level} instance for a given log level. If the log level
+     * is invalid null will be returned.
+     *
      * @param string $name level name
      *
-     * @return Level
+     * @return Level|null
      */
-    public function fromName($name)
+    public static function fromName(string $name): ?Level
     {
-        self::init();
         $name = strtolower($name);
-        return self::$values[$name] ?? null;
+        return self::getLevels()[$name] ?? null;
     }
-    
+
     /**
-     * Check if the provided level is a valid level
+     * Check if the provided level is a valid level.
      *
      * @param string $level
      *
-     * @return string
+     * @return bool
      */
-    public function isValidLevel($level)
+    public static function isValidLevel(string $level): bool
     {
-        return $this->fromName($level) ? true : false;
+        return self::fromName($level) !== null;
     }
 }

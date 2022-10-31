@@ -2,68 +2,61 @@
 
 namespace Rollbar\Payload;
 
-use Rollbar\LevelFactory;
 use Rollbar\SerializerInterface;
 
+/**
+ * Each constant is a PSR-3 compatible logging level. They are mapped to Rollbar
+ * service supported levels in {@see LevelFactory::getLevels()}.
+ */
 class Level implements SerializerInterface
 {
-    /**
-     * Those are PSR-3 compatible loggin levels. They are mapped to Rollbar
-     * service supported levels in Level::init()
-     */
     const EMERGENCY = 'emergency';
-    const ALERT = 'alert';
-    const CRITICAL = 'critical';
-    const ERROR = 'error';
-    const WARNING = 'warning';
-    const NOTICE = 'notice';
-    const INFO = 'info';
-    const DEBUG = 'debug';
-    
-    /**
-     * @deprecated 1.2.0
-     */
-    const IGNORED = 'ignored';
-    /**
-     * @deprecated 1.2.0
-     */
-    const IGNORE = 'ignore';
+    const ALERT     = 'alert';
+    const CRITICAL  = 'critical';
+    const ERROR     = 'error';
+    const WARNING   = 'warning';
+    const NOTICE    = 'notice';
+    const INFO      = 'info';
+    const DEBUG     = 'debug';
 
     /**
-     * @deprecated 1.2.0
+     * Instantiates the level object with the Rollbar service compatible error
+     * levels.
      *
-     * Usage of Level::error(), Level::warning(), Level::info(), Level::notice(),
-     * Level::debug() is no longer supported. It has been replaced with matching
-     * class constants, i.e.: Level::ERROR
+     * @param string $level The Rollbar service error level.
+     * @param int    $val   The Rollbar service numeric error level.
      */
-    public static function __callStatic($name, $args)
-    {
-        $factory = new LevelFactory();
-        $level = $factory->fromName($name);
-        
-        if (!$level) {
-            throw new \Exception("Level '$level' doesn't exist.");
-        }
-        
-        return $level;
-    }
-
     public function __construct(
         private string $level,
         private int $val
     ) {
     }
 
+    /**
+     * Returns the Rollbar service error level.
+     *
+     * @return string
+     */
     public function __toString()
     {
         return $this->level;
     }
 
+    /**
+     * Returns the Rollbar service numeric error level.
+     *
+     * @return int
+     */
     public function toInt(): int
     {
         return $this->val;
     }
 
+    /**
+     * Returns the serialized Rollbar service level.
+     *
+     * @return string
+     */
     public function serialize()
     {
         return $this->level;

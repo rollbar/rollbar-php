@@ -15,7 +15,6 @@ use Rollbar\Payload\EncodedPayload;
 class RollbarLogger extends AbstractLogger
 {
     private $config;
-    private $levelFactory;
     private $truncation;
     private $queue;
     private $reportCount = 0;
@@ -23,7 +22,6 @@ class RollbarLogger extends AbstractLogger
     public function __construct(array $config)
     {
         $this->config = new Config($config);
-        $this->levelFactory = new LevelFactory();
         $this->truncation = new Truncation($this->config);
         $this->queue = array();
     }
@@ -134,7 +132,7 @@ class RollbarLogger extends AbstractLogger
         // enum here, and work with Level enum through protected level.
         if ($level instanceof Level) {
             $level = (string)$level;
-        } elseif (!$this->levelFactory->isValidLevel($level)) {
+        } elseif (!LevelFactory::isValidLevel($level)) {
             $exception = new InvalidArgumentException("Invalid log level '$level'.");
             $this->verboseLogger()->error($exception->getMessage());
             throw $exception;

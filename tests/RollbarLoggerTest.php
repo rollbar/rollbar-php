@@ -367,7 +367,7 @@ class RollbarLoggerTest extends BaseRollbarTest
             "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php"
         ));
-        $response = $l->report(Level::warning(), "Testing PHP Notifier", array());
+        $response = $l->report(Level::WARNING, "Testing PHP Notifier", array());
         $this->assertEquals(200, $response->getStatus());
     }
 

@@ -39,11 +39,10 @@ class DataTest extends BaseRollbarTest
 
     public function testLevel(): void
     {
-        $levelFactory = new LevelFactory;
         $level = Level::ERROR;
         
         $this->assertEquals(
-            $levelFactory->fromName($level),
+            LevelFactory::fromName($level),
             $this->data->setLevel($level)->getLevel()
         );
     }
