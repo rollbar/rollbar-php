@@ -5,7 +5,6 @@ namespace Rollbar\TestHelpers;
 use Psr\Log\AbstractLogger;
 use Stringable;
 
-
 /**
  * Simple logger that saves logs to an array.
  *
