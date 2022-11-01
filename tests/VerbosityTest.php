@@ -605,7 +605,7 @@ class VerbosityTest extends BaseRollbarTest
                 $dataMock = $unitTest->getMockBuilder(Data::class)
                     ->disableOriginalConstructor()
                     ->getMock();
-                $dataMock->method('getLevel')->willReturn(\Rollbar\Payload\Level::INFO());
+                $dataMock->method('getLevel')->willReturn(\Rollbar\LevelFactory::fromName(Level::INFO));
                 $payloadMock = $unitTest->getMockBuilder(Payload::class)
                     ->disableOriginalConstructor()
                     ->getMock();

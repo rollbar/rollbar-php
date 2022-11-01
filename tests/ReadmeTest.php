@@ -40,7 +40,7 @@ class ReadmeTest extends BaseRollbarTest
         );
 
         // If you want to check if logging with Rollbar was successful
-        $response = Rollbar::report((new LevelFactory)->fromName(Level::INFO), 'testing wasSuccessful()');
+        $response = Rollbar::report(LevelFactory::fromName(Level::INFO), 'testing wasSuccessful()');
         if (!$response->wasSuccessful()) {
             throw new \Exception('logging with Rollbar failed');
         }

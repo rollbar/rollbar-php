@@ -14,8 +14,7 @@ class MalformedPayloadDataTransformer implements \Rollbar\TransformerInterface
     ): ?Payload {
         $mock = \Mockery::mock(Data::class)->makePartial();
         $mock->shouldReceive("serialize")->andReturn(false);
-        $levelFactory = new \Rollbar\LevelFactory();
-        $mock->setLevel($levelFactory->fromName($level));
+        $mock->setLevel(\Rollbar\LevelFactory::fromName($level));
         $payload->setData($mock);
         return $payload;
     }

@@ -59,11 +59,6 @@ class DataBuilder implements DataBuilderInterface
     protected $captureUsername;
     
     /**
-     * @var LevelFactory
-     */
-    protected $levelFactory;
-    
-    /**
      * @var Utilities
      */
     protected $utilities;
@@ -105,7 +100,6 @@ class DataBuilder implements DataBuilderInterface
         $this->setSendMessageTrace($config);
         $this->setLocalVarsDump($config);
         $this->setCaptureErrorStacktraces($config);
-        $this->setLevelFactory($config);
         $this->setCaptureEmail($config);
         $this->setCaptureUsername($config);
         $this->setCaptureIP($config);
@@ -331,16 +325,6 @@ class DataBuilder implements DataBuilderInterface
         $this->includeExcCodeContext = self::$defaults->includeExcCodeContext($fromConfig);
     }
     
-    protected function setLevelFactory($config)
-    {
-        $this->levelFactory = $config['levelFactory'] ?? null;
-        if (!$this->levelFactory) {
-            throw new \InvalidArgumentException(
-                'Missing dependency: LevelFactory not provided to the DataBuilder.'
-            );
-        }
-    }
-    
     protected function setUtilities($config)
     {
         $this->utilities = $config['utilities'] ?? null;
@@ -557,7 +541,7 @@ class DataBuilder implements DataBuilderInterface
             $level = $this->psrLevels[$level] ?? null;
             if ($level !== null) {
                 // this is a well-known PSR level: "error", "notice", "info", etc.
-                return $this->levelFactory->fromName($level);
+                return LevelFactory::fromName($level);
             }
         }
         return null;

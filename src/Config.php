@@ -144,11 +144,6 @@ class Config
     private $configArray;
 
     /**
-     * @var LevelFactory
-     */
-    private $levelFactory;
-
-    /**
      * @var TransformerInterface
      */
     private ?TransformerInterface $transformer = null;
@@ -229,8 +224,6 @@ class Config
     public function __construct(array $configArray)
     {
         $this->includedErrno = Defaults::get()->includedErrno();
-
-        $this->levelFactory = new LevelFactory();
 
         $this->updateConfig($configArray);
 
@@ -405,10 +398,6 @@ class Config
 
     private function setDataBuilder(array $config): void
     {
-        if (!isset($config['levelFactory'])) {
-            $config['levelFactory'] = $this->levelFactory;
-        }
-
         if (!isset($config['utilities'])) {
             $config['utilities'] = $this->utilities();
         }
@@ -434,7 +423,7 @@ class Config
         if ($override instanceof Level) {
             $this->minimumLevel = $override->toInt();
         } elseif (is_string($override)) {
-            $level = $this->levelFactory->fromName($override);
+            $level = LevelFactory::fromName($override);
             if ($level !== null) {
                 $this->minimumLevel = $level->toInt();
             }
@@ -731,11 +720,6 @@ class Config
         return $this->dataBuilder;
     }
 
-    public function getLevelFactory()
-    {
-        return $this->levelFactory;
-    }
-
     public function getSender()
     {
         return $this->sender;
@@ -857,7 +841,7 @@ class Config
             return true;
         }
 
-        if ($this->levelTooLow($this->levelFactory->fromName($level))) {
+        if ($this->levelTooLow(LevelFactory::fromName($level))) {
             $this->verboseLogger()->debug("Occurrence's level is too low");
             return true;
         }

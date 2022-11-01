@@ -16,7 +16,6 @@ class DataBuilderTest extends BaseRollbarTest
         $this->dataBuilder = new DataBuilder(array(
             'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
-            'levelFactory' => new LevelFactory,
             'utilities' => new Utilities
         ));
     }
@@ -345,7 +344,6 @@ class DataBuilderTest extends BaseRollbarTest
             'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'branch' => 'test-branch',
-            'levelFactory' => new LevelFactory,
             'utilities' => new Utilities
         ));
 
@@ -359,7 +357,6 @@ class DataBuilderTest extends BaseRollbarTest
             'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'code_version' => '3.4.1',
-            'levelFactory' => new LevelFactory,
             'utilities' => new Utilities
         ));
         $output = $dataBuilder->makeData(Level::ERROR, "testing", array());
@@ -372,7 +369,6 @@ class DataBuilderTest extends BaseRollbarTest
             'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'host' => 'my host',
-            'levelFactory' => new LevelFactory,
             'utilities' => new Utilities
         ));
         $output = $dataBuilder->makeData(Level::ERROR, "testing", array());
@@ -384,7 +380,6 @@ class DataBuilderTest extends BaseRollbarTest
         $dataBuilder = new DataBuilder(array(
             'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
-            'levelFactory' => new LevelFactory,
             'utilities' => new Utilities
         ));
         
@@ -399,7 +394,6 @@ class DataBuilderTest extends BaseRollbarTest
             'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'send_message_trace' => true,
-            'levelFactory' => new LevelFactory,
             'utilities' => new Utilities
         ));
     
@@ -451,7 +445,6 @@ class DataBuilderTest extends BaseRollbarTest
         $dataBuilder = new DataBuilder(array(
             'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
-            'levelFactory' => new LevelFactory,
             'utilities' => new Utilities
         ));
         $exception = $this->exceptionTraceArgsHelper('trace args message');
@@ -474,7 +467,6 @@ class DataBuilderTest extends BaseRollbarTest
             'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'local_vars_dump' => true,
-            'levelFactory' => new LevelFactory,
             'utilities' => new Utilities
         ));
         $expected = 'trace args message';
@@ -509,7 +501,6 @@ class DataBuilderTest extends BaseRollbarTest
             'environment' => 'tests',
             'include_error_code_context' => true,
             'include_exception_code_context' => false,
-            'levelFactory' => new LevelFactory,
             'utilities' => new Utilities
         ));
         $output = $dataBuilder->getExceptionTrace(new \Exception())->getFrames();
@@ -521,7 +512,6 @@ class DataBuilderTest extends BaseRollbarTest
         $dataBuilder = new DataBuilder(array(
             'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
-            'levelFactory' => new LevelFactory,
             'utilities' => new Utilities
         ));
         $output = $dataBuilder->getExceptionTrace(new \Exception())->getFrames();
@@ -534,7 +524,6 @@ class DataBuilderTest extends BaseRollbarTest
             'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'include_exception_code_context' => true,
-            'levelFactory' => new LevelFactory,
             'utilities' => new Utilities
         ));
         $output = $dataBuilder->getExceptionTrace(new \Exception())->getFrames();
@@ -550,7 +539,6 @@ class DataBuilderTest extends BaseRollbarTest
             'environment' => 'tests',
             'include_error_code_context' => false,
             'include_exception_code_context' => true,
-            'levelFactory' => new LevelFactory,
             'utilities' => $utilities
         ));
         $testFilePath = __DIR__ . '/DataBuilderTest.php';
@@ -591,7 +579,6 @@ class DataBuilderTest extends BaseRollbarTest
             'environment' => 'tests',
             'include_error_code_context' => true,
             'include_exception_code_context' => false,
-            'levelFactory' => new LevelFactory,
             'utilities' => $utilities
         ));
 
@@ -656,7 +643,6 @@ class DataBuilderTest extends BaseRollbarTest
         $dataBuilder = new DataBuilder(array(
             'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
-            'levelFactory' => new LevelFactory,
             'utilities' => $utilities
         ));
 
@@ -710,7 +696,6 @@ class DataBuilderTest extends BaseRollbarTest
                 'username' => 'tester',
                 'email' => 'test@test.com'
             ),
-            'levelFactory' => new LevelFactory,
             'utilities' => new Utilities
         ));
         $output = $dataBuilder->makeData(Level::ERROR, "testing", array());
@@ -752,7 +737,6 @@ class DataBuilderTest extends BaseRollbarTest
                     'email' => 'test@test.com'
                 );
             },
-            'levelFactory' => new LevelFactory,
             'utilities' => new Utilities
         ));
         $output = $dataBuilder->makeData(Level::ERROR, "testing", array());
@@ -769,7 +753,6 @@ class DataBuilderTest extends BaseRollbarTest
                 'username' => 'tester',
                 'email' => 'test@test.com'
             ),
-            'levelFactory' => new LevelFactory,
             'utilities' => new Utilities
         ));
         $output = $dataBuilder->makeData(Level::ERROR, "testing", array());
@@ -804,7 +787,6 @@ class DataBuilderTest extends BaseRollbarTest
             'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'root' => '/var/www/app',
-            'levelFactory' => new LevelFactory,
             'utilities' => new Utilities
         ));
         $output = $dataBuilder->makeData(Level::ERROR, "testing", array());
@@ -825,7 +807,6 @@ class DataBuilderTest extends BaseRollbarTest
         $dataBuilder = new DataBuilder(array(
             'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
-            'levelFactory' => new LevelFactory,
             'utilities' => new Utilities,
             'include_raw_request_body' => true,
         ));
@@ -854,7 +835,6 @@ class DataBuilderTest extends BaseRollbarTest
         $config = array(
             'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
-            'levelFactory' => new LevelFactory,
             'utilities' => new Utilities,
             'include_raw_request_body' => true
         );
@@ -889,7 +869,6 @@ class DataBuilderTest extends BaseRollbarTest
             'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'capture_error_stacktraces' => $captureErrorStacktraces,
-            'levelFactory' => new LevelFactory,
             'utilities' => new Utilities
         ));
         
@@ -909,7 +888,6 @@ class DataBuilderTest extends BaseRollbarTest
             'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'include_exception_code_context' => true,
-            'levelFactory' => new LevelFactory,
             'utilities' => new Utilities
         ));
         $frames = $dataBuilder->makeFrames(new \Exception(), false); // A
@@ -917,9 +895,9 @@ class DataBuilderTest extends BaseRollbarTest
             'tests/DataBuilderTest.php',
             $frames[count($frames)-1]->getFilename()
         );
-        // 915 is the line number where the comment "// A" is found
+        // 893 is the line number where the comment "// A" is found
         $this->assertEquals(
-            915,
+            893,
             $frames[count($frames)-1]->getLineno(),
             "Possible false negative: did this file change? Check the line number for line with '// A' comment"
         );
@@ -938,7 +916,6 @@ class DataBuilderTest extends BaseRollbarTest
             'accessToken' => $this->getTestAccessToken(),
             'environment' => 'tests',
             'capture_error_stacktraces' => $captureErrorStacktraces,
-            'levelFactory' => new LevelFactory,
             'utilities' => new Utilities
         ));
         

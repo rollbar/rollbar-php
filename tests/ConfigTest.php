@@ -322,21 +322,21 @@ class ConfigTest extends BaseRollbarTest
             'environment' => $this->env
         ));
         
-        $this->assertPayloadNotIgnored($config, $this->prepareMockPayload(Level::DEBUG()));
+        $this->assertPayloadNotIgnored($config, $this->prepareMockPayload(LevelFactory::fromName(Level::DEBUG)));
         
-        $config->configure(array('minimum_level' => Level::WARNING()));
+        $config->configure(array('minimum_level' => LevelFactory::fromName(Level::WARNING)));
         
-        $this->assertPayloadIgnored($config, $this->prepareMockPayload(Level::DEBUG()));
-        $this->assertPayloadNotIgnored($config, $this->prepareMockPayload(Level::WARNING()));
+        $this->assertPayloadIgnored($config, $this->prepareMockPayload(LevelFactory::fromName(Level::DEBUG)));
+        $this->assertPayloadNotIgnored($config, $this->prepareMockPayload(LevelFactory::fromName(Level::WARNING)));
         
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
             'environment' => $this->env,
-            'minimumLevel' => Level::ERROR()
+            'minimumLevel' => Level::ERROR
         ));
         
-        $this->assertPayloadIgnored($config, $this->prepareMockPayload(Level::WARNING()));
-        $this->assertPayloadNotIgnored($config, $this->prepareMockPayload(Level::ERROR()));
+        $this->assertPayloadIgnored($config, $this->prepareMockPayload(LevelFactory::fromName(Level::WARNING)));
+        $this->assertPayloadNotIgnored($config, $this->prepareMockPayload(LevelFactory::fromName(Level::ERROR)));
     }
     
     public function assertPayloadIgnored($config, $payload): void
@@ -405,7 +405,7 @@ class ConfigTest extends BaseRollbarTest
     {
         $d = m::mock(Data::class)
             ->shouldReceive("getLevel")
-            ->andReturn(Level::CRITICAL())
+            ->andReturn(LevelFactory::fromName(Level::CRITICAL))
             ->mock();
         $p = m::mock(Payload::class)
             ->shouldReceive("getData")
@@ -744,10 +744,9 @@ class ConfigTest extends BaseRollbarTest
                 $called = true;
             }
         ));
-        $levelFactory = $config->getLevelFactory();
-        
+
         $data = new Data($this->env, new Body(new Message("test")));
-        $data->setLevel($levelFactory->fromName(Level::ERROR));
+        $data->setLevel(LevelFactory::fromName(Level::ERROR));
         
         $config->checkIgnored(
             new Payload(
@@ -785,10 +784,8 @@ class ConfigTest extends BaseRollbarTest
             }
         ));
         
-        $levelFactory = $config->getLevelFactory();
-        
         $data = new Data($this->env, new Body(new Message("test")));
-        $data->setLevel($levelFactory->fromName(Level::ERROR));
+        $data->setLevel(LevelFactory::fromName(Level::ERROR));
         
         $config->checkIgnored(
             new Payload(

@@ -159,8 +159,10 @@ class RollbarLoggerTest extends BaseRollbarTest
 
         $this->assertSame(0, $verbose->count(Level::INFO, 'Occurrence successfully logged'));
         $logger->log(Level::WARNING, "Testing PHP Notifier", []);
-        $this->assertSame(1,
-            $verbose->count(Level::INFO, 'Attempting to log: [' . Level::WARNING . '] Testing PHP Notifier'));
+        $this->assertSame(
+            1,
+            $verbose->count(Level::INFO, 'Attempting to log: [' . Level::WARNING . '] Testing PHP Notifier'),
+        );
         $this->assertSame(1, $verbose->count(Level::INFO, 'Occurrence successfully logged'));
     }
 
@@ -367,7 +369,7 @@ class RollbarLoggerTest extends BaseRollbarTest
             "access_token" => $this->getTestAccessToken(),
             "environment" => "testing-php"
         ));
-        $response = $l->report(Level::warning(), "Testing PHP Notifier", array());
+        $response = $l->report(Level::WARNING, "Testing PHP Notifier", array());
         $this->assertEquals(200, $response->getStatus());
     }
 
