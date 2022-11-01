@@ -168,43 +168,6 @@ class RollbarTest extends BaseRollbarTest
         $this->assertEquals(2, $verbose->count(Level::INFO, 'Occurrence successfully logged'));
     }
 
-    /**
-     * Below are backwards compatibility tests with v0.18.2
-     */
-    public function testBackwardsSimpleMessageVer(): void
-    {
-        Rollbar::init(self::$simpleConfig);
-
-        $uuid = Rollbar::report_message("Hello world");
-        $this->assertStringMatchesFormat('%x-%x-%x-%x-%x', $uuid);
-    }
-    
-    public function testBackwardsSimpleError(): void
-    {
-        set_error_handler(function () {
-        }); // disable PHPUnit's error handler
-        
-        Rollbar::init(self::$simpleConfig);
-        
-        $result = Rollbar::report_php_error(E_ERROR, "Runtime error", "the_file.php", 1);
-        // always returns false.
-        $this->assertFalse($result);
-    }
-    
-    public function testBackwardsSimpleException(): void
-    {
-        Rollbar::init(self::$simpleConfig);
-        
-        $uuid = null;
-        try {
-            throw new \Exception("test exception");
-        } catch (\Exception $e) {
-            $uuid = Rollbar::report_exception($e);
-        }
-
-        $this->assertStringMatchesFormat('%x-%x-%x-%x-%x', $uuid);
-    }
-
     public function testBackwardsFlush(): void
     {
         Rollbar::init(self::$simpleConfig);
