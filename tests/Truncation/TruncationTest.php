@@ -13,7 +13,7 @@ class TruncationTest extends BaseRollbarTest
     public function setUp(): void
     {
         $config = new Config(array('access_token' => $this->getTestAccessToken()));
-        $this->truncate = new \Rollbar\Truncation\Truncation($config);
+        $this->truncate = new Truncation($config);
     }
     
     public function testCustomTruncation(): void
@@ -22,7 +22,7 @@ class TruncationTest extends BaseRollbarTest
             'access_token' => $this->getTestAccessToken(),
             'custom_truncation' => CustomTruncation::class
         ));
-        $this->truncate = new \Rollbar\Truncation\Truncation($config);
+        $this->truncate = new Truncation($config);
         
         $data = new EncodedPayload(array(
             "data" => array(
@@ -39,7 +39,7 @@ class TruncationTest extends BaseRollbarTest
         
         $result = $this->truncate->truncate($data);
         
-        $this->assertNotFalse(str_contains($data, 'Custom truncation test string'));
+        $this->assertStringContainsString('Custom truncation test string', $result);
     }
 
     /**
@@ -48,7 +48,7 @@ class TruncationTest extends BaseRollbarTest
     public function testTruncateNoPerformance($data): void
     {
         
-        $data = new \Rollbar\Payload\EncodedPayload($data);
+        $data = new EncodedPayload($data);
         $data->encode();
         
         $result = $this->truncate->truncate($data);
@@ -56,7 +56,7 @@ class TruncationTest extends BaseRollbarTest
         $size = strlen(json_encode($result));
         
         $this->assertTrue(
-            $size <= \Rollbar\Truncation\Truncation::MAX_PAYLOAD_SIZE,
+            $size <= Truncation::MAX_PAYLOAD_SIZE,
             "Truncation failed. Payload size exceeds MAX_PAYLOAD_SIZE."
         );
     }
@@ -84,7 +84,7 @@ class TruncationTest extends BaseRollbarTest
 
         $data = array_merge(
             $stringsTest->executeTruncateNothingProvider(),
-            $stringsTest->executearrayProvider(),
+            $stringsTest->executeArrayProvider(),
             $framesTestData
         );
         

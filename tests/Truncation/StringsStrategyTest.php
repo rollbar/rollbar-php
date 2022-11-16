@@ -30,7 +30,12 @@ class StringsStrategyTest extends BaseRollbarTest
         $result = $this->execute($data);
         $this->assertEquals($expected, $result);
     }
-    
+
+    /**
+     * Also used by {@see TruncationTest::truncateProvider()}.
+     *
+     * @return array
+     */
     public function executeTruncateNothingProvider(): array
     {
         $data = array();
@@ -50,8 +55,6 @@ class StringsStrategyTest extends BaseRollbarTest
     {
         $result = $this->execute($data);
         
-        $resultAnalysis = array();
-        
         foreach ($result['data']['body']['message']['body']['value'] as $key => $toTrim) {
             $this->assertTrue(
                 strlen($toTrim) <= $expectedThreshold,
@@ -60,7 +63,12 @@ class StringsStrategyTest extends BaseRollbarTest
             );
         }
     }
-    
+
+    /**
+     * Also used by {@see TruncationTest::truncateProvider()}.
+     *
+     * @return array
+     */
     public function executeArrayProvider(): array
     {
         $data = array();
