@@ -202,11 +202,15 @@ class Config
     private bool $sendMessageTrace = false;
 
     /**
-     * @var string (fully qualified class name) The name of the your custom
-     * truncation strategy class. The class should inherit from
-     * Rollbar\Truncation\AbstractStrategy.
+     * The fully qualified class name of a custom truncation strategy class or null if no custom class is specified.
+     * The class should implement {@see \Rollbar\Truncation\StrategyInterface}.
+     *
+     * @var string|null $customTruncation
+     *
+     * @since 1.6.0
+     * @since 4.0.0 Added string|null type, and defaults to null.
      */
-    private $customTruncation;
+    private ?string $customTruncation = null;
 
     /**
      * @var boolean Should the SDK raise an exception after logging an error.
@@ -546,12 +550,29 @@ class Config
         return $this->allowedCircularReferenceTypes;
     }
 
-    public function setCustomTruncation($type)
+    /**
+     * Sets the custom truncation strategy class for payloads.
+     *
+     * @param string|null $type The fully qualified class name of the custom payload truncation strategy. The class
+     *                          must implement {@see \Rollbar\Truncation\StrategyInterface}. If null is given any custom
+     *                          strategy will be removed.
+     *
+     * @return void
+     */
+    public function setCustomTruncation(?string $type): void
     {
         $this->customTruncation = $type;
     }
 
-    public function getCustomTruncation()
+    /**
+     * Returns the fully qualified class name of the custom payload truncation strategy.
+     *
+     * @return string|null Will return null if a custom truncation strategy was not defined.
+     *
+     * @since 1.6.0
+     * @since 4.0.0 Added may return null.
+     */
+    public function getCustomTruncation(): ?string
     {
         return $this->customTruncation;
     }

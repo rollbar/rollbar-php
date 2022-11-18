@@ -11,7 +11,7 @@ class FramesStrategyTest extends BaseRollbarTest
     /**
      * @dataProvider executeProvider
      */
-    public function testExecute($data, $expected): void
+    public function testExecute(array $data, array $expected): void
     {
         $config = new Config(array('access_token' => $this->getTestAccessToken()));
         $truncation = new Truncation($config);
@@ -25,7 +25,13 @@ class FramesStrategyTest extends BaseRollbarTest
         
         $this->assertEquals($expected, $result->data());
     }
-    
+
+
+    /**
+     * Also used by {@see TruncationTest::truncateProvider()}.
+     *
+     * @return array
+     */
     public function executeProvider(): array
     {
         $data = array(
