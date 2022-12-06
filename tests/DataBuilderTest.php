@@ -2,6 +2,7 @@
 
 namespace Rollbar;
 
+use Exception;
 use Rollbar\Payload\Level;
 use Rollbar\TestHelpers\MockPhpStream;
 
@@ -686,6 +687,32 @@ class DataBuilderTest extends BaseRollbarTest
         $this->assertNull($output[0]->getContext());
     }
 
+    public function testExceptionInContext(): void
+    {
+        $dataBuilder = new DataBuilder(array(
+            'accessToken' => $this->getTestAccessToken(),
+            'environment' => 'tests',
+            'utilities'   => new Utilities(),
+        ));
+
+        $output = $dataBuilder->makeData(
+            Level::ERROR,
+            "testing",
+            array(
+                'exception' => new Exception('testing exception'),
+            ),
+        )->serialize();
+
+        $this->assertSame(
+            array(
+                'class'       => 'Exception',
+                'message'     => 'testing exception',
+                'description' => 'testing',
+            ),
+            $output['body']['trace']['exception'],
+        );
+    }
+
     public function testPerson(): void
     {
         $dataBuilder = new DataBuilder(array(
@@ -897,7 +924,7 @@ class DataBuilderTest extends BaseRollbarTest
         );
         // 893 is the line number where the comment "// A" is found
         $this->assertEquals(
-            893,
+            920,
             $frames[count($frames)-1]->getLineno(),
             "Possible false negative: did this file change? Check the line number for line with '// A' comment"
         );
