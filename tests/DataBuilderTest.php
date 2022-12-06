@@ -922,7 +922,7 @@ class DataBuilderTest extends BaseRollbarTest
             'tests/DataBuilderTest.php',
             $frames[count($frames)-1]->getFilename()
         );
-        // 893 is the line number where the comment "// A" is found
+        // The line number where the comment "// A" is found should be the expeced value.
         $this->assertEquals(
             920,
             $frames[count($frames)-1]->getLineno(),
