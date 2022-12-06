@@ -15,6 +15,7 @@ use Rollbar\Payload\Frame;
 use Rollbar\Payload\TraceChain;
 use Rollbar\Payload\ExceptionInfo;
 use Rollbar\Rollbar;
+use Stringable;
 use Throwable;
 
 class DataBuilder implements DataBuilderInterface
@@ -341,14 +342,15 @@ class DataBuilder implements DataBuilderInterface
     }
 
     /**
-     * @param string $level
-     * @param Throwable|string $toLog
-     * @param $context
+     * @param string                      $level
+     * @param Throwable|string|Stringable $toLog
+     * @param array                       $context
+     *
      * @return Data
      */
-    public function makeData(string $level, Throwable|string $toLog, array $context): Data
+    public function makeData(string $level, Throwable|string|Stringable $toLog, array $context): Data
     {
-        $env = $this->getEnvironment();
+        $env  = $this->getEnvironment();
         $body = $this->getBody($toLog, $context);
         $data = new Data($env, $body);
         $data->setLevel($this->getLevel($level, $toLog))
@@ -374,10 +376,19 @@ class DataBuilder implements DataBuilderInterface
         return $this->environment;
     }
 
-    protected function getBody($toLog, $context)
+    protected function getBody(Throwable|string|Stringable $toLog, array $context): Body
     {
         $baseException = $this->getBaseException();
-        if ($toLog instanceof ErrorWrapper) {
+
+        // Get the exception from either the $message or $context['exception']. See
+        // https://www.php-fig.org/psr/psr-3/#13-context for a description of $context['exception'].
+        if (isset($context['exception']) && $context['exception'] instanceof $baseException) {
+            $message = null;
+            if (!$toLog instanceof Throwable) {
+                $message = (string) $toLog;
+            }
+            $content = $this->getExceptionTrace($context['exception'], $message);
+        } elseif ($toLog instanceof ErrorWrapper) {
             $content = $this->getErrorTrace($toLog);
         } elseif ($toLog instanceof $baseException) {
             $content = $this->getExceptionTrace($toLog);
@@ -393,13 +404,15 @@ class DataBuilder implements DataBuilderInterface
     }
 
     /**
-     * @param Throwable $exc
+     * @param Throwable              $exc
+     * @param string|Stringable|null $message
+     *
      * @return Trace|TraceChain
      */
-    public function getExceptionTrace(Throwable $exc): Trace|TraceChain
+    public function getExceptionTrace(Throwable $exc, string|Stringable $message = null): Trace|TraceChain
     {
-        $chain = array();
-        $chain[] = $this->makeTrace($exc, $this->includeExcCodeContext);
+        $chain   = array();
+        $chain[] = $this->makeTrace($exc, $this->includeExcCodeContext, message: $message);
 
         $previous = $exc->getPrevious();
 
@@ -420,22 +433,29 @@ class DataBuilder implements DataBuilderInterface
     }
 
     /**
-     * @param Throwable $exception
-     * @param bool $includeContext whether or not to include context
-     * @param string|null $classOverride
+     * @param Throwable              $exception
+     * @param bool                   $includeContext whether or not to include context
+     * @param string|null            $classOverride
+     * @param string|Stringable|null $message
+     *
      * @return Trace
      */
-    public function makeTrace(Throwable $exception, bool $includeContext, ?string $classOverride = null): Trace
-    {
+    public function makeTrace(
+        Throwable $exception,
+        bool $includeContext,
+        ?string $classOverride = null,
+        string|Stringable $message = null,
+    ): Trace {
         if ($this->captureErrorStacktraces) {
             $frames = $this->makeFrames($exception, $includeContext);
         } else {
             $frames = array();
         }
-        
+
         $excInfo = new ExceptionInfo(
             $classOverride ?: get_class($exception),
-            $exception->getMessage()
+            $exception->getMessage(),
+            $message
         );
         return new Trace($frames, $excInfo);
     }
