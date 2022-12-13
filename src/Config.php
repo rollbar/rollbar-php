@@ -721,7 +721,12 @@ class Config
         }
     }
 
-    public function logPayloadLogger()
+    /**
+     * Returns the logger responsible for logging request payload and response dumps, if enabled.
+     *
+     * @return LoggerInterface
+     */
+    public function logPayloadLogger(): LoggerInterface
     {
         return $this->logPayloadLogger;
     }

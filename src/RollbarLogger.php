@@ -3,6 +3,7 @@
 namespace Rollbar;
 
 use Psr\Log\InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use Stringable;
 use Throwable;
 use Psr\Log\AbstractLogger;
@@ -256,9 +257,14 @@ class RollbarLogger extends AbstractLogger
         return $this->config->getDataBuilder();
     }
 
-    public function outputLogger()
+    /**
+     * Returns the logger responsible for logging request payload and response dumps, if enabled.
+     *
+     * @return LoggerInterface
+     */
+    public function logPayloadLogger(): LoggerInterface
     {
-        return $this->config->outputLogger();
+        return $this->config->logPayloadLogger();
     }
 
     public function verboseLogger()
