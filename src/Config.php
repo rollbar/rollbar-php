@@ -193,6 +193,10 @@ class Config
     private $mtRandmax;
 
     private $includedErrno;
+
+    /**
+     * @var bool Sets whether to respect current {@see error_reporting()} level or not.
+     */
     private bool $useErrorReporting = false;
 
     /**
@@ -884,10 +888,10 @@ class Config
     }
 
     /**
-     * Check if the error should be ignored due to `included_errno` config,
-     * `use_error_reporting` config or `error_sample_rates` config.
+     * Check if the error should be ignored due to `includedErrno` config, `useErrorReporting` config or
+     * `errorSampleRates` config.
      *
-     * @param errno
+     * @param int $errno The PHP error level bitmask.
      *
      * @return bool
      */
@@ -1058,7 +1062,8 @@ class Config
     public function sendBatch(array $batch, string $accessToken): ?Response
     {
         if ($this->transmitting()) {
-            return $this->sender->sendBatch($batch, $accessToken);
+            $this->sender->sendBatch($batch, $accessToken);
+            return null;
         } else {
             $response = new Response(0, "Not transmitting (transmitting disabled in configuration)");
             $this->verboseLogger()->warning($response->getInfo());
