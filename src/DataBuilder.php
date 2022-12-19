@@ -64,7 +64,12 @@ class DataBuilder implements DataBuilderInterface
      */
     protected $utilities;
 
-    public function __construct($config)
+    /**
+     * Initializes the data builder from the Rollbar configs.
+     *
+     * @param array $config The configuration array.
+     */
+    public function __construct(array $config)
     {
         self::$defaults = Defaults::get();
         
@@ -281,7 +286,15 @@ class DataBuilder implements DataBuilderInterface
         $this->serverExtras = $config['serverExtras'] ?? null;
     }
 
-    public function setCustom($config)
+    /**
+     * Stores the 'custom' key from the $config array. The 'custom' key should hold an array of key / value pairs to be
+     * sent to Rollbar with each request.
+     *
+     * @param array $config The configuration array.
+     *
+     * @return void
+     */
+    public function setCustom(array $config): void
     {
         $this->custom = $config['custom'] ?? \Rollbar\Defaults::get()->custom();
     }
@@ -342,9 +355,12 @@ class DataBuilder implements DataBuilderInterface
     }
 
     /**
-     * @param string                      $level
-     * @param Throwable|string|Stringable $toLog
-     * @param array                       $context
+     * Creates the {@see Data} object from an exception or log message. This method respects the PSR-3 standard on
+     * handling exceptions in the context https://www.php-fig.org/psr/psr-3/#13-context.
+     *
+     * @param string                      $level   The severity log level for the item being logged.
+     * @param Throwable|string|Stringable $toLog   The exception or message to be logged.
+     * @param array                       $context Any additional context data.
      *
      * @return Data
      */
@@ -961,8 +977,13 @@ class DataBuilder implements DataBuilderInterface
     {
         return $this->serverExtras;
     }
-    
-    public function getCustom()
+
+    /**
+     * Returns the array of key / value pairs that will be sent with the payload to Rollbar.
+     *
+     * @return array|null
+     */
+    public function getCustom(): ?array
     {
         return $this->custom;
     }
@@ -1043,22 +1064,32 @@ class DataBuilder implements DataBuilderInterface
         return ['message' => $custom];
     }
 
-    public function addCustom($key, $data)
+    /**
+     * Adds a new key / value pair that will be sent with the payload to Rollbar. If the key already exists in the
+     * custom data array the existing value will be overwritten.
+     *
+     * @param string $key  The key to store this value in the custom array.
+     * @param mixed  $data The value that is going to be stored. Must be a primitive or JSON serializable.
+     *
+     * @return void
+     */
+    public function addCustom(string $key, mixed $data): void
     {
-        if ($this->custom === null) {
-            $this->custom = array();
-        }
-        
         if (!is_array($this->custom)) {
-            throw new \Exception(
-                "Custom data configured in Rollbar::init() is not an array."
-            );
+            $this->custom = array();
         }
         
         $this->custom[$key] = $data;
     }
-    
-    public function removeCustom($key)
+
+    /**
+     * Removes a key from the custom data array that is sent with the payload to Rollbar.
+     *
+     * @param string $key The key to remove.
+     *
+     * @return void
+     */
+    public function removeCustom(string $key): void
     {
         unset($this->custom[$key]);
     }
@@ -1114,18 +1145,18 @@ class DataBuilder implements DataBuilderInterface
 
         return $source;
     }
-    
+
     /**
-     * Wrap a PHP error in an ErrorWrapper class and add backtrace information
+     * Wrap a PHP error in the {@see ErrorWrapper} class and add stacktrace information.
      *
-     * @param string $errno
-     * @param string $errstr
-     * @param string $errfile
-     * @param string $errline
+     * @param int         $errno   The level of the error raised.
+     * @param string      $errstr  The error message.
+     * @param string|null $errfile The filename that the error was raised in.
+     * @param int|null    $errline The line number where the error was raised.
      *
      * @return ErrorWrapper
      */
-    public function generateErrorWrapper($errno, $errstr, $errfile, $errline)
+    public function generateErrorWrapper(int $errno, string $errstr, ?string $errfile, ?int $errline): ErrorWrapper
     {
         return new ErrorWrapper(
             $errno,
@@ -1140,12 +1171,12 @@ class DataBuilder implements DataBuilderInterface
     /**
      * Fetches the stack trace for fatal and regular errors.
      *
-     * @var string $errfile
-     * @var string $errline
+     * @param string|null $errfile The filename that the error was raised in.
+     * @param int|null    $errline The line number where the error was raised.
      *
      * @return array
      */
-    protected function buildErrorTrace($errfile, $errline)
+    protected function buildErrorTrace(?string $errfile, ?int $errline): array
     {
         if ($this->captureErrorStacktraces) {
             $backTrace = $this->fetchErrorTrace();
