@@ -4,7 +4,19 @@ namespace Rollbar;
 
 use Rollbar\Payload\Payload;
 
+/**
+ * The FilterInterface allows a custom payload filter to be used. It should be passed to the configs with the 'filter'
+ * key. A custom filter should implement this interface.
+ */
 interface FilterInterface
 {
-    public function shouldSend(Payload $payload, string $accessToken);
+    /**
+     * Method called to determine if a payload should be sent to the Rollbar service. If true is returned the payload
+     * will not be sent.
+     *
+     * @param Payload $payload The payload instance that may be sent.
+     *
+     * @return bool
+     */
+    public function shouldSend(Payload $payload): bool;
 }

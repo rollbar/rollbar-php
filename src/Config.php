@@ -833,7 +833,7 @@ class Config
         return $this->sendMessageTrace;
     }
 
-    public function checkIgnored($payload, string $accessToken, $toLog, bool $isUncaught)
+    public function checkIgnored($payload, $toLog, bool $isUncaught)
     {
         if (isset($this->checkIgnore)) {
             try {
@@ -856,7 +856,7 @@ class Config
         }
 
         if (!is_null($this->filter)) {
-            $filter = $this->filter->shouldSend($payload, $accessToken);
+            $filter = $this->filter->shouldSend($payload);
             $this->verboseLogger()->debug("Custom filter result: " . var_export($filter, true));
             return $filter;
         }

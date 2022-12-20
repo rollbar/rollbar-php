@@ -612,7 +612,6 @@ class VerbosityTest extends BaseRollbarTest
                 $payloadMock->method('getData')->willReturn($dataMock);
                 $config->checkIgnored(
                     $payloadMock,
-                    $unitTest->getTestAccessToken(),
                     $payloadMock,
                     false
                 );
@@ -651,7 +650,7 @@ class VerbosityTest extends BaseRollbarTest
             // logic under test
                 $data = $config->getRollbarData(\Rollbar\Payload\Level::INFO, 'some message', array());
                 $payload = new \Rollbar\Payload\Payload($data, $unitTest->getTestAccessToken());
-                $config->checkIgnored($payload, $unitTest->getTestAccessToken(), 'some message', false);
+                $config->checkIgnored($payload, 'some message', false);
             },
             function () use ($unitTest) {
             // verbosity expectations
@@ -685,7 +684,7 @@ class VerbosityTest extends BaseRollbarTest
             // logic under test
                 $data = $config->getRollbarData(\Rollbar\Payload\Level::INFO, 'some message', array());
                 $payload = new \Rollbar\Payload\Payload($data, $unitTest->getTestAccessToken());
-                $config->checkIgnored($payload, $unitTest->getTestAccessToken(), 'some message', false);
+                $config->checkIgnored($payload, 'some message', false);
             },
             function () use ($unitTest) {
             // verbosity expectations
@@ -722,7 +721,7 @@ class VerbosityTest extends BaseRollbarTest
             // logic under test
                 $data = $config->getRollbarData(\Rollbar\Payload\Level::INFO, 'some message', array());
                 $payload = new \Rollbar\Payload\Payload($data, $unitTest->getTestAccessToken());
-                $config->checkIgnored($payload, $unitTest->getTestAccessToken(), 'some message', false);
+                $config->checkIgnored($payload, 'some message', false);
             },
             function () use ($unitTest) {
             // verbosity expectations

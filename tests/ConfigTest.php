@@ -341,12 +341,12 @@ class ConfigTest extends BaseRollbarTest
     
     public function assertPayloadIgnored($config, $payload): void
     {
-        $this->assertTrue($config->checkIgnored($payload, 'access-token', $this->error, false));
+        $this->assertTrue($config->checkIgnored($payload, $this->error, false));
     }
     
     public function assertPayloadNotIgnored($config, $payload): void
     {
-        $this->assertFalse($config->checkIgnored($payload, 'access-token', $this->error, false));
+        $this->assertFalse($config->checkIgnored($payload, $this->error, false));
     }
     
     private function prepareMockPayload($level): Payload
@@ -421,8 +421,8 @@ class ConfigTest extends BaseRollbarTest
             "environment" => $this->env,
             "filter" => $filter
         ));
-        $this->assertTrue($c->checkIgnored($p, "fake_access_token", $this->error, false));
-        $this->assertFalse($c->checkIgnored($p, "fake_access_token", $this->error, false));
+        $this->assertTrue($c->checkIgnored($p, $this->error, false));
+        $this->assertFalse($c->checkIgnored($p, $this->error, false));
     }
 
     public function testSender(): void
@@ -608,7 +608,6 @@ class ConfigTest extends BaseRollbarTest
                 $data,
                 $config->getAccessToken()
             ),
-            $this->getTestAccessToken(),
             $this->error,
             false
         );
@@ -647,7 +646,6 @@ class ConfigTest extends BaseRollbarTest
                 $data,
                 $config->getAccessToken()
             ),
-            $this->getTestAccessToken(),
             $this->error,
             true
         );
