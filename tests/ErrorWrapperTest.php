@@ -11,10 +11,10 @@ class ErrorWrapperTest extends BaseRollbarTest
             "",
             null,
             null,
-            "FAKE BACKTRACE",
+            ['fake' => 'FAKE BACKTRACE'],
             new Utilities
         );
-        $this->assertEquals("FAKE BACKTRACE", $errWrapper->getBacktrace());
+        $this->assertEquals(['fake' => 'FAKE BACKTRACE'], $errWrapper->getBacktrace());
     }
 
     public function testGetClassName(): void
