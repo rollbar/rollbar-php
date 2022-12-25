@@ -28,13 +28,13 @@ jobs:
   # compatible version as well as the most-recent stable version. This will
   # fail-fast by default, so we include our edgiest versions (currently 7.4)
   # first as they're most likely to fail.
-  # @seealso https://freek.dev/1546
-  # @seealso https://www.dereuromark.de/2019/01/04/test-composer-dependencies-with-prefer-lowest/
+  # @see https://freek.dev/1546
+  # @see https://www.dereuromark.de/2019/01/04/test-composer-dependencies-with-prefer-lowest/
   php-tests:
     strategy:
       matrix:
         # All the versions, OS, and dependency levels we want to support
-        php: [8.0, 8.1]
+        php: [8.0, 8.1, 8.2]
         dependency: [stable] # TODO: lowest
         os: [ubuntu]         # TODO: windows, macos
         # Our code has paths for with- and without- XDebug, and we want to test
@@ -46,7 +46,7 @@ jobs:
     runs-on: ${{ matrix.os }}-latest
     steps:
       - name: Checkout the code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install PHP and composer environment
         uses: shivammathur/setup-php@v2
@@ -58,10 +58,10 @@ jobs:
 
       - name: Get composer cache directory
         id: composer-cache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ matrix.os }}-composer-${{ hashFiles('**/composer.json') }}-${{ matrix.dependency }}-
