@@ -318,7 +318,7 @@ class RollbarLoggerTest extends BaseRollbarTest
             array()
         );
         
-        $this->assertEquals(400, $response->getStatus());
+        $this->assertEquals(422, $response->getStatus());
     }
 
     public function testFlush(): void
