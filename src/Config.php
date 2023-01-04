@@ -833,7 +833,7 @@ class Config
         return $this->sendMessageTrace;
     }
 
-    public function checkIgnored($payload, string $accessToken, $toLog, bool $isUncaught)
+    public function checkIgnored(Payload $payload, string $accessToken, $toLog, bool $isUncaught)
     {
         if (isset($this->checkIgnore)) {
             try {
