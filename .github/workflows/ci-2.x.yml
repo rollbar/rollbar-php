@@ -29,9 +29,9 @@ jobs:
   # compatible version as well as the most-recent stable version. This will
   # fail-fast by default, so we include our edgiest versions (currently 7.4)
   # first as they're most likely to fail.
-  # @seealso https://freek.dev/1546
-  # @seealso https://www.dereuromark.de/2019/01/04/test-composer-dependencies-with-prefer-lowest/
-  # @seealso https://github.com/actions/starter-workflows/blob/main/ci/php.yml
+  # @see https://freek.dev/1546
+  # @see https://www.dereuromark.de/2019/01/04/test-composer-dependencies-with-prefer-lowest/
+  # @see https://github.com/actions/starter-workflows/blob/main/ci/php.yml
   php-tests:
     strategy:
       matrix:
@@ -70,13 +70,13 @@ jobs:
     steps:
       - name: Checkout the next/2.x/main branch during scheduled builds
         if: github.ref == 'refs/heads/master'
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: 'next/2.x/main'
 
       - name: Checkout the pushed branch
         if: github.ref != 'refs/heads/master'
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install PHP and composer environment
         uses: shivammathur/setup-php@v2
@@ -88,10 +88,10 @@ jobs:
 
       - name: Get composer cache directory
         id: composer-cache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ matrix.os }}-composer-${{ hashFiles('**/composer.json') }}-${{ matrix.dependency }}-
