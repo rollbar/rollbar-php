@@ -856,7 +856,7 @@ class Config
         }
 
         if (!is_null($this->filter)) {
-            $filter = $this->filter->shouldSend($payload);
+            $filter = $this->filter->shouldSend($payload, $isUncaught);
             $this->verboseLogger()->debug("Custom filter result: " . var_export($filter, true));
             return $filter;
         }
