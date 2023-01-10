@@ -426,12 +426,12 @@ class RollbarLogger extends AbstractLogger
     /**
      * Calls the custom 'responseHandler', config if it exists.
      *
-     * @param Payload $payload  The payload that was sent.
-     * @param mixed   $response The response from the Rollbar service.
+     * @param Payload  $payload  The payload that was sent.
+     * @param Response $response The response from the Rollbar service.
      *
      * @return void
      */
-    protected function handleResponse(Payload $payload, mixed $response): void
+    protected function handleResponse(Payload $payload, Response $response): void
     {
         $this->config->handleResponse($payload, $response);
     }

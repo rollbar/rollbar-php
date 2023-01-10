@@ -833,7 +833,8 @@ class Config
         return $this->sendMessageTrace;
     }
 
-    public function checkIgnored($payload, $toLog, bool $isUncaught)
+
+    public function checkIgnored(Payload $payload, $toLog, bool $isUncaught)
     {
         if (isset($this->checkIgnore)) {
             try {
@@ -1077,7 +1078,7 @@ class Config
         $this->sender->wait($accessToken, $max);
     }
 
-    public function handleResponse(Payload $payload, mixed $response): void
+    public function handleResponse(Payload $payload, Response $response): void
     {
         if (!is_null($this->responseHandler)) {
             $this->verboseLogger()->debug(
