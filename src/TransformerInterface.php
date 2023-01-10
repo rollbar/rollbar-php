@@ -12,6 +12,6 @@ interface TransformerInterface
         Payload $payload,
         Level|string $level,
         mixed $toLog,
-        array $context = array ()
-    ): ?Payload;
+        array $context = array()
+    ): Payload;
 }
