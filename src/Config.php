@@ -795,7 +795,7 @@ class Config
         Level|string $level,
         mixed $toLog,
         array $context = array ()
-    ): ?Payload {
+    ): Payload {
         if (count($this->custom) > 0) {
             $this->verboseLogger()->debug("Adding custom data to the payload.");
             $data = $payload->getData();

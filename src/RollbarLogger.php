@@ -370,14 +370,14 @@ class RollbarLogger extends AbstractLogger
      * @param string|Stringable $toLog       The message or error to be sent to Rollbar.
      * @param array             $context     Additional data to send with the message.
      *
-     * @return Payload|null
+     * @return Payload
      */
     protected function getPayload(
         string $accessToken,
         string $level,
         string|Stringable $toLog,
         array $context,
-    ): ?Payload {
+    ): Payload {
         $data    = $this->config->getRollbarData($level, $toLog, $context);
         $payload = new Payload($data, $accessToken);
         return $this->config->transform($payload, $level, $toLog, $context);
