@@ -96,7 +96,7 @@ class CurlSender implements SenderInterface
         $this->checkForCompletedRequests($accessToken);
     }
 
-    public function wait(string $accessToken, int $max = 0)
+    public function wait(string $accessToken, int $max = 0): void
     {
         if (count($this->inflightRequests) <= $max) {
             return;
@@ -186,10 +186,5 @@ class CurlSender implements SenderInterface
             curl_close($handle);
         }
         $this->maybeSendMoreBatchRequests($accessToken);
-    }
-    
-    public function toString()
-    {
-        return "Rollbar API endpoint: " . $this->getEndpoint();
     }
 }

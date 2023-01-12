@@ -96,7 +96,7 @@ class FluentSender implements SenderInterface
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function wait(string $accessToken, int $max)
+    public function wait(string $accessToken, int $max): void
     {
         return;
     }
@@ -107,11 +107,5 @@ class FluentSender implements SenderInterface
     protected function loadFluentLogger()
     {
         $this->fluentLogger = new FluentLogger($this->fluentHost, $this->fluentPort);
-    }
-    
-    public function toString()
-    {
-        return "fluentd " . $this->fluentHost . ":" . $this->fluentPort .
-                " tag: " . $this->fluentTag;
     }
 }

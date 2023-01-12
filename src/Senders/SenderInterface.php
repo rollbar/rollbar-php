@@ -2,13 +2,46 @@
 
 namespace Rollbar\Senders;
 
-use Rollbar\Payload\Payload;
 use Rollbar\Payload\EncodedPayload;
+use Rollbar\Payload\Payload;
+use Rollbar\Response;
 
+/**
+ * The sender interface is used to define how an error report sender should transport payloads to Rollbar Service.
+ *
+ * An optional constructor can be included in the implementing class. If the constructor is present a single argument
+ * with the value of the `senderOptions` config option will be passed to the constructor.
+ */
 interface SenderInterface
 {
-    public function send(EncodedPayload $payload, string $accessToken);
+    /**
+     * Sends the payload to the Rollbar service and returns the response.
+     *
+     * @param EncodedPayload $payload     The payload to deliver to the Rollbar service.
+     * @param string         $accessToken The project access token.
+     *
+     * @return Response
+     */
+    public function send(EncodedPayload $payload, string $accessToken): Response;
+
+    /**
+     * Sends an array of payloads to the Rollbar service.
+     *
+     * @param Payload[] $batch       The array of {@see Payload} instances.
+     * @param string    $accessToken The project access token.
+     *
+     * @return void
+     */
     public function sendBatch(array $batch, string $accessToken): void;
-    public function wait(string $accessToken, int $max);
-    public function toString();
+
+    /**
+     * Method used to keep the batch send process alive until all or $max number of Payloads are sent, which ever comes
+     * first.
+     *
+     * @param string $accessToken The project access token.
+     * @param int    $max         The maximum payloads to send before stopping the batch send process.
+     *
+     * @return void
+     */
+    public function wait(string $accessToken, int $max): void;
 }

@@ -55,7 +55,7 @@ class AgentSender implements SenderInterface
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function wait(string $accessToken, int $max)
+    public function wait(string $accessToken, int $max): void
     {
         return;
     }
@@ -64,10 +64,5 @@ class AgentSender implements SenderInterface
     {
         $filename = $this->agentLogLocation . '/rollbar-relay.' . getmypid() . '.' . microtime(true) . '.rollbar';
         $this->agentLog = fopen($filename, 'a');
-    }
-    
-    public function toString()
-    {
-        return "agent log: " . $this->agentLogLocation;
     }
 }

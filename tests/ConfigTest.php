@@ -124,7 +124,7 @@ class ConfigTest extends BaseRollbarTest
                         );
         $senderMock = $this->getMockBuilder(SenderInterface::class)
                         ->getMock();
-        $senderMock->method('send')->willReturn(null);
+        $senderMock->method('send')->willReturn(new Response(200, 'Test'));
 
         $payload = new \Rollbar\Payload\EncodedPayload(array('data'=>array()));
         $payload->encode();
