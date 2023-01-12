@@ -242,7 +242,7 @@ class RollbarLogger extends AbstractLogger
         $payload     = $this->getPayload($accessToken, $level, $message, $context);
 
         $isUncaught = $this->isUncaughtLogData($message);
-        if ($this->config->checkIgnored($payload, $accessToken, $message, $isUncaught)) {
+        if ($this->config->checkIgnored($payload, $message, $isUncaught)) {
             $this->verboseLogger()->info('Occurrence ignored');
             $response = new Response(0, "Ignored");
         } else {
