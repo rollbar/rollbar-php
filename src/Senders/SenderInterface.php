@@ -44,4 +44,13 @@ interface SenderInterface
      * @return void
      */
     public function wait(string $accessToken, int $max): void;
+
+    /**
+     * Returns true if the access token is required by the sender to send the payload. In cases where an intermediary
+     * sender is being used like Fluentd.
+     *
+     * @return bool
+     * @since 4.0.0
+     */
+    public function requireAccessToken(): bool;
 }

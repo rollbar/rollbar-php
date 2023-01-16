@@ -102,6 +102,18 @@ class FluentSender implements SenderInterface
     }
 
     /**
+     * Returns true if the access token is required by the sender to send the payload. The Fluentd service can provide
+     * its own access token.
+     *
+     * @return bool
+     * @since 4.0.0
+     */
+    public function requireAccessToken(): bool
+    {
+        return false;
+    }
+
+    /**
      * Loads the fluent logger
      */
     protected function loadFluentLogger()

@@ -291,13 +291,14 @@ class Config
         $this->setLogPayloadLogger($config);
         $this->setVerbose($config);
         $this->setVerboseLogger($config);
+        // The sender must be set before the access token, so we know if it is required.
+        $this->setSender($config);
         $this->setAccessToken($config);
         $this->setDataBuilder($config);
         $this->setTransformer($config);
         $this->setMinimumLevel($config);
         $this->setReportSuppressed($config);
         $this->setFilters($config);
-        $this->setSender($config);
         $this->setScrubber($config);
         $this->setBatched($config);
         $this->setBatchSize($config);
@@ -337,8 +338,14 @@ class Config
         if (isset($_ENV['ROLLBAR_ACCESS_TOKEN']) && !isset($config['access_token'])) {
             $config['access_token'] = $_ENV['ROLLBAR_ACCESS_TOKEN'];
         }
-        $this->utilities()->validateString($config['access_token'], "config['access_token']", 32, false);
-        $this->accessToken = $config['access_token'];
+        
+        $this->utilities()->validateString(
+            $config['access_token'],
+            "config['access_token']",
+            32,
+            !$this->sender->requireAccessToken(),
+        );
+        $this->accessToken = $config['access_token'] ?? '';
     }
 
     private function setEnabled(array $config): void

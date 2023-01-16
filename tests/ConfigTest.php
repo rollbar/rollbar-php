@@ -428,9 +428,12 @@ class ConfigTest extends BaseRollbarTest
     public function testSender(): void
     {
         $p = m::mock(EncodedPayload::class);
-        $sender = m::mock(SenderInterface::class)
-            ->shouldReceive("send")
+        $sender = m::mock(SenderInterface::class);
+        $sender->shouldReceive("send")
             ->with($p, $this->getTestAccessToken())
+            ->once()
+            ->mock();
+        $sender->shouldReceive('requireAccessToken')
             ->once()
             ->mock();
         $c = new Config(array(
