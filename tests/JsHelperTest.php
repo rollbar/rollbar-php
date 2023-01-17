@@ -226,19 +226,29 @@ class JsHelperTest extends BaseRollbarTest
         );
     }
     
-    public function testConfigJsTag()
+    /**
+     * @dataProvider configJsTagProvider
+     */
+    public function testConfigJsTag($config, $expectedJson)
     {
-        $config = array(
-            'config1' => 'value 1'
-        );
-        
-        $expectedJson = json_encode($config);
         $expected = "var _rollbarConfig = $expectedJson;";
         
         $helper = new RollbarJsHelper($config);
         $result = $helper->configJsTag();
         
         $this->assertEquals($expected, $result);
+    }
+    
+    public function configJsTagProvider()
+    {
+        return array(
+            array(array(), '{}'),
+            array(array('config1' => 'value 1'), '{"config1":"value 1"}'),
+            array(
+                array('hostBlackList' => array('example.com', 'badhost.com')),
+                '{"hostBlackList":["example.com","badhost.com"]}'
+            ),
+        );
     }
     
     /**
