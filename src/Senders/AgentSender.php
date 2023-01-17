@@ -60,9 +60,23 @@ class AgentSender implements SenderInterface
         return;
     }
 
+    /**
+     * Returns true if the access token is required by the sender to send the payload. The agent can be configured to
+     * provide its own access token. But may not have its own, so we are requiring it for now. See
+     * {@link https://github.com/rollbar/rollbar-php/issues/405} for more details.
+     *
+     * @since 4.0.0
+     *
+     * @return bool
+     */
+    public function requireAccessToken(): bool
+    {
+        return true;
+    }
+
     private function loadAgentFile()
     {
-        $filename = $this->agentLogLocation . '/rollbar-relay.' . getmypid() . '.' . microtime(true) . '.rollbar';
+        $filename       = $this->agentLogLocation . '/rollbar-relay.' . getmypid() . '.' . microtime(true) . '.rollbar';
         $this->agentLog = fopen($filename, 'a');
     }
 }

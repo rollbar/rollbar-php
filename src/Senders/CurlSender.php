@@ -110,6 +110,18 @@ class CurlSender implements SenderInterface
         }
     }
 
+    /**
+     * Returns true if the access token is required by the sender to send the payload. The curl sender requires the
+     * access token since it is sending directly to the Rollbar service.
+     *
+     * @return bool
+     * @since 4.0.0
+     */
+    public function requireAccessToken(): bool
+    {
+        return false;
+    }
+
     private function maybeSendMoreBatchRequests(string $accessToken)
     {
         $max = $this->maxBatchRequests - count($this->inflightRequests);
