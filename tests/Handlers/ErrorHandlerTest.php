@@ -1,8 +1,9 @@
 <?php namespace Rollbar\Handlers;
 
-use \Rollbar\Rollbar;
-use \Rollbar\RollbarLogger;
-use \Rollbar\BaseRollbarTest;
+use Rollbar\Rollbar;
+use Rollbar\RollbarLogger;
+use Rollbar\BaseRollbarTest;
+use Rollbar\Handlers\ErrorHandler;
 
 /**
  * TODO: consider using $this->useErrorHandler to deal with stopping the
@@ -19,9 +20,9 @@ class ErrorHandlerTest extends BaseRollbarTest
         parent::__construct($name, $data, $dataName);
     }
 
-    private static $simpleConfig = array();
+    private static array $simpleConfig = array();
     
-    public function testPreviousErrorHandler()
+    public function testPreviousErrorHandler(): void
     {
         $testCase = $this;
         
@@ -37,9 +38,9 @@ class ErrorHandlerTest extends BaseRollbarTest
         @trigger_error(E_USER_ERROR);
     }
     
-    public function testRegister()
+    public function testRegister(): void
     {
-        $handler = $this->getMockBuilder('Rollbar\\Handlers\\ErrorHandler')
+        $handler = $this->getMockBuilder(ErrorHandler::class)
                         ->setConstructorArgs(array(new RollbarLogger(self::$simpleConfig)))
                         ->setMethods(array('handle'))
                         ->getMock();
@@ -52,9 +53,9 @@ class ErrorHandlerTest extends BaseRollbarTest
         trigger_error(E_USER_ERROR);
     }
     
-    public function testHandle()
+    public function testHandle(): void
     {
-        $logger = $this->getMockBuilder('Rollbar\\RollbarLogger')
+        $logger = $this->getMockBuilder(RollbarLogger::class)
                         ->setConstructorArgs(array(self::$simpleConfig))
                         ->setMethods(array('log'))
                         ->getMock();

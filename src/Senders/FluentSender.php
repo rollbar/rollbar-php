@@ -96,9 +96,21 @@ class FluentSender implements SenderInterface
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function wait(string $accessToken, int $max)
+    public function wait(string $accessToken, int $max): void
     {
         return;
+    }
+
+    /**
+     * Returns true if the access token is required by the sender to send the payload. The Fluentd service can provide
+     * its own access token.
+     *
+     * @return bool
+     * @since 4.0.0
+     */
+    public function requireAccessToken(): bool
+    {
+        return false;
     }
 
     /**
@@ -107,11 +119,5 @@ class FluentSender implements SenderInterface
     protected function loadFluentLogger()
     {
         $this->fluentLogger = new FluentLogger($this->fluentHost, $this->fluentPort);
-    }
-    
-    public function toString()
-    {
-        return "fluentd " . $this->fluentHost . ":" . $this->fluentPort .
-                " tag: " . $this->fluentTag;
     }
 }

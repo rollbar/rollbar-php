@@ -1,7 +1,7 @@
 <?php namespace Rollbar;
 
-use \Mockery as m;
-use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use Mockery as m;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Rollbar\FakeDataBuilder;
 use Rollbar\Payload\Body;
 use Rollbar\Payload\Data;
@@ -18,12 +18,21 @@ use Rollbar\TestHelpers\Exceptions\FiftyFiftyExceptionSampleRate;
 use Rollbar\TestHelpers\Exceptions\FiftyFityChildExceptionSampleRate;
 use Rollbar\TestHelpers\Exceptions\QuarterExceptionSampleRate;
 use Rollbar\TestHelpers\Exceptions\VerboseExceptionSampleRate;
+use Rollbar\Senders\SenderInterface;
+use Rollbar\Payload\EncodedPayload;
+use Rollbar\FilterInterface;
+use Rollbar\TransformerInterface;
+use Rollbar\DataBuilder;
+use Psr\Log\NullLogger;
+use Monolog\Logger;
+use Monolog\Handler\ErrorLogHandler;
+use Psr\Log\LoggerInterface;
 
 class ConfigTest extends BaseRollbarTest
 {
     use MockeryPHPUnitIntegration;
 
-    private $error;
+    private ErrorWrapper $error;
 
     public function setUp(): void
     {
@@ -44,9 +53,9 @@ class ConfigTest extends BaseRollbarTest
         m::close();
     }
     
-    private $env = "rollbar-php-testing";
+    private string $env = "rollbar-php-testing";
 
-    public function testAccessToken()
+    public function testAccessToken(): void
     {
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
@@ -55,7 +64,7 @@ class ConfigTest extends BaseRollbarTest
         $this->assertEquals($this->getTestAccessToken(), $config->getAccessToken());
     }
 
-    public function testEnabled()
+    public function testEnabled(): void
     {
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
@@ -71,7 +80,7 @@ class ConfigTest extends BaseRollbarTest
         $this->assertFalse($config->enabled());
     }
 
-    public function testTransmit()
+    public function testTransmit(): void
     {
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
@@ -87,7 +96,7 @@ class ConfigTest extends BaseRollbarTest
         $this->assertFalse($config->transmitting());
     }
 
-    public function testLogPayload()
+    public function testLogPayload(): void
     {
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
@@ -103,9 +112,9 @@ class ConfigTest extends BaseRollbarTest
         $this->assertTrue($config->loggingPayload());
     }
 
-    public function testLoggingPayload()
+    public function testLoggingPayload(): void
     {
-        $logPayloadLoggerMock = $this->getMockBuilder('\Psr\Log\LoggerInterface')->getMock();
+        $logPayloadLoggerMock = $this->getMockBuilder(LoggerInterface::class)->getMock();
         $logPayloadLoggerMock->expects($this->once())
                         ->method('debug')
                         ->with(
@@ -113,9 +122,9 @@ class ConfigTest extends BaseRollbarTest
                                 '/Sending payload with .*:\n\{"data":/'
                             )
                         );
-        $senderMock = $this->getMockBuilder('\Rollbar\Senders\SenderInterface')
+        $senderMock = $this->getMockBuilder(SenderInterface::class)
                         ->getMock();
-        $senderMock->method('send')->willReturn(null);
+        $senderMock->method('send')->willReturn(new Response(200, 'Test'));
 
         $payload = new \Rollbar\Payload\EncodedPayload(array('data'=>array()));
         $payload->encode();
@@ -130,16 +139,16 @@ class ConfigTest extends BaseRollbarTest
         $config->send($payload, $this->getTestAccessToken());
     }
 
-    public function testConfigureLogPayloadLogger()
+    public function testConfigureLogPayloadLogger(): void
     {
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
             'environment' => $this->env
         ));
-        $this->assertInstanceOf('\Monolog\Logger', $config->logPayloadLogger());
+        $this->assertInstanceOf(Logger::class, $config->logPayloadLogger());
         $handlers = $config->logPayloadLogger()->getHandlers();
         $handler = $handlers[0];
-        $this->assertInstanceOf('\Monolog\Handler\ErrorLogHandler', $handler);
+        $this->assertInstanceOf(ErrorLogHandler::class, $handler);
         $this->assertEquals(\Monolog\Logger::DEBUG, $handler->getLevel());
 
         $config = new Config(array(
@@ -147,10 +156,10 @@ class ConfigTest extends BaseRollbarTest
             'environment' => $this->env,
             'log_payload_logger' => new \Psr\Log\NullLogger()
         ));
-        $this->assertInstanceOf('\Psr\Log\NullLogger', $config->logPayloadLogger());
+        $this->assertInstanceOf(NullLogger::class, $config->logPayloadLogger());
     }
 
-    public function testVerbose()
+    public function testVerbose(): void
     {
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
@@ -158,11 +167,11 @@ class ConfigTest extends BaseRollbarTest
         ));
         // assert the appropriate default logger
         $this->assertEquals(Config::VERBOSE_NONE, $config->verbose());
-        $this->assertInstanceOf('\Monolog\Logger', $config->verboseLogger());
+        $this->assertInstanceOf(Logger::class, $config->verboseLogger());
         // assert the appropriate default handler
         $handlers = $config->verboseLogger()->getHandlers();
         $handler = $handlers[0];
-        $this->assertInstanceOf('\Monolog\Handler\ErrorLogHandler', $handler);
+        $this->assertInstanceOf(ErrorLogHandler::class, $handler);
         // assert the appropriate default handler level
         $this->assertEquals($config->verboseInteger(), $handler->getLevel());
         
@@ -173,7 +182,7 @@ class ConfigTest extends BaseRollbarTest
         $this->assertEquals($config->verboseInteger(), $handler->getLevel());
     }
 
-    public function testVerboseInfo()
+    public function testVerboseInfo(): void
     {
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
@@ -181,7 +190,7 @@ class ConfigTest extends BaseRollbarTest
             'verbose' => \Psr\Log\LogLevel::INFO
         ));
 
-        $handlerMock = $this->getMockBuilder('\Monolog\Handler\ErrorLogHandler')
+        $handlerMock = $this->getMockBuilder(ErrorLogHandler::class)
             ->setMethods(array('handle'))
             ->getMock();
 
@@ -192,7 +201,7 @@ class ConfigTest extends BaseRollbarTest
         $config->verboseLogger()->info('Test trace');
     }
 
-    public function testVerboseInteger()
+    public function testVerboseInteger(): void
     {
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
@@ -205,23 +214,23 @@ class ConfigTest extends BaseRollbarTest
         $this->assertEquals(100, $config->verboseInteger());
     }
 
-    public function testConfigureVerboseLogger()
+    public function testConfigureVerboseLogger(): void
     {
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
             'environment' => $this->env
         ));
-        $this->assertInstanceOf('\Monolog\Logger', $config->verboseLogger());
+        $this->assertInstanceOf(Logger::class, $config->verboseLogger());
         
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
             'environment' => $this->env,
             'verbose_logger' => new \Psr\Log\NullLogger()
         ));
-        $this->assertInstanceOf('\Psr\Log\NullLogger', $config->verboseLogger());
+        $this->assertInstanceOf(NullLogger::class, $config->verboseLogger());
     }
 
-    public function testAccessTokenFromEnvironment()
+    public function testAccessTokenFromEnvironment(): void
     {
         $_ENV['ROLLBAR_ACCESS_TOKEN'] = $this->getTestAccessToken();
         $config = new Config(array(
@@ -230,17 +239,17 @@ class ConfigTest extends BaseRollbarTest
         $this->assertEquals($this->getTestAccessToken(), $config->getAccessToken());
     }
 
-    public function testDataBuilder()
+    public function testDataBuilder(): void
     {
         $arr = array(
             "access_token" => $this->getTestAccessToken(),
             "environment" => $this->env
         );
         $config = new Config($arr);
-        $this->assertInstanceOf('Rollbar\DataBuilder', $config->getDataBuilder());
+        $this->assertInstanceOf(DataBuilder::class, $config->getDataBuilder());
     }
 
-    public function testExtend()
+    public function testExtend(): void
     {
         $arr = array(
             "access_token" => $this->getTestAccessToken(),
@@ -257,7 +266,7 @@ class ConfigTest extends BaseRollbarTest
         $this->assertEquals($expected, $extended);
     }
 
-    public function testConfigure()
+    public function testConfigure(): void
     {
         $arr = array(
             "access_token" => $this->getTestAccessToken(),
@@ -274,7 +283,7 @@ class ConfigTest extends BaseRollbarTest
         $this->assertEquals($expected, $config->getConfigArray());
     }
 
-    public function testExplicitDataBuilder()
+    public function testExplicitDataBuilder(): void
     {
         $fdb = new FakeDataBuilder(array());
         $arr = array(
@@ -288,11 +297,11 @@ class ConfigTest extends BaseRollbarTest
         $this->assertEquals($expected, array_pop(FakeDataBuilder::$logged));
     }
 
-    public function testTransformer()
+    public function testTransformer(): void
     {
-        $p = m::mock("Rollbar\Payload\Payload");
-        $pPrime = m::mock("Rollbar\Payload\Payload");
-        $transformer = m::mock("Rollbar\TransformerInterface");
+        $p = m::mock(Payload::class);
+        $pPrime = m::mock(Payload::class);
+        $transformer = m::mock(TransformerInterface::class);
         $transformer->shouldReceive('transform')
             ->once()
             ->with($p, "error", "message", [ "extra_data" ])
@@ -306,43 +315,43 @@ class ConfigTest extends BaseRollbarTest
         $this->assertEquals($pPrime, $config->transform($p, "error", "message", [ "extra_data" ]));
     }
 
-    public function testMinimumLevel()
+    public function testMinimumLevel(): void
     {
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
             'environment' => $this->env
         ));
         
-        $this->assertPayloadNotIgnored($config, $this->prepareMockPayload(Level::DEBUG()));
+        $this->assertPayloadNotIgnored($config, $this->prepareMockPayload(LevelFactory::fromName(Level::DEBUG)));
         
-        $config->configure(array('minimum_level' => Level::WARNING()));
+        $config->configure(array('minimum_level' => LevelFactory::fromName(Level::WARNING)));
         
-        $this->assertPayloadIgnored($config, $this->prepareMockPayload(Level::DEBUG()));
-        $this->assertPayloadNotIgnored($config, $this->prepareMockPayload(Level::WARNING()));
+        $this->assertPayloadIgnored($config, $this->prepareMockPayload(LevelFactory::fromName(Level::DEBUG)));
+        $this->assertPayloadNotIgnored($config, $this->prepareMockPayload(LevelFactory::fromName(Level::WARNING)));
         
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
             'environment' => $this->env,
-            'minimumLevel' => Level::ERROR()
+            'minimumLevel' => Level::ERROR
         ));
         
-        $this->assertPayloadIgnored($config, $this->prepareMockPayload(Level::WARNING()));
-        $this->assertPayloadNotIgnored($config, $this->prepareMockPayload(Level::ERROR()));
+        $this->assertPayloadIgnored($config, $this->prepareMockPayload(LevelFactory::fromName(Level::WARNING)));
+        $this->assertPayloadNotIgnored($config, $this->prepareMockPayload(LevelFactory::fromName(Level::ERROR)));
     }
     
-    public function assertPayloadIgnored($config, $payload)
+    public function assertPayloadIgnored($config, $payload): void
     {
-        $this->assertTrue($config->checkIgnored($payload, 'access-token', $this->error, false));
+        $this->assertTrue($config->checkIgnored($payload, $this->error, false));
     }
     
-    public function assertPayloadNotIgnored($config, $payload)
+    public function assertPayloadNotIgnored($config, $payload): void
     {
-        $this->assertFalse($config->checkIgnored($payload, 'access-token', $this->error, false));
+        $this->assertFalse($config->checkIgnored($payload, $this->error, false));
     }
     
-    private function prepareMockPayload($level)
+    private function prepareMockPayload($level): Payload
     {
-        $data = m::mock("Rollbar\Payload\Data")
+        $data = m::mock(Data::class)
             ->shouldReceive('getLevel')
             ->andReturn($level)
             ->mock();
@@ -365,7 +374,7 @@ class ConfigTest extends BaseRollbarTest
      *           [0, "report_suppressed", true,  false]
      *           [1, "report_suppressed", false, false]
      */
-    public function testReportSuppressed($errorReporting, $configKey, $configValue, $shouldSuppressExpect)
+    public function testReportSuppressed($errorReporting, $configKey, $configValue, $shouldSuppressExpect): void
     {
         $oldErrorReporting = error_reporting($errorReporting);
         try {
@@ -392,17 +401,17 @@ class ConfigTest extends BaseRollbarTest
         $this->assertTrue(@$config->shouldSuppress());
     }
 
-    public function testFilter()
+    public function testFilter(): void
     {
-        $d = m::mock("Rollbar\Payload\Data")
+        $d = m::mock(Data::class)
             ->shouldReceive("getLevel")
-            ->andReturn(Level::CRITICAL())
+            ->andReturn(LevelFactory::fromName(Level::CRITICAL))
             ->mock();
-        $p = m::mock("Rollbar\Payload\Payload")
+        $p = m::mock(Payload::class)
             ->shouldReceive("getData")
             ->andReturn($d)
             ->mock();
-        $filter = m::mock("Rollbar\FilterInterface")
+        $filter = m::mock(FilterInterface::class)
             ->shouldReceive("shouldSend")
             ->twice()
             ->andReturn(true, false)
@@ -412,16 +421,19 @@ class ConfigTest extends BaseRollbarTest
             "environment" => $this->env,
             "filter" => $filter
         ));
-        $this->assertTrue($c->checkIgnored($p, "fake_access_token", $this->error, false));
-        $this->assertFalse($c->checkIgnored($p, "fake_access_token", $this->error, false));
+        $this->assertTrue($c->checkIgnored($p, $this->error, false));
+        $this->assertFalse($c->checkIgnored($p, $this->error, false));
     }
 
-    public function testSender()
+    public function testSender(): void
     {
-        $p = m::mock("Rollbar\Payload\EncodedPayload");
-        $sender = m::mock("Rollbar\Senders\SenderInterface")
-            ->shouldReceive("send")
+        $p = m::mock(EncodedPayload::class);
+        $sender = m::mock(SenderInterface::class);
+        $sender->shouldReceive("send")
             ->with($p, $this->getTestAccessToken())
+            ->once()
+            ->mock();
+        $sender->shouldReceive('requireAccessToken')
             ->once()
             ->mock();
         $c = new Config(array(
@@ -432,7 +444,7 @@ class ConfigTest extends BaseRollbarTest
         $c->send($p, $this->getTestAccessToken());
     }
     
-    public function testEndpoint()
+    public function testEndpoint(): void
     {
         $config = new Config(array(
             "access_token" => $this->getTestAccessToken(),
@@ -446,7 +458,7 @@ class ConfigTest extends BaseRollbarTest
         );
     }
 
-    public function testCustom()
+    public function testCustom(): void
     {
         $expectedCustom = array(
             "foo" => "bar",
@@ -469,152 +481,7 @@ class ConfigTest extends BaseRollbarTest
         $this->assertSame($expectedCustom, $actualCustom);
     }
 
-    public function testCustomPrimitive()
-    {
-        $config = new Config(array(
-            "access_token" => $this->getTestAccessToken(),
-            "environment" => $this->env,
-            "custom" => true,
-        ));
-
-        $result = $config->getDataBuilder()->makeData(
-            Level::INFO,
-            "Test message with custom data added dynamically.",
-            array(),
-        );
-
-        $custom = $result->getCustom();
-
-        $this->assertSame(array('message' => true), $custom);
-    }
-
-    public function testCustomPrimitiveFalsy()
-    {
-        $config = new Config(array(
-            "access_token" => $this->getTestAccessToken(),
-            "environment" => $this->env,
-            "custom" => 0.0,
-        ));
-
-        $result = $config->getDataBuilder()->makeData(
-            Level::INFO,
-            "Test message with custom data added dynamically.",
-            array(),
-        );
-
-        $custom = $result->getCustom();
-
-        $this->assertSame(array(), $custom);
-    }
-
-    public function testCustomObject()
-    {
-        $expectedCustom = array(
-            "foo" => "bar",
-            "fuzz" => "buzz"
-        );
-        $config = new Config(array(
-            "access_token" => $this->getTestAccessToken(),
-            "environment" => $this->env,
-            "custom" => (object) $expectedCustom,
-        ));
-
-        // New error handler to make sure we get the deprecated notice
-        set_error_handler(function (
-            int $errno,
-            string $errstr,
-        ) : bool {
-            $this->assertStringContainsString("deprecated", $errstr);
-            return true;
-        }, E_USER_DEPRECATED);
-
-        $result = $config->getDataBuilder()->makeData(
-            Level::INFO,
-            "Test message with custom data added dynamically.",
-            array(),
-        );
-
-        // Clear the handler, so it does not mess with other tests.
-        restore_error_handler();
-
-        $actualCustom = $result->getCustom();
-
-        $this->assertSame($expectedCustom, $actualCustom);
-    }
-
-    public function testDeprecatedSerializable()
-    {
-        $expectedCustom = array(
-            "foo" => "bar",
-            "fuzz" => "buzz"
-        );
-        $config = new Config(array(
-            "access_token" => $this->getTestAccessToken(),
-            "environment" => $this->env,
-            "custom" => new DeprecatedSerializable($expectedCustom),
-        ));
-
-        // New error handler to make sure we get the deprecated notice
-        set_error_handler(function (
-            int $errno,
-            string $errstr,
-        ) : bool {
-            $this->assertStringContainsString("Serializable", $errstr);
-            $this->assertStringContainsString("deprecated", $errstr);
-            return true;
-        }, E_USER_DEPRECATED);
-
-        $result = $config->getDataBuilder()->makeData(
-            Level::INFO,
-            "Test message with custom data added dynamically.",
-            array(),
-        );
-
-        // Clear the handler, so it does not mess with other tests.
-        restore_error_handler();
-
-        $actualCustom = $result->getCustom();
-
-        $this->assertSame($expectedCustom, $actualCustom);
-    }
-
-    public function testCustomSerializable()
-    {
-        $expectedCustom = array(
-            "foo" => "bar",
-            "fuzz" => "buzz"
-        );
-        $config = new Config(array(
-            "access_token" => $this->getTestAccessToken(),
-            "environment" => $this->env,
-            "custom" => new CustomSerializable($expectedCustom),
-        ));
-
-        // Make sure the deprecation notice is not sent if the object implements __serializable as it should
-        set_error_handler(function (
-            int $errno,
-            string $errstr,
-        ) : bool {
-            $this->assertStringNotContainsString("Serializable", $errstr);
-            $this->assertStringNotContainsString("deprecated", $errstr);
-            return true;
-        }, E_USER_DEPRECATED);
-
-        $result = $config->getDataBuilder()->makeData(
-            Level::INFO,
-            "Test message with custom data added dynamically.",
-            array(),
-        );
-
-        // Clear the handler, so it does not mess with other tests.
-        restore_error_handler();
-
-        $actualCustom = $result->getCustom();
-
-        $this->assertSame($expectedCustom, $actualCustom);
-    }
-
-    public function testMaxItems()
+    public function testMaxItems(): void
     {
         $config = new Config(array(
             "access_token" => $this->getTestAccessToken()
@@ -630,7 +497,7 @@ class ConfigTest extends BaseRollbarTest
         $this->assertEquals(Defaults::get()->maxItems()+1, $config->getMaxItems());
     }
     
-    public function testCustomDataMethod()
+    public function testCustomDataMethod(): void
     {
         $logger = new RollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
@@ -656,7 +523,7 @@ class ConfigTest extends BaseRollbarTest
         $this->assertEquals('bar', $result['data_from_my_custom_method']);
     }
 
-    public function testEndpointDefault()
+    public function testEndpointDefault(): void
     {
         $config = new Config(array(
             "access_token" => $this->getTestAccessToken(),
@@ -669,7 +536,7 @@ class ConfigTest extends BaseRollbarTest
         );
     }
     
-    public function testBaseApiUrl()
+    public function testBaseApiUrl(): void
     {
         $config = new Config(array(
             "access_token" => $this->getTestAccessToken(),
@@ -683,7 +550,7 @@ class ConfigTest extends BaseRollbarTest
         );
     }
     
-    public function testBaseApiUrlDefault()
+    public function testBaseApiUrlDefault(): void
     {
         $config = new Config(array(
             "access_token" => $this->getTestAccessToken(),
@@ -696,7 +563,7 @@ class ConfigTest extends BaseRollbarTest
         );
     }
     
-    public function testRaiseOnError()
+    public function testRaiseOnError(): void
     {
         $config = new Config(array(
             "access_token" => $this->getTestAccessToken(),
@@ -707,7 +574,7 @@ class ConfigTest extends BaseRollbarTest
         $this->assertTrue($config->getRaiseOnError());
     }
 
-    public function testSendMessageTrace()
+    public function testSendMessageTrace(): void
     {
         $c = new Config(array(
             "access_token" => $this->getTestAccessToken(),
@@ -725,7 +592,7 @@ class ConfigTest extends BaseRollbarTest
         $this->assertFalse($c->getSendMessageTrace());
     }
 
-    public function testCheckIgnore()
+    public function testCheckIgnore(): void
     {
         $called = false;
         $config = new Config(array(
@@ -735,17 +602,15 @@ class ConfigTest extends BaseRollbarTest
                 $called = true;
             }
         ));
-        $levelFactory = $config->getLevelFactory();
-        
+
         $data = new Data($this->env, new Body(new Message("test")));
-        $data->setLevel($levelFactory->fromName(Level::ERROR));
+        $data->setLevel(LevelFactory::fromName(Level::ERROR));
         
         $config->checkIgnored(
             new Payload(
                 $data,
                 $config->getAccessToken()
             ),
-            $this->getTestAccessToken(),
             $this->error,
             false
         );
@@ -753,7 +618,7 @@ class ConfigTest extends BaseRollbarTest
         $this->assertTrue($called);
     }
 
-    public function testCheckIgnoreParameters()
+    public function testCheckIgnoreParameters(): void
     {
         $called = false;
         $isUncaughtPassed = null;
@@ -776,17 +641,14 @@ class ConfigTest extends BaseRollbarTest
             }
         ));
         
-        $levelFactory = $config->getLevelFactory();
-        
         $data = new Data($this->env, new Body(new Message("test")));
-        $data->setLevel($levelFactory->fromName(Level::ERROR));
+        $data->setLevel(LevelFactory::fromName(Level::ERROR));
         
         $config->checkIgnored(
             new Payload(
                 $data,
                 $config->getAccessToken()
             ),
-            $this->getTestAccessToken(),
             $this->error,
             true
         );
@@ -796,7 +658,7 @@ class ConfigTest extends BaseRollbarTest
         $this->assertEquals($this->error, $errorPassed);
     }
     
-    public function testCaptureErrorStacktraces()
+    public function testCaptureErrorStacktraces(): void
     {
         $logger = new RollbarLogger(array(
             "access_token" => $this->getTestAccessToken(),
@@ -818,7 +680,7 @@ class ConfigTest extends BaseRollbarTest
     /**
      * @dataProvider useErrorReportingProvider
      */
-    public function testUseErrorReporting($use_error_reporting, $error_reporting, $expected)
+    public function testUseErrorReporting($use_error_reporting, $error_reporting, $expected): void
     {
         $called = false;
         
@@ -848,7 +710,7 @@ class ConfigTest extends BaseRollbarTest
         }
     }
     
-    public function useErrorReportingProvider()
+    public function useErrorReportingProvider(): array
     {
         return array(
             "use_error_reporting off" => array(
@@ -872,7 +734,7 @@ class ConfigTest extends BaseRollbarTest
     /**
      * @dataProvider providerExceptionSampleRate
      */
-    public function testExceptionSampleRate($exception, $expected)
+    public function testExceptionSampleRate($exception, $expected): void
     {
         $config = new Config(array(
             "access_token" => "ad865e76e7fb496fab096ac07b1dbabb",
@@ -887,7 +749,7 @@ class ConfigTest extends BaseRollbarTest
         $this->assertEquals($expected, $sampleRate);
     }
     
-    public function providerExceptionSampleRate()
+    public function providerExceptionSampleRate(): array
     {
         return array(
             array(

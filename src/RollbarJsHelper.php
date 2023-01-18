@@ -140,8 +140,8 @@ class RollbarJsHelper
     public function shouldAppendNonce($headers)
     {
         foreach ($headers as $header) {
-            if (strpos($header, 'Content-Security-Policy') !== false &&
-                strpos($header, "'unsafe-inline'") !== false) {
+            if (str_contains($header, 'Content-Security-Policy') &&
+                str_contains($header, "'unsafe-inline'")) {
                 return true;
             }
         }

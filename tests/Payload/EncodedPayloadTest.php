@@ -2,7 +2,7 @@
 
 class EncodedPayloadTest extends \Rollbar\BaseRollbarTest
 {
-    public function testEncode()
+    public function testEncode(): void
     {
         $expected = '{"foo":"bar"}';
         
@@ -24,7 +24,7 @@ class EncodedPayloadTest extends \Rollbar\BaseRollbarTest
     /**
      * @requires PHP 5.5
      */
-    public function testEncodeMalformedData()
+    public function testEncodeMalformedData(): void
     {
         $encoded = new EncodedPayload(array(
             'data' => array(

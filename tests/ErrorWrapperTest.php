@@ -4,20 +4,20 @@ use Rollbar\ErrorWrapper;
 
 class ErrorWrapperTest extends BaseRollbarTest
 {
-    public function testBacktrace()
+    public function testBacktrace(): void
     {
         $errWrapper = new ErrorWrapper(
             E_ERROR,
             "",
             null,
             null,
-            "FAKE BACKTRACE",
+            ['fake' => 'FAKE BACKTRACE'],
             new Utilities
         );
-        $this->assertEquals("FAKE BACKTRACE", $errWrapper->getBacktrace());
+        $this->assertEquals(['fake' => 'FAKE BACKTRACE'], $errWrapper->getBacktrace());
     }
 
-    public function testGetClassName()
+    public function testGetClassName(): void
     {
         $errWrapper = new ErrorWrapper(
             E_ERROR,

@@ -35,11 +35,12 @@ From the Settings > Project Access Token menu, click Create New Access Token.
 Copy the `post_client_item` value and paste it into the code below.
 
 ```php
-require 'vendor/autoload.php'; // composer require rollbar/rollbar:^2
+require 'vendor/autoload.php'; // composer require rollbar/rollbar
 
-\Rollbar\Rollbar::init(
-  [ 'access_token' => '***', 'environment' => 'development' ]
-);
+\Rollbar\Rollbar::init([
+    'access_token' => '***', 
+    'environment'  => 'development',
+]);
 ```
 
 For detailed usage instructions and configuration reference, refer to our
@@ -63,7 +64,7 @@ For detailed usage instructions and configuration reference, refer to our
 
 Major releases of this library support major versions of PHP, as follows:
 
-* For PHP 8, choose the `master` branch.
+* For PHP 8, choose the `4.x` or `3.x` branch.
 * For PHP 7, choose a `2.x` release.
 * For PHP 5, choose a `1.x` release.
 
@@ -72,7 +73,9 @@ composer:
 
 ```sh
 # for PHP 8 compatibility
-$ composer require rollbar/rollbar:dev-master
+$ composer require rollbar/rollbar:^4
+# or
+$ composer require rollbar/rollbar:^3
 
 # for PHP 7 compatibility
 $ composer require rollbar/rollbar:^2

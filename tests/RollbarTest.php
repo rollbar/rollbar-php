@@ -1,8 +1,8 @@
 <?php namespace Rollbar;
 
-use Rollbar\Rollbar;
 use Rollbar\Payload\Payload;
 use Rollbar\Payload\Level;
+use Rollbar\TestHelpers\ArrayLogger;
 
 /**
  * Usage of static method Rollbar::logger() is intended here.
@@ -11,60 +11,59 @@ use Rollbar\Payload\Level;
  */
 class RollbarTest extends BaseRollbarTest
 {
-    
+    private static $simpleConfig = array();
+
     public function setUp(): void
     {
         self::$simpleConfig['access_token'] = $this->getTestAccessToken();
         self::$simpleConfig['environment'] = 'test';
     }
 
-    private static $simpleConfig = array();
-    
     public static function setUpBeforeClass(): void
     {
         Rollbar::destroy();
     }
     
-    public function testInitWithConfig()
+    public function testInitWithConfig(): void
     {
         Rollbar::init(self::$simpleConfig);
         
-        $this->assertInstanceOf('Rollbar\RollbarLogger', Rollbar::logger());
+        $this->assertInstanceOf(RollbarLogger::class, Rollbar::logger());
         $this->assertEquals(new Config(self::$simpleConfig), Rollbar::logger()->getConfig());
     }
     
-    public function testInitWithLogger()
+    public function testInitWithLogger(): void
     {
-        $logger = $this->getMockBuilder('Rollbar\RollbarLogger')->disableOriginalConstructor()->getMock();
+        $logger = $this->getMockBuilder(RollbarLogger::class)->disableOriginalConstructor()->getMock();
 
         Rollbar::init($logger);
         
         $this->assertSame($logger, Rollbar::logger());
     }
     
-    public function testInitConfigureLogger()
+    public function testInitConfigureLogger(): void
     {
-        $logger = $this->getMockBuilder('Rollbar\RollbarLogger')->disableOriginalConstructor()->getMock();
+        $logger = $this->getMockBuilder(RollbarLogger::class)->disableOriginalConstructor()->getMock();
         $logger->expects($this->once())->method('configure')->with(self::$simpleConfig);
 
         Rollbar::init($logger);
         Rollbar::init(self::$simpleConfig);
     }
     
-    public function testInitReplaceLogger()
+    public function testInitReplaceLogger(): void
     {
         Rollbar::init(self::$simpleConfig);
 
-        $this->assertInstanceOf('Rollbar\RollbarLogger', Rollbar::logger());
+        $this->assertInstanceOf(RollbarLogger::class, Rollbar::logger());
 
-        $logger = $this->getMockBuilder('Rollbar\RollbarLogger')->disableOriginalConstructor()->getMock();
+        $logger = $this->getMockBuilder(RollbarLogger::class)->disableOriginalConstructor()->getMock();
 
         Rollbar::init($logger);
 
         $this->assertSame($logger, Rollbar::logger());
     }
 
-    public function testLogException()
+    public function testLogException(): void
     {
         Rollbar::init(self::$simpleConfig);
 
@@ -77,16 +76,16 @@ class RollbarTest extends BaseRollbarTest
         $this->assertTrue(true);
     }
     
-    public function testLogMessage()
+    public function testLogMessage(): void
     {
         Rollbar::init(self::$simpleConfig);
       
-        $response = Rollbar::log(Level::INFO, 'testing info level');
+        Rollbar::log(Level::INFO, 'testing info level');
       
         $this->assertTrue(true);
     }
     
-    public function testLogExtraData()
+    public function testLogExtraData(): void
     {
         Rollbar::init(self::$simpleConfig);
         
@@ -113,94 +112,63 @@ class RollbarTest extends BaseRollbarTest
         );
     }
     
-    public function testDebug()
+    public function testDebug(): void
     {
         $this->shortcutMethodTestHelper(Level::DEBUG);
     }
     
-    public function testInfo()
+    public function testInfo(): void
     {
         $this->shortcutMethodTestHelper(Level::INFO);
     }
     
-    public function testNotice()
+    public function testNotice(): void
     {
         $this->shortcutMethodTestHelper(Level::NOTICE);
     }
     
-    public function testWarning()
+    public function testWarning(): void
     {
         $this->shortcutMethodTestHelper(Level::WARNING);
     }
     
-    public function testError()
+    public function testError(): void
     {
         $this->shortcutMethodTestHelper(Level::ERROR);
     }
     
-    public function testCritical()
+    public function testCritical(): void
     {
         $this->shortcutMethodTestHelper(Level::CRITICAL);
     }
     
-    public function testAlert()
+    public function testAlert(): void
     {
         $this->shortcutMethodTestHelper(Level::ALERT);
     }
     
-    public function testEmergency()
+    public function testEmergency(): void
     {
         $this->shortcutMethodTestHelper(Level::EMERGENCY);
     }
     
-    protected function shortcutMethodTestHelper($level)
+    protected function shortcutMethodTestHelper($level): void
     {
         $message = "shortcutMethodTestHelper: $level";
-        
+
+        $verbose = new ArrayLogger();
+        Rollbar::init(array('verbose_logger' => $verbose));
+
         $result = Rollbar::$level($message);
-        $expected = Rollbar::log($level, $message);
-        
-        $this->assertEquals($expected, $result);
+        $this->assertEquals(1, $verbose->count(Level::INFO, "Attempting to log: [$level] " . $message));
+        $this->assertEquals(1, $verbose->count(Level::INFO, 'Occurrence successfully logged'));
+
+        $expected = Rollbar::report($level, $message);
+        $this->assertEquals(2, $verbose->count(Level::INFO, "Attempting to log: [$level] " . $message));
+        $this->assertEquals(2, $verbose->count(Level::INFO, 'Occurrence successfully logged'));
     }
 
-    /**
-     * Below are backwards compatibility tests with v0.18.2
-     */
-    public function testBackwardsSimpleMessageVer()
-    {
-        Rollbar::init(self::$simpleConfig);
-
-        $uuid = Rollbar::report_message("Hello world");
-        $this->assertStringMatchesFormat('%x-%x-%x-%x-%x', $uuid);
-    }
-    
-    public function testBackwardsSimpleError()
-    {
-        set_error_handler(function () {
-        }); // disable PHPUnit's error handler
-        
-        Rollbar::init(self::$simpleConfig);
-        
-        $result = Rollbar::report_php_error(E_ERROR, "Runtime error", "the_file.php", 1);
-        // always returns false.
-        $this->assertFalse($result);
-    }
-    
-    public function testBackwardsSimpleException()
-    {
-        Rollbar::init(self::$simpleConfig);
-        
-        $uuid = null;
-        try {
-            throw new \Exception("test exception");
-        } catch (\Exception $e) {
-            $uuid = Rollbar::report_exception($e);
-        }
-
-        $this->assertStringMatchesFormat('%x-%x-%x-%x-%x', $uuid);
-    }
-
-    public function testBackwardsFlush()
+    public function testBackwardsFlush(): void
     {
         Rollbar::init(self::$simpleConfig);
 
@@ -208,7 +176,7 @@ class RollbarTest extends BaseRollbarTest
         $this->assertTrue(true);
     }
     
-    public function testConfigure()
+    public function testConfigure(): void
     {
         $expected = 'expectedEnv';
         
@@ -228,7 +196,7 @@ class RollbarTest extends BaseRollbarTest
         $this->assertEquals($expected, $payload->getData()->getEnvironment());
     }
     
-    public function testEnable()
+    public function testEnable(): void
     {
         Rollbar::init(self::$simpleConfig);
         $this->assertTrue(Rollbar::enabled());
@@ -252,7 +220,7 @@ class RollbarTest extends BaseRollbarTest
         $this->assertTrue(Rollbar::disabled());
     }
 
-    public function testLogUncaughtUnsetLogger()
+    public function testLogUncaughtUnsetLogger(): void
     {
         $sut = new Rollbar;
         $result = $sut->logUncaught('level', new \Exception);
@@ -260,7 +228,7 @@ class RollbarTest extends BaseRollbarTest
         $this->assertEquals($expected, $result);
     }
 
-    public function testLogUncaught()
+    public function testLogUncaught(): void
     {
         $sut = new Rollbar;
         Rollbar::init(self::$simpleConfig);

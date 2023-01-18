@@ -2,20 +2,25 @@
 
 namespace Rollbar\Truncation;
 
-use \Rollbar\Payload\EncodedPayload;
+use Rollbar\Payload\EncodedPayload;
 
-class AbstractStrategy implements IStrategy
+/**
+ * The base for all Rollbar truncation classes.
+ *
+ * @since 1.1.0
+ */
+abstract class AbstractStrategy implements StrategyInterface
 {
-    public function __construct(protected $truncation)
+    public function __construct(protected Truncation $truncation)
     {
     }
-    
-    public function execute(EncodedPayload $payload)
+
+    public function execute(EncodedPayload $payload): EncodedPayload
     {
         return $payload;
     }
-    
-    public function applies(EncodedPayload $payload)
+
+    public function applies(EncodedPayload $payload): bool
     {
         return true;
     }

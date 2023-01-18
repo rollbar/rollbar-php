@@ -31,15 +31,25 @@ class ErrorWrapper extends \Exception
                 E_USER_DEPRECATED => "E_USER_DEPRECATED"
             );
         }
-        return isset(self::$constName[$const]) ? self::$constName[$const] : null;
+        return self::$constName[$const] ?? null;
     }
 
+    /**
+     * Creates the instance from the error data.
+     *
+     * @param int         $errorLevel   The level of the error raised.
+     * @param string      $errorMessage The error message.
+     * @param string|null $errorFile    The filename that the error was raised in.
+     * @param int|null    $errorLine    The line number where the error was raised.
+     * @param array|null  $backTrace    The stack trace for the error.
+     * @param Utilities   $utilities    The configured utilities class.
+     */
     public function __construct(
-        public $errorLevel,
-        public $errorMessage,
-        public $errorFile,
-        public $errorLine,
-        public $backTrace,
+        public int $errorLevel,
+        public string $errorMessage,
+        public ?string $errorFile,
+        public ?int $errorLine,
+        public ?array $backTrace,
         $utilities
     ) {
         parent::__construct($this->errorMessage, $this->errorLevel);

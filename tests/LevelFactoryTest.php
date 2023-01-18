@@ -4,58 +4,79 @@ use Rollbar\Payload\Level;
 
 class LevelFactoryTest extends BaseRollbarTest
 {
-    private $levelFactory;
-    
-    public function setUp(): void
-    {
-        $this->levelFactory = new LevelFactory();
-    }
-    
     /**
      * @dataProvider isValidLevelProvider
      */
-    public function testIsValidLevelProvider($level, $expected)
+    public function testIsValidLevelProvider(string $level, bool $expected): void
     {
-        $this->assertEquals(
+        self::assertSame(
             $expected,
-            $this->levelFactory->isValidLevel($level)
+            LevelFactory::isValidLevel($level)
         );
     }
-    
-    public function isValidLevelProvider()
+
+    public function isValidLevelProvider(): array
     {
         $data = $this->fromNameProvider();
         foreach ($data as &$testParams) {
-            $testParams []= true;
+            $testParams[] = true;
         }
-        $data []= array('test-stub', false);
+        $data[] = ['test-stub', false];
         return $data;
     }
-    
+
+    public function testFromNameInvalid(): void
+    {
+        self::assertNull(LevelFactory::fromName('not a level'));
+    }
+
     /**
      * @dataProvider fromNameProvider
      */
-    public function testFromName($level)
+    public function testFromName(string $level): void
     {
-        $this->assertInstanceOf(
-            'Rollbar\Payload\Level',
-            $this->levelFactory->fromName($level)
+        self::assertInstanceOf(
+            Level::class,
+            LevelFactory::fromName($level)
         );
     }
-    
-    public function fromNameProvider()
+
+    public function fromNameProvider(): array
     {
-        return array(
-            array(Level::EMERGENCY),
-            array(Level::ALERT),
-            array(Level::CRITICAL),
-            array(Level::ERROR),
-            array(Level::WARNING),
-            array(Level::NOTICE),
-            array(Level::INFO),
-            array(Level::DEBUG),
-            array(Level::IGNORED),
-            array(Level::IGNORE),
+        return [
+            [Level::EMERGENCY],
+            [Level::ALERT],
+            [Level::CRITICAL],
+            [Level::ERROR],
+            [Level::WARNING],
+            [Level::NOTICE],
+            [Level::INFO],
+            [Level::DEBUG],
+        ];
+    }
+
+    /**
+     * @dataProvider fromNameOrInstanceProvider
+     */
+    public function testFromNameOrInstance(Level|string $level): void
+    {
+        self::assertInstanceOf(
+            Level::class,
+            LevelFactory::fromName($level)
         );
+    }
+
+    public function fromNameOrInstanceProvider(): array
+    {
+        return [
+            [Level::EMERGENCY],
+            [Level::ALERT],
+            [LevelFactory::fromName(Level::CRITICAL)],
+            [Level::ERROR],
+            [Level::WARNING],
+            [LevelFactory::fromName(Level::NOTICE)],
+            [LevelFactory::fromName(Level::INFO)],
+            [Level::DEBUG],
+        ];
     }
 }

@@ -15,6 +15,7 @@ use Rollbar\Payload\Frame;
 use Rollbar\Payload\TraceChain;
 use Rollbar\Payload\ExceptionInfo;
 use Rollbar\Rollbar;
+use Stringable;
 use Throwable;
 
 class DataBuilder implements DataBuilderInterface
@@ -59,16 +60,16 @@ class DataBuilder implements DataBuilderInterface
     protected $captureUsername;
     
     /**
-     * @var LevelFactory
-     */
-    protected $levelFactory;
-    
-    /**
      * @var Utilities
      */
     protected $utilities;
 
-    public function __construct($config)
+    /**
+     * Initializes the data builder from the Rollbar configs.
+     *
+     * @param array $config The configuration array.
+     */
+    public function __construct(array $config)
     {
         self::$defaults = Defaults::get();
         
@@ -105,7 +106,6 @@ class DataBuilder implements DataBuilderInterface
         $this->setSendMessageTrace($config);
         $this->setLocalVarsDump($config);
         $this->setCaptureErrorStacktraces($config);
-        $this->setLevelFactory($config);
         $this->setCaptureEmail($config);
         $this->setCaptureUsername($config);
         $this->setCaptureIP($config);
@@ -114,68 +114,68 @@ class DataBuilder implements DataBuilderInterface
 
     protected function setCaptureIP($config)
     {
-        $fromConfig = isset($config['capture_ip']) ? $config['capture_ip'] : null;
+        $fromConfig = $config['capture_ip'] ?? null;
         $this->captureIP = self::$defaults->captureIP($fromConfig);
     }
     
     protected function setCaptureEmail($config)
     {
-        $fromConfig = isset($config['capture_email']) ? $config['capture_email'] : null;
+        $fromConfig = $config['capture_email'] ?? null;
         $this->captureEmail = self::$defaults->captureEmail($fromConfig);
     }
     
     protected function setCaptureUsername($config)
     {
-        $fromConfig = isset($config['capture_username']) ? $config['capture_username'] : null;
+        $fromConfig = $config['capture_username'] ?? null;
         $this->captureUsername = self::$defaults->captureUsername($fromConfig);
     }
 
     protected function setEnvironment($config)
     {
-        $fromConfig = isset($config['environment']) ? $config['environment'] : self::$defaults->get()->environment();
+        $fromConfig = $config['environment'] ?? self::$defaults->get()->environment();
         $this->utilities->validateString($fromConfig, "config['environment']", null, false);
         $this->environment = $fromConfig;
     }
 
     protected function setDefaultMessageLevel($config)
     {
-        $fromConfig = isset($config['messageLevel']) ? $config['messageLevel'] : null;
+        $fromConfig = $config['messageLevel'] ?? null;
         $this->messageLevel = self::$defaults->messageLevel($fromConfig);
     }
 
     protected function setDefaultExceptionLevel($config)
     {
-        $fromConfig = isset($config['exceptionLevel']) ? $config['exceptionLevel'] : null;
+        $fromConfig = $config['exceptionLevel'] ?? null;
         $this->exceptionLevel = self::$defaults->exceptionLevel($fromConfig);
     }
 
     protected function setDefaultPsrLevels($config)
     {
-        $fromConfig = isset($config['psrLevels']) ? $config['psrLevels'] : null;
+        $fromConfig = $config['psrLevels'] ?? null;
         $this->psrLevels = self::$defaults->psrLevels($fromConfig);
     }
 
     protected function setErrorLevels($config)
     {
-        $fromConfig = isset($config['errorLevels']) ? $config['errorLevels'] : null;
+        $fromConfig = $config['errorLevels'] ?? null;
         $this->errorLevels = self::$defaults->errorLevels($fromConfig);
     }
 
     protected function setSendMessageTrace($config)
     {
-        $fromConfig = isset($config['send_message_trace']) ? $config['send_message_trace'] : null;
+        $fromConfig = $config['send_message_trace'] ?? null;
         $this->sendMessageTrace = self::$defaults->sendMessageTrace($fromConfig);
     }
     
     protected function setRawRequestBody($config)
     {
-        $fromConfig = isset($config['include_raw_request_body']) ? $config['include_raw_request_body'] : null;
+        $fromConfig = $config['include_raw_request_body'] ?? null;
         $this->rawRequestBody = self::$defaults->rawRequestBody($fromConfig);
     }
 
     protected function setLocalVarsDump($config)
     {
-        $fromConfig = isset($config['local_vars_dump']) ? $config['local_vars_dump'] : null;
+        $fromConfig = $config['local_vars_dump'] ?? null;
         $this->localVarsDump = self::$defaults->localVarsDump($fromConfig);
         if ($this->localVarsDump && !empty(ini_get('zend.exception_ignore_args'))) {
             ini_set('zend.exception_ignore_args', '0');
@@ -185,38 +185,38 @@ class DataBuilder implements DataBuilderInterface
     
     protected function setCaptureErrorStacktraces($config)
     {
-        $fromConfig = isset($config['capture_error_stacktraces']) ? $config['capture_error_stacktraces'] : null;
+        $fromConfig = $config['capture_error_stacktraces'] ?? null;
         $this->captureErrorStacktraces = self::$defaults->captureErrorStacktraces($fromConfig);
     }
 
     protected function setCodeVersion($config)
     {
-        $fromConfig = isset($config['codeVersion']) ? $config['codeVersion'] : null;
+        $fromConfig = $config['codeVersion'] ?? null;
         if (!isset($fromConfig)) {
-            $fromConfig = isset($config['code_version']) ? $config['code_version'] : null;
+            $fromConfig = $config['code_version'] ?? null;
         }
         $this->codeVersion = self::$defaults->codeVersion($fromConfig);
     }
 
     protected function setPlatform($config)
     {
-        $fromConfig = isset($config['platform']) ? $config['platform'] : null;
+        $fromConfig = $config['platform'] ?? null;
         $this->platform = self::$defaults->platform($fromConfig);
     }
 
     protected function setFramework($config)
     {
-        $this->framework = isset($config['framework']) ? $config['framework'] : null;
+        $this->framework = $config['framework'] ?? null;
     }
 
     protected function setContext($config)
     {
-        $this->context = isset($config['context']) ? $config['context'] : null;
+        $this->context = $config['context'] ?? null;
     }
 
     protected function setRequestParams($config)
     {
-        $this->requestParams = isset($config['requestParams']) ? $config['requestParams'] : null;
+        $this->requestParams = $config['requestParams'] ?? null;
     }
 
     /*
@@ -225,7 +225,7 @@ class DataBuilder implements DataBuilderInterface
     protected function setRequestBody($config)
     {
         
-        $this->requestBody = isset($config['requestBody']) ? $config['requestBody'] : null;
+        $this->requestBody = $config['requestBody'] ?? null;
         
         if (!$this->requestBody && $this->rawRequestBody) {
             $this->requestBody = file_get_contents("php://input");
@@ -234,46 +234,42 @@ class DataBuilder implements DataBuilderInterface
 
     protected function setRequestExtras($config)
     {
-        $this->requestExtras = isset($config["requestExtras"]) ? $config["requestExtras"] : null;
+        $this->requestExtras = $config["requestExtras"] ?? null;
     }
 
     protected function setPerson($config)
     {
-        $this->person = isset($config['person']) ? $config['person'] : null;
+        $this->person = $config['person'] ?? null;
     }
 
     protected function setPersonFunc($config)
     {
-        $this->personFunc = isset($config['person_fn']) ? $config['person_fn'] : null;
+        $this->personFunc = $config['person_fn'] ?? null;
     }
 
     protected function setServerRoot($config)
     {
-        $fromConfig = isset($config['serverRoot']) ? $config['serverRoot'] : null;
+        $fromConfig = $config['serverRoot'] ?? null;
         if (!isset($fromConfig)) {
-            $fromConfig = isset($config['root']) ? $config['root'] : null;
+            $fromConfig = $config['root'] ?? null;
         }
         $this->serverRoot = self::$defaults->serverRoot($fromConfig);
     }
 
     protected function setServerBranch($config)
     {
-        $fromConfig = isset($config['serverBranch']) ? $config['serverBranch'] : null;
+        $fromConfig = $config['serverBranch'] ?? null;
         if (!isset($fromConfig)) {
-            $fromConfig = isset($config['branch']) ? $config['branch'] : null;
+            $fromConfig = $config['branch'] ?? null;
         }
             
         $this->serverBranch = self::$defaults->branch($fromConfig);
         
         if ($this->serverBranch === null) {
-            $autodetectBranch = isset($config['autodetect_branch']) ?
-                $config['autodetect_branch'] :
-                self::$defaults->autodetectBranch();
+            $autodetectBranch = $config['autodetect_branch'] ?? self::$defaults->autodetectBranch();
             
             if ($autodetectBranch) {
-                $allowExec = isset($config['allow_exec']) ?
-                    $config['allow_exec'] :
-                    self::$defaults->allowExec();
+                $allowExec = $config['allow_exec'] ?? self::$defaults->allowExec();
                     
                 $this->serverBranch = $this->detectGitBranch($allowExec);
             }
@@ -282,74 +278,70 @@ class DataBuilder implements DataBuilderInterface
 
     protected function setServerCodeVersion($config)
     {
-        $this->serverCodeVersion = isset($config['serverCodeVersion']) ? $config['serverCodeVersion'] : null;
+        $this->serverCodeVersion = $config['serverCodeVersion'] ?? null;
     }
 
     protected function setServerExtras($config)
     {
-        $this->serverExtras = isset($config['serverExtras']) ? $config['serverExtras'] : null;
+        $this->serverExtras = $config['serverExtras'] ?? null;
     }
 
-    public function setCustom($config)
+    /**
+     * Stores the 'custom' key from the $config array. The 'custom' key should hold an array of key / value pairs to be
+     * sent to Rollbar with each request.
+     *
+     * @param array $config The configuration array.
+     *
+     * @return void
+     */
+    public function setCustom(array $config): void
     {
-        $this->custom = isset($config['custom']) ? $config['custom'] : \Rollbar\Defaults::get()->custom();
+        $this->custom = $config['custom'] ?? \Rollbar\Defaults::get()->custom();
     }
     
     public function setCustomDataMethod($config)
     {
-        $this->customDataMethod = isset($config['custom_data_method']) ?
-            $config['custom_data_method'] :
-            \Rollbar\Defaults::get()->customDataMethod();
+        $this->customDataMethod = $config['custom_data_method'] ?? \Rollbar\Defaults::get()->customDataMethod();
     }
 
     protected function setFingerprint($config)
     {
-        $this->fingerprint = isset($config['fingerprint']) ? $config['fingerprint'] : null;
+        $this->fingerprint = $config['fingerprint'] ?? null;
     }
 
     protected function setTitle($config)
     {
-        $this->title = isset($config['title']) ? $config['title'] : null;
+        $this->title = $config['title'] ?? null;
     }
 
     protected function setNotifier($config)
     {
-        $fromConfig = isset($config['notifier']) ? $config['notifier'] : null;
+        $fromConfig = $config['notifier'] ?? null;
         $this->notifier = self::$defaults->notifier($fromConfig);
     }
 
     protected function setBaseException($config)
     {
-        $fromConfig = isset($config['baseException']) ? $config['baseException'] : null;
+        $fromConfig = $config['baseException'] ?? null;
         $this->baseException = self::$defaults->baseException($fromConfig);
     }
 
     protected function setIncludeCodeContext($config)
     {
-        $fromConfig = isset($config['include_error_code_context']) ? $config['include_error_code_context'] : null;
+        $fromConfig = $config['include_error_code_context'] ?? null;
         $this->includeCodeContext = self::$defaults->includeCodeContext($fromConfig);
     }
 
     protected function setIncludeExcCodeContext($config)
     {
         $fromConfig =
-            isset($config['include_exception_code_context']) ? $config['include_exception_code_context'] : null;
+            $config['include_exception_code_context'] ?? null;
         $this->includeExcCodeContext = self::$defaults->includeExcCodeContext($fromConfig);
-    }
-    
-    protected function setLevelFactory($config)
-    {
-        $this->levelFactory = isset($config['levelFactory']) ? $config['levelFactory'] : null;
-        if (!$this->levelFactory) {
-            throw new \InvalidArgumentException(
-                'Missing dependency: LevelFactory not provided to the DataBuilder.'
-            );
-        }
     }
     
     protected function setUtilities($config)
     {
-        $this->utilities = isset($config['utilities']) ? $config['utilities'] : null;
+        $this->utilities = $config['utilities'] ?? null;
         if (!$this->utilities) {
             throw new \InvalidArgumentException(
                 'Missing dependency: Utilities not provided to the DataBuilder.'
@@ -359,18 +351,22 @@ class DataBuilder implements DataBuilderInterface
 
     protected function setHost($config)
     {
-        $this->host = isset($config['host']) ? $config['host'] : self::$defaults->host();
+        $this->host = $config['host'] ?? self::$defaults->host();
     }
 
     /**
-     * @param string $level
-     * @param Throwable|string $toLog
-     * @param $context
+     * Creates the {@see Data} object from an exception or log message. This method respects the PSR-3 standard on
+     * handling exceptions in the context https://www.php-fig.org/psr/psr-3/#13-context.
+     *
+     * @param string                      $level   The severity log level for the item being logged.
+     * @param Throwable|string|Stringable $toLog   The exception or message to be logged.
+     * @param array                       $context Any additional context data.
+     *
      * @return Data
      */
-    public function makeData(string $level, Throwable|string $toLog, array $context): Data
+    public function makeData(string $level, Throwable|string|Stringable $toLog, array $context): Data
     {
-        $env = $this->getEnvironment();
+        $env  = $this->getEnvironment();
         $body = $this->getBody($toLog, $context);
         $data = new Data($env, $body);
         $data->setLevel($this->getLevel($level, $toLog))
@@ -396,10 +392,19 @@ class DataBuilder implements DataBuilderInterface
         return $this->environment;
     }
 
-    protected function getBody($toLog, $context)
+    protected function getBody(Throwable|string|Stringable $toLog, array $context): Body
     {
         $baseException = $this->getBaseException();
-        if ($toLog instanceof ErrorWrapper) {
+
+        // Get the exception from either the $message or $context['exception']. See
+        // https://www.php-fig.org/psr/psr-3/#13-context for a description of $context['exception'].
+        if (isset($context['exception']) && $context['exception'] instanceof $baseException) {
+            $message = null;
+            if (!$toLog instanceof Throwable) {
+                $message = (string) $toLog;
+            }
+            $content = $this->getExceptionTrace($context['exception'], $message);
+        } elseif ($toLog instanceof ErrorWrapper) {
             $content = $this->getErrorTrace($toLog);
         } elseif ($toLog instanceof $baseException) {
             $content = $this->getExceptionTrace($toLog);
@@ -415,13 +420,15 @@ class DataBuilder implements DataBuilderInterface
     }
 
     /**
-     * @param Throwable $exc
+     * @param Throwable              $exc
+     * @param string|Stringable|null $message
+     *
      * @return Trace|TraceChain
      */
-    public function getExceptionTrace(Throwable $exc): Trace|TraceChain
+    public function getExceptionTrace(Throwable $exc, string|Stringable $message = null): Trace|TraceChain
     {
-        $chain = array();
-        $chain[] = $this->makeTrace($exc, $this->includeExcCodeContext);
+        $chain   = array();
+        $chain[] = $this->makeTrace($exc, $this->includeExcCodeContext, message: $message);
 
         $previous = $exc->getPrevious();
 
@@ -442,22 +449,29 @@ class DataBuilder implements DataBuilderInterface
     }
 
     /**
-     * @param Throwable $exception
-     * @param bool $includeContext whether or not to include context
-     * @param string|null $classOverride
+     * @param Throwable              $exception
+     * @param bool                   $includeContext whether or not to include context
+     * @param string|null            $classOverride
+     * @param string|Stringable|null $message
+     *
      * @return Trace
      */
-    public function makeTrace(Throwable $exception, bool $includeContext, ?string $classOverride = null): Trace
-    {
+    public function makeTrace(
+        Throwable $exception,
+        bool $includeContext,
+        ?string $classOverride = null,
+        string|Stringable $message = null,
+    ): Trace {
         if ($this->captureErrorStacktraces) {
             $frames = $this->makeFrames($exception, $includeContext);
         } else {
             $frames = array();
         }
-        
+
         $excInfo = new ExceptionInfo(
             $classOverride ?: get_class($exception),
-            $exception->getMessage()
+            $exception->getMessage(),
+            $message
         );
         return new Trace($frames, $excInfo);
     }
@@ -563,7 +577,7 @@ class DataBuilder implements DataBuilderInterface
             $level = $this->psrLevels[$level] ?? null;
             if ($level !== null) {
                 // this is a well-known PSR level: "error", "notice", "info", etc.
-                return $this->levelFactory->fromName($level);
+                return LevelFactory::fromName($level);
             }
         }
         return null;
@@ -615,8 +629,8 @@ class DataBuilder implements DataBuilderInterface
             ->setUserIp($this->getUserIp());
       
         if (isset($_SERVER)) {
-            $request->setMethod(isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : null)
-                ->setQueryString(isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : null);
+            $request->setMethod($_SERVER['REQUEST_METHOD'] ?? null)
+                ->setQueryString($_SERVER['QUERY_STRING'] ?? null);
         }
       
         if (isset($_GET)) {
@@ -683,11 +697,11 @@ class DataBuilder implements DataBuilderInterface
                     
                     if (stripos($fpPart, 'for=') !== false) {
                         // Parse 'for' forwarded pair
-                        $result['for'] = isset($result['for']) ? $result['for'] : array();
+                        $result['for'] = $result['for'] ?? array();
                         $result['for'][] = substr($fpPart, strlen('for='));
                     } elseif (stripos($fpPart, 'by=') !== false) {
                         // Parse 'by' forwarded pair
-                        $result['by'] = isset($result['by']) ? $result['by'] : array();
+                        $result['by'] = $result['by'] ?? array();
                         $result['by'][] = substr($fpPart, strlen('by='));
                     }
                 }
@@ -785,7 +799,7 @@ class DataBuilder implements DataBuilderInterface
         }
 
         if (isset($_SERVER)) {
-            $path = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '/';
+            $path = $_SERVER['REQUEST_URI'] ?? '/';
             $url .= $path;
         }
 
@@ -941,10 +955,7 @@ class DataBuilder implements DataBuilderInterface
 
     protected function getHost()
     {
-        if (isset($this->host)) {
-            return $this->host;
-        }
-        return gethostname();
+        return $this->host ?? gethostname();
     }
 
     protected function getServerRoot()
@@ -966,8 +977,13 @@ class DataBuilder implements DataBuilderInterface
     {
         return $this->serverExtras;
     }
-    
-    public function getCustom()
+
+    /**
+     * Returns the array of key / value pairs that will be sent with the payload to Rollbar.
+     *
+     * @return array|null
+     */
+    public function getCustom(): ?array
     {
         return $this->custom;
     }
@@ -1048,29 +1064,39 @@ class DataBuilder implements DataBuilderInterface
         return ['message' => $custom];
     }
 
-    public function addCustom($key, $data)
+    /**
+     * Adds a new key / value pair that will be sent with the payload to Rollbar. If the key already exists in the
+     * custom data array the existing value will be overwritten.
+     *
+     * @param string $key  The key to store this value in the custom array.
+     * @param mixed  $data The value that is going to be stored. Must be a primitive or JSON serializable.
+     *
+     * @return void
+     */
+    public function addCustom(string $key, mixed $data): void
     {
-        if ($this->custom === null) {
-            $this->custom = array();
-        }
-        
         if (!is_array($this->custom)) {
-            throw new \Exception(
-                "Custom data configured in Rollbar::init() is not an array."
-            );
+            $this->custom = array();
         }
         
         $this->custom[$key] = $data;
     }
-    
-    public function removeCustom($key)
+
+    /**
+     * Removes a key from the custom data array that is sent with the payload to Rollbar.
+     *
+     * @param string $key The key to remove.
+     *
+     * @return void
+     */
+    public function removeCustom(string $key): void
     {
         unset($this->custom[$key]);
     }
 
     protected function getFingerprint($context)
     {
-        return isset($context['fingerprint']) ? $context['fingerprint'] : $this->fingerprint;
+        return $context['fingerprint'] ?? $this->fingerprint;
     }
 
     protected function getTitle()
@@ -1119,18 +1145,18 @@ class DataBuilder implements DataBuilderInterface
 
         return $source;
     }
-    
+
     /**
-     * Wrap a PHP error in an ErrorWrapper class and add backtrace information
+     * Wrap a PHP error in the {@see ErrorWrapper} class and add stacktrace information.
      *
-     * @param string $errno
-     * @param string $errstr
-     * @param string $errfile
-     * @param string $errline
+     * @param int         $errno   The level of the error raised.
+     * @param string      $errstr  The error message.
+     * @param string|null $errfile The filename that the error was raised in.
+     * @param int|null    $errline The line number where the error was raised.
      *
      * @return ErrorWrapper
      */
-    public function generateErrorWrapper($errno, $errstr, $errfile, $errline)
+    public function generateErrorWrapper(int $errno, string $errstr, ?string $errfile, ?int $errline): ErrorWrapper
     {
         return new ErrorWrapper(
             $errno,
@@ -1145,12 +1171,12 @@ class DataBuilder implements DataBuilderInterface
     /**
      * Fetches the stack trace for fatal and regular errors.
      *
-     * @var string $errfile
-     * @var string $errline
+     * @param string|null $errfile The filename that the error was raised in.
+     * @param int|null    $errline The line number where the error was raised.
      *
      * @return array
      */
-    protected function buildErrorTrace($errfile, $errline)
+    protected function buildErrorTrace(?string $errfile, ?int $errline): array
     {
         if ($this->captureErrorStacktraces) {
             $backTrace = $this->fetchErrorTrace();
@@ -1198,7 +1224,7 @@ class DataBuilder implements DataBuilderInterface
 
         // in XDebug 3 and later, the function is defined but disabled unless
         // the xdebug mode parameter includes it
-        return false === strpos(ini_get('xdebug.mode'), 'develop') ? false : true;
+        return !str_contains(ini_get('xdebug.mode'), 'develop') ? false : true;
     }
     
     private function fetchErrorTrace()

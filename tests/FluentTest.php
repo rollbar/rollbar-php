@@ -7,7 +7,7 @@ use Rollbar\Payload\Level;
 class FluentTest extends BaseRollbarTest
 {
 
-    public function testFluent()
+    public function testFluent(): void
     {
         if (!class_exists('Fluent\Logger\FluentLogger')) {
             $this->markTestSkipped(
@@ -28,7 +28,7 @@ class FluentTest extends BaseRollbarTest
             'fluent_port' => $port,
             'handler' => 'fluent'
         ));
-        $this->assertEquals(200, $logger->log(Level::INFO, 'this is a test', array())->getStatus());
+        $this->assertEquals(200, $logger->report(Level::INFO, 'this is a test', array())->getStatus());
 
         socket_close($socket);
     }

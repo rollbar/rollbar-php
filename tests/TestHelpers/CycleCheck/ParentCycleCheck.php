@@ -2,7 +2,7 @@
 
 class ParentCycleCheck
 {
-    public $child;
+    public ChildCycleCheck $child;
     
     public function __construct()
     {

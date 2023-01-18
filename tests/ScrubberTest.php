@@ -7,18 +7,18 @@ use Rollbar\TestHelpers\MockPhpStream;
 
 class ScrubberTest extends BaseRollbarTest
 {
-    public function scrubUrlDataProvider()
+    public function scrubUrlDataProvider(): array
     {
         return array(
             'nothing to scrub' => array(
-                'https://rollbar.com', // $testData
+                array('https://rollbar.com'), // $testData
                 array(), // $scrubfields
-                'https://rollbar.com' // $expected
+                array('https://rollbar.com'), // $expected
             ),
             'mix of scrub and no scrub' => array(
-                'https://rollbar.com?arg1=val1&arg2=val2&arg3=val3', // $testData
+                array('https://rollbar.com?arg1=val1&arg2=val2&arg3=val3'), // $testData
                 array('arg2'), // $scrubFields
-                'https://rollbar.com?arg1=val1&arg2=xxxxxxxx&arg3=val3' // $expected
+                array('https://rollbar.com?arg1=val1&arg2=xxxxxxxx&arg3=val3'), // $expected
             ),
         );
     }
@@ -26,7 +26,7 @@ class ScrubberTest extends BaseRollbarTest
     /**
      * @dataProvider scrubSafelistProvider
      */
-    public function testScrubSafelist($testData, $scrubFields, $safelist, $expected)
+    public function testScrubSafelist($testData, $scrubFields, $safelist, $expected): void
     {
         $scrubber = new Scrubber(array(
             'scrubFields' => $scrubFields,
@@ -40,7 +40,7 @@ class ScrubberTest extends BaseRollbarTest
         );
     }
     
-    public function scrubSafelistProvider()
+    public function scrubSafelistProvider(): array
     {
         return array(
             array(
@@ -87,16 +87,16 @@ class ScrubberTest extends BaseRollbarTest
     /**
      * @dataProvider scrubDataProvider
      */
-    public function testScrub($testData, $scrubFields, $expected)
+    public function testScrub(array $testData, array $scrubFields, array $expected): void
     {
         $scrubber = new Scrubber(array(
-            'scrubFields' => $scrubFields
+            'scrubFields' => $scrubFields,
         ));
-        $result = $scrubber->scrub($testData);
+        $result   = $scrubber->scrub($testData);
         $this->assertEquals($expected, $result, "Looks like some fields did not get scrubbed correctly.");
     }
     
-    public function scrubDataProvider()
+    public function scrubDataProvider(): array
     {
         return array_merge(array(
             'flat data array' =>
@@ -112,27 +112,27 @@ class ScrubberTest extends BaseRollbarTest
         ), $this->scrubUrlDataProvider(), $this->scrubJSONNumbersProvider());
     }
 
-    private function scrubJSONNumbersProvider()
+    private function scrubJSONNumbersProvider(): array
     {
         return array(
             'plain array' => array(
-                  '[1023,1924]',
+                  array('[1023,1924]'),
                   array(
                       'sensitive'
                   ),
-                  '[1023,1924]'
+                  array('[1023,1924]')
             ),
             'param equals array' => array(
-                'b=[1023,1924]',
+                array('b=[1023,1924]'),
                 array(
                     'sensitive'
                 ),
-                'b=[1023,1924]'
+                array('b=[1023,1924]')
             )
         );
     }
 
-    private function scrubFlatDataProvider()
+    private function scrubFlatDataProvider(): array
     {
         return array(
             array( // $testData
@@ -149,7 +149,7 @@ class ScrubberTest extends BaseRollbarTest
         );
     }
     
-    private function scrubRecursiveDataProvider()
+    private function scrubRecursiveDataProvider(): array
     {
         return array(
             array( // $testData
@@ -196,63 +196,71 @@ class ScrubberTest extends BaseRollbarTest
         );
     }
     
-    private function scrubFlatStringDataProvider()
+    private function scrubFlatStringDataProvider(): array
     {
         return array(
             // $testData
-            '?' . http_build_query(
-                array(
-                    'arg1' => 'val 1',
-                    'sensitive' => 'scrubit',
-                    'arg2' => 'val 3'
-                )
+            array(
+                '?' . http_build_query(
+                    array(
+                        'arg1'      => 'val 1',
+                        'sensitive' => 'scrubit',
+                        'arg2'      => 'val 3',
+                    )
+                ),
             ),
             array( // $scrubFields
                 'sensitive'
             ),
             // $expected
-            '?' . http_build_query(
-                array(
-                    'arg1' => 'val 1',
-                    'sensitive' => 'xxxxxxxx',
-                    'arg2' => 'val 3'
-                )
+            array(
+                '?' . http_build_query(
+                    array(
+                        'arg1'      => 'val 1',
+                        'sensitive' => 'xxxxxxxx',
+                        'arg2'      => 'val 3',
+                    )
+                ),
             ),
         );
     }
     
-    private function scrubRecursiveStringDataProvider()
+    private function scrubRecursiveStringDataProvider(): array
     {
         return array(
             // $testData
-            '?' . http_build_query(
-                array(
-                    'arg1' => 'val 1',
-                    'sensitive' => 'scrubit',
-                    'arg2' => array(
-                        'arg3' => 'val 3',
-                        'sensitive' => 'scrubit'
+            array(
+                '?' . http_build_query(
+                    array(
+                        'arg1'      => 'val 1',
+                        'sensitive' => 'scrubit',
+                        'arg2'      => array(
+                            'arg3'      => 'val 3',
+                            'sensitive' => 'scrubit',
+                        ),
                     )
-                )
+                ),
             ),
             array( // $scrubFields
-                'sensitive'
+                'sensitive',
             ),
             // $expected
-            '?' . http_build_query(
-                array(
-                    'arg1' => 'val 1',
-                    'sensitive' => 'xxxxxxxx',
-                    'arg2' => array(
-                        'arg3' => 'val 3',
-                        'sensitive' => 'xxxxxxxx'
+            array(
+                '?' . http_build_query(
+                    array(
+                        'arg1'      => 'val 1',
+                        'sensitive' => 'xxxxxxxx',
+                        'arg2'      => array(
+                            'arg3'      => 'val 3',
+                            'sensitive' => 'xxxxxxxx',
+                        ),
                     )
-                )
+                ),
             ),
         );
     }
     
-    private function scrubRecursiveStringRecursiveDataProvider()
+    private function scrubRecursiveStringRecursiveDataProvider(): array
     {
         return array(
             array( // $testData
@@ -315,7 +323,7 @@ class ScrubberTest extends BaseRollbarTest
     /**
      * @dataProvider scrubArrayDataProvider
      */
-    public function testScrubArray($testData, $scrubFields, $expected)
+    public function testScrubArray($testData, $scrubFields, $expected): void
     {
         $scrubber = new Scrubber(array(
             'scrubFields' => $scrubFields
@@ -324,7 +332,7 @@ class ScrubberTest extends BaseRollbarTest
         $this->assertEquals($expected, $result, "Looks like some fields did not get scrubbed correctly.");
     }
 
-    public function scrubArrayDataProvider()
+    public function scrubArrayDataProvider(): array
     {
         return array(
             'flat data array' => array(
@@ -381,7 +389,7 @@ class ScrubberTest extends BaseRollbarTest
         );
     }
 
-    public function testScrubReplacement()
+    public function testScrubReplacement(): void
     {
         $testData = array('scrubit' => '123');
         

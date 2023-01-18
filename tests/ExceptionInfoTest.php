@@ -4,7 +4,7 @@ use Rollbar;
 
 class ExceptionInfoTest extends Rollbar\BaseRollbarTest
 {
-    public function testClass()
+    public function testClass(): void
     {
         $class = "HelloWorld";
         $exc = new ExceptionInfo($class, "message");
@@ -13,7 +13,7 @@ class ExceptionInfoTest extends Rollbar\BaseRollbarTest
         $this->assertEquals("TestClass", $exc->setClass("TestClass")->getClass());
     }
 
-    public function testMessage()
+    public function testMessage(): void
     {
         $message = "A message";
         $exc = new ExceptionInfo("C", $message);
@@ -22,7 +22,7 @@ class ExceptionInfoTest extends Rollbar\BaseRollbarTest
         $this->assertEquals("Another", $exc->setMessage("Another")->getMessage());
     }
 
-    public function testDescription()
+    public function testDescription(): void
     {
         $description = "long form";
         $exc = new ExceptionInfo("C", "s", $description);

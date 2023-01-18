@@ -2,7 +2,7 @@
 
 class EncodedPayload extends \Rollbar\Payload\EncodedPayload
 {
-    protected static $encodingCount = 0;
+    protected static int $encodingCount = 0;
     
     public function encode(?array $data = null): void
     {
@@ -10,12 +10,12 @@ class EncodedPayload extends \Rollbar\Payload\EncodedPayload
         self::$encodingCount++;
     }
     
-    public static function getEncodingCount()
+    public static function getEncodingCount(): int
     {
         return self::$encodingCount;
     }
     
-    public static function resetEncodingCount()
+    public static function resetEncodingCount(): void
     {
         self::$encodingCount = 0;
     }

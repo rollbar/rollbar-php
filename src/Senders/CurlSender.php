@@ -96,7 +96,7 @@ class CurlSender implements SenderInterface
         $this->checkForCompletedRequests($accessToken);
     }
 
-    public function wait(string $accessToken, int $max = 0)
+    public function wait(string $accessToken, int $max = 0): void
     {
         if (count($this->inflightRequests) <= $max) {
             return;
@@ -108,6 +108,18 @@ class CurlSender implements SenderInterface
             }
             curl_multi_select($this->multiHandle); // or do: usleep(10000);
         }
+    }
+
+    /**
+     * Returns true if the access token is required by the sender to send the payload. The curl sender requires the
+     * access token since it is sending directly to the Rollbar service.
+     *
+     * @return bool
+     * @since 4.0.0
+     */
+    public function requireAccessToken(): bool
+    {
+        return false;
     }
 
     private function maybeSendMoreBatchRequests(string $accessToken)
@@ -186,10 +198,5 @@ class CurlSender implements SenderInterface
             curl_close($handle);
         }
         $this->maybeSendMoreBatchRequests($accessToken);
-    }
-    
-    public function toString()
-    {
-        return "Rollbar API endpoint: " . $this->getEndpoint();
     }
 }

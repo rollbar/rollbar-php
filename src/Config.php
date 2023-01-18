@@ -17,6 +17,9 @@ use Rollbar\Senders\SenderInterface;
 use Rollbar\TransformerInterface;
 use Rollbar\UtilitiesTrait;
 use Throwable;
+use Rollbar\ResponseHandlerInterface;
+use Rollbar\Senders\FluentSender;
+use Rollbar\FilterInterface;
 
 class Config
 {
@@ -141,11 +144,6 @@ class Config
     private $configArray;
 
     /**
-     * @var LevelFactory
-     */
-    private $levelFactory;
-
-    /**
      * @var TransformerInterface
      */
     private ?TransformerInterface $transformer = null;
@@ -195,6 +193,10 @@ class Config
     private $mtRandmax;
 
     private $includedErrno;
+
+    /**
+     * @var bool Sets whether to respect current {@see error_reporting()} level or not.
+     */
     private bool $useErrorReporting = false;
 
     /**
@@ -204,11 +206,15 @@ class Config
     private bool $sendMessageTrace = false;
 
     /**
-     * @var string (fully qualified class name) The name of the your custom
-     * truncation strategy class. The class should inherit from
-     * Rollbar\Truncation\AbstractStrategy.
+     * The fully qualified class name of a custom truncation strategy class or null if no custom class is specified.
+     * The class should implement {@see \Rollbar\Truncation\StrategyInterface}.
+     *
+     * @var string|null $customTruncation
+     *
+     * @since 1.6.0
+     * @since 4.0.0 Added string|null type, and defaults to null.
      */
-    private $customTruncation;
+    private ?string $customTruncation = null;
 
     /**
      * @var boolean Should the SDK raise an exception after logging an error.
@@ -226,8 +232,6 @@ class Config
     public function __construct(array $configArray)
     {
         $this->includedErrno = Defaults::get()->includedErrno();
-
-        $this->levelFactory = new LevelFactory();
 
         $this->updateConfig($configArray);
 
@@ -287,13 +291,14 @@ class Config
         $this->setLogPayloadLogger($config);
         $this->setVerbose($config);
         $this->setVerboseLogger($config);
+        // The sender must be set before the access token, so we know if it is required.
+        $this->setSender($config);
         $this->setAccessToken($config);
         $this->setDataBuilder($config);
         $this->setTransformer($config);
         $this->setMinimumLevel($config);
         $this->setReportSuppressed($config);
         $this->setFilters($config);
-        $this->setSender($config);
         $this->setScrubber($config);
         $this->setBatched($config);
         $this->setBatchSize($config);
@@ -333,8 +338,14 @@ class Config
         if (isset($_ENV['ROLLBAR_ACCESS_TOKEN']) && !isset($config['access_token'])) {
             $config['access_token'] = $_ENV['ROLLBAR_ACCESS_TOKEN'];
         }
-        $this->utilities()->validateString($config['access_token'], "config['access_token']", 32, false);
-        $this->accessToken = $config['access_token'];
+        
+        $this->utilities()->validateString(
+            $config['access_token'],
+            "config['access_token']",
+            32,
+            !$this->sender->requireAccessToken(),
+        );
+        $this->accessToken = $config['access_token'] ?? '';
     }
 
     private function setEnabled(array $config): void
@@ -402,10 +413,6 @@ class Config
 
     private function setDataBuilder(array $config): void
     {
-        if (!isset($config['levelFactory'])) {
-            $config['levelFactory'] = $this->levelFactory;
-        }
-
         if (!isset($config['utilities'])) {
             $config['utilities'] = $this->utilities();
         }
@@ -425,13 +432,13 @@ class Config
     {
         $this->minimumLevel = \Rollbar\Defaults::get()->minimumLevel();
 
-        $override = array_key_exists('minimum_level', $config) ? $config['minimum_level'] : null;
+        $override = $config['minimum_level'] ?? null;
         $override = array_key_exists('minimumLevel', $config) ? $config['minimumLevel'] : $override;
 
         if ($override instanceof Level) {
             $this->minimumLevel = $override->toInt();
         } elseif (is_string($override)) {
-            $level = $this->levelFactory->fromName($override);
+            $level = LevelFactory::fromName($override);
             if ($level !== null) {
                 $this->minimumLevel = $level->toInt();
             }
@@ -454,7 +461,7 @@ class Config
 
     private function setFilters(array $config): void
     {
-        $this->setupWithOptions($config, "filter", "Rollbar\FilterInterface");
+        $this->setupWithOptions($config, "filter", FilterInterface::class);
     }
 
     private function setSender(array $config): void
@@ -554,12 +561,29 @@ class Config
         return $this->allowedCircularReferenceTypes;
     }
 
-    public function setCustomTruncation($type)
+    /**
+     * Sets the custom truncation strategy class for payloads.
+     *
+     * @param string|null $type The fully qualified class name of the custom payload truncation strategy. The class
+     *                          must implement {@see \Rollbar\Truncation\StrategyInterface}. If null is given any custom
+     *                          strategy will be removed.
+     *
+     * @return void
+     */
+    public function setCustomTruncation(?string $type): void
     {
         $this->customTruncation = $type;
     }
 
-    public function getCustomTruncation()
+    /**
+     * Returns the fully qualified class name of the custom payload truncation strategy.
+     *
+     * @return string|null Will return null if a custom truncation strategy was not defined.
+     *
+     * @since 1.6.0
+     * @since 4.0.0 Added may return null.
+     */
+    public function getCustomTruncation(): ?string
     {
         return $this->customTruncation;
     }
@@ -606,7 +630,7 @@ class Config
         if (!isset($config['handler']) || $config['handler'] != 'fluent') {
             return $default;
         }
-        $default = "Rollbar\Senders\FluentSender";
+        $default = FluentSender::class;
 
         if (isset($config['fluent_host'])) {
             $config['senderOptions']['fluentHost'] = $config['fluent_host'];
@@ -625,7 +649,7 @@ class Config
 
     private function setResponseHandler(array $config): void
     {
-        $this->setupWithOptions($config, "responseHandler", "Rollbar\ResponseHandlerInterface");
+        $this->setupWithOptions($config, "responseHandler", ResponseHandlerInterface::class);
     }
 
     private function setCheckIgnoreFunction(array $config): void
@@ -694,9 +718,7 @@ class Config
             if ($passWholeConfig) {
                 $options = $config;
             } else {
-                $options = isset($config[$keyName . "Options"]) ?
-                            $config[$keyName . "Options"] :
-                            array();
+                $options = $config[$keyName . "Options"] ?? array();
             }
             $this->$keyName = new $class($options);
         } else {
@@ -710,7 +732,12 @@ class Config
         }
     }
 
-    public function logPayloadLogger()
+    /**
+     * Returns the logger responsible for logging request payload and response dumps, if enabled.
+     *
+     * @return LoggerInterface
+     */
+    public function logPayloadLogger(): LoggerInterface
     {
         return $this->logPayloadLogger;
     }
@@ -728,11 +755,6 @@ class Config
     public function getDataBuilder()
     {
         return $this->dataBuilder;
-    }
-
-    public function getLevelFactory()
-    {
-        return $this->levelFactory;
     }
 
     public function getSender()
@@ -780,7 +802,7 @@ class Config
         Level|string $level,
         mixed $toLog,
         array $context = array ()
-    ): ?Payload {
+    ): Payload {
         if (count($this->custom) > 0) {
             $this->verboseLogger()->debug("Adding custom data to the payload.");
             $data = $payload->getData();
@@ -818,7 +840,8 @@ class Config
         return $this->sendMessageTrace;
     }
 
-    public function checkIgnored($payload, string $accessToken, $toLog, bool $isUncaught)
+
+    public function checkIgnored(Payload $payload, $toLog, bool $isUncaught)
     {
         if (isset($this->checkIgnore)) {
             try {
@@ -841,7 +864,7 @@ class Config
         }
 
         if (!is_null($this->filter)) {
-            $filter = $this->filter->shouldSend($payload, $accessToken);
+            $filter = $this->filter->shouldSend($payload, $isUncaught);
             $this->verboseLogger()->debug("Custom filter result: " . var_export($filter, true));
             return $filter;
         }
@@ -856,7 +879,7 @@ class Config
             return true;
         }
 
-        if ($this->levelTooLow($this->levelFactory->fromName($level))) {
+        if ($this->levelTooLow(LevelFactory::fromName($level))) {
             $this->verboseLogger()->debug("Occurrence's level is too low");
             return true;
         }
@@ -873,10 +896,10 @@ class Config
     }
 
     /**
-     * Check if the error should be ignored due to `included_errno` config,
-     * `use_error_reporting` config or `error_sample_rates` config.
+     * Check if the error should be ignored due to `includedErrno` config, `useErrorReporting` config or
+     * `errorSampleRates` config.
      *
-     * @param errno
+     * @param int $errno The PHP error level bitmask.
      *
      * @return bool
      */
@@ -1047,7 +1070,8 @@ class Config
     public function sendBatch(array $batch, string $accessToken): ?Response
     {
         if ($this->transmitting()) {
-            return $this->sender->sendBatch($batch, $accessToken);
+            $this->sender->sendBatch($batch, $accessToken);
+            return null;
         } else {
             $response = new Response(0, "Not transmitting (transmitting disabled in configuration)");
             $this->verboseLogger()->warning($response->getInfo());
@@ -1061,7 +1085,7 @@ class Config
         $this->sender->wait($accessToken, $max);
     }
 
-    public function handleResponse(Payload $payload, mixed $response): void
+    public function handleResponse(Payload $payload, Response $response): void
     {
         if (!is_null($this->responseHandler)) {
             $this->verboseLogger()->debug(

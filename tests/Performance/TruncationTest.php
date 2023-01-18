@@ -2,16 +2,16 @@
 
 namespace Rollbar\Performance;
 
-use \Rollbar\Performance\MassivePayload;
-use \Rollbar\Performance\TestHelpers\Truncation;
-use \Rollbar\Performance\TestHelpers\EncodedPayload;
+use Rollbar\Performance\MassivePayload;
+use Rollbar\Performance\TestHelpers\Truncation;
+use Rollbar\Performance\TestHelpers\EncodedPayload;
 
-use \Rollbar\Truncation\StringsStrategyTest;
-use \Rollbar\Truncation\FramesStrategyTest;
-use \Rollbar\Truncation\MinBodyStrategyTest;
+use Rollbar\Truncation\StringsStrategyTest;
+use Rollbar\Truncation\FramesStrategyTest;
+use Rollbar\Truncation\MinBodyStrategyTest;
 
-use \Rollbar\Config;
-use \Rollbar\BaseRollbarTest;
+use Rollbar\Config;
+use Rollbar\BaseRollbarTest;
 
 class TruncationTest extends BaseRollbarTest
 {
@@ -176,7 +176,7 @@ class TruncationTest extends BaseRollbarTest
     /**
      * @dataProvider truncateProvider
      */
-    public function testTruncate($dataName, $data, array $assertions = array())
+    public function testTruncate($dataName, $data, array $assertions = array()): void
     {
         $payload = new EncodedPayload($data);
         $payload->encode();
@@ -193,7 +193,7 @@ class TruncationTest extends BaseRollbarTest
         }
     }
     
-    public function truncateProvider()
+    public function truncateProvider(): array
     {
         $stringsTest = new StringsStrategyTest();
         $framesTest = new FramesStrategyTest();

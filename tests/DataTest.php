@@ -1,21 +1,26 @@
 <?php namespace Rollbar;
 
-use \Mockery as m;
+use Mockery as m;
 use Rollbar\Payload\Data;
 use Rollbar\Payload\Level;
+use Rollbar\Payload\Notifier;
+use Rollbar\Payload\Server;
+use Rollbar\Payload\Person;
+use Rollbar\Payload\Request;
+use Rollbar\Payload\Body;
 
 class DataTest extends BaseRollbarTest
 {
-    private $body;
-    private $data;
+    private m\LegacyMockInterface|Body|m\MockInterface $body;
+    private Data $data;
 
     public function setUp(): void
     {
-        $this->body = m::mock("Rollbar\Payload\Body");
+        $this->body = m::mock(Body::class);
         $this->data = new Data("test", $this->body);
     }
 
-    public function testEnvironmentMustBeString()
+    public function testEnvironmentMustBeString(): void
     {
         $data = new Data("env", $this->body);
         $this->assertEquals("env", $data->getEnvironment());
@@ -23,82 +28,80 @@ class DataTest extends BaseRollbarTest
         $this->assertEquals("test", $data->setEnvironment("test")->getEnvironment());
     }
 
-    public function testBody()
+    public function testBody(): void
     {
         $data = new Data("env", $this->body);
         $this->assertEquals($this->body, $data->getBody());
 
-        $body2 = m::mock("Rollbar\Payload\Body");
+        $body2 = m::mock(Body::class);
         $this->assertEquals($body2, $data->setBody($body2)->getBody());
     }
 
-    public function testLevel()
+    public function testLevel(): void
     {
-        $levelFactory = new LevelFactory;
         $level = Level::ERROR;
         
         $this->assertEquals(
-            $levelFactory->fromName($level),
+            LevelFactory::fromName($level),
             $this->data->setLevel($level)->getLevel()
         );
     }
 
-    public function testTimestamp()
+    public function testTimestamp(): void
     {
         $timestamp = time();
         $this->assertEquals($timestamp, $this->data->setTimestamp($timestamp)->getTimestamp());
     }
 
-    public function testCodeVersion()
+    public function testCodeVersion(): void
     {
         $codeVersion = "v0.18.1";
         $this->assertEquals($codeVersion, $this->data->setCodeVersion($codeVersion)->getCodeVersion());
     }
 
-    public function testPlatform()
+    public function testPlatform(): void
     {
         $platform = "Linux";
         $this->assertEquals($platform, $this->data->setPlatform($platform)->getPlatform());
     }
 
-    public function testLanguage()
+    public function testLanguage(): void
     {
         $language = "PHP";
         $this->assertEquals($language, $this->data->setLanguage($language)->getLanguage());
     }
 
-    public function testFramework()
+    public function testFramework(): void
     {
         $framework = "Laravel";
         $this->assertEquals($framework, $this->data->setFramework($framework)->getFramework());
     }
 
-    public function testContext()
+    public function testContext(): void
     {
         $context = "SuperController->getResource()";
         $this->assertEquals($context, $this->data->setContext($context)->getContext());
     }
 
-    public function testRequest()
+    public function testRequest(): void
     {
-        $request = m::mock("Rollbar\Payload\Request");
+        $request = m::mock(Request::class);
         $this->assertEquals($request, $this->data->setRequest($request)->getRequest());
     }
 
-    public function testPerson()
+    public function testPerson(): void
     {
-        $person = m::mock("Rollbar\Payload\Person");
-        ;
+        $person = m::mock(Person::class);
         $this->assertEquals($person, $this->data->setPerson($person)->getPerson());
     }
 
-    public function testServer()
+    public function testServer(): void
     {
-        $server = m::mock("Rollbar\Payload\Server");
+        $server = m::mock(Server::class);
         $this->assertEquals($server, $this->data->setServer($server)->getServer());
     }
 
-    public function testCustom()
+    public function testCustom(): void
     {
         $custom = array(
             "x" => 1,
@@ -108,39 +111,39 @@ class DataTest extends BaseRollbarTest
         $this->assertEquals($custom, $this->data->setCustom($custom)->getCustom());
     }
 
-    public function testFingerprint()
+    public function testFingerprint(): void
     {
         $fingerprint = "bad-error-with-database";
         $this->assertEquals($fingerprint, $this->data->setFingerprint($fingerprint)->getFingerprint());
     }
 
-    public function testTitle()
+    public function testTitle(): void
     {
         $title = "End of the World as we know it";
         $this->assertEquals($title, $this->data->setTitle($title)->getTitle());
     }
 
-    public function testUuid()
+    public function testUuid(): void
     {
         $uuid = "21EC2020-3AEA-4069-A2DD-08002B30309D";
         $this->assertEquals($uuid, $this->data->setUuid($uuid)->getUuid());
     }
 
-    public function testNotifier()
+    public function testNotifier(): void
     {
-        $notifier = m::mock("Rollbar\Payload\Notifier");
+        $notifier = m::mock(Notifier::class);
         $this->assertEquals($notifier, $this->data->setNotifier($notifier)->getNotifier());
     }
 
-    public function testEncode()
+    public function testEncode(): void
     {
         $time = time();
-        $level = $this->mockSerialize("Rollbar\Payload\Level", "{LEVEL}");
+        $level = $this->mockSerialize(Level::class, "{LEVEL}");
         $body = $this->mockSerialize($this->body, "{BODY}");
-        $request = $this->mockSerialize("Rollbar\Payload\Request", "{REQUEST}");
-        $person = $this->mockSerialize("Rollbar\Payload\Person", "{PERSON}");
-        $server = $this->mockSerialize("Rollbar\Payload\Server", "{SERVER}");
-        $notifier = $this->mockSerialize("Rollbar\Payload\Notifier", "{NOTIFIER}");
+        $request = $this->mockSerialize(Request::class, "{REQUEST}");
+        $person = $this->mockSerialize(Person::class, "{PERSON}");
+        $server = $this->mockSerialize(Server::class, "{SERVER}");
+        $notifier = $this->mockSerialize(Notifier::class, "{NOTIFIER}");
 
         $data = $this->data
             ->setEnvironment("testing")

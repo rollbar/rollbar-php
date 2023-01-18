@@ -3,13 +3,13 @@
 namespace Rollbar\Truncation;
 
 use Rollbar\Payload\EncodedPayload;
-use \Rollbar\Config;
-use \Rollbar\BaseRollbarTest;
+use Rollbar\Config;
+use Rollbar\BaseRollbarTest;
 
 class StringsStrategyTest extends BaseRollbarTest
 {
     
-    protected function execute($data)
+    protected function execute($data): array
     {
         $config = new Config(array('access_token' => $this->getTestAccessToken()));
         $truncation = new Truncation($config);
@@ -25,13 +25,18 @@ class StringsStrategyTest extends BaseRollbarTest
     /**
      * @dataProvider executeTruncateNothingProvider
      */
-    public function testExecuteTruncateNothing($data, $expected)
+    public function testExecuteTruncateNothing($data, $expected): void
     {
         $result = $this->execute($data);
         $this->assertEquals($expected, $result);
     }
-    
-    public function executeTruncateNothingProvider()
+
+    /**
+     * Also used by {@see TruncationTest::truncateProvider()}.
+     *
+     * @return array
+     */
+    public function executeTruncateNothingProvider(): array
     {
         $data = array();
         
@@ -46,11 +51,9 @@ class StringsStrategyTest extends BaseRollbarTest
     /**
      * @dataProvider executeArrayProvider
      */
-    public function testExecuteArray($data, $expectedThreshold)
+    public function testExecuteArray($data, $expectedThreshold): void
     {
         $result = $this->execute($data);
-        
-        $resultAnalysis = array();
         
         foreach ($result['data']['body']['message']['body']['value'] as $key => $toTrim) {
             $this->assertTrue(
@@ -60,8 +63,13 @@ class StringsStrategyTest extends BaseRollbarTest
             );
         }
     }
-    
-    public function executeArrayProvider()
+
+    /**
+     * Also used by {@see TruncationTest::truncateProvider()}.
+     *
+     * @return array
+     */
+    public function executeArrayProvider(): array
     {
         $data = array();
         
@@ -73,7 +81,7 @@ class StringsStrategyTest extends BaseRollbarTest
         return $data;
     }
     
-    public function thresholdTestProvider($threshold)
+    public function thresholdTestProvider($threshold): array
     {
         $stringLengthToTrim = $threshold*2;
         
@@ -90,7 +98,7 @@ class StringsStrategyTest extends BaseRollbarTest
         return array($payload, $threshold);
     }
 
-    public function executeProvider()
+    public function executeProvider(): array
     {
         $data = array();
 
@@ -107,7 +115,7 @@ class StringsStrategyTest extends BaseRollbarTest
         return $data;
     }
     
-    public function payloadStructureProvider($message)
+    public function payloadStructureProvider($message): array
     {
         return array(
             "data" => array(

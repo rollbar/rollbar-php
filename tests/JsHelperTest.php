@@ -2,8 +2,8 @@
 
 class JsHelperTest extends BaseRollbarTest
 {
-    protected $jsHelper;
-    protected $testSnippetPath;
+    protected RollbarJsHelper $jsHelper;
+    protected string|false $testSnippetPath;
     
     public function setUp(): void
     {
@@ -11,7 +11,7 @@ class JsHelperTest extends BaseRollbarTest
         $this->testSnippetPath = realpath(__DIR__ . "/../data/rollbar.snippet.js");
     }
     
-    public function testSnippetPath()
+    public function testSnippetPath(): void
     {
         $this->assertEquals(
             $this->testSnippetPath,
@@ -22,9 +22,9 @@ class JsHelperTest extends BaseRollbarTest
     /**
      * @dataProvider shouldAddJsProvider
      */
-    public function testShouldAddJs($setup, $expected)
+    public function testShouldAddJs($setup, $expected): void
     {
-        $mock = \Mockery::mock('Rollbar\RollbarJsHelper');
+        $mock = \Mockery::mock(\Rollbar\RollbarJsHelper::class);
              
         $status = $setup['status'];
         
@@ -40,7 +40,7 @@ class JsHelperTest extends BaseRollbarTest
         $this->assertEquals($expected, $mock->shouldAddJs($status, array()));
     }
     
-    public function shouldAddJsProvider()
+    public function shouldAddJsProvider(): array
     {
         return array(
             array(
@@ -81,7 +81,7 @@ class JsHelperTest extends BaseRollbarTest
     /**
      * @dataProvider isHtmlProvider
      */
-    public function testIsHtml($headers, $expected)
+    public function testIsHtml($headers, $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -89,7 +89,7 @@ class JsHelperTest extends BaseRollbarTest
         );
     }
     
-    public function isHtmlProvider()
+    public function isHtmlProvider(): array
     {
         return array(
             array(
@@ -110,7 +110,7 @@ class JsHelperTest extends BaseRollbarTest
     /**
      * @dataProvider hasAttachmentProvider
      */
-    public function testHasAttachment($headers, $expected)
+    public function testHasAttachment($headers, $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -118,7 +118,7 @@ class JsHelperTest extends BaseRollbarTest
         );
     }
     
-    public function hasAttachmentProvider()
+    public function hasAttachmentProvider(): array
     {
         return array(
             array(
@@ -135,7 +135,7 @@ class JsHelperTest extends BaseRollbarTest
         );
     }
     
-    public function testJsSnippet()
+    public function testJsSnippet(): void
     {
         $expected = file_get_contents($this->testSnippetPath);
         
@@ -145,7 +145,7 @@ class JsHelperTest extends BaseRollbarTest
     /**
      * @dataProvider shouldAppendNonceProvider
      */
-    public function testShouldAppendNonce($headers, $expected)
+    public function testShouldAppendNonce($headers, $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -153,7 +153,7 @@ class JsHelperTest extends BaseRollbarTest
         );
     }
     
-    public function shouldAppendNonceProvider()
+    public function shouldAppendNonceProvider(): array
     {
         return array(
             array(
@@ -180,7 +180,7 @@ class JsHelperTest extends BaseRollbarTest
     /**
      * @dataProvider scriptTagProvider
      */
-    public function testScriptTag($content, $headers, $nonce, $expected)
+    public function testScriptTag($content, $headers, $nonce, $expected): void
     {
         if ($expected === 'Exception') {
             try {
@@ -198,7 +198,7 @@ class JsHelperTest extends BaseRollbarTest
         }
     }
     
-    public function scriptTagProvider()
+    public function scriptTagProvider(): array
     {
         return array(
             'nonce script' => array(
@@ -229,7 +229,7 @@ class JsHelperTest extends BaseRollbarTest
     /**
      * @dataProvider configJsTagProvider
      */
-    public function testConfigJsTag($config, $expectedJson)
+    public function testConfigJsTag($config, $expectedJson): void
     {
         $expected = "var _rollbarConfig = $expectedJson;";
         
@@ -250,11 +250,11 @@ class JsHelperTest extends BaseRollbarTest
             ),
         );
     }
-    
+
     /**
      * @dataProvider addJsProvider
      */
-    public function testBuildJs($config, $headers, $nonce, $expected)
+    public function testBuildJs($config, $headers, $nonce, $expected): void
     {
         $result = RollbarJsHelper::buildJs(
             $config,
@@ -269,7 +269,7 @@ class JsHelperTest extends BaseRollbarTest
     /**
      * @dataProvider addJsProvider
      */
-    public function testAddJs($config, $headers, $nonce, $expected)
+    public function testAddJs($config, $headers, $nonce, $expected): void
     {
         $helper = new RollbarJsHelper($config);
         
@@ -282,7 +282,7 @@ class JsHelperTest extends BaseRollbarTest
         $this->assertEquals($expected, $result);
     }
     
-    public function addJsProvider()
+    public function addJsProvider(): array
     {
         $this->setUp();
         $expectedJs = file_get_contents($this->testSnippetPath);
