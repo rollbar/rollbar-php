@@ -61,7 +61,7 @@ class RollbarJsHelper
      */
     public function configJsTag()
     {
-        return "var _rollbarConfig = " . json_encode($this->config, JSON_FORCE_OBJECT) . ";";
+        return "var _rollbarConfig = " . json_encode((object)$this->config) . ";";
     }
     
     /**

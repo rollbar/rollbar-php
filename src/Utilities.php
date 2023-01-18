@@ -106,23 +106,28 @@ final class Utilities
         }
 
         foreach ($obj as $key => $val) {
-            if (is_object($val)) {
-                $val = self::serializeObject(
-                    $val,
-                    $customKeys,
-                    $objectHashes,
-                    $maxDepth,
-                    $depth
-                );
-            } elseif (is_array($val)) {
-                $val = self::serializeForRollbar(
-                    $val,
-                    $customKeys,
-                    $objectHashes,
-                    $maxDepth,
-                    $depth+1
-                );
+            try {
+                if (is_object($val)) {
+                    $val = self::serializeObject(
+                        $val,
+                        $customKeys,
+                        $objectHashes,
+                        $maxDepth,
+                        $depth
+                    );
+                } elseif (is_array($val)) {
+                    $val = self::serializeForRollbar(
+                        $val,
+                        $customKeys,
+                        $objectHashes,
+                        $maxDepth,
+                        $depth+1
+                    );
+                }
+            } catch (\Throwable $e) {
+                $val = 'Error during serialization: '.$e->getMessage();
             }
+
             
             if ($customKeys !== null && in_array($key, $customKeys)) {
                 $returnVal[$key] = $val;
