@@ -7,6 +7,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.0-beta]
+### Added
+* PHP 8 language level mitigations, add typehints by @Chris8934 in #569.
+* Added support for `psr/log` v3 by @danielmorell in #577.
+* Added comments and type annotations to the `EncodedPayload` class and payload 
+  interfaces by @danielmorell in #581.
+* Added typing / comments to `Rollbar` and `RollbarLogger` classes by 
+  @danielmorell in #585.
+* Added required public methods to the `DataBuilderInterface` by @danielmorell 
+  in #586.
+* Added typing / comments to the `ResponseHandlerInterface` by @danielmorell in 
+  #588.
+* Added typing / comments to the `ScrubberInterface` and `Scrubber` class by 
+  @danielmorell in #591.
+* Added typing / comments to the `FilterInterface` by @danielmorell in #587.
+* Added typing / comments to the `SenderInterface` by @danielmorell in #592.
+### Changed
+* Renamed `IStrategy` to `StrategyInterface` updated `Truncation` and changed 
+  custom truncation strategy from requiring class extend the `AbstractStrategy` 
+  to now require it implement `StrategyInterface` by @danielmorell in #580.
+* Replaced the `FilterInterface::shouldSend()` `$accessΤoken` argument with 
+  `$isUncaught` making it close to `check_ignore` usage @danielmorell in #587.
+### Removed
+* Removed deprecated log levels and fixed inconsistent use of
+  `Rollbar/LevelFactory` by @danielmorell in #578.
+* Removed previously deprecated reporting methods from `Rollbar` by @danielmorell 
+  in #579.
+* Removed the `null` return type from `TransformerInterface::getPayload()` 
+  by @danielmorell in #593.
+### Fixed
+* Fixed call of method name changed in 8fac418 by @danielmorell in #583. 
+* Fixed #461 Added support for `psr/log` context exception by @danielmorell in 
+  #582.
+* Fixed #469 Added `requireAccessToken()` method to `SenderInterface` by 
+  @danielmorell in #595.
+
+## [3.1.4] - 2022-11-18
+This version adds a catch during the serialization process to stop serializaiton
+errors from causing reports not to be sent to rollbar.
+### Added
+* Error catching error during serialization by @stephpy in #576
+
+## [3.1.3] - 2022-05-23
+This release patches several bugs.
+### Added
+* Added Safer `parse_str()` usage by @tanakahisateru in #566
+### Fixed
+* Fixed comment line number in tests by @matt-h in #563
+* Fixed rollbar/rollbar-php-laravel#136 try using `__serialize` when obj
+  implements `\Serializable` by @pcoutinho in #567.
+* Fixed error suppressor context detection for PHP 8 by @tanakahisateru in #565
+* Fixed #571 added `null` check on `$filename` by @danielmorell in #572
+* Fixed bug in tests on local machine (mac m1) by @Chris53897 in #568
+
 ## [3.1.2] - 2022-03-30
 This release is a patch to fix a regression in functionality that was introduced
 in v3.0.0.
