@@ -242,7 +242,8 @@ class Rollbar
      *
      * @return string uuid
      *
-     * @deprecated 1.0.0 This method has been replaced by ::log
+     * @deprecated 1.0.0 This method has been replaced by {@see Rollbar::log}.
+     *             This method will be removed in 4.0.0.
      */
     public static function report_exception($exc, $extra_data = null, $payload_data = null)
     {
@@ -260,7 +261,8 @@ class Rollbar
      *
      * @return string uuid
      *
-     * @deprecated 1.0.0 This method has been replaced by ::log
+     * @deprecated 1.0.0 This method has been replaced by {@see Rollbar::log}.
+     *             This method will be removed in 4.0.0.
      */
     public static function report_message($message, $level = null, $extra_data = null, $payload_data = null)
     {
@@ -273,7 +275,9 @@ class Rollbar
     /**
      * Catch any fatal errors that are causing the shutdown
      *
-     * @deprecated 1.0.0 This method has been replaced by ::fatalHandler
+     * @deprecated 1.0.0 This method has been replaced by
+     *             {@see Rollbar::fatalHandler} This method will be removed in
+     *             4.0.0.
      */
     public static function report_fatal_error()
     {
@@ -284,7 +288,8 @@ class Rollbar
     /**
      * This function must return false so that the default php error handler runs
      *
-     * @deprecated 1.0.0 This method has been replaced by ::log
+     * @deprecated 1.0.0 This method has been replaced by {@see Rollbar::log}.
+     *             This method will be removed in 4.0.0.
      */
     public static function report_php_error($errno, $errstr, $errfile, $errline)
     {
