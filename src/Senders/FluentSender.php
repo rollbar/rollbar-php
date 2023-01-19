@@ -108,7 +108,10 @@ class FluentSender implements SenderInterface
     {
         $this->fluentLogger = new FluentLogger($this->fluentHost, $this->fluentPort);
     }
-    
+
+    /**
+     * @deprecated 3.2.0 and will be removed in 4.0.0.
+     */
     public function toString()
     {
         return "fluentd " . $this->fluentHost . ":" . $this->fluentPort .

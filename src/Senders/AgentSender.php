@@ -65,7 +65,10 @@ class AgentSender implements SenderInterface
         $filename = $this->agentLogLocation . '/rollbar-relay.' . getmypid() . '.' . microtime(true) . '.rollbar';
         $this->agentLog = fopen($filename, 'a');
     }
-    
+
+    /**
+     * @deprecated 3.2.0 and will be removed in 4.0.0.
+     */
     public function toString()
     {
         return "agent log: " . $this->agentLogLocation;

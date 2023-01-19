@@ -21,16 +21,16 @@ class Level implements SerializerInterface
     const DEBUG = 'debug';
     
     /**
-     * @deprecated 1.2.0
+     * @deprecated 1.2.0 and will be removed in 4.0.0.
      */
     const IGNORED = 'ignored';
     /**
-     * @deprecated 1.2.0
+     * @deprecated 1.2.0 and will be removed in 4.0.0.
      */
     const IGNORE = 'ignore';
 
     /**
-     * @deprecated 1.2.0
+     * @deprecated 1.2.0 and will be removed in 4.0.0.
      *
      * Usage of Level::error(), Level::warning(), Level::info(), Level::notice(),
      * Level::debug() is no longer supported. It has been replaced with matching
