@@ -2,6 +2,7 @@
 
 namespace Rollbar;
 
+use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Rollbar\DataBuilder;
 use Rollbar\DataBuilderInterface;
@@ -26,7 +27,7 @@ class Config
     use UtilitiesTrait;
 
     const VERBOSE_NONE = 'none';
-    const VERBOSE_NONE_INT = 1000;
+    const VERBOSE_NONE_INT = Logger::DEBUG;
 
     private static array $options = array(
         'access_token',
