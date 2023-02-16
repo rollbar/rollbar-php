@@ -37,7 +37,7 @@ class Level implements SerializerInterface
      *
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->level;
     }

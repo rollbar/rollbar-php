@@ -2,30 +2,24 @@
 
 namespace Rollbar;
 
+use Monolog\Handler\ErrorLogHandler;
+use Monolog\Handler\NoopHandler;
+use Monolog\Logger;
 use Psr\Log\LoggerInterface;
-use Rollbar\DataBuilder;
-use Rollbar\DataBuilderInterface;
-use Rollbar\Defaults;
 use Rollbar\Payload\Level;
 use Rollbar\Payload\Payload;
 use Rollbar\Payload\EncodedPayload;
-use Rollbar\ScrubberInterface;
-use Rollbar\Scrubber;
 use Rollbar\Senders\AgentSender;
 use Rollbar\Senders\CurlSender;
 use Rollbar\Senders\SenderInterface;
-use Rollbar\TransformerInterface;
-use Rollbar\UtilitiesTrait;
 use Throwable;
-use Rollbar\ResponseHandlerInterface;
 use Rollbar\Senders\FluentSender;
-use Rollbar\FilterInterface;
 
 class Config
 {
     use UtilitiesTrait;
 
-    const VERBOSE_NONE = 'none';
+    const VERBOSE_NONE     = 'none';
     const VERBOSE_NONE_INT = 1000;
 
     private static array $options = array(
@@ -374,9 +368,9 @@ class Config
     private function setLogPayloadLogger(array $config): void
     {
         $this->logPayloadLogger = $config['log_payload_logger'] ??
-            new \Monolog\Logger('rollbar.payload', array(new \Monolog\Handler\ErrorLogHandler()));
+            new Logger('rollbar.payload', array(new ErrorLogHandler()));
 
-        if (!($this->logPayloadLogger instanceof \Psr\Log\LoggerInterface)) {
+        if (!($this->logPayloadLogger instanceof LoggerInterface)) {
             throw new \Exception('Log Payload Logger must implement \Psr\Log\LoggerInterface');
         }
     }
@@ -391,12 +385,30 @@ class Config
         if (isset($config['verbose_logger'])) {
             $this->verboseLogger = $config['verbose_logger'];
         } else {
-            $handler = new \Monolog\Handler\ErrorLogHandler();
-            $handler->setLevel($this->verboseInteger());
-            $this->verboseLogger = new \Monolog\Logger('rollbar.verbose', array($handler));
+            $verboseLevel = $this->verboseInteger();
+            // The verboseLogger must be an instance of LoggerInterface. Setting
+            // it to null would require every log call to check if it is null,
+            // so we set it to a NoopHandler instead. The NoopHandler does what
+            // you would expect and does nothing.
+            //
+            // Additionally, since Monolog v3 all log levels are defined in an
+            // enum. This means that using a custom log level will throw an
+            // exception. To avoid this we only set the level if it is not our
+            // "custom" verbose level.
+            //
+            // Using a built-in level would cause the verbose logger to log
+            // messages that are currently silent if the verbose log leve is set
+            // to "none".
+            if ($verboseLevel === self::VERBOSE_NONE_INT) {
+                $handler = new NoopHandler();
+            } else {
+                $handler = new ErrorLogHandler();
+                $handler->setLevel($verboseLevel);
+            }
+            $this->verboseLogger = new Logger('rollbar.verbose', array($handler));
         }
 
-        if (!($this->verboseLogger instanceof \Psr\Log\LoggerInterface)) {
+        if (!($this->verboseLogger instanceof LoggerInterface)) {
             throw new \Exception('Verbose logger must implement \Psr\Log\LoggerInterface');
         }
     }
@@ -548,7 +560,19 @@ class Config
         if ($this->verbose == self::VERBOSE_NONE) {
             return self::VERBOSE_NONE_INT;
         }
-        return \Monolog\Logger::toMonologLevel($this->verbose);
+        /**
+         * @psalm-suppress UndefinedClass
+         * @psalm-suppress UndefinedDocblockClass
+         * @var int|\Monolog\Level $level Monolog v2 returns an integer, v3 returns a \Monolog\Level enum.
+         */
+        $level = Logger::toMonologLevel($this->verbose);
+        /**
+         * @psalm-suppress UndefinedClass
+         */
+        if (is_a($level, '\Monolog\Level')) {
+            return $level->value;
+        }
+        return $level;
     }
 
     public function getCustom()
@@ -742,7 +766,7 @@ class Config
         return $this->logPayloadLogger;
     }
 
-    public function verboseLogger()
+    public function verboseLogger(): LoggerInterface
     {
         return $this->verboseLogger;
     }

@@ -42,7 +42,7 @@ class Response
         return "https://rollbar.com/occurrence/uuid/?uuid=" . urlencode($this->uuid);
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         $url = $this->getOccurrenceUrl();
         return "Status: $this->status\n" .
