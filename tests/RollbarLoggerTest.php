@@ -1,6 +1,7 @@
 <?php namespace Rollbar;
 
 use Exception;
+use Monolog\Handler\NoopHandler;
 use Rollbar\Payload\Level;
 use Rollbar\Payload\Payload;
 use Rollbar\TestHelpers\ArrayLogger;
@@ -190,21 +191,7 @@ class RollbarLoggerTest extends BaseRollbarTest
             "verbose" => \Rollbar\Config::VERBOSE_NONE
         ));
 
-        $verboseLogger = $logger->verboseLogger();
-        $originalHandler = $verboseLogger->getHandlers();
-        $originalHandler = $originalHandler[0];
-
-        $handlerMock = $this->getMockBuilder(ErrorLogHandler::class)
-            ->setMethods(array('handle'))
-            ->getMock();
-
-        $handlerMock->setLevel($originalHandler->getLevel());
-        
-        $handlerMock->expects($this->never())->method('handle');
-
-        $verboseLogger->setHandlers(array($handlerMock));
-
-        $logger->info('Internal message');
+        $this->assertInstanceOf(NoopHandler::class, $logger->verboseLogger()->getHandlers()[0]);
     }
 
     public function testVerbose(): void

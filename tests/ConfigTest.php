@@ -2,6 +2,7 @@
 
 use Mockery as m;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use Monolog\Handler\NoopHandler;
 use Rollbar\FakeDataBuilder;
 use Rollbar\Payload\Body;
 use Rollbar\Payload\Data;
@@ -149,7 +150,13 @@ class ConfigTest extends BaseRollbarTest
         $handlers = $config->logPayloadLogger()->getHandlers();
         $handler = $handlers[0];
         $this->assertInstanceOf(ErrorLogHandler::class, $handler);
-        $this->assertEquals(\Monolog\Logger::DEBUG, $handler->getLevel());
+
+        // The Level class was created in Monolog v3.0.0. This is needed to support both v2 and v3.
+        if (class_exists('\Monolog\Level')) {
+            $this->assertEquals(\Monolog\Level::Debug, $handler->getLevel());
+        } else {
+            $this->assertEquals(Logger::DEBUG, $handler->getLevel());
+        }
 
         $config = new Config(array(
             'access_token' => $this->getTestAccessToken(),
@@ -171,15 +178,19 @@ class ConfigTest extends BaseRollbarTest
         // assert the appropriate default handler
         $handlers = $config->verboseLogger()->getHandlers();
         $handler = $handlers[0];
-        $this->assertInstanceOf(ErrorLogHandler::class, $handler);
-        // assert the appropriate default handler level
-        $this->assertEquals($config->verboseInteger(), $handler->getLevel());
+        $this->assertInstanceOf(NoopHandler::class, $handler);
         
         // assert the verbosity level in the handler matches the level in the config
         $config->configure(array('verbose' => \Psr\Log\LogLevel::DEBUG));
         $handlers = $config->verboseLogger()->getHandlers();
         $handler = $handlers[0];
-        $this->assertEquals($config->verboseInteger(), $handler->getLevel());
+
+        // The Level class was created in Monolog v3.0.0. This is needed to support both v2 and v3.
+        if (class_exists('\Monolog\Level')) {
+            $this->assertEquals($config->verboseInteger(), $handler->getLevel()->value);
+        } else {
+            $this->assertEquals($config->verboseInteger(), $handler->getLevel());
+        }
     }
 
     public function testVerboseInfo(): void
