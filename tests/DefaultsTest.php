@@ -14,6 +14,11 @@ class DefaultsTest extends BaseRollbarTest
      */
     private \Rollbar\Defaults $defaults;
 
+    /**
+     * @var string[]
+     */
+    private array $defaultPsrLevels;
+
     public function setUp(): void
     {
         $this->defaults = new Defaults;

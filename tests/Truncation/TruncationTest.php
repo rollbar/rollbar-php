@@ -9,7 +9,8 @@ use Rollbar\TestHelpers\CustomTruncation;
 
 class TruncationTest extends BaseRollbarTest
 {
-    
+    private Truncation $truncate;
+
     public function setUp(): void
     {
         $config = new Config(array('access_token' => $this->getTestAccessToken()));

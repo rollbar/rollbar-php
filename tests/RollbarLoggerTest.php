@@ -782,8 +782,7 @@ class RollbarLoggerTest extends BaseRollbarTest
 
     public static function providesToLogEntityForUncaughtCheck(): array
     {
-        $uncaught = new Exception;
-        $uncaught->isUncaught = true;
+        $uncaught = new ExceptionWrapper(new Exception(), true);
         return [
             [ 'some string', false, 'String log data should not be seen as uncaught' ],
             [ [], false, 'Array log data should not be seen as uncaught' ],
