@@ -6,7 +6,7 @@ class ErrorWrapper extends \Exception
 {
     private static $constName;
 
-    public $isUncaught;
+    public bool $isUncaught = false;
 
     private $utilities;
 

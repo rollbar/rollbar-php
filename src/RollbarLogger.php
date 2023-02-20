@@ -488,6 +488,9 @@ class RollbarLogger extends AbstractLogger
      */
     public function isUncaughtLogData(mixed $toLog): bool
     {
+        if ($toLog instanceof ExceptionWrapper || $toLog instanceof ErrorWrapper) {
+            return $toLog->isUncaught === true;
+        }
         if (! $toLog instanceof Throwable) {
             return false;
         }

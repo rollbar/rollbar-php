@@ -20,7 +20,7 @@ class ExceptionWrapper implements Stringable
      */
     public function __construct(
         private Throwable $exception,
-        public bool $isUncaught,
+        public bool $isUncaught = false,
     ) {
     }
 
