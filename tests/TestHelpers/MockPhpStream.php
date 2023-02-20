@@ -4,7 +4,7 @@ namespace Rollbar\TestHelpers;
 
 class MockPhpStream
 {
-    
+    public $context;
     protected static int $index = 0;
     protected static $length = null;
 
