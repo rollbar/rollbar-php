@@ -249,13 +249,8 @@ class Rollbar
         if (is_null(self::$logger)) {
             return self::getNotInitializedResponse();
         }
-        $toLog->isUncaught = true;
-        try {
-            $result = self::$logger->report($level, $toLog, $context);
-        } finally {
-            unset($toLog->isUncaught);
-        }
-        return $result;
+        $wrapper = new ExceptionWrapper($toLog, isUncaught: true);
+        return self::$logger->report($level, $wrapper, $context);
     }
 
     /**

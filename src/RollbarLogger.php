@@ -217,6 +217,10 @@ class RollbarLogger extends AbstractLogger
             $this->verboseLogger()->notice('Rollbar is disabled');
             return new Response(0, "Disabled");
         }
+        $isUncaught = $this->isUncaughtLogData($message);
+        if ($message instanceof ExceptionWrapper) {
+            $message = $message->getException();
+        }
 
         // Convert a Level proper into a string proper, as the code paths that
         // follow have allowed both only by virtue that a Level downcasts to a
@@ -241,7 +245,6 @@ class RollbarLogger extends AbstractLogger
         $accessToken = $this->getAccessToken();
         $payload     = $this->getPayload($accessToken, $level, $message, $context);
 
-        $isUncaught = $this->isUncaughtLogData($message);
         if ($this->config->checkIgnored($payload, $message, $isUncaught)) {
             $this->verboseLogger()->info('Occurrence ignored');
             $response = new Response(0, "Ignored");

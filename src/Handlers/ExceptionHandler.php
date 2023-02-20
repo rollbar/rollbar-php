@@ -2,6 +2,7 @@
 
 namespace Rollbar\Handlers;
 
+use Rollbar\ExceptionWrapper;
 use Rollbar\Rollbar;
 use Rollbar\RollbarLogger;
 use Rollbar\Payload\Level;
@@ -24,10 +25,9 @@ class ExceptionHandler extends AbstractHandler
         }
         
         $exception = $args[0];
-        $exception->isUncaught = true;
-        $this->logger()->log(Level::ERROR, $exception, array());
-        unset($exception->isUncaught);
-        
+        $wrapper = new ExceptionWrapper($exception, isUncaught: true);
+        $this->logger()->log(Level::ERROR, $wrapper, array());
+
         // if there was no prior handler, then we toss that exception
         if ($this->previousHandler === null) {
             throw $exception;
