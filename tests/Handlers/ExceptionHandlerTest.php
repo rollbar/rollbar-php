@@ -99,7 +99,7 @@ class ExceptionHandlerTest extends BaseRollbarTest
     {
         // Set error reporting level and error handler to capture deprecation
         // warnings.
-        error_reporting(E_ALL);
+        $prev = error_reporting(E_ALL);
         $errors = array();
         set_error_handler(function ($errno, $errstr, $errfile, $errline) use (&$errors) {
             $errors[] = array(
@@ -114,6 +114,7 @@ class ExceptionHandlerTest extends BaseRollbarTest
 
         $handler->handle(new \Exception());
         restore_error_handler();
+        error_reporting($prev);
 
         // self::assertSame used instead of self::assertSame so the contents of
         // $errors are printed in the test output.
