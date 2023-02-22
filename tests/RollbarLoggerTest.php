@@ -178,6 +178,21 @@ class RollbarLoggerTest extends BaseRollbarTest
         $this->assertEquals(200, $response->getStatus());
     }
 
+    public function testReportWithIsUncaught(): void
+    {
+        $test = $this;
+        $logger = new RollbarLogger([
+            "access_token" => $this->getTestAccessToken(),
+            "environment"  => "testing-php",
+            'check_ignore' => function ($isUncaught) use ($test) {
+                $test::assertTrue($isUncaught);
+            },
+        ]);
+
+        $response = $logger->report(Level::WARNING, "Testing PHP Notifier", isUncaught: true);
+        $this->assertEquals(200, $response->getStatus());
+    }
+
     public function testDefaultVerbose(): void
     {
         $this->testNotVerbose();
@@ -764,31 +779,5 @@ class RollbarLoggerTest extends BaseRollbarTest
         } catch (\Exception $ex) {
             $logger->log(Level::ERROR, $ex);
         }
-    }
-
-    /**
-     * @dataProvider providesToLogEntityForUncaughtCheck
-     */
-    public function testIsUncaughtLogData(mixed $toLog, bool $expected, string $message): void
-    {
-        $logger = new RollbarLogger(array(
-            "access_token" => $this->getTestAccessToken(),
-            "environment" => 'test',
-            "raise_on_error" => true
-        ));
-
-        $this->assertSame($logger->isUncaughtLogData($toLog), $expected, $message);
-    }
-
-    public static function providesToLogEntityForUncaughtCheck(): array
-    {
-        $uncaught = new ExceptionWrapper(new Exception(), true);
-        return [
-            [ 'some string', false, 'String log data should not be seen as uncaught' ],
-            [ [], false, 'Array log data should not be seen as uncaught' ],
-            [ new StdClass, false, 'An object not deriving from Throwable should not be seen as uncaught' ],
-            [ new Exception, false, 'A raw exception is not seen as uncaught' ],
-            [ $uncaught, true, 'A Throwable-derived object marked as uncaught must be seen as uncaught' ],
-        ];
     }
 }
