@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.0-rc]
+### Added
+* Added #575 support for `monolog/monolog` v3 by @danielmorell in #602
+### Changed
+* Updated the object serialization logic by @danielmorell in #605
+### Removed
+* Removed the `Config::getAllowedCircularReferenceTypes()` method by @danielmorell in #603
+* Removed the `Serializable` deprecation warning by @danielmorell in #605
+### Fixed
+* Fixed #590 PHP 8.2 deprecated dynamic property creation by @danielmorell in #606
+
 ## [4.0.0-beta]
 ### Added
 * PHP 8 language level mitigations, add typehints by @Chris8934 in #569.
