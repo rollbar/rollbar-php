@@ -230,12 +230,14 @@ class RollbarTest extends BaseRollbarTest
 
     public function testLogUncaught(): void
     {
-        $sut = new Rollbar;
-        Rollbar::init(self::$simpleConfig);
-        $logger = Rollbar::logger();
-        $toLog = new \Exception;
+        $test = $this;
+        Rollbar::init(array_merge(self::$simpleConfig, [
+            'check_ignore' => function ($isUncaught) use ($test) {
+                $test::assertTrue($isUncaught);
+            },
+        ]));
+        $toLog  = new \Exception;
         $result = Rollbar::logUncaught(Level::ERROR, $toLog);
         $this->assertEquals(200, $result->getStatus());
-        $this->assertObjectNotHasAttribute('uncaught', $toLog);
     }
 }

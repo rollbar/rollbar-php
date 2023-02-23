@@ -73,11 +73,11 @@ class ExceptionHandlerTest extends BaseRollbarTest
         
         $logger = $this->getMockBuilder(RollbarLogger::class)
                         ->setConstructorArgs(array(self::$simpleConfig))
-                        ->setMethods(array('log'))
+                        ->setMethods(array('report'))
                         ->getMock();
         
         $logger->expects($this->once())
-                ->method('log');
+                ->method('report');
         
         $handler = new ExceptionHandler($logger);
         $handler->register();
@@ -86,5 +86,38 @@ class ExceptionHandlerTest extends BaseRollbarTest
         
         set_exception_handler(function () {
         });
+    }
+
+    /**
+     * This test is specifically for the deprecated dynamic properties in PHP 8.2. We were setting a property named
+     * "isUncaught" on the exception object, which is now deprecated. This test ensures that we are no longer setting
+     * that property.
+     *
+     * @return void
+     */
+    public function testDeprecatedDynamicProperties(): void
+    {
+        // Set error reporting level and error handler to capture deprecation
+        // warnings.
+        $prev = error_reporting(E_ALL);
+        $errors = array();
+        set_error_handler(function ($errno, $errstr, $errfile, $errline) use (&$errors) {
+            $errors[] = array(
+                'errno'   => $errno,
+                'errstr'  => $errstr,
+                'errfile' => $errfile,
+                'errline' => $errline,
+            );
+        });
+        $handler = new ExceptionHandler(new RollbarLogger(self::$simpleConfig));
+        $handler->register();
+
+        $handler->handle(new \Exception());
+        restore_error_handler();
+        error_reporting($prev);
+
+        // self::assertSame used instead of self::assertSame so the contents of
+        // $errors are printed in the test output.
+        self::assertSame([], $errors);
     }
 }

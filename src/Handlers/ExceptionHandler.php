@@ -24,10 +24,8 @@ class ExceptionHandler extends AbstractHandler
         }
         
         $exception = $args[0];
-        $exception->isUncaught = true;
-        $this->logger()->log(Level::ERROR, $exception, array());
-        unset($exception->isUncaught);
-        
+        $this->logger()->report(Level::ERROR, $exception, isUncaught: true);
+
         // if there was no prior handler, then we toss that exception
         if ($this->previousHandler === null) {
             throw $exception;

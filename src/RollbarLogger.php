@@ -200,9 +200,11 @@ class RollbarLogger extends AbstractLogger
      * Creates the {@see Response} object and reports the message to the Rollbar
      * service.
      *
-     * @param string|Level      $level   The severity level to send to Rollbar.
-     * @param string|Stringable $message The log message.
-     * @param array             $context Any additional context data.
+     * @param string|Level      $level      The severity level to send to Rollbar.
+     * @param string|Stringable $message    The log message.
+     * @param array             $context    Any additional context data.
+     * @param bool              $isUncaught True if the error or exception was captured by a Rollbar handler. Thus, it
+     *                                      was not caught by the application.
      *
      * @return Response
      *
@@ -211,8 +213,12 @@ class RollbarLogger extends AbstractLogger
      *
      * @since  4.0.0
      */
-    public function report($level, string|Stringable $message, array $context = array()): Response
-    {
+    public function report(
+        string|Level $level,
+        string|Stringable $message,
+        array $context = array(),
+        bool $isUncaught = false
+    ): Response {
         if ($this->disabled()) {
             $this->verboseLogger()->notice('Rollbar is disabled');
             return new Response(0, "Disabled");
@@ -241,7 +247,6 @@ class RollbarLogger extends AbstractLogger
         $accessToken = $this->getAccessToken();
         $payload     = $this->getPayload($accessToken, $level, $message, $context);
 
-        $isUncaught = $this->isUncaughtLogData($message);
         if ($this->config->checkIgnored($payload, $message, $isUncaught)) {
             $this->verboseLogger()->info('Occurrence ignored');
             $response = new Response(0, "Ignored");
@@ -474,23 +479,5 @@ class RollbarLogger extends AbstractLogger
         $encoded = new EncodedPayload($payload);
         $encoded->encode();
         return $encoded;
-    }
-
-    /**
-     * Check whether the data to log represents an uncaught error, exception,
-     * or fatal error. This works in concert with src/Handlers/, which sets
-     * the `isUncaught` property on the `Throwable` representation of data.
-     *
-     * @since 3.0.1
-     */
-    public function isUncaughtLogData(mixed $toLog): bool
-    {
-        if (! $toLog instanceof Throwable) {
-            return false;
-        }
-        if (! isset($toLog->isUncaught)) {
-            return false;
-        }
-        return $toLog->isUncaught === true;
     }
 }

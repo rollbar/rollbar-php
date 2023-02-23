@@ -6,8 +6,6 @@ class ErrorWrapper extends \Exception
 {
     private static $constName;
 
-    public $isUncaught;
-
     private $utilities;
 
     private static function getConstName($const)
