@@ -580,11 +580,6 @@ class Config
         return $this->dataBuilder->getCustom();
     }
 
-    public function getAllowedCircularReferenceTypes()
-    {
-        return $this->allowedCircularReferenceTypes;
-    }
-
     /**
      * Sets the custom truncation strategy class for payloads.
      *
