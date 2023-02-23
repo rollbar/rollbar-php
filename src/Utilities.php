@@ -146,41 +146,44 @@ final class Utilities
         $maxDepth = -1,
         $depth = 0
     ) {
-        $serialized = null;
-        
         if (self::serializedAlready($obj, $objectHashes)) {
-            $serialized = self::circularReferenceLabel($obj);
-        } else {
-            if ($obj instanceof \Serializable) {
-                self::markSerialized($obj, $objectHashes);
-                if (method_exists($obj, '__serialize')) {
-                    $serialized = $obj->__serialize();
-                } else {
-                    trigger_error("Using the Serializable interface has been deprecated.", E_USER_DEPRECATED);
-                    $serialized = $obj->serialize();
-                }
-            } elseif ($obj instanceof SerializerInterface) {
-                self::markSerialized($obj, $objectHashes);
-                $serialized = $obj->serialize();
-            } else {
-                $serialized = array(
-                    'class' => get_class($obj)
-                );
-                
-                if ($obj instanceof \Iterator) {
-                    $serialized['value'] = 'non-serializable';
-                } else {
-                    $serialized['value'] = self::serializeForRollbar(
-                        $obj,
-                        $customKeys,
-                        $objectHashes,
-                        $maxDepth,
-                        $depth+1
-                    );
-                }
-            }
+            return self::circularReferenceLabel($obj);
         }
-        
+
+        // Internal Rollbar classes.
+        if ($obj instanceof SerializerInterface) {
+            self::markSerialized($obj, $objectHashes);
+            return $obj->serialize();
+        }
+
+        // All other classes.
+        if ($obj instanceof \Serializable) {
+            self::markSerialized($obj, $objectHashes);
+            if (method_exists($obj, '__serialize')) {
+                return $obj->__serialize();
+            }
+            return $obj->serialize();
+        }
+
+        $serialized = array(
+            'class' => get_class($obj)
+        );
+
+        // Don't serialize Iterators as rewinding them does not guarantee the
+        // previous state.
+        if ($obj instanceof \Iterator) {
+            $serialized['value'] = 'non-serializable';
+            return $serialized;
+        }
+
+        $serialized['value'] = self::serializeForRollbar(
+            $obj,
+            $customKeys,
+            $objectHashes,
+            $maxDepth,
+            $depth+1
+        );
+
         return $serialized;
     }
     
