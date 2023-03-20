@@ -7,7 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [4.0.0-rc]
+## [4.0.0] - 2023-03-20
+### Added
+* PHP 8 language level mitigations, add typehints by @Chris8934 in #569.
+* Added support for `psr/log` v3 by @danielmorell in #577.
+* Added support for `monolog/monolog` v3 by @danielmorell in #602 fixing #575.
+* Added comments and type annotations to the `EncodedPayload` class and payload
+  interfaces by @danielmorell in #581.
+* Added typing / comments to `Rollbar` and `RollbarLogger` classes by
+  @danielmorell in #585.
+* Added required public methods to the `DataBuilderInterface` by @danielmorell
+  in #586.
+* Added typing / comments to the `ResponseHandlerInterface` by @danielmorell in
+  #588.
+* Added typing / comments to the `ScrubberInterface` and `Scrubber` class by
+  @danielmorell in #591.
+* Added typing / comments to the `FilterInterface` by @danielmorell in #587.
+* Added typing / comments to the `SenderInterface` by @danielmorell in #592.
+### Changed
+* Renamed `IStrategy` to `StrategyInterface` updated `Truncation` and changed
+  custom truncation strategy from requiring class extend the `AbstractStrategy`
+  to now require it implement `StrategyInterface` by @danielmorell in #580.
+* Replaced the `FilterInterface::shouldSend()` `$accessΤoken` argument with
+  `$isUncaught` making it close to `check_ignore` usage @danielmorell in #587.
+* Updated the object serialization logic by @danielmorell in #605
+### Removed
+* Removed deprecated log levels and fixed inconsistent use of
+  `Rollbar/LevelFactory` by @danielmorell in #578.
+* Removed previously deprecated reporting methods from `Rollbar` by @danielmorell
+  in #579.
+* Removed the `null` return type from `TransformerInterface::getPayload()`
+  by @danielmorell in #593.
+* Removed the `Config::getAllowedCircularReferenceTypes()` method by @danielmorell in #603
+* Removed the `Serializable` deprecation warning by @danielmorell in #605
+### Fixed
+* Fixed call of method name changed in 8fac418 by @danielmorell in #583.
+* Fixed #461 Added support for `psr/log` context exception by @danielmorell in
+  #582.
+* Fixed #469 Added `requireAccessToken()` method to `SenderInterface` by
+  @danielmorell in #595.
+* Fixed #590 PHP 8.2 deprecated dynamic property creation by @danielmorell in #606
+
+## [4.0.0-rc] - 2023-02-23
 ### Added
 * Added #575 support for `monolog/monolog` v3 by @danielmorell in #602
 ### Changed
@@ -18,7 +59,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 * Fixed #590 PHP 8.2 deprecated dynamic property creation by @danielmorell in #606
 
-## [4.0.0-beta]
+## [4.0.0-beta] - 2023-01-18
 ### Added
 * PHP 8 language level mitigations, add typehints by @Chris8934 in #569.
 * Added support for `psr/log` v3 by @danielmorell in #577.
