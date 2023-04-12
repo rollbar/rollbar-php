@@ -233,7 +233,7 @@ class VerbosityTest extends BaseRollbarTest
             'verbose_logger' => $this->verboseLogger,
         ]);
         Rollbar::log(LogLevel::INFO, "Testing PHP Notifier");
-        $this->assertVerboseLogContains('Occurrence rejected by the API: with status 403', LogLevel::ERROR);
+        $this->assertVerboseLogContains('Occurrence rejected by the API: with status 403: ', LogLevel::ERROR);
     }
 
     /**
