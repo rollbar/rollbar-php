@@ -310,15 +310,15 @@ class VerbosityTest extends BaseRollbarTest
         $unitTest = $this;
         $this->rollbarLogTest(
             array( // config
-                "access_token" => $this->getTestAccessToken(),
+                // Invalid access token should cause a 403 response.
+                "access_token" => '00000000000000000000000000000000',
                 "environment" => "testing-php",
-                "endpoint" => "https://api.rollbar.com/api/foo/"
             ),
             function () use ($unitTest) {
             // verbosity expectations
                 $unitTest->expectLog(
                     1,
-                    '/Occurrence rejected by the API: .*/',
+                    '/Occurrence rejected by the API: with status 403: .*/',
                     \Psr\Log\LogLevel::ERROR
                 );
             },
