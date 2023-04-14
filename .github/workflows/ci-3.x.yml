@@ -1,0 +1,84 @@
+# CI checks for Rollbar-PHP, master branch.
+#
+# Test with act:
+#   brew install act
+#   act -P ubuntu-latest=shivammathur/node:latest
+#
+# @see https://github.com/nektos/act/issues/329
+name: CI for Rollbar-PHP, version 3.x
+
+# Fire this action on pushes to all branches except the development branches
+# for older versions of PHP. Thus, all branches assume to target master (and
+# will be checked accordingly) unless they begin with next/. Also, run every
+# day at 02:42 GMT to catch failures from dependencies that update
+# independently.
+on:
+  push:
+    branches:
+      - next/3.x/**
+    tags:
+      - v3.*
+  pull_request:
+    branches:
+      - next/3.x/**
+  schedule:
+      # Every day at 02:42
+    - cron: '42 2 * * *'
+
+jobs:
+  # Check that this runs on PHP on all versions we claim to support, on both
+  # UNIX-like and Windows environments, and that use both the lowest possible
+  # compatible version as well as the most-recent stable version. This will
+  # fail-fast by default, so we include our edgiest versions first as they're
+  # most likely to fail.
+  # @see https://freek.dev/1546
+  # @see https://www.dereuromark.de/2019/01/04/test-composer-dependencies-with-prefer-lowest/
+  php-tests:
+    strategy:
+      matrix:
+        # All the versions, OS, and dependency levels we want to support
+        php: [8.0, 8.1, 8.2]
+        dependency: [stable] # TODO: lowest
+        os: [ubuntu]         # TODO: windows, macos
+        # Our code has paths for with- and without- XDebug, and we want to test
+        # both of them.
+        # @see https://xdebug.org/docs/all_settings#mode
+        xdebug3-mode: ["xdebug.mode=develop,coverage", "xdebug.mode=coverage"]
+
+    name: PHP ${{ matrix.php }} on ${{ matrix.os }}, ${{ matrix.dependency }} dependencies preferred
+    runs-on: ${{ matrix.os }}-latest
+    steps:
+      - name: Checkout the next/3.x/main branch during scheduled builds
+        if: github.ref == 'refs/heads/master'
+        uses: actions/checkout@v3
+        with:
+          ref: 'next/3.x/main'
+
+      - name: Checkout the pushed branch
+        if: github.ref != 'refs/heads/master'
+        uses: actions/checkout@v3
+
+      - name: Install PHP and composer environment
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: curl
+          ini-values: zend.exception_ignore_args=Off, ${{ matrix.xdebug3-mode }}
+          coverage: xdebug
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ matrix.os }}-composer-${{ hashFiles('**/composer.json') }}-${{ matrix.dependency }}-
+          restore-keys: ${{ matrix.os }}-composer-${{ matrix.dependency }}-
+
+      - name: Install dependencies
+        run: composer update --prefer-${{ matrix.dependency }} --prefer-dist --no-interaction
+
+      - name: Execute tests
+        run: composer test
