@@ -54,7 +54,7 @@
     "docker-run": "docker run -it -v \"${PWD}\":/opt/rollbar/rollbar-php rollbar/rollbar-php:3",
     "test": [
       "phpcs --standard=PSR2 src tests",
-      "psalm --long-progress --use-baseline=psalm.baseline",
+      "psalm --long-progress",
       "phpunit --coverage-clover build/logs/clover.xml --testsuite 'Rollbar Test Suite'"
     ],
     "fix": "phpcbf --standard=PSR2 src tests",
