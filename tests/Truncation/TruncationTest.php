@@ -48,7 +48,6 @@ class TruncationTest extends BaseRollbarTest
      */
     public function testTruncateNoPerformance($data): void
     {
-        
         $data = new EncodedPayload($data);
         $data->encode();
         
@@ -62,13 +61,12 @@ class TruncationTest extends BaseRollbarTest
         );
     }
     
-    public function truncateProvider(): array
+    public static function truncateProvider(): array
     {
-        
-        $stringsTest = new StringsStrategyTest();
-        $framesTest = new FramesStrategyTest();
+        $stringsTest = new StringsStrategyTest("StringsStrategyTest");
+        $framesTest = new FramesStrategyTest("FramesStrategyTest");
 
-        $framesTestData = $framesTest->executeProvider();
+        $framesTestData = $framesTest::executeProvider();
         
         // Fill up frames with data to go over the allowed payload size limit
         $frames = &$framesTestData['truncate middle using trace key'][0]['data']['body']['trace']['frames'];
@@ -84,8 +82,8 @@ class TruncationTest extends BaseRollbarTest
         }
 
         $data = array_merge(
-            $stringsTest->executeTruncateNothingProvider(),
-            $stringsTest->executeArrayProvider(),
+            $stringsTest::executeTruncateNothingProvider(),
+            $stringsTest::executeArrayProvider(),
             $framesTestData
         );
         

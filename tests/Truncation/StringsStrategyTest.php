@@ -8,7 +8,6 @@ use Rollbar\BaseRollbarTest;
 
 class StringsStrategyTest extends BaseRollbarTest
 {
-    
     protected function execute($data): array
     {
         $config = new Config(array('access_token' => $this->getTestAccessToken()));
@@ -36,13 +35,13 @@ class StringsStrategyTest extends BaseRollbarTest
      *
      * @return array
      */
-    public function executeTruncateNothingProvider(): array
+    public static function executeTruncateNothingProvider(): array
     {
         $data = array();
         
         $data["truncate nothing"] = array(
-            $this->payloadStructureProvider(str_repeat("A", 10)),
-            $this->payloadStructureProvider(str_repeat("A", 10))
+            self::payloadStructureProvider(str_repeat("A", 10)),
+            self::payloadStructureProvider(str_repeat("A", 10))
         );
         
         return $data;
@@ -69,23 +68,23 @@ class StringsStrategyTest extends BaseRollbarTest
      *
      * @return array
      */
-    public function executeArrayProvider(): array
+    public static function executeArrayProvider(): array
     {
         $data = array();
         
         $thresholds = StringsStrategy::getThresholds();
         foreach ($thresholds as $threshold) {
-            $data['truncate strings to ' . $threshold] = $this->thresholdTestProvider($threshold);
+            $data['truncate strings to ' . $threshold] = self::thresholdTestProvider($threshold);
         }
         
         return $data;
     }
     
-    public function thresholdTestProvider($threshold): array
+    public static function thresholdTestProvider($threshold): array
     {
         $stringLengthToTrim = $threshold*2;
         
-        $payload = $this->payloadStructureProvider(array());
+        $payload = self::payloadStructureProvider(array());
         $payload['data']['body']['message']['body']['value2'] = array();
         
         while (strlen(json_encode($payload)) <= Truncation::MAX_PAYLOAD_SIZE) {
@@ -103,19 +102,19 @@ class StringsStrategyTest extends BaseRollbarTest
         $data = array();
 
         $data["truncate nothing"] = array(
-            $this->payloadStructureProvider(str_repeat("A", 10)),
-            $this->payloadStructureProvider(str_repeat("A", 10))
+            self::payloadStructureProvider(str_repeat("A", 10)),
+            self::payloadStructureProvider(str_repeat("A", 10))
         );
 
         $thresholds = StringsStrategy::getThresholds();
         foreach ($thresholds as $threshold) {
-            $data['truncate strings to ' . $threshold] = $this->thresholdTestProvider($threshold);
+            $data['truncate strings to ' . $threshold] = self::thresholdTestProvider($threshold);
         }
 
         return $data;
     }
     
-    public function payloadStructureProvider($message): array
+    public static function payloadStructureProvider($message): array
     {
         return array(
             "data" => array(

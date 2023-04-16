@@ -222,7 +222,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         $originalHandler = $originalHandler[0];
 
         $handlerMock = $this->getMockBuilder(ErrorLogHandler::class)
-            ->setMethods(array('handle'))
+            ->onlyMethods(array('handle'))
             ->getMock();
         $handlerMock->setLevel($originalHandler->getLevel());
 
@@ -493,7 +493,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         }
     }
     
-    public function scrubDataProvider(): array
+    public static function scrubDataProvider(): array
     {
         return array(
             array( // test 1
@@ -652,9 +652,9 @@ class RollbarLoggerTest extends BaseRollbarTest
         );
     }
     
-    public function scrubQueryStringDataProvider(): array
+    public static function scrubQueryStringDataProvider(): array
     {
-        $data = $this->scrubDataProvider();
+        $data = self::scrubDataProvider();
         
         foreach ($data as &$test) {
             $test[0] = http_build_query($test[0]);
@@ -757,7 +757,7 @@ class RollbarLoggerTest extends BaseRollbarTest
         );
     }
     
-    public function maxItemsProvider(): array
+    public static function maxItemsProvider(): array
     {
         return array(
             'use default max_items' => array(null),

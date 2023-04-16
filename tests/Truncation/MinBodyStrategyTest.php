@@ -27,7 +27,7 @@ class MinBodyStrategyTest extends BaseRollbarTest
         $this->assertEquals($expected, $result->data());
     }
     
-    public function executeProvider(): array
+    public static function executeProvider(): array
     {
         $data = array();
         
@@ -52,18 +52,18 @@ class MinBodyStrategyTest extends BaseRollbarTest
         
         
         $data['trace data set'] = array(
-            $this->payloadStructureProvider(array('trace' => $traceData)),
-            $this->payloadStructureProvider(array('trace' => $expected))
+            self::payloadStructureProvider(array('trace' => $traceData)),
+            self::payloadStructureProvider(array('trace' => $expected))
         );
         
         $data['trace_chain data set'] = array(
-            $this->payloadStructureProvider(array('trace_chain' => $traceData)),
-            $this->payloadStructureProvider(array('trace_chain' => $expected))
+            self::payloadStructureProvider(array('trace_chain' => $traceData)),
+            self::payloadStructureProvider(array('trace_chain' => $expected))
         );
         return $data;
     }
     
-    protected function payloadStructureProvider($body): array
+    protected static function payloadStructureProvider($body): array
     {
         return array(
             "data" => array(

@@ -40,7 +40,7 @@ class JsHelperTest extends BaseRollbarTest
         $this->assertEquals($expected, $mock->shouldAddJs($status, array()));
     }
     
-    public function shouldAddJsProvider(): array
+    public static function shouldAddJsProvider(): array
     {
         return array(
             array(
@@ -89,7 +89,7 @@ class JsHelperTest extends BaseRollbarTest
         );
     }
     
-    public function isHtmlProvider(): array
+    public static function isHtmlProvider(): array
     {
         return array(
             array(
@@ -118,7 +118,7 @@ class JsHelperTest extends BaseRollbarTest
         );
     }
     
-    public function hasAttachmentProvider(): array
+    public static function hasAttachmentProvider(): array
     {
         return array(
             array(
@@ -153,7 +153,7 @@ class JsHelperTest extends BaseRollbarTest
         );
     }
     
-    public function shouldAppendNonceProvider(): array
+    public static function shouldAppendNonceProvider(): array
     {
         return array(
             array(
@@ -198,7 +198,7 @@ class JsHelperTest extends BaseRollbarTest
         }
     }
     
-    public function scriptTagProvider(): array
+    public static function scriptTagProvider(): array
     {
         return array(
             'nonce script' => array(
@@ -239,7 +239,7 @@ class JsHelperTest extends BaseRollbarTest
         $this->assertEquals($expected, $result);
     }
     
-    public function configJsTagProvider()
+    public static function configJsTagProvider(): array
     {
         return array(
             array(array(), '{}'),
@@ -254,7 +254,7 @@ class JsHelperTest extends BaseRollbarTest
     /**
      * @dataProvider addJsProvider
      */
-    public function testBuildJs($config, $headers, $nonce, $expected): void
+    public static function testBuildJs($config, $headers, $nonce, $expected): void
     {
         $result = RollbarJsHelper::buildJs(
             $config,
@@ -263,7 +263,7 @@ class JsHelperTest extends BaseRollbarTest
             "var customJs = true;"
         );
         
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
     
     /**

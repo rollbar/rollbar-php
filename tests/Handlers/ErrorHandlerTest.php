@@ -42,7 +42,7 @@ class ErrorHandlerTest extends BaseRollbarTest
     {
         $handler = $this->getMockBuilder(ErrorHandler::class)
                         ->setConstructorArgs(array(new RollbarLogger(self::$simpleConfig)))
-                        ->setMethods(array('handle'))
+                        ->onlyMethods(array('handle'))
                         ->getMock();
                         
         $handler->expects($this->once())
@@ -57,7 +57,7 @@ class ErrorHandlerTest extends BaseRollbarTest
     {
         $logger = $this->getMockBuilder(RollbarLogger::class)
                         ->setConstructorArgs(array(self::$simpleConfig))
-                        ->setMethods(array('report'))
+                        ->onlyMethods(array('report'))
                         ->getMock();
         
         $logger->expects($this->once())
