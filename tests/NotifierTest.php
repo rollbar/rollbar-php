@@ -31,14 +31,11 @@ class NotifierTest extends BaseRollbarTest
         $encoding = json_encode($notifier, flags: JSON_THROW_ON_ERROR|JSON_FORCE_OBJECT);
         $decoding = json_decode($encoding, flags: JSON_THROW_ON_ERROR);
 
-        if(method_exists($this, 'assertObjectHasProperty'))
-        {
+        if (method_exists($this, 'assertObjectHasProperty')) {
             # phpUnit 10
             $this->assertObjectHasProperty('name', $decoding);
             $this->assertObjectHasProperty('version', $decoding);
-        }
-        else
-        {
+        } else {
             # phpUnit 9
             $this->assertObjectHasAttribute('name', $decoding);
             $this->assertObjectHasAttribute('version', $decoding);
