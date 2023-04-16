@@ -55,7 +55,7 @@
     "test": [
       "phpcs --standard=PSR2 src tests",
       "psalm --long-progress --use-baseline=psalm.baseline",
-      "phpunit --coverage-clover build/logs/clover.xml --testsuite 'Rollbar Test Suite'"
+      "phpunit --coverage-clover build/logs/clover.xml"
     ],
     "fix": "phpcbf --standard=PSR2 src tests",
     "get-js-snippet": "ROLLBAR_JS_TAG=$(curl -s https://api.github.com/repos/rollbar/rollbar.js/releases/latest | sed -n 's/\"tag_name\":.*\"\\(.*\\)\",/\\1/p' | sed 's/ *//'); curl -X GET https://raw.githubusercontent.com/rollbar/rollbar.js/$ROLLBAR_JS_TAG/dist/rollbar.snippet.js > data/rollbar.snippet.js",

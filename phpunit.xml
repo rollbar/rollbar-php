@@ -4,11 +4,16 @@
          bootstrap="./tests/bootstrap.php"
          colors="true"
          cacheDirectory=".phpunit.cache"
+         defaultTestSuite="Rollbar Test Suite"
 >
   <testsuites>
     <testsuite name="Rollbar Test Suite">
       <directory suffix=".php">./tests/</directory>
       <exclude>./tests/Performance/</exclude>
+      <exclude>./tests/TestHelpers/</exclude>
+      <exclude>./tests/FakeDataBuilder.php</exclude>
+      <exclude>./tests/bootstrap.php</exclude>
+      <exclude>./tests/BaseRollbarTest.php</exclude>
     </testsuite>
 
     <testsuite name="Rollbar Performance Test Suite">
