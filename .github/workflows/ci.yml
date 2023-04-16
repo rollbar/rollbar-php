@@ -51,7 +51,7 @@ jobs:
           - php: '8.2'
             dependency: 'stable'
 
-    name: PHP ${{ matrix.php }} on ${{ matrix.os }}, ${{ matrix.dependency }} dependencies preferred, {{ matrix.xdebug3-mode }}
+    name: PHP ${{ matrix.php }} on ${{ matrix.os }}, ${{ matrix.dependency }} dependencies preferred, ${{ matrix.xdebug3-mode }}
     runs-on: ${{ matrix.os }}-latest
     steps:
       - name: Checkout the code
