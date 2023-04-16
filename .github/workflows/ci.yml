@@ -11,7 +11,7 @@ name: CI for Rollbar-PHP, master
 # for older versions of PHP. Thus, all branches assume to target master (and
 # will be checked accordingly) unless they begin with next/. Also, run every
 # day at 02:42 GMT to catch failures from dependencies that update
-# independently.Z
+# independently.
 on:
   push:
     branches-ignore:
@@ -41,13 +41,13 @@ jobs:
         xdebug3-mode: ["xdebug.mode=develop,coverage", "xdebug.mode=coverage"]
         include:
           - php: '8.0'
-            dependency: 'prefer-lowest'
+            dependency: 'lowest'
           - php: '8.0'
-            dependency: 'prefer-stable'
+            dependency: 'stable'
           - php: '8.1'
-            dependency: 'prefer-stable'
+            dependency: 'stable'
           - php: '8.2'
-            dependency: 'prefer-stable'
+            dependency: 'stable'
 
     name: PHP ${{ matrix.php }} on ${{ matrix.os }}, ${{ matrix.dependency }} dependencies preferred
     runs-on: ${{ matrix.os }}-latest

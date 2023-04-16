@@ -44,13 +44,13 @@ jobs:
         xdebug3-mode: ["xdebug.mode=develop,coverage", "xdebug.mode=coverage"]
         include:
           - php: '8.0'
-            dependency: 'prefer-lowest'
+            dependency: 'lowest'
           - php: '8.0'
-            dependency: 'prefer-stable'
+            dependency: 'stable'
           - php: '8.1'
-            dependency: 'prefer-stable'
+            dependency: 'stable'
           - php: '8.2'
-            dependency: 'prefer-stable'
+            dependency: 'stable'
 
     name: PHP ${{ matrix.php }} on ${{ matrix.os }}, ${{ matrix.dependency }} dependencies preferred
     runs-on: ${{ matrix.os }}-latest
