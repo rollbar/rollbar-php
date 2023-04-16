@@ -30,8 +30,19 @@ class NotifierTest extends BaseRollbarTest
         $notifier = Notifier::defaultNotifier()->serialize();
         $encoding = json_encode($notifier, flags: JSON_THROW_ON_ERROR|JSON_FORCE_OBJECT);
         $decoding = json_decode($encoding, flags: JSON_THROW_ON_ERROR);
-        $this->assertObjectHasProperty('name', $decoding);
-        $this->assertObjectHasProperty('version', $decoding);
+
+        if(method_exists($this, 'assertObjectHasProperty'))
+        {
+            # phpUnit 10
+            $this->assertObjectHasProperty('name', $decoding);
+            $this->assertObjectHasProperty('version', $decoding);
+        }
+        else
+        {
+            # phpUnit 9
+            $this->assertObjectHasAttribute('name', $decoding);
+            $this->assertObjectHasAttribute('version', $decoding);
+        }
     }
 
     public function testDefaultNotifierVersionIsSemVerCompliant(): void
