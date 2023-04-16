@@ -11,7 +11,7 @@ name: CI for Rollbar-PHP, master
 # for older versions of PHP. Thus, all branches assume to target master (and
 # will be checked accordingly) unless they begin with next/. Also, run every
 # day at 02:42 GMT to catch failures from dependencies that update
-# independently.
+# independently.Z
 on:
   push:
     branches-ignore:
