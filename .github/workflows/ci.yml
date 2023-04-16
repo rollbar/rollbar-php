@@ -44,7 +44,9 @@ jobs:
         xdebug3-mode: ["xdebug.mode=develop,coverage", "xdebug.mode=coverage"]
         include:
           - php: '8.0'
+            os: 'ubuntu'
             dependency: 'lowest'
+            xdebug3-mode: "xdebug.mode=develop,coverage"
 
     name: PHP ${{ matrix.php }} on ${{ matrix.os }}, ${{ matrix.dependency }} dependencies preferred, ${{ matrix.xdebug3-mode }}
     runs-on: ${{ matrix.os }}-latest
