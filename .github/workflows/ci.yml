@@ -36,7 +36,7 @@ jobs:
         # All the versions, OS, and dependency levels we want to support
         os: [ubuntu]         # TODO: windows, macos
         php: [ '8.2' ]
-        stability: [ stable ]
+        dependency: [ stable ]
         # Our code has paths for with- and without- XDebug, and we want to test
         # both of them.
         # @see https://xdebug.org/docs/all_settings#mode
