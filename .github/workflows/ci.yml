@@ -35,6 +35,8 @@ jobs:
       matrix:
         # All the versions, OS, and dependency levels we want to support
         os: [ubuntu]         # TODO: windows, macos
+        php: [ '8.2' ]
+        stability: [ stable ]
         # Our code has paths for with- and without- XDebug, and we want to test
         # both of them.
         # @see https://xdebug.org/docs/all_settings#mode
@@ -49,7 +51,7 @@ jobs:
           - php: '8.2'
             dependency: 'stable'
 
-    name: PHP ${{ matrix.php }} on ${{ matrix.os }}, ${{ matrix.dependency }} dependencies preferred
+    name: PHP ${{ matrix.php }} on ${{ matrix.os }}, ${{ matrix.dependency }} dependencies preferred, {{ matrix.xdebug3-mode }}
     runs-on: ${{ matrix.os }}-latest
     steps:
       - name: Checkout the code
