@@ -2,20 +2,18 @@
 
 namespace Rollbar\Performance;
 
-use Rollbar\Performance\MassivePayload;
 use Rollbar\Performance\TestHelpers\Truncation;
 use Rollbar\Performance\TestHelpers\EncodedPayload;
-
 use Rollbar\Truncation\StringsStrategyTest;
 use Rollbar\Truncation\FramesStrategyTest;
 use Rollbar\Truncation\MinBodyStrategyTest;
-
 use Rollbar\Config;
 use Rollbar\BaseRollbarTest;
 
 class TruncationTest extends BaseRollbarTest
 {
-    
+    private Truncation $truncate;
+
     public function setUp(): void
     {
         $config = new Config(array('access_token' => $this->getTestAccessToken()));

@@ -1,10 +1,11 @@
-<?php namespace Rollbar\Performance\TestHelpers;
+<?php
+namespace Rollbar\Performance\TestHelpers;
 
 class Truncation extends \Rollbar\Truncation\Truncation
 {
-    protected $memoryUsage = 0;
-    protected $timeUsage = 0;
-    protected $payloadSize = 0;
+    protected float $memoryUsage = 0;
+    protected float $timeUsage = 0;
+    protected float $payloadSize = 0;
     protected string $lastRunOutput = "";
     protected array $strategiesUsed = array();
     
@@ -29,17 +30,6 @@ class Truncation extends \Rollbar\Truncation\Truncation
         $this->strategiesUsed = array_unique($this->strategiesUsed);
         
         $this->lastRunOutput = $this->composeLastRunOutput();
-        
-        return $result;
-    }
-    
-    public function needsTruncating(\Rollbar\Payload\EncodedPayload $payload, $strategy): bool
-    {
-        $result = parent::needsTruncating($payload, $strategy);
-        
-        if ($result) {
-            $this->strategiesUsed []= is_string($strategy) ? $strategy : get_class($strategy);
-        }
         
         return $result;
     }
