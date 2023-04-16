@@ -34,13 +34,20 @@ jobs:
     strategy:
       matrix:
         # All the versions, OS, and dependency levels we want to support
-        php: [8.0, 8.1, 8.2]
-        dependency: [stable] # TODO: lowest
         os: [ubuntu]         # TODO: windows, macos
         # Our code has paths for with- and without- XDebug, and we want to test
         # both of them.
         # @see https://xdebug.org/docs/all_settings#mode
         xdebug3-mode: ["xdebug.mode=develop,coverage", "xdebug.mode=coverage"]
+        include:
+          - php: '8.0'
+            dependency: 'prefer-lowest'
+          - php: '8.0'
+            dependency: 'prefer-stable'
+          - php: '8.1'
+            dependency: 'prefer-stable'
+          - php: '8.2'
+            dependency: 'prefer-stable'
 
     name: PHP ${{ matrix.php }} on ${{ matrix.os }}, ${{ matrix.dependency }} dependencies preferred
     runs-on: ${{ matrix.os }}-latest
