@@ -32,6 +32,7 @@ jobs:
   # @see https://www.dereuromark.de/2019/01/04/test-composer-dependencies-with-prefer-lowest/
   php-tests:
     strategy:
+      fail-fast: false
       matrix:
         # All the versions, OS, and dependency levels we want to support
         os: [ubuntu]         # TODO: windows, macos
