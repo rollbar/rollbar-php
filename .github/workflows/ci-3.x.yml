@@ -44,12 +44,12 @@ jobs:
         # Our code has paths for with- and without- XDebug, and we want to test
         # both of them.
         # @see https://xdebug.org/docs/all_settings#mode
-        xdebug3-mode: [ "xdebug.mode=develop,coverage", "xdebug.mode=coverage" ]
+        xdebug3-mode: ['develop,coverage', 'coverage']
         include:
           - php: '8.0'
             os: 'ubuntu'
             dependency: 'lowest'
-            xdebug3-mode: "xdebug.mode=develop,coverage"
+            xdebug3-mode: 'develop,coverage'
 
     name: PHP ${{ matrix.php }} on ${{ matrix.os }}, ${{ matrix.dependency }} dependencies preferred, ${{ matrix.xdebug3-mode }}
     runs-on: ${{ matrix.os }}-latest
@@ -69,7 +69,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           extensions: curl
-          ini-values: zend.exception_ignore_args=Off, ${{ matrix.xdebug3-mode }}
+          ini-values: zend.exception_ignore_args=Off, xdebug3-mode="${{ matrix.xdebug3-mode }}"
           coverage: xdebug
 
       - name: Get composer cache directory
