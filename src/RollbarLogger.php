@@ -191,7 +191,7 @@ class RollbarLogger extends AbstractLogger
      * @throws InvalidArgumentException If $level is not a valid level.
      * @throws Throwable Rethrown $message if it is {@see Throwable} and {@see Config::raiseOnError} is true.
      */
-    public function log($level, string|Stringable $message, array $context = array()): void
+    public function log($level, $message, array $context = array()): void
     {
         $this->report($level, $message, $context);
     }
