@@ -227,13 +227,13 @@ class VerbosityTest extends BaseRollbarTest
     public function testRollbarLoggerResponseStatusError(): void
     {
         Rollbar::init([
-            'access_token'   => $this->getTestAccessToken(),
+            // Invalid access token should cause a 403 response.
+            'access_token'   => '00000000000000000000000000000000',
             'environment'    => 'testing-php',
             'verbose_logger' => $this->verboseLogger,
-            'endpoint'       => 'https://api.rollbar.com/api/foo/',
         ]);
         Rollbar::log(LogLevel::INFO, "Testing PHP Notifier");
-        $this->assertVerboseLogContains('Occurrence rejected by the API:', LogLevel::ERROR);
+        $this->assertVerboseLogContains('Occurrence rejected by the API: with status 403: ', LogLevel::ERROR);
     }
 
     /**
