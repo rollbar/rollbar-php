@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.1] - 2023-04-28
+### Added
+* Added response status code to verbose log message fixing #613 by 
+  @danielmorell in #614.
+### Fixed
+* Fixed #617 `RollbarLogger:log()` not compatible with psr/log 1 by 
+  @danielmorell in #623.
+### Maintenance
+* Added missing CI workflow for v3.x by @danielmorell in #616.
+* Added Phpunit 10 result folder to .gitignore by @Chris53897 in #625.
+* Updated test dependencies to fix generated mock class type annotation error by 
+  @danielmorell in #627.
+* Fixed duplicate Psalm config and silenced unnecessary warnings by @Chris53897 
+  in #622.
+* Fixed test helper method `ArrayLogger:log()` psr/log 1 compatability by
+  @danielmorell in #626.
+* Fixed the CI status badge in the README.md file. by @danielmorell in #628.
+
 ## [4.0.0] - 2023-03-20
 ### Added
 * PHP 8 language level mitigations, add typehints by @Chris8934 in #569.
