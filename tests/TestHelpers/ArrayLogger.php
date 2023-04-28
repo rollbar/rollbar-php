@@ -30,7 +30,7 @@ class ArrayLogger extends AbstractLogger
     /**
      * @inheritDoc
      */
-    public function log($level, Stringable|string $message, array $context = []): void
+    public function log($level, $message, array $context = []): void
     {
         $this->logs[] = self::stringify($level, $message);
     }
