@@ -10,7 +10,7 @@
 
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/rollbar/rollbar.svg?style=flat-square)](https://packagist.org/packages/rollbar/rollbar)
-![Build Status](https://github.com/rollbar/rollbar-php/workflows/Rollbar-PHP%20CI/badge.svg)
+[![CI for Rollbar-PHP, master](https://github.com/rollbar/rollbar-php/actions/workflows/ci.yml/badge.svg)](https://github.com/rollbar/rollbar-php/actions/workflows/ci.yml)
 [![Total Downloads](https://img.shields.io/packagist/dt/rollbar/rollbar.svg?style=flat-square)](https://packagist.org/packages/rollbar/rollbar)
 
 ---
