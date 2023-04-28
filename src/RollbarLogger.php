@@ -191,7 +191,7 @@ class RollbarLogger extends AbstractLogger
      * @throws InvalidArgumentException If $level is not a valid level.
      * @throws Throwable Rethrown $message if it is {@see Throwable} and {@see Config::raiseOnError} is true.
      */
-    public function log($level, string|Stringable $message, array $context = array()): void
+    public function log($level, $message, array $context = array()): void
     {
         $this->report($level, $message, $context);
     }
@@ -269,7 +269,8 @@ class RollbarLogger extends AbstractLogger
         } elseif ($response->getStatus() >= 400) {
             $info = $response->getInfo();
             $this->verboseLogger()->error(
-                'Occurrence rejected by the API: ' . ($info['message'] ?? 'message not set')
+                'Occurrence rejected by the API: with status ' . $response->getStatus() . ': '
+                . ($info['message'] ?? 'message not set')
             );
         } else {
             $this->verboseLogger()->info('Occurrence successfully logged');
