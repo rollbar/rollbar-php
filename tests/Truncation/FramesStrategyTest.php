@@ -32,7 +32,7 @@ class FramesStrategyTest extends BaseRollbarTest
      *
      * @return array
      */
-    public function executeProvider(): array
+    public static function executeProvider(): array
     {
         $data = array(
             'nothing to truncate using trace key' => array(

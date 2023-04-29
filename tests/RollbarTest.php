@@ -223,7 +223,7 @@ class RollbarTest extends BaseRollbarTest
     public function testLogUncaughtUnsetLogger(): void
     {
         $sut = new Rollbar;
-        $result = $sut->logUncaught('level', new \Exception);
+        $result = $sut::logUncaught('level', new \Exception);
         $expected = new Response(0, "Rollbar Not Initialized");
         $this->assertEquals($expected, $result);
     }

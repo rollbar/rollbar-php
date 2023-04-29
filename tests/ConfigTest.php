@@ -202,7 +202,7 @@ class ConfigTest extends BaseRollbarTest
         ));
 
         $handlerMock = $this->getMockBuilder(ErrorLogHandler::class)
-            ->setMethods(array('handle'))
+            ->onlyMethods(array('handle'))
             ->getMock();
 
         $handlerMock->expects($this->once())->method('handle');
@@ -721,7 +721,7 @@ class ConfigTest extends BaseRollbarTest
         }
     }
     
-    public function useErrorReportingProvider(): array
+    public static function useErrorReportingProvider(): array
     {
         return array(
             "use_error_reporting off" => array(
@@ -760,7 +760,7 @@ class ConfigTest extends BaseRollbarTest
         $this->assertEquals($expected, $sampleRate);
     }
     
-    public function providerExceptionSampleRate(): array
+    public static function providerExceptionSampleRate(): array
     {
         return array(
             array(

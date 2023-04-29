@@ -7,7 +7,7 @@ use Rollbar\TestHelpers\MockPhpStream;
 
 class ScrubberTest extends BaseRollbarTest
 {
-    public function scrubUrlDataProvider(): array
+    public static function scrubUrlDataProvider(): array
     {
         return array(
             'nothing to scrub' => array(
@@ -40,7 +40,7 @@ class ScrubberTest extends BaseRollbarTest
         );
     }
     
-    public function scrubSafelistProvider(): array
+    public static function scrubSafelistProvider(): array
     {
         return array(
             array(
@@ -96,23 +96,23 @@ class ScrubberTest extends BaseRollbarTest
         $this->assertEquals($expected, $result, "Looks like some fields did not get scrubbed correctly.");
     }
     
-    public function scrubDataProvider(): array
+    public static function scrubDataProvider(): array
     {
         return array_merge(array(
             'flat data array' =>
-                $this->scrubFlatDataProvider(),
+                self::scrubFlatDataProvider(),
             'recursive data array' =>
-                $this->scrubRecursiveDataProvider(),
+                self::scrubRecursiveDataProvider(),
             'string encoded values' =>
-                $this->scrubFlatStringDataProvider(),
+                self::scrubFlatStringDataProvider(),
             'string encoded recursive values' =>
-                $this->scrubRecursiveStringDataProvider(),
+                self::scrubRecursiveStringDataProvider(),
             'string encoded recursive values in recursive array' =>
-                $this->scrubRecursiveStringRecursiveDataProvider()
-        ), $this->scrubUrlDataProvider(), $this->scrubJSONNumbersProvider());
+                self::scrubRecursiveStringRecursiveDataProvider()
+        ), self::scrubUrlDataProvider(), self::scrubJSONNumbersProvider());
     }
 
-    private function scrubJSONNumbersProvider(): array
+    private static function scrubJSONNumbersProvider(): array
     {
         return array(
             'plain array' => array(
@@ -132,7 +132,7 @@ class ScrubberTest extends BaseRollbarTest
         );
     }
 
-    private function scrubFlatDataProvider(): array
+    private static function scrubFlatDataProvider(): array
     {
         return array(
             array( // $testData
@@ -149,7 +149,7 @@ class ScrubberTest extends BaseRollbarTest
         );
     }
     
-    private function scrubRecursiveDataProvider(): array
+    private static function scrubRecursiveDataProvider(): array
     {
         return array(
             array( // $testData
@@ -196,7 +196,7 @@ class ScrubberTest extends BaseRollbarTest
         );
     }
     
-    private function scrubFlatStringDataProvider(): array
+    private static function scrubFlatStringDataProvider(): array
     {
         return array(
             // $testData
@@ -225,7 +225,7 @@ class ScrubberTest extends BaseRollbarTest
         );
     }
     
-    private function scrubRecursiveStringDataProvider(): array
+    private static function scrubRecursiveStringDataProvider(): array
     {
         return array(
             // $testData
@@ -260,7 +260,7 @@ class ScrubberTest extends BaseRollbarTest
         );
     }
     
-    private function scrubRecursiveStringRecursiveDataProvider(): array
+    private static function scrubRecursiveStringRecursiveDataProvider(): array
     {
         return array(
             array( // $testData
@@ -332,7 +332,7 @@ class ScrubberTest extends BaseRollbarTest
         $this->assertEquals($expected, $result, "Looks like some fields did not get scrubbed correctly.");
     }
 
-    public function scrubArrayDataProvider(): array
+    public static function scrubArrayDataProvider(): array
     {
         return array(
             'flat data array' => array(

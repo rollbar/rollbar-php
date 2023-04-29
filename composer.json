@@ -38,11 +38,11 @@
   },
 
   "require-dev": {
-    "phpunit/phpunit": "^9.6",
+    "phpunit/phpunit": "^9.6 || ^10.1",
     "mockery/mockery": "^1.5.1",
-    "squizlabs/php_codesniffer": "^3.6 || 3.x-dev",
-    "phpmd/phpmd" : "^2",
-    "vimeo/psalm": "^5"
+    "squizlabs/php_codesniffer": "^3.7",
+    "phpmd/phpmd" : "^2.13",
+    "vimeo/psalm": "^5.9"
   },
 
   "suggest": {
@@ -55,7 +55,7 @@
     "test": [
       "phpcs --standard=PSR2 src tests",
       "psalm --long-progress",
-      "phpunit --coverage-clover build/logs/clover.xml --testsuite 'Rollbar Test Suite'"
+      "phpunit --coverage-clover build/logs/clover.xml"
     ],
     "fix": "phpcbf --standard=PSR2 src tests",
     "get-js-snippet": "ROLLBAR_JS_TAG=$(curl -s https://api.github.com/repos/rollbar/rollbar.js/releases/latest | sed -n 's/\"tag_name\":.*\"\\(.*\\)\",/\\1/p' | sed 's/ *//'); curl -X GET https://raw.githubusercontent.com/rollbar/rollbar.js/$ROLLBAR_JS_TAG/dist/rollbar.snippet.js > data/rollbar.snippet.js",

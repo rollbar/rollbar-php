@@ -15,9 +15,9 @@ class LevelFactoryTest extends BaseRollbarTest
         );
     }
 
-    public function isValidLevelProvider(): array
+    public static function isValidLevelProvider(): array
     {
-        $data = $this->fromNameProvider();
+        $data = self::fromNameProvider();
         foreach ($data as &$testParams) {
             $testParams[] = true;
         }
@@ -41,7 +41,7 @@ class LevelFactoryTest extends BaseRollbarTest
         );
     }
 
-    public function fromNameProvider(): array
+    public static function fromNameProvider(): array
     {
         return [
             [Level::EMERGENCY],
@@ -66,7 +66,7 @@ class LevelFactoryTest extends BaseRollbarTest
         );
     }
 
-    public function fromNameOrInstanceProvider(): array
+    public static function fromNameOrInstanceProvider(): array
     {
         return [
             [Level::EMERGENCY],

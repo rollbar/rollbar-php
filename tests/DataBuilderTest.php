@@ -78,11 +78,11 @@ class DataBuilderTest extends BaseRollbarTest
         $this->assertEquals($expected, $result);
     }
     
-    public function getUrlProvider(): array
+    public static function getUrlProvider(): array
     {
-        $protoData = $this->getUrlProtoProvider();
-        $hostData = $this->getUrlHostProvider();
-        $portData = $this->getUrlPortProvider();
+        $protoData = self::getUrlProtoProvider();
+        $hostData = self::getUrlHostProvider();
+        $portData = self::getUrlPortProvider();
         
         $testData = array();
         
@@ -118,7 +118,7 @@ class DataBuilderTest extends BaseRollbarTest
         $this->assertEquals($expected, $output);
     }
     
-    public function parseForwardedStringProvider(): array
+    public static function parseForwardedStringProvider(): array
     {
         return array(
             array( // test 1
@@ -182,7 +182,7 @@ class DataBuilderTest extends BaseRollbarTest
         $_SERVER = $pre_SERVER;
     }
     
-    public function getUrlProtoProvider(): array
+    public static function getUrlProtoProvider(): array
     {
         return array(
             array( // test 1: HTTP_FORWARDED
@@ -237,7 +237,7 @@ class DataBuilderTest extends BaseRollbarTest
         $this->assertEquals($expected, $output);
     }
     
-    public function getUrlHostProvider(): array
+    public static function getUrlHostProvider(): array
     {
         return array(
             array( // test 1: HTTP_FORWARDED
@@ -311,7 +311,7 @@ class DataBuilderTest extends BaseRollbarTest
         $this->assertEquals($expected, $output);
     }
     
-    public function getUrlPortProvider(): array
+    public static function getUrlPortProvider(): array
     {
         return array(
             array( // test 1: HTTP_X_FORWARDED
@@ -952,7 +952,7 @@ class DataBuilderTest extends BaseRollbarTest
         $this->assertEquals($expected, count($frames) == 0);
     }
     
-    public function captureErrorStacktracesProvider(): array
+    public static function captureErrorStacktracesProvider(): array
     {
         return array(
             array(false,true),
@@ -1002,7 +1002,7 @@ class DataBuilderTest extends BaseRollbarTest
         unset($_SERVER['HTTP_X_REAL_IP']);
     }
     
-    public function getUserIpProvider(): array
+    public static function getUserIpProvider(): array
     {
         return array(
             array('127.0.0.1', '127.0.0.1', null),
