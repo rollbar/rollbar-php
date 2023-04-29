@@ -33,7 +33,7 @@
   "require": {
     "php": ">=8.0.0 <9.0",
     "ext-curl": "*",
-    "psr/log": "^2 || ^3",
+    "psr/log": "^1 || ^2 || ^3",
     "monolog/monolog": "^2 || ^3"
   },
 
