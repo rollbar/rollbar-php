@@ -4,13 +4,11 @@ namespace Rollbar\Performance;
 
 use Rollbar\Truncation\StringsStrategyTest;
 use Rollbar\Truncation\FramesStrategyTest;
-
 use Rollbar\Truncation\StringsStrategy;
 
 class MassivePayload
 {
-
-    public function executeProvider()
+    public function executeProvider(): array
     {
         $framesTest = new FramesStrategyTest();
         
@@ -25,7 +23,7 @@ class MassivePayload
         return $data;
     }
     
-    public function generateStringData()
+    public function generateStringData(): array
     {
         $stringsTest = new StringsStrategyTest();
         
