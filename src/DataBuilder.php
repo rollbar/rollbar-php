@@ -470,8 +470,8 @@ class DataBuilder implements DataBuilderInterface
 
         $excInfo = new ExceptionInfo(
             $classOverride ?: get_class($exception),
-            $exception->getMessage(),
-            $message
+            $message,
+            $exception->getMessage()
         );
         return new Trace($frames, $excInfo);
     }
