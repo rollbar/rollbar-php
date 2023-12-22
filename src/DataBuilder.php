@@ -462,18 +462,25 @@ class DataBuilder implements DataBuilderInterface
         ?string $classOverride = null,
         string|Stringable $message = null,
     ): Trace {
+        $frames = array();
         if ($this->captureErrorStacktraces) {
             $frames = $this->makeFrames($exception, $includeContext);
-        } else {
-            $frames = array();
+        }
+        
+        $exceptionMessage = $exception->getMessage();
+        $description = $message;
+
+        // If a message is explicitly set when calling the logger, use that. Otherwise, use the exception's message.
+        if (null !== $message) {
+            $exceptionMessage = $message;
+            $description = $exception->getMessage();
         }
 
-        $excInfo = new ExceptionInfo(
+        return new Trace($frames, new ExceptionInfo(
             $classOverride ?: get_class($exception),
-            $exception->getMessage(),
-            $message
-        );
-        return new Trace($frames, $excInfo);
+            $exceptionMessage,
+            $description,
+        ));
     }
 
     public function makeFrames($exception, $includeContext)
