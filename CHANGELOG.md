@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.2] - 2023-12-22
+### Fixed
+* Fixed unable to to define custom scrubber by @zinkovskiy in #554.
+* Fixed #631 log message was in the description by @danielmorell in #632.
+### Maintenance
+* Fixed tests for performance test suite by @Chris53897 in #619.
+* Updated PHPUnit to v10 by @Chris53897 in #621.
+* Added CI tests for `--prefer-lowest` by @Chris53897 in #624.
+* Added CI tests for PHP 8.3 by @Chris53897 in #630.
+
 ## [4.0.1] - 2023-04-28
 ### Added
 * Added response status code to verbose log message fixing #613 by 
