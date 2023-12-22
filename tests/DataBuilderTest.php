@@ -706,8 +706,8 @@ class DataBuilderTest extends BaseRollbarTest
         $this->assertSame(
             array(
                 'class'       => 'Exception',
-                'message'     => 'testing exception',
-                'description' => 'testing',
+                'message'     => 'testing',
+                'description' => 'testing exception',
             ),
             $output['body']['trace']['exception'],
         );
