@@ -33,8 +33,8 @@ class TelemetryEvent implements SerializerInterface
      * @param string              $type      The type of telemetry data. One of: {@see DataType}.
      * @param string              $level     The severity level of the telemetry data. One of: "critical", "error",
      *                                       "warning", "info", or "debug".
-     * @param array|TelemetryBody $body      Additional data for the telemetry event. If an array is provided, it will be
-     *                                       converted to a {@see TelemetryBody} object.
+     * @param array|TelemetryBody $body      Additional data for the telemetry event. If an array is provided, it will
+     *                                       be converted to a {@see TelemetryBody} object.
      * @param float|null          $timestamp When this occurred, as a unix timestamp in milliseconds. If not provided,
      *                                       Rollbar will use the current time.
      */

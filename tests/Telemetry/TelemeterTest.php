@@ -172,7 +172,8 @@ class TelemeterTest extends BaseRollbarTest
         self::assertSame('200', $events[0]->body->status_code);
     }
 
-    public function testCaptureNavigation(): void {
+    public function testCaptureNavigation(): void
+    {
         $telemeter = new Telemeter();
         $telemeter->captureNavigation('https://example.com/foo', 'https://example.com/bar');
 
