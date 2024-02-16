@@ -1139,7 +1139,7 @@ class Config
         // > the value E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR |
         // > E_USER_ERROR | E_RECOVERABLE_ERROR | E_PARSE.
         // https://www.php.net/manual/en/language.operators.errorcontrol.php
-        if (version_compare(PHP_VERSION, '8.0', 'ge') && $errorReporting === (
+        if ($errorReporting === (
                 E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR | E_PARSE
             )) {
             return true;
