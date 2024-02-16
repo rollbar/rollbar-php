@@ -3,7 +3,6 @@
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="./tests/bootstrap.php"
          colors="true"
-         cacheDirectory=".phpunit.cache"
          defaultTestSuite="Rollbar Test Suite"
 >
   <testsuites>
@@ -26,11 +25,4 @@
   <php>
     <env name="ROLLBAR_TEST_TOKEN" value="ad865e76e7fb496fab096ac07b1dbabb"/>
   </php>
-
-  <source>
-    <include>
-      <directory suffix=".php">./src</directory>
-    </include>
-  </source>
-
 </phpunit>

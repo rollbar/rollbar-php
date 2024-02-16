@@ -5,6 +5,7 @@ namespace Rollbar;
 use Monolog\Logger;
 use Rollbar\Payload\Notifier;
 use Psr\Log\LogLevel;
+use Rollbar\Telemetry\Telemeter;
 use Throwable;
 
 class Defaults
@@ -328,10 +329,31 @@ class Defaults
     {
         return $value ?? $this->minimumLevel;
     }
-    
+
     public function raiseOnError($value = null)
     {
         return $value ?? $this->raiseOnError;
+    }
+
+    /**
+     * Returns the telemetry configuration array or null if telemetry should be disabled.
+     *
+     * @param bool|array|null $value If true or null returns the default telemetry configuration. If false returns null.
+     *
+     * @return array|null The telemetry configuration.
+     *
+     * @since 4.1.0
+     */
+    public function telemetry(bool|array|null $value = null): ?array
+    {
+        if (true === $value) {
+            return $this->telemetry;
+        }
+        if (is_array($value)) {
+            // Ensure that the telemetry array contains only the keys we expect and includes all the required keys.
+            return array_merge($this->telemetry, array_intersect_key($value, $this->telemetry));
+        }
+        return null;
     }
 
     private $psrLevels;
@@ -384,4 +406,16 @@ class Defaults
     private $maxItems = 10;
     private $minimumLevel = 0;
     private $raiseOnError = false;
+
+    /**
+     * @var array $telemetry The default telemetry configuration.
+     *
+     * @since 4.1.0
+     */
+    private array $telemetry = [
+        'maxTelemetryEvents' => Telemeter::MAX_EVENTS,
+        'filter' => null,
+        'includeItemsInTelemetry' => true,
+        'includeIgnoredItemsInTelemetry' => false,
+    ];
 }

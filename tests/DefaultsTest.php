@@ -5,6 +5,7 @@ use Rollbar\Defaults;
 use Rollbar\Payload\Level;
 use Rollbar\Payload\Notifier;
 use Psr\Log\LogLevel;
+use Rollbar\Telemetry\Telemeter;
 use Throwable;
 
 class DefaultsTest extends BaseRollbarTest
@@ -282,6 +283,50 @@ class DefaultsTest extends BaseRollbarTest
     public function testRaiseOnError(): void
     {
         $this->assertEquals(false, $this->defaults->raiseOnError());
+    }
+
+    public function testTelemetry(): void
+    {
+        $this->assertSame([
+            'maxTelemetryEvents' => Telemeter::MAX_EVENTS,
+            'filter' => null,
+            'includeItemsInTelemetry' => true,
+            'includeIgnoredItemsInTelemetry' => false,
+        ], $this->defaults->telemetry(true));
+
+        $this->assertSame([
+            'maxTelemetryEvents' => Telemeter::MAX_EVENTS,
+            'filter' => null,
+            'includeItemsInTelemetry' => true,
+            'includeIgnoredItemsInTelemetry' => false,
+        ], $this->defaults->telemetry([]));
+
+        $this->assertNull($this->defaults->telemetry(null));
+        $this->assertNull($this->defaults->telemetry(false));
+
+        $this->assertSame([
+            'maxTelemetryEvents' => Telemeter::MAX_EVENTS,
+            'filter' => null,
+            'includeItemsInTelemetry' => true,
+            'includeIgnoredItemsInTelemetry' => false,
+        ], $this->defaults->telemetry(['foo' => 'bar']));
+
+        $this->assertSame([
+            'maxTelemetryEvents' => Telemeter::MAX_EVENTS,
+            'filter' => null,
+            'includeItemsInTelemetry' => true,
+            'includeIgnoredItemsInTelemetry' => true,
+        ], $this->defaults->telemetry([
+            'includeItemsInTelemetry' => true,
+            'includeIgnoredItemsInTelemetry' => true,
+        ]));
+
+        $this->assertSame([
+            'maxTelemetryEvents' => Telemeter::MAX_EVENTS,
+            'filter' => 'foo',
+            'includeItemsInTelemetry' => true,
+            'includeIgnoredItemsInTelemetry' => false,
+        ], $this->defaults->telemetry(['filter' => 'foo']));
     }
 
     /**
