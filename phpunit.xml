@@ -3,21 +3,21 @@
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="./tests/bootstrap.php"
          colors="true"
-         defaultTestSuite="Rollbar Test Suite"
->
+         cacheDirectory=".phpunit.cache"
+         defaultTestSuite="Rollbar Test Suite">
   <testsuites>
     <testsuite name="Rollbar Test Suite">
       <directory suffix=".php">./tests/</directory>
-      <exclude>./tests/Performance/</exclude>
-      <exclude>./tests/TestHelpers/</exclude>
-      <exclude>./tests/FakeDataBuilder.php</exclude>
-      <exclude>./tests/bootstrap.php</exclude>
-      <exclude>./tests/BaseRollbarTest.php</exclude>
+        <exclude>./tests/Performance/</exclude>
+        <exclude>./tests/TestHelpers/</exclude>
+        <exclude>./tests/FakeDataBuilder.php</exclude>
+        <exclude>./tests/bootstrap.php</exclude>
+        <exclude>./tests/BaseRollbarTest.php</exclude>
     </testsuite>
 
-    <testsuite name="Rollbar Performance Test Suite">
-      <directory suffix=".php">./tests/Performance/</directory>
-    </testsuite>
+      <testsuite name="Rollbar Performance Test Suite">
+          <directory suffix=".php">./tests/Performance/</directory>
+      </testsuite>
   </testsuites>
 
   <coverage/>
@@ -25,4 +25,10 @@
   <php>
     <env name="ROLLBAR_TEST_TOKEN" value="ad865e76e7fb496fab096ac07b1dbabb"/>
   </php>
+
+    <source restrictDeprecations="true" restrictNotices="true" restrictWarnings="true">
+      <include>
+        <directory>src</directory>
+      </include>
+    </source>
 </phpunit>
