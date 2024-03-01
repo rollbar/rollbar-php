@@ -404,12 +404,18 @@ class ConfigTest extends BaseRollbarTest
 
     public function testReportSuppressedActuallySuppressed()
     {
+        // To make sure that the suppression actually works, we need to reset the error_reporting.
+        $oldErrorReporting = error_reporting(E_ALL);
+
         $config = new Config(array(
             'report_suppressed' => false,
             "access_token" => $this->getTestAccessToken()
         ));
         $this->assertFalse($config->shouldSuppress());
         $this->assertTrue(@$config->shouldSuppress());
+
+        // Reset the error_reporting to its original value.
+        error_reporting($oldErrorReporting);
     }
 
     public function testFilter(): void

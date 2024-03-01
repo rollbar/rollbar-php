@@ -5,6 +5,9 @@ namespace Rollbar;
 use Exception;
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use Rollbar\Payload\TelemetryBody;
+use Rollbar\Payload\TelemetryEvent;
+use Rollbar\Telemetry\Telemeter;
 use Stringable;
 use Throwable;
 use Psr\Log\AbstractLogger;
@@ -212,6 +215,7 @@ class RollbarLogger extends AbstractLogger
      * @throws Throwable Rethrown $message if it is {@see Throwable} and {@see Config::raiseOnError} is true.
      *
      * @since  4.0.0
+     * @since  4.1.0 Will include the reported item in the telemetry events if applicable.
      */
     public function report(
         string|Level $level,
@@ -239,13 +243,28 @@ class RollbarLogger extends AbstractLogger
 
         $this->verboseLogger()->info("Attempting to log: [$level] " . $message);
 
-        if ($this->config->internalCheckIgnored($level, $message)) {
+        $accessToken = $this->getAccessToken();
+        $payload = null;
+        $ignored = $this->config->internalCheckIgnored($level, $message);
+
+        // We don't want to build the payload if it is going to be ignored, so we can avoid the overhead of building it.
+        // This is done before adding the event to the telemetry queue, so the reported occurrence is not duplicated in
+        // the telemetry data.
+        if (!$ignored) {
+            $payload = $this->getPayload($accessToken, $level, $message, $context);
+        }
+        // Add the event to the telemetry queue if it is enabled, but after we have built the payload, so it is not
+        // duplicated in the telemetry data as well.
+        $telemeter = Rollbar::getTelemeter();
+        if (null !== $telemeter && $telemeter->shouldIncludeItemsInTelemetry()) {
+            $uuid = (!$ignored)? $payload->getData()->getUuid(): null;
+            $telemeter->captureRollbarItem($level, $message, $context, $ignored, $uuid);
+        }
+
+        if ($ignored) {
             $this->verboseLogger()->info('Occurrence ignored');
             return new Response(0, "Ignored");
         }
-
-        $accessToken = $this->getAccessToken();
-        $payload     = $this->getPayload($accessToken, $level, $message, $context);
 
         if ($this->config->checkIgnored($payload, $message, $isUncaught)) {
             $this->verboseLogger()->info('Occurrence ignored');
@@ -281,6 +300,33 @@ class RollbarLogger extends AbstractLogger
         }
 
         return $response;
+    }
+
+    /**
+     * Captures a telemetry event that may be sent with future payloads.
+     *
+     * @param string              $type      The type of telemetry data. One of: "log", "network", "dom", "navigation",
+     *                                       "error", or "manual".
+     * @param string              $level     The severity level of the telemetry data. One of: "critical", "error",
+     *                                       "warning", "info", or "debug".
+     * @param array|TelemetryBody $metadata  Additional data about the telemetry event.
+     * @param string|null         $uuid      The Rollbar UUID to associate with this telemetry event.
+     * @param int|null            $timestamp When this occurred, as a unix timestamp in milliseconds. If not provided,
+     *                                       the current time will be used.
+     *
+     * @return TelemetryEvent|null Returns the {@see TelemetryEvent} that was captured or null if the {@see Telemeter}
+     *                             has not been initialized or the event is filtered out.
+     *
+     * @since 4.1.0
+     */
+    public function captureTelemetryEvent(
+        string $type,
+        string $level,
+        array|TelemetryBody $metadata,
+        string $uuid = null,
+        ?int $timestamp = null,
+    ): ?TelemetryEvent {
+        return Rollbar::getTelemeter()?->capture($type, $level, $metadata, $uuid, $timestamp);
     }
 
     /**

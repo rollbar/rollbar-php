@@ -10,11 +10,11 @@ use Rollbar\Payload\Person;
 use Rollbar\Payload\Server;
 use Rollbar\Payload\Request;
 use Rollbar\Payload\Data;
+use Rollbar\Payload\TelemetryEvent;
 use Rollbar\Payload\Trace;
 use Rollbar\Payload\Frame;
 use Rollbar\Payload\TraceChain;
 use Rollbar\Payload\ExceptionInfo;
-use Rollbar\Rollbar;
 use Stringable;
 use Throwable;
 
@@ -411,7 +411,7 @@ class DataBuilder implements DataBuilderInterface
         } else {
             $content = $this->getMessage($toLog);
         }
-        return new Body($content, $context);
+        return new Body($content, $context, $this->getTelemetry());
     }
 
     public function getErrorTrace(ErrorWrapper $error)
@@ -562,8 +562,8 @@ class DataBuilder implements DataBuilderInterface
         return new Message(
             (string)$toLog,
             $this->sendMessageTrace ?
-            debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS) :
-            null
+                debug_backtrace($this->localVarsDump ? 0 : DEBUG_BACKTRACE_IGNORE_ARGS) :
+                null
         );
     }
 
@@ -669,7 +669,19 @@ class DataBuilder implements DataBuilderInterface
         }
         return $request;
     }
-    
+
+    /**
+     * Returns the array of telemetry events to be sent with the payload or null if telemetry is not enabled.
+     *
+     * @return TelemetryEvent[]|null
+     *
+     * @since 4.1.0
+     */
+    protected function getTelemetry(): ?array
+    {
+        return Rollbar::getTelemeter()?->copyEvents();
+    }
+
     public function parseForwardedString($forwarded)
     {
         $result = array();
@@ -913,8 +925,7 @@ class DataBuilder implements DataBuilderInterface
             try {
                 $personData = ($this->personFunc)();
             } catch (\Exception $exception) {
-                Rollbar::scope(array('person_fn' => null))->
-                    log(Level::ERROR, $exception);
+                Rollbar::scope(array('person_fn' => null))->log(Level::ERROR, $exception);
             }
         }
 
@@ -1247,27 +1258,27 @@ class DataBuilder implements DataBuilderInterface
     {
         foreach ($backTrace as $index => $frame) {
             extract($frame);
-            
+
             $fatalHandlerMethod = (isset($method)
-                                    && $method === 'Rollbar\\Handlers\\FatalHandler::handle');
-                                    
+                && $method === 'Rollbar\\Handlers\\FatalHandler::handle');
+
             $fatalHandlerClassAndFunction = (isset($class)
-                                                && $class === 'Rollbar\\Handlers\\FatalHandler'
-                                                && isset($function)
-                                                && $function === 'handle');
-            
+                && $class === 'Rollbar\\Handlers\\FatalHandler'
+                && isset($function)
+                && $function === 'handle');
+
             $errorHandlerMethod = (isset($method)
-                                    && $method === 'Rollbar\\Handlers\\ErrorHandler::handle');
-                                    
+                && $method === 'Rollbar\\Handlers\\ErrorHandler::handle');
+
             $errorHandlerClassAndFunction = (isset($class)
-                                                && $class === 'Rollbar\\Handlers\\ErrorHandler'
-                                                && isset($function)
-                                                && $function === 'handle');
-            
+                && $class === 'Rollbar\\Handlers\\ErrorHandler'
+                && isset($function)
+                && $function === 'handle');
+
             if ($fatalHandlerMethod ||
-                 $fatalHandlerClassAndFunction ||
-                 $errorHandlerMethod ||
-                 $errorHandlerClassAndFunction) {
+                $fatalHandlerClassAndFunction ||
+                $errorHandlerMethod ||
+                $errorHandlerClassAndFunction) {
                 return array_slice($backTrace, $index+1);
             }
         }

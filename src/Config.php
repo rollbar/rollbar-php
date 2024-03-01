@@ -2,6 +2,7 @@
 
 namespace Rollbar;
 
+use InvalidArgumentException;
 use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\NoopHandler;
 use Monolog\Logger;
@@ -12,6 +13,8 @@ use Rollbar\Payload\EncodedPayload;
 use Rollbar\Senders\AgentSender;
 use Rollbar\Senders\CurlSender;
 use Rollbar\Senders\SenderInterface;
+use Rollbar\Telemetry\Telemeter;
+use Rollbar\Telemetry\TelemetryFilterInterface;
 use Throwable;
 use Rollbar\Senders\FluentSender;
 
@@ -60,6 +63,7 @@ class Config
         'scrub_safelist',
         'timeout',
         'transmit',
+        'telemetry',
         'custom_truncation',
         'report_suppressed',
         'use_error_reporting',
@@ -219,6 +223,13 @@ class Config
     private bool $raiseOnError = false;
 
     /**
+     * @var null|array The telemetry config. If null, telemetry is disabled.
+     *
+     * @since 4.1.0
+     */
+    private ?array $telemetry;
+
+    /**
      * @var int The maximum number of items reported to Rollbar within one
      * request.
      */
@@ -303,6 +314,7 @@ class Config
         $this->setCheckIgnoreFunction($config);
         $this->setSendMessageTrace($config);
         $this->setRaiseOnError($config);
+        $this->setTelemetry($config);
 
         if (isset($config['included_errno'])) {
             $this->includedErrno = $config['included_errno'];
@@ -333,7 +345,7 @@ class Config
         if (isset($_ENV['ROLLBAR_ACCESS_TOKEN']) && !isset($config['access_token'])) {
             $config['access_token'] = $_ENV['ROLLBAR_ACCESS_TOKEN'];
         }
-        
+
         $this->utilities()->validateString(
             $config['access_token'],
             "config['access_token']",
@@ -443,7 +455,7 @@ class Config
 
     private function setMinimumLevel(array $config): void
     {
-        $this->minimumLevel = \Rollbar\Defaults::get()->minimumLevel();
+        $this->minimumLevel = Defaults::get()->minimumLevel();
 
         $override = $config['minimum_level'] ?? null;
         $override = array_key_exists('minimumLevel', $config) ? $config['minimumLevel'] : $override;
@@ -468,7 +480,7 @@ class Config
         }
 
         if (!$this->reportSuppressed) {
-            $this->reportSuppressed = \Rollbar\Defaults::get()->reportSuppressed();
+            $this->reportSuppressed = Defaults::get()->reportSuppressed();
         }
     }
 
@@ -508,8 +520,22 @@ class Config
         if (array_key_exists('raise_on_error', $config)) {
             $this->raiseOnError = $config['raise_on_error'];
         } else {
-            $this->raiseOnError = \Rollbar\Defaults::get()->raiseOnError();
+            $this->raiseOnError = Defaults::get()->raiseOnError();
         }
+    }
+
+    /**
+     * Sets and cleans the telemetry config.
+     *
+     * @param array $config The config array.
+     * @return void
+     *
+     * @since 4.1.0
+     */
+    private function setTelemetry(array $config): void
+    {
+        $telemetry = key_exists('telemetry', $config) ? $config['telemetry']: true;
+        $this->telemetry = Defaults::get()->telemetry($telemetry);
     }
 
     private function setBatchSize(array $config): void
@@ -746,7 +772,7 @@ class Config
         }
 
         if (!$this->$keyName instanceof $expectedType) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 "$keyName must be a $expectedType"
             );
         }
@@ -815,6 +841,61 @@ class Config
     public function getRaiseOnError(): bool
     {
         return $this->raiseOnError;
+    }
+
+    /**
+     * Returns the telemetry instance or null if telemetry is disabled.
+     *
+     * @param Telemeter|null $telemeter An optional telemeter instance to scope the telemetry to. This allows us to
+     *                                  keep the same telemeter instance when mutating the config. Otherwise, we would
+     *                                  destroy the telemetry queue when mutating the config.
+     * @return Telemeter|null The telemetry instance or null if telemetry is disabled.
+     *
+     * @since 4.1.0
+     */
+    public function getTelemetry(?Telemeter $telemeter): ?Telemeter
+    {
+        if (null === $this->telemetry) {
+            return null;
+        }
+        $config = $this->telemetry;
+        $config['filter'] = $this->initTelemetryFilter($config['filter']);
+        if (null === $telemeter) {
+            return new Telemeter(...$config);
+        }
+        $telemeter->scope(...$config);
+        return $telemeter;
+    }
+
+    /**
+     * Returns the telemetry filter instance or null if no filter is configured.
+     *
+     * @param string|null $filterClass The fully qualified class name of the telemetry filter class or null if no
+     *                                 filter is configured.
+     * @return TelemetryFilterInterface|null
+     *
+     * @throws InvalidArgumentException if the configured filter class does not exist or does not implement
+     *                                  {@see TelemetryFilterInterface}.
+     *
+     * @since 4.1.0
+     */
+    private function initTelemetryFilter(?string $filterClass): ?TelemetryFilterInterface
+    {
+        if (null === $filterClass) {
+            return null;
+        }
+        if (!class_exists($filterClass)) {
+            throw new InvalidArgumentException(
+                "Telemetry filter class $filterClass does not exist"
+            );
+        }
+        $filter = new $filterClass($this->telemetry);
+        if (!$filter instanceof TelemetryFilterInterface) {
+            throw new InvalidArgumentException(
+                "Telemetry filter class $filterClass must implement TelemetryFilterInterface"
+            );
+        }
+        return $filter;
     }
 
     public function transform(
@@ -1058,9 +1139,9 @@ class Config
         // > the value E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR |
         // > E_USER_ERROR | E_RECOVERABLE_ERROR | E_PARSE.
         // https://www.php.net/manual/en/language.operators.errorcontrol.php
-        if (version_compare(PHP_VERSION, '8.0', 'ge') && $errorReporting === (
-            E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR | E_PARSE
-        )) {
+        if ($errorReporting === (
+                E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR | E_PARSE
+            )) {
             return true;
         }
 

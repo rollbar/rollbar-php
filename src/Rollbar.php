@@ -8,6 +8,9 @@ use Rollbar\Payload\Level;
 use Rollbar\Handlers\FatalHandler;
 use Rollbar\Handlers\ErrorHandler;
 use Rollbar\Handlers\ExceptionHandler;
+use Rollbar\Payload\TelemetryBody;
+use Rollbar\Payload\TelemetryEvent;
+use Rollbar\Telemetry\Telemeter;
 use Stringable;
 use Throwable;
 
@@ -41,6 +44,19 @@ class Rollbar
      * @var ExceptionHandler|null
      */
     private static ?ExceptionHandler $exceptionHandler = null;
+
+    /**
+     * The instance of the telemeter. This is null if Rollbar has not been initialized or {@see Rollbar::destroy()} has
+     * been called.
+     *
+     * The Telemeter instance is placed here so that it is not destroyed and the queue lost if the Rollbar config is
+     * changed.
+     *
+     * @var Telemeter|null
+     *
+     * @since 4.1.0
+     */
+    private static ?Telemeter $telemeter = null;
 
     /**
      * Sets up Rollbar monitoring and logging.
@@ -92,6 +108,8 @@ class Rollbar
             }
             self::setupBatchHandling();
         }
+
+        self::updateTelemeter();
     }
 
     /**
@@ -109,6 +127,7 @@ class Rollbar
     {
         if ($configOrLogger instanceof RollbarLogger) {
             self::$logger = $configOrLogger;
+            self::updateTelemeter();
             return;
         }
 
@@ -119,6 +138,19 @@ class Rollbar
         }
 
         self::$logger = new RollbarLogger($configOrLogger);
+        self::updateTelemeter();
+    }
+
+    /**
+     * Updates the telemeter instance with the latest configs.
+     *
+     * @return void
+     *
+     * @since 4.1.0
+     */
+    private static function updateTelemeter(): void
+    {
+        self::$telemeter = self::$logger->getConfig()->getTelemetry(self::$telemeter);
     }
 
     /**
@@ -184,7 +216,11 @@ class Rollbar
         if (is_null(self::$logger)) {
             return new RollbarLogger($config);
         }
-        return self::$logger->scope($config);
+        $logger = self::$logger->scope($config);
+
+        // Reassign the telemeter in case the config changed.
+        self::updateTelemeter();
+        return $logger;
     }
 
     /**
@@ -365,6 +401,36 @@ class Rollbar
     }
 
     /**
+     * Captures a telemetry event that may be sent with future payloads.
+     *
+     * @param string              $type      The type of telemetry data. One of: "log", "network", "dom", "navigation",
+     *                                       "error", or "manual".
+     * @param string              $level     The severity level of the telemetry data. One of: "critical", "error",
+     *                                       "warning", "info", or "debug".
+     * @param array|TelemetryBody $metadata  Additional data about the telemetry event.
+     * @param string|null         $uuid      The Rollbar UUID to associate with this telemetry event.
+     * @param int|null            $timestamp When this occurred, as a unix timestamp in milliseconds. If not provided,
+     *                                       the current time will be used.
+     *
+     * @return TelemetryEvent|null Returns the {@see TelemetryEvent} that was captured or null if Rollbar or the
+     *                             {@see Telemeter} has not been initialized or the event is filtered out.
+     *
+     * @since 4.1.0
+     */
+    public static function captureTelemetryEvent(
+        string $type,
+        string $level,
+        array|TelemetryBody $metadata,
+        string $uuid = null,
+        ?int $timestamp = null,
+    ): ?TelemetryEvent {
+        if (is_null(self::$logger)) {
+            return null;
+        }
+        return self::$logger->captureTelemetryEvent($type, $level, $metadata, $uuid, $timestamp);
+    }
+
+    /**
      * Creates a listener that monitors for exceptions.
      *
      * @return void
@@ -395,6 +461,18 @@ class Rollbar
     {
         self::$fatalHandler = new FatalHandler(self::$logger);
         self::$fatalHandler->register();
+    }
+
+    /**
+     * Returns the configured instance of the telemeter.
+     *
+     * @return Telemeter|null
+     *
+     * @since 4.1.0
+     */
+    public static function getTelemeter(): ?Telemeter
+    {
+        return self::$telemeter;
     }
 
     /**
@@ -490,16 +568,20 @@ class Rollbar
     public static function configure(array $config): void
     {
         self::$logger->configure($config);
+        self::updateTelemeter();
     }
 
     /**
-     * Destroys the currently stored $logger allowing for a fresh configuration. This is especially used in testing
-     * scenarios.
+     * Destroys the currently stored $logger and $telemeter allowing for a fresh configuration. This is especially used
+     * in testing scenarios.
      *
      * @return void
+     *
+     * @since 4.1.0 Also destroys the telemeter.
      */
     public static function destroy(): void
     {
         self::$logger = null;
+        self::$telemeter = null;
     }
 }

@@ -193,6 +193,22 @@ class RollbarLoggerTest extends BaseRollbarTest
         $this->assertEquals(200, $response->getStatus());
     }
 
+    public function testReportTelemetry(): void
+    {
+        // Init used so that the telemeter is initialized.
+        Rollbar::init([
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => "testing-php",
+        ]);
+
+        Rollbar::logger()->report(Level::WARNING, "Testing PHP Notifier", isUncaught: true);
+        $events = Rollbar::getTelemeter()->copyEvents();
+        $this->assertCount(1, $events);
+        $this->assertSame($events[0]->type, 'error');
+        $this->assertSame($events[0]->level, 'warning');
+        $this->assertSame($events[0]->body->message, 'Testing PHP Notifier');
+    }
+
     public function testDefaultVerbose(): void
     {
         $this->testNotVerbose();

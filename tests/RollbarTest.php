@@ -2,6 +2,9 @@
 
 use Rollbar\Payload\Payload;
 use Rollbar\Payload\Level;
+use Rollbar\Payload\TelemetryEvent;
+use Rollbar\Telemetry\DataType;
+use Rollbar\Telemetry\Telemeter;
 use Rollbar\TestHelpers\ArrayLogger;
 
 /**
@@ -61,6 +64,19 @@ class RollbarTest extends BaseRollbarTest
         Rollbar::init($logger);
 
         $this->assertSame($logger, Rollbar::logger());
+    }
+
+    public function testInitTelemeter(): void
+    {
+        // Default telemeter is enabled
+        Rollbar::init(self::$simpleConfig);
+
+        $this->assertInstanceOf(Telemeter::class, Rollbar::getTelemeter());
+
+        // Ensure telemeter is disabled when config is set to false
+        Rollbar::init(array_merge(['telemetry' => false], self::$simpleConfig));
+
+        $this->assertNull(Rollbar::getTelemeter());
     }
 
     public function testLogException(): void
@@ -150,6 +166,22 @@ class RollbarTest extends BaseRollbarTest
     public function testEmergency(): void
     {
         $this->shortcutMethodTestHelper(Level::EMERGENCY);
+    }
+
+    public function testCaptureTelemetryEvent(): void
+    {
+        Rollbar::init(self::$simpleConfig);
+
+        $event = Rollbar::captureTelemetryEvent(
+            type: DataType::LOG,
+            level: 'info',
+            metadata: ['message' => 'test message'],
+        );
+
+        self::assertInstanceOf(TelemetryEvent::class, $event);
+        self::assertEquals(DataType::LOG, $event->type);
+        self::assertEquals('test message', $event->body->message);
+        self::assertEquals('info', $event->level);
     }
     
     protected function shortcutMethodTestHelper($level): void
