@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.1.0-beta] - 2024-03-01
+### Added
+* Added support for Telemetry by @danielmorell in #634.
+### Fixed
+* Fixed #480 IPv6 could not be resolved by curl sender by @danielmorell in #635.
+
 ## [4.0.2] - 2023-12-22
 ### Fixed
 * Fixed unable to to define custom scrubber by @zinkovskiy in #554.
