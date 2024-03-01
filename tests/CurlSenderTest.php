@@ -2,7 +2,10 @@
 
 namespace Rollbar;
 
+use ReflectionClass;
+use ReflectionException;
 use Rollbar\Payload\Level;
+use Rollbar\Senders\CurlSender;
 
 class CurlSenderTest extends BaseRollbarTest
 {
@@ -25,5 +28,44 @@ class CurlSenderTest extends BaseRollbarTest
                 "Empty reply from server"
             )
         );
+    }
+
+    /**
+     * This test will fail if the {@see CurlSender::$ipResolve} property is renamed or removed.
+     */
+    public function testIPResolve(): void
+    {
+        $sender = new CurlSender([
+            'ip_resolve' => CURL_IPRESOLVE_V4,
+        ]);
+        self::assertSame(CURL_IPRESOLVE_V4, self::getPrivateProperty($sender, 'ipResolve'));
+
+        $sender = new CurlSender([]);
+        self::assertSame(CURL_IPRESOLVE_V4, self::getPrivateProperty($sender, 'ipResolve'));
+
+        $sender = new CurlSender([
+            'ip_resolve' => CURL_IPRESOLVE_V6,
+        ]);
+        self::assertSame(CURL_IPRESOLVE_V6, self::getPrivateProperty($sender, 'ipResolve'));
+
+        $sender = new CurlSender([
+            'ip_resolve' => CURL_IPRESOLVE_WHATEVER,
+        ]);
+        self::assertSame(CURL_IPRESOLVE_WHATEVER, self::getPrivateProperty($sender, 'ipResolve'));
+    }
+
+    /**
+     * Returns the value of a private property of an object.
+     *
+     * @param object $object   The object from which to get the private property.
+     * @param string $property The name of the private property to get.
+     * @return mixed
+     * @throws ReflectionException If the object or property does not exist.
+     */
+    private static function getPrivateProperty(object $object, string $property): mixed
+    {
+        $reflection = new ReflectionClass($object);
+        $property = $reflection->getProperty($property);
+        return $property->getValue($object);
     }
 }
