@@ -26,6 +26,7 @@ class CurlSender implements SenderInterface
     private $maxBatchRequests = 75;
     private $batchRequests = array();
     private $inflightRequests = array();
+    private $ipResolve = CURL_IPRESOLVE_V4;
 
     public function __construct($opts)
     {
@@ -53,6 +54,10 @@ class CurlSender implements SenderInterface
         }
         if (array_key_exists('ca_cert_path', $opts)) {
             $this->caCertPath = $opts['ca_cert_path'];
+        }
+        if (array_key_exists('ip_resolve', $opts)
+            && in_array($opts['ip_resolve'], [CURL_IPRESOLVE_V4, CURL_IPRESOLVE_V6, CURL_IPRESOLVE_WHATEVER])) {
+            $this->ipResolve = $opts['ip_resolve'];
         }
     }
     
@@ -151,7 +156,7 @@ class CurlSender implements SenderInterface
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($handle, CURLOPT_TIMEOUT, $this->timeout);
         curl_setopt($handle, CURLOPT_HTTPHEADER, array('X-Rollbar-Access-Token: ' . $accessToken));
-        curl_setopt($handle, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+        curl_setopt($handle, CURLOPT_IPRESOLVE, $this->ipResolve);
 
         if (!is_null($this->caCertPath)) {
             curl_setopt($handle, CURLOPT_CAINFO, $this->caCertPath);
