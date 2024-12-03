@@ -176,7 +176,7 @@ class Telemeter
         string $type,
         string $level,
         array|TelemetryBody $metadata,
-        string $uuid = null,
+        ?string $uuid = null,
         ?int $timestamp = null,
     ): ?TelemetryEvent {
         if ($this->maxQueueSize === 0) {
@@ -213,7 +213,7 @@ class Telemeter
     public function captureError(
         array|string|ErrorWrapper|Throwable $error,
         string $level = 'error',
-        string $uuid = null,
+        ?string $uuid = null,
         ?int $timestamp = null,
     ): ?TelemetryEvent {
         if (is_string($error)) {
@@ -253,7 +253,7 @@ class Telemeter
     public function captureLog(
         string $message,
         string $level = 'info',
-        string $uuid = null,
+        ?string $uuid = null,
         ?int $timestamp = null,
     ): ?TelemetryEvent {
         return $this->capture('log', $level, new TelemetryBody(message: $message), $uuid, $timestamp);
@@ -278,7 +278,7 @@ class Telemeter
         string $url,
         string $status_code,
         string $level = 'info',
-        string $uuid = null,
+        ?string $uuid = null,
         ?int $timestamp = null,
     ): ?TelemetryEvent {
         return $this->capture(
@@ -311,7 +311,7 @@ class Telemeter
         string $from,
         string $to,
         string $level = 'info',
-        string $uuid = null,
+        ?string $uuid = null,
         ?int $timestamp = null,
     ): ?TelemetryEvent {
         return $this->capture('log', $level, new TelemetryBody(from: $from, to: $to), $uuid, $timestamp);

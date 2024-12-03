@@ -323,7 +323,7 @@ class RollbarLogger extends AbstractLogger
         string $type,
         string $level,
         array|TelemetryBody $metadata,
-        string $uuid = null,
+        ?string $uuid = null,
         ?int $timestamp = null,
     ): ?TelemetryEvent {
         return Rollbar::getTelemeter()?->capture($type, $level, $metadata, $uuid, $timestamp);

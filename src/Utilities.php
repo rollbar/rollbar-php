@@ -78,14 +78,14 @@ final class Utilities
      * Serialize all, or the given keys, from the given object and store it
      * in this class's internal store (see self::$ObjectHashes).
      */
-    public static function serializeForRollbarInternal($obj, array $customKeys = null)
+    public static function serializeForRollbarInternal($obj, ?array $customKeys = null)
     {
         return self::serializeForRollbar($obj, $customKeys, self::$ObjectHashes);
     }
 
     public static function serializeForRollbar(
         $obj,
-        array $customKeys = null,
+        ?array $customKeys = null,
         &$objectHashes = array(),
         $maxDepth = -1,
         $depth = 0
@@ -141,7 +141,7 @@ final class Utilities
     
     private static function serializeObject(
         $obj,
-        array $customKeys = null,
+        ?array $customKeys = null,
         &$objectHashes = array(),
         $maxDepth = -1,
         $depth = 0

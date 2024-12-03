@@ -43,7 +43,6 @@ class Defaults
             E_USER_ERROR => "error",
             E_USER_WARNING => "warning",
             E_USER_NOTICE => "debug",
-            E_STRICT => "info",
             E_RECOVERABLE_ERROR => "error",
             E_DEPRECATED => "info",
             E_USER_DEPRECATED => "info"
