@@ -3,7 +3,8 @@
 use Rollbar\Payload\Payload;
 use Rollbar\Payload\Level;
 use Rollbar\Payload\TelemetryEvent;
-use Rollbar\Telemetry\DataType;
+use Rollbar\Telemetry\EventLevel;
+use Rollbar\Telemetry\EventType;
 use Rollbar\Telemetry\Telemeter;
 use Rollbar\TestHelpers\ArrayLogger;
 
@@ -173,15 +174,15 @@ class RollbarTest extends BaseRollbarTest
         Rollbar::init(self::$simpleConfig);
 
         $event = Rollbar::captureTelemetryEvent(
-            type: DataType::LOG,
-            level: 'info',
+            type: EventType::Log,
+            level: EventLevel::Info,
             metadata: ['message' => 'test message'],
         );
 
         self::assertInstanceOf(TelemetryEvent::class, $event);
-        self::assertEquals(DataType::LOG, $event->type);
+        self::assertEquals(EventType::Log, $event->type);
         self::assertEquals('test message', $event->body->message);
-        self::assertEquals('info', $event->level);
+        self::assertEquals(EventLevel::Info, $event->level);
     }
     
     protected function shortcutMethodTestHelper($level): void

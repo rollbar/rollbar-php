@@ -3,7 +3,8 @@
 namespace Rollbar\Payload;
 
 use Rollbar\SerializerInterface;
-use Rollbar\Telemetry\DataType;
+use Rollbar\Telemetry\EventLevel;
+use Rollbar\Telemetry\EventType;
 use Rollbar\UtilitiesTrait;
 
 /**
@@ -25,22 +26,21 @@ class TelemetryEvent implements SerializerInterface
      *
      * Some types should be accompanied by specific data in the body.
      *
-     * - If $type is {@see DataType::LOG}, the body should contain "message" key.
-     * - If $type is {@see DataType::NETWORK}, the body should contain "method", "url", and "status_code" keys.
-     * - If $type is {@see DataType::NAVIGATION}, the body should contain "from" and "to" keys.
-     * - If $type is {@see DataType::ERROR}, the body should contain "message" key.
+     * - If $type is {@see EventType::Log}, the body should contain "message" key.
+     * - If $type is {@see EventType::Network}, the body should contain "method", "url", and "status_code" keys.
+     * - If $type is {@see EventType::Navigation}, the body should contain "from" and "to" keys.
+     * - If $type is {@see EventType::Error}, the body should contain "message" key.
      *
-     * @param string              $type      The type of telemetry data. One of: {@see DataType}.
-     * @param string              $level     The severity level of the telemetry data. One of: "critical", "error",
-     *                                       "warning", "info", or "debug".
+     * @param EventType           $type      The type of telemetry data.
+     * @param EventLevel          $level     The severity level of the telemetry data.
      * @param array|TelemetryBody $body      Additional data for the telemetry event. If an array is provided, it will
      *                                       be converted to a {@see TelemetryBody} object.
      * @param float|null          $timestamp When this occurred, as a unix timestamp in milliseconds. If not provided,
      *                                       Rollbar will use the current time.
      */
     public function __construct(
-        public string $type,
-        public string $level,
+        public EventType $type,
+        public EventLevel $level,
         array|TelemetryBody $body,
         public ?float $timestamp = null,
     ) {
@@ -55,8 +55,8 @@ class TelemetryEvent implements SerializerInterface
         $result = array_filter([
             'uuid' => $this->uuid,
             'source' => $this->source,
-            'level' => $this->level,
-            'type' => $this->type,
+            'level' => $this->level->value,
+            'type' => $this->type->value,
             'body' => $this->body->serialize(),
             'timestamp_ms' => $this->timestamp,
         ]);

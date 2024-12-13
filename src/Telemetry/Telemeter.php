@@ -53,14 +53,14 @@ class Telemeter
      * Returns the Rollbar telemetry type that corresponds to the given PSR-3 log level.
      *
      * @param string $level The PSR-3 log level.
-     * @return string
+     * @return EventType
      */
-    private static function getTypeFromLevel(string $level): string
+    private static function getTypeFromLevel(string $level): EventType
     {
         return match ($level) {
-            Level::EMERGENCY, Level::ALERT, Level::CRITICAL, Level::ERROR, Level::WARNING => DataType::ERROR,
-            Level::NOTICE, Level::INFO => DataType::LOG,
-            default => DataType::MANUAL,
+            Level::EMERGENCY, Level::ALERT, Level::CRITICAL, Level::ERROR, Level::WARNING => EventType::Error,
+            Level::NOTICE, Level::INFO => EventType::Log,
+            default => EventType::Manual,
         };
     }
 
@@ -68,16 +68,16 @@ class Telemeter
      * Returns the Rollbar telemetry level that corresponds to the given PSR-3 log level.
      *
      * @param string $level The PSR-3 log level.
-     * @return string
+     * @return EventLevel
      */
-    private static function getLevelFromLevel(string $level): string
+    private static function getLevelFromPsrLevel(string $level): EventLevel
     {
         return match ($level) {
-            Level::EMERGENCY, Level::ALERT, Level::CRITICAL => 'critical',
-            Level::ERROR => 'error',
-            Level::WARNING => 'warning',
-            Level::DEBUG => 'debug',
-            default => 'info',
+            Level::EMERGENCY, Level::ALERT, Level::CRITICAL => EventLevel::Critical,
+            Level::ERROR => EventLevel::Error,
+            Level::WARNING => EventLevel::Warning,
+            Level::DEBUG => EventLevel::Debug,
+            default => EventLevel::Info,
         };
     }
 
@@ -161,10 +161,8 @@ class Telemeter
     /**
      * Captures a telemetry event and adds it to the queue.
      *
-     * @param string              $type      The type of telemetry data. One of: "log", "network", "dom", "navigation",
-     *                                       "error", or "manual".
-     * @param string              $level     The severity level of the telemetry data. One of: "critical", "error",
-     *                                       "warning", "info", or "debug".
+     * @param EventType           $type      The type of telemetry data.
+     * @param EventLevel          $level     The severity level of the telemetry data.
      * @param array|TelemetryBody $metadata  Additional data about the telemetry event.
      * @param string|null         $uuid      The Rollbar UUID to associate with this telemetry event.
      * @param int|null            $timestamp When this occurred, as a unix timestamp in milliseconds. If not provided,
@@ -173,11 +171,11 @@ class Telemeter
      * @return TelemetryEvent|null
      */
     public function capture(
-        string $type,
-        string $level,
+        EventType           $type,
+        EventLevel          $level,
         array|TelemetryBody $metadata,
-        string $uuid = null,
-        ?int $timestamp = null,
+        string              $uuid = null,
+        ?int                $timestamp = null,
     ): ?TelemetryEvent {
         if ($this->maxQueueSize === 0) {
             return null;
@@ -200,9 +198,7 @@ class Telemeter
      *                                                       as the message. If an array is given, it will be used as
      *                                                       the metadata body. If an ErrorWrapper is given, it will be
      *                                                       parsed for the message and stack trace.
-     * @param string                              $level     The severity level of the telemetry data. One of:
-     *                                                       "critical", "error", "warning", "info", or "debug".
-     *                                                       Defaults to "error".
+     * @param EventLevel                          $level     The severity level of the telemetry data.
      * @param string|null                         $uuid      The Rollbar UUID to associate with this telemetry event.
      * @param int|null                            $timestamp When this occurred, as a unix timestamp in milliseconds. If
      *                                                       not provided, the current time will be used.
@@ -212,12 +208,12 @@ class Telemeter
      */
     public function captureError(
         array|string|ErrorWrapper|Throwable $error,
-        string $level = 'error',
+        EventLevel $level = EventLevel::Error,
         string $uuid = null,
         ?int $timestamp = null,
     ): ?TelemetryEvent {
         if (is_string($error)) {
-            return $this->capture('error', $level, new TelemetryBody(message: $error), $uuid, $timestamp);
+            return $this->capture(EventType::Error, $level, new TelemetryBody(message: $error), $uuid, $timestamp);
         }
         if ($error instanceof ErrorWrapper) {
             $metadata = new TelemetryBody(
@@ -225,7 +221,7 @@ class Telemeter
                 subtype: 'error',
                 stack: $this->stringifyBacktrace($error->getBacktrace()),
             );
-            return $this->capture('error', $level, $metadata, $uuid, $timestamp);
+            return $this->capture(EventType::Error, $level, $metadata, $uuid, $timestamp);
         }
         if ($error instanceof Throwable) {
             $metadata = new TelemetryBody(
@@ -233,17 +229,16 @@ class Telemeter
                 subtype: 'exception',
                 stack: $this->stringifyBacktrace($error->getTrace())
             );
-            return $this->capture('error', $level, $metadata, $uuid, $timestamp);
+            return $this->capture(EventType::Error, $level, $metadata, $uuid, $timestamp);
         }
-        return $this->capture('error', $level, $error, $uuid, $timestamp);
+        return $this->capture(EventType::Error, $level, $error, $uuid, $timestamp);
     }
 
     /**
      * Captures a log message as a telemetry event and adds it to the queue.
      *
      * @param string      $message   The log message to capture.
-     * @param string      $level     The severity level of the telemetry data. One of: "critical", "error", "warning",
-     *                               "info", or "debug". Defaults to "info".
+     * @param EventLevel  $level     The severity level of the telemetry data.
      * @param string|null $uuid      The Rollbar UUID to associate with this telemetry event.
      * @param int|null    $timestamp When this occurred, as a unix timestamp in milliseconds. If not provided, the
      *                               current time will be used.
@@ -252,11 +247,11 @@ class Telemeter
      */
     public function captureLog(
         string $message,
-        string $level = 'info',
+        EventLevel $level = EventLevel::Info,
         string $uuid = null,
         ?int $timestamp = null,
     ): ?TelemetryEvent {
-        return $this->capture('log', $level, new TelemetryBody(message: $message), $uuid, $timestamp);
+        return $this->capture(EventType::Log, $level, new TelemetryBody(message: $message), $uuid, $timestamp);
     }
 
     /**
@@ -265,8 +260,7 @@ class Telemeter
      * @param string      $method      The HTTP method. E.g. GET, POST, etc.
      * @param string      $url         The URL of the request.
      * @param string      $status_code The HTTP status code.
-     * @param string      $level       The severity level of the telemetry data. One of: "critical", "error", "warning",
-     *                                 "info", or "debug". Defaults to "info".
+     * @param EventLevel  $level       The severity level of the telemetry data.
      * @param string|null $uuid        The Rollbar UUID to associate with this telemetry event.
      * @param int|null    $timestamp   When this occurred, as a unix timestamp in milliseconds. If not provided, the
      *                                 current time will be used.
@@ -277,12 +271,12 @@ class Telemeter
         string $method,
         string $url,
         string $status_code,
-        string $level = 'info',
+        EventLevel $level = EventLevel::Info,
         string $uuid = null,
         ?int $timestamp = null,
     ): ?TelemetryEvent {
         return $this->capture(
-            type: 'log',
+            type: EventType::Log,
             level: $level,
             metadata: new TelemetryBody(
                 method: $method,
@@ -299,8 +293,7 @@ class Telemeter
      *
      * @param string      $from      The URL of the previous page.
      * @param string      $to        The URL of the next page.
-     * @param string      $level     The severity level of the telemetry data. One of: "critical", "error", "warning",
-     *                               "info", or "debug". Defaults to "info".
+     * @param EventLevel  $level     The severity level of the telemetry data.
      * @param string|null $uuid      The Rollbar UUID to associate with this telemetry event.
      * @param int|null    $timestamp When this occurred, as a unix timestamp in milliseconds. If not provided, the
      *                               current time will be used.
@@ -310,11 +303,11 @@ class Telemeter
     public function captureNavigation(
         string $from,
         string $to,
-        string $level = 'info',
+        EventLevel $level = EventLevel::Info,
         string $uuid = null,
         ?int $timestamp = null,
     ): ?TelemetryEvent {
-        return $this->capture('log', $level, new TelemetryBody(from: $from, to: $to), $uuid, $timestamp);
+        return $this->capture(EventType::Log, $level, new TelemetryBody(from: $from, to: $to), $uuid, $timestamp);
     }
 
     /**
@@ -348,7 +341,7 @@ class Telemeter
         }
         // Make sure to respect the PSR exception context. See https://www.php-fig.org/psr/psr-3/#13-context.
         if (($context['exception'] ?? null) instanceof Throwable) {
-            $event = $this->captureError($context['exception'], self::getLevelFromLevel($level), $uuid);
+            $event = $this->captureError($context['exception'], self::getLevelFromPsrLevel($level), $uuid);
             if (null === $event) {
                 return null;
             }
@@ -361,12 +354,12 @@ class Telemeter
         }
         // If the rollbar item is an exception, we should capture it as an error event.
         if ($message instanceof Throwable) {
-            return $this->captureError($message, self::getLevelFromLevel($level), $uuid);
+            return $this->captureError($message, self::getLevelFromPsrLevel($level), $uuid);
         }
         // Otherwise, we will capture it based on the level.
         return $this->capture(
             type: self::getTypeFromLevel($level),
-            level: self::getLevelFromLevel($level),
+            level: self::getLevelFromPsrLevel($level),
             metadata: new TelemetryBody(message: $this->getRollbarItemMessage($message)),
             uuid: $uuid,
         );
