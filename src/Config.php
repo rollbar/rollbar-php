@@ -252,7 +252,7 @@ class Config
         }
 
         $levels = array(E_WARNING, E_NOTICE, E_USER_ERROR, E_USER_WARNING,
-            E_USER_NOTICE, E_STRICT, E_RECOVERABLE_ERROR);
+            E_USER_NOTICE, E_RECOVERABLE_ERROR);
         // PHP 5.3.0
         if (defined('E_DEPRECATED')) {
             $levels = array_merge($levels, array(E_DEPRECATED, E_USER_DEPRECATED));

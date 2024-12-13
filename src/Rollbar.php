@@ -421,7 +421,7 @@ class Rollbar
         string $type,
         string $level,
         array|TelemetryBody $metadata,
-        string $uuid = null,
+        ?string $uuid = null,
         ?int $timestamp = null,
     ): ?TelemetryEvent {
         if (is_null(self::$logger)) {

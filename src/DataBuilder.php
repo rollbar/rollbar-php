@@ -425,7 +425,7 @@ class DataBuilder implements DataBuilderInterface
      *
      * @return Trace|TraceChain
      */
-    public function getExceptionTrace(Throwable $exc, string|Stringable $message = null): Trace|TraceChain
+    public function getExceptionTrace(Throwable $exc, string|Stringable|null $message = null): Trace|TraceChain
     {
         $chain   = array();
         $chain[] = $this->makeTrace($exc, $this->includeExcCodeContext, message: $message);
@@ -460,7 +460,7 @@ class DataBuilder implements DataBuilderInterface
         Throwable $exception,
         bool $includeContext,
         ?string $classOverride = null,
-        string|Stringable $message = null,
+        string|Stringable|null $message = null,
     ): Trace {
         $frames = array();
         if ($this->captureErrorStacktraces) {
