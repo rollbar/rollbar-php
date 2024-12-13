@@ -853,7 +853,7 @@ class Config
      *
      * @since 4.1.0
      */
-    public function getTelemetry(?Telemeter $telemeter): ?Telemeter
+    public function getTelemetry(?Telemeter $telemeter = null): ?Telemeter
     {
         if (null === $this->telemetry) {
             return null;
