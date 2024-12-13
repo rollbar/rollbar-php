@@ -853,13 +853,23 @@ class Config
      *
      * @since 4.1.0
      */
-    public function getTelemetry(?Telemeter $telemeter): ?Telemeter
+    public function getTelemetry(?Telemeter $telemeter = null): ?Telemeter
     {
         if (null === $this->telemetry) {
             return null;
         }
+
         $config = $this->telemetry;
         $config['filter'] = $this->initTelemetryFilter($config['filter']);
+
+        // Filter out any invalid config options.
+        $config = array_intersect_key($config, [
+            'maxTelemetryEvents' => Telemeter::MAX_EVENTS,
+            'filter' => null,
+            'includeItemsInTelemetry' => false,
+            'includeIgnoredItemsInTelemetry' => false,
+        ]);
+
         if (null === $telemeter) {
             return new Telemeter(...$config);
         }
