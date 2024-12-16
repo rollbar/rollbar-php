@@ -4,6 +4,8 @@ use Exception;
 use Monolog\Handler\NoopHandler;
 use Rollbar\Payload\Level;
 use Rollbar\Payload\Payload;
+use Rollbar\Telemetry\EventLevel;
+use Rollbar\Telemetry\EventType;
 use Rollbar\TestHelpers\ArrayLogger;
 use Rollbar\TestHelpers\Exceptions\SilentExceptionSampleRate;
 use StdClass;
@@ -204,8 +206,8 @@ class RollbarLoggerTest extends BaseRollbarTest
         Rollbar::logger()->report(Level::WARNING, "Testing PHP Notifier", isUncaught: true);
         $events = Rollbar::getTelemeter()->copyEvents();
         $this->assertCount(1, $events);
-        $this->assertSame($events[0]->type, 'error');
-        $this->assertSame($events[0]->level, 'warning');
+        $this->assertSame($events[0]->type, EventType::Error);
+        $this->assertSame($events[0]->level, EventLevel::Warning);
         $this->assertSame($events[0]->body->message, 'Testing PHP Notifier');
     }
 

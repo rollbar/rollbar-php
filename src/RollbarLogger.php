@@ -7,6 +7,8 @@ use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Rollbar\Payload\TelemetryBody;
 use Rollbar\Payload\TelemetryEvent;
+use Rollbar\Telemetry\EventLevel;
+use Rollbar\Telemetry\EventType;
 use Rollbar\Telemetry\Telemeter;
 use Stringable;
 use Throwable;
@@ -305,10 +307,8 @@ class RollbarLogger extends AbstractLogger
     /**
      * Captures a telemetry event that may be sent with future payloads.
      *
-     * @param string              $type      The type of telemetry data. One of: "log", "network", "dom", "navigation",
-     *                                       "error", or "manual".
-     * @param string              $level     The severity level of the telemetry data. One of: "critical", "error",
-     *                                       "warning", "info", or "debug".
+     * @param EventType           $type      The type of telemetry data.
+     * @param EventLevel          $level     The severity level of the telemetry data.
      * @param array|TelemetryBody $metadata  Additional data about the telemetry event.
      * @param string|null         $uuid      The Rollbar UUID to associate with this telemetry event.
      * @param int|null            $timestamp When this occurred, as a unix timestamp in milliseconds. If not provided,
@@ -320,8 +320,8 @@ class RollbarLogger extends AbstractLogger
      * @since 4.1.0
      */
     public function captureTelemetryEvent(
-        string $type,
-        string $level,
+        EventType $type,
+        EventLevel $level,
         array|TelemetryBody $metadata,
         ?string $uuid = null,
         ?int $timestamp = null,
