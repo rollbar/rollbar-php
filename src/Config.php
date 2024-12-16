@@ -252,7 +252,7 @@ class Config
         }
 
         $levels = array(E_WARNING, E_NOTICE, E_USER_ERROR, E_USER_WARNING,
-            E_USER_NOTICE, E_STRICT, E_RECOVERABLE_ERROR);
+            E_USER_NOTICE, E_RECOVERABLE_ERROR);
         // PHP 5.3.0
         if (defined('E_DEPRECATED')) {
             $levels = array_merge($levels, array(E_DEPRECATED, E_USER_DEPRECATED));
@@ -853,13 +853,23 @@ class Config
      *
      * @since 4.1.0
      */
-    public function getTelemetry(?Telemeter $telemeter): ?Telemeter
+    public function getTelemetry(?Telemeter $telemeter = null): ?Telemeter
     {
         if (null === $this->telemetry) {
             return null;
         }
+
         $config = $this->telemetry;
         $config['filter'] = $this->initTelemetryFilter($config['filter']);
+
+        // Filter out any invalid config options.
+        $config = array_intersect_key($config, [
+            'maxTelemetryEvents' => Telemeter::MAX_EVENTS,
+            'filter' => null,
+            'includeItemsInTelemetry' => false,
+            'includeIgnoredItemsInTelemetry' => false,
+        ]);
+
         if (null === $telemeter) {
             return new Telemeter(...$config);
         }

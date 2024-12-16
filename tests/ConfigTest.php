@@ -12,6 +12,7 @@ use Rollbar\Payload\Payload;
 use Rollbar\RollbarLogger;
 use Rollbar\Defaults;
 
+use Rollbar\Telemetry\Telemeter;
 use Rollbar\TestHelpers\CustomSerializable;
 use Rollbar\TestHelpers\DeprecatedSerializable;
 use Rollbar\TestHelpers\Exceptions\SilentExceptionSampleRate;
@@ -589,6 +590,34 @@ class ConfigTest extends BaseRollbarTest
         ));
         
         $this->assertTrue($config->getRaiseOnError());
+    }
+
+    public function testGetTelemetry(): void
+    {
+        $config = new Config(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => $this->env,
+        ));
+
+        $this->assertInstanceOf(Telemeter::class, $config->getTelemetry());
+
+        $config = new Config(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => $this->env,
+            "telemetry" => false,
+        ));
+
+        $this->assertNull($config->getTelemetry());
+
+        $config = new Config(array(
+            "access_token" => $this->getTestAccessToken(),
+            "environment" => $this->env,
+            "telemetry" => [
+                'invalidKey' => 'invalidValue'
+            ],
+        ));
+
+        $this->assertInstanceOf(Telemeter::class, $config->getTelemetry());
     }
 
     public function testSendMessageTrace(): void
