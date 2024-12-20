@@ -45,10 +45,10 @@ class TelemeterTest extends BaseRollbarTest
         self::assertSame(100, $telemeter->getMaxQueueSize());
         self::assertSame(0, $telemeter->getQueueSize());
 
-        $telemeter->push(new TelemetryEvent(DataType::LOG, 'info', ['message' => 'foo']));
+        $telemeter->push(new TelemetryEvent(EventType::Log, EventLevel::Info, ['message' => 'foo']));
         self::assertSame(1, $telemeter->getQueueSize());
 
-        $telemeter->push(new TelemetryEvent(DataType::LOG, 'info', new TelemetryBody('bar')));
+        $telemeter->push(new TelemetryEvent(EventType::Log, EventLevel::Info, new TelemetryBody('bar')));
         self::assertSame(2, $telemeter->getQueueSize());
     }
 
@@ -56,8 +56,8 @@ class TelemeterTest extends BaseRollbarTest
     {
         $telemeter = new Telemeter();
 
-        $event1 = new TelemetryEvent(DataType::LOG, 'info', ['message' => 'foo']);
-        $event2 = new TelemetryEvent(DataType::LOG, 'info', new TelemetryBody('bar'));
+        $event1 = new TelemetryEvent(EventType::Log, EventLevel::Info, ['message' => 'foo']);
+        $event2 = new TelemetryEvent(EventType::Log, EventLevel::Info, new TelemetryBody('bar'));
 
         $telemeter->push($event1);
         $telemeter->push($event2);
@@ -77,8 +77,8 @@ class TelemeterTest extends BaseRollbarTest
 
         $telemeter = new Telemeter(filter: $filter);
 
-        $event1 = new TelemetryEvent(DataType::LOG, 'info', ['message' => 'foo']);
-        $event2 = new TelemetryEvent(DataType::LOG, 'info', new TelemetryBody('bar'));
+        $event1 = new TelemetryEvent(EventType::Log, EventLevel::Info, ['message' => 'foo']);
+        $event2 = new TelemetryEvent(EventType::Log, EventLevel::Info, new TelemetryBody('bar'));
 
         $telemeter->push($event1);
         $telemeter->push($event2);
@@ -91,13 +91,13 @@ class TelemeterTest extends BaseRollbarTest
     public function testCapture(): void
     {
         $telemeter = new Telemeter();
-        $telemeter->capture(DataType::LOG, 'info', ['message' => 'foo']);
+        $telemeter->capture(EventType::Log, EventLevel::Info, ['message' => 'foo']);
 
         $events = $telemeter->copyEvents();
         self::assertSame(1, count($events));
         self::assertSame('foo', $events[0]->body->message);
-        self::assertSame('info', $events[0]->level);
-        self::assertSame(DataType::LOG, $events[0]->type);
+        self::assertSame(EventLevel::Info, $events[0]->level);
+        self::assertSame(EventType::Log, $events[0]->type);
         self::assertNotNull($events[0]->timestamp);
     }
 
@@ -109,8 +109,8 @@ class TelemeterTest extends BaseRollbarTest
         });
 
         $telemeter = new Telemeter(filter: $filter);
-        $telemeter->capture(DataType::LOG, 'info', ['message' => 'foo']);
-        $telemeter->capture(DataType::LOG, 'info', ['message' => 'bar']);
+        $telemeter->capture(EventType::Log, EventLevel::Info, ['message' => 'foo']);
+        $telemeter->capture(EventType::Log, EventLevel::Info, ['message' => 'bar']);
 
         // Because the filter is also applied on the copyEvents() call, we want to make sure that the 'foo' event is
         // filtered out, but the 'bar' event is not.
@@ -125,39 +125,39 @@ class TelemeterTest extends BaseRollbarTest
     {
         $telemeter = new Telemeter();
         $telemeter->captureError('foo');
-        $telemeter->captureError(['message' => 'bar'], 'warning');
-        $telemeter->captureError(['message' => 'baz'], 'critical');
+        $telemeter->captureError(['message' => 'bar'], EventLevel::Warning);
+        $telemeter->captureError(['message' => 'baz'], EventLevel::Critical);
 
         $events = $telemeter->copyEvents();
         self::assertSame(3, count($events));
         self::assertSame('foo', $events[0]->body->message);
-        self::assertSame('error', $events[0]->type);
-        self::assertSame('error', $events[0]->level);
+        self::assertSame(EventType::Error, $events[0]->type);
+        self::assertSame(EventLevel::Error, $events[0]->level);
 
         self::assertSame('bar', $events[1]->body->message);
-        self::assertSame('error', $events[1]->type);
-        self::assertSame('warning', $events[1]->level);
+        self::assertSame(EventType::Error, $events[1]->type);
+        self::assertSame(EventLevel::Warning, $events[1]->level);
 
         self::assertSame('baz', $events[2]->body->message);
-        self::assertSame('error', $events[2]->type);
-        self::assertSame('critical', $events[2]->level);
+        self::assertSame(EventType::Error, $events[2]->type);
+        self::assertSame(EventLevel::Critical, $events[2]->level);
     }
 
     public function testCaptureLog(): void
     {
         $telemeter = new Telemeter();
         $telemeter->captureLog('foo');
-        $telemeter->captureLog('bar', 'debug');
+        $telemeter->captureLog('bar', EventLevel::Debug);
 
         $events = $telemeter->copyEvents();
         self::assertSame(2, count($events));
         self::assertSame('foo', $events[0]->body->message);
-        self::assertSame('log', $events[0]->type);
-        self::assertSame('info', $events[0]->level);
+        self::assertSame(EventType::Log, $events[0]->type);
+        self::assertSame(EventLevel::Info, $events[0]->level);
 
         self::assertSame('bar', $events[1]->body->message);
-        self::assertSame('log', $events[1]->type);
-        self::assertSame('debug', $events[1]->level);
+        self::assertSame(EventType::Log, $events[1]->type);
+        self::assertSame(EventLevel::Debug, $events[1]->level);
     }
 
     public function testCaptureNetwork(): void
@@ -201,36 +201,36 @@ class TelemeterTest extends BaseRollbarTest
         $telemeter = new Telemeter();
         $error = new Exception('oops');
         $event = $telemeter->captureRollbarItem(Level::DEBUG, 'baz', context: ['exception' => $error]);
-        self::assertSame(DataType::ERROR, $event->type);
+        self::assertSame(EventType::Error, $event->type);
         self::assertSame('oops', $event->body->extra['error_message']);
         self::assertSame('baz', $event->body->message);
 
         // Test a Throwable $message is treated as an error
         $event = $telemeter->captureRollbarItem(Level::DEBUG, $error);
-        self::assertSame(DataType::ERROR, $event->type);
+        self::assertSame(EventType::Error, $event->type);
         self::assertSame('oops', $event->body->message);
 
         // Test telemetry type dynamically determined from the Rollbar level.
-        self::assertSame(DataType::ERROR, $telemeter->captureRollbarItem(Level::EMERGENCY, 'foo')->type);
-        self::assertSame(DataType::ERROR, $telemeter->captureRollbarItem(Level::ALERT, 'foo')->type);
-        self::assertSame(DataType::ERROR, $telemeter->captureRollbarItem(Level::CRITICAL, 'foo')->type);
-        self::assertSame(DataType::ERROR, $telemeter->captureRollbarItem(Level::ERROR, 'foo')->type);
-        self::assertSame(DataType::ERROR, $telemeter->captureRollbarItem(Level::WARNING, 'foo')->type);
-        self::assertSame(DataType::LOG, $telemeter->captureRollbarItem(Level::NOTICE, 'foo')->type);
-        self::assertSame(DataType::LOG, $telemeter->captureRollbarItem(Level::INFO, 'foo')->type);
-        self::assertSame(DataType::MANUAL, $telemeter->captureRollbarItem(Level::DEBUG, 'foo')->type);
-        self::assertSame(DataType::MANUAL, $telemeter->captureRollbarItem('bar', 'foo')->type);
+        self::assertSame(EventType::Error, $telemeter->captureRollbarItem(Level::EMERGENCY, 'foo')->type);
+        self::assertSame(EventType::Error, $telemeter->captureRollbarItem(Level::ALERT, 'foo')->type);
+        self::assertSame(EventType::Error, $telemeter->captureRollbarItem(Level::CRITICAL, 'foo')->type);
+        self::assertSame(EventType::Error, $telemeter->captureRollbarItem(Level::ERROR, 'foo')->type);
+        self::assertSame(EventType::Error, $telemeter->captureRollbarItem(Level::WARNING, 'foo')->type);
+        self::assertSame(EventType::Log, $telemeter->captureRollbarItem(Level::NOTICE, 'foo')->type);
+        self::assertSame(EventType::Log, $telemeter->captureRollbarItem(Level::INFO, 'foo')->type);
+        self::assertSame(EventType::Manual, $telemeter->captureRollbarItem(Level::DEBUG, 'foo')->type);
+        self::assertSame(EventType::Manual, $telemeter->captureRollbarItem('bar', 'foo')->type);
 
         // Test telemetry level dynamically determined from the Rollbar level.
-        self::assertSame('critical', $telemeter->captureRollbarItem(Level::EMERGENCY, 'foo')->level);
-        self::assertSame('critical', $telemeter->captureRollbarItem(Level::ALERT, 'foo')->level);
-        self::assertSame('critical', $telemeter->captureRollbarItem(Level::CRITICAL, 'foo')->level);
-        self::assertSame('error', $telemeter->captureRollbarItem(Level::ERROR, 'foo')->level);
-        self::assertSame('warning', $telemeter->captureRollbarItem(Level::WARNING, 'foo')->level);
-        self::assertSame('info', $telemeter->captureRollbarItem(Level::NOTICE, 'foo')->level);
-        self::assertSame('info', $telemeter->captureRollbarItem(Level::INFO, 'foo')->level);
-        self::assertSame('debug', $telemeter->captureRollbarItem(Level::DEBUG, 'foo')->level);
-        self::assertSame('info', $telemeter->captureRollbarItem('bar', 'foo')->level);
+        self::assertSame(EventLevel::Critical, $telemeter->captureRollbarItem(Level::EMERGENCY, 'foo')->level);
+        self::assertSame(EventLevel::Critical, $telemeter->captureRollbarItem(Level::ALERT, 'foo')->level);
+        self::assertSame(EventLevel::Critical, $telemeter->captureRollbarItem(Level::CRITICAL, 'foo')->level);
+        self::assertSame(EventLevel::Error, $telemeter->captureRollbarItem(Level::ERROR, 'foo')->level);
+        self::assertSame(EventLevel::Warning, $telemeter->captureRollbarItem(Level::WARNING, 'foo')->level);
+        self::assertSame(EventLevel::Info, $telemeter->captureRollbarItem(Level::NOTICE, 'foo')->level);
+        self::assertSame(EventLevel::Info, $telemeter->captureRollbarItem(Level::INFO, 'foo')->level);
+        self::assertSame(EventLevel::Debug, $telemeter->captureRollbarItem(Level::DEBUG, 'foo')->level);
+        self::assertSame(EventLevel::Info, $telemeter->captureRollbarItem('bar', 'foo')->level);
     }
 
     public function testGetMaxQueueSize(): void
@@ -354,8 +354,8 @@ class TelemeterTest extends BaseRollbarTest
         });
         $telemeter = new Telemeter();
 
-        $event1 = new TelemetryEvent(DataType::LOG, 'info', ['message' => 'foo']);
-        $event2 = new TelemetryEvent(DataType::LOG, 'info', new TelemetryBody('bar'));
+        $event1 = new TelemetryEvent(EventType::Log, EventLevel::Info, ['message' => 'foo']);
+        $event2 = new TelemetryEvent(EventType::Log, EventLevel::Info, new TelemetryBody('bar'));
 
         $telemeter->push($event1);
         $telemeter->push($event2);
