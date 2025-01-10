@@ -43,7 +43,7 @@ jobs:
         # @see https://xdebug.org/docs/all_settings#mode
         xdebug3-mode: ['develop,coverage', 'coverage']
         include:
-          - php: '8.0'
+          - php: '8.1'
             os: 'ubuntu'
             dependency: 'lowest'
             xdebug3-mode: 'develop,coverage'
