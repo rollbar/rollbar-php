@@ -70,7 +70,7 @@ class Telemeter
      * @param string $level The PSR-3 log level.
      * @return EventLevel
      */
-    private static function getLevelFromPsrLevel(string $level): EventLevel
+    public static function getLevelFromPsrLevel(string $level): EventLevel
     {
         return match ($level) {
             Level::EMERGENCY, Level::ALERT, Level::CRITICAL => EventLevel::Critical,
