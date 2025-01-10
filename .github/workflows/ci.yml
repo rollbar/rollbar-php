@@ -73,8 +73,22 @@ jobs:
           key: ${{ matrix.os }}-composer-${{ hashFiles('**/composer.json') }}-${{ matrix.dependency }}-
           restore-keys: ${{ matrix.os }}-composer-${{ matrix.dependency }}-
 
-      - name: Install dependencies
+      - name: Install dependencies PHP < 8.4
+        if: matrix.php != '8.4'
         run: composer update --prefer-${{ matrix.dependency }} --prefer-dist --no-interaction
 
-      - name: Execute tests
+      - name: Execute tests PHP < 8.4
+        if: matrix.php != '8.4'
         run: composer test
+
+      # This is a temporary workaround until vimeo/psalm is updated to support PHP 8.4.
+      # See https://github.com/vimeo/psalm/issues/11107
+      - name: Install dependencies PHP 8.4
+        if: matrix.php == '8.4'
+        run: composer update --prefer-${{ matrix.dependency }} --prefer-dist --no-interaction --ignore-platform-reqs
+
+      - name: Execute tests PHP 8.4
+        if: matrix.php == '8.4'
+        run: |
+          ./vendor/bin/phpcs --standard=PSR2 ./src ./tests
+          ./vendor/bin/phpunit --coverage-clover build/logs/clover.xml
