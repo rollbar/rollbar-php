@@ -24,6 +24,18 @@ class TelemeterTest extends BaseRollbarTest
         self::assertSame(100, $telemeter->getMaxQueueSize());
     }
 
+    public function testGetLevelFromPsrLevel(): void
+    {
+        self::assertSame(EventLevel::Critical, Telemeter::getLevelFromPsrLevel(Level::EMERGENCY));
+        self::assertSame(EventLevel::Critical, Telemeter::getLevelFromPsrLevel(Level::ALERT));
+        self::assertSame(EventLevel::Critical, Telemeter::getLevelFromPsrLevel(Level::CRITICAL));
+        self::assertSame(EventLevel::Error, Telemeter::getLevelFromPsrLevel(Level::ERROR));
+        self::assertSame(EventLevel::Warning, Telemeter::getLevelFromPsrLevel(Level::WARNING));
+        self::assertSame(EventLevel::Info, Telemeter::getLevelFromPsrLevel(Level::NOTICE));
+        self::assertSame(EventLevel::Info, Telemeter::getLevelFromPsrLevel(Level::INFO));
+        self::assertSame(EventLevel::Debug, Telemeter::getLevelFromPsrLevel(Level::DEBUG));
+    }
+
     public function testScope(): void
     {
         $telemeter = new Telemeter();
