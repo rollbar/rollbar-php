@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.1.0-rc] - 2024-12-20
+### Added
+* Added telemetry config filter to prevent invalid arguments by @danielmorell in #642.
+### Changed
+* Changed telemetry event type and level to enums by @danielmorell in #643.
+* Changed the `Telemeter::getLevelFromPsrLevel()` method from private to public by @danielmorell in #644.
+### Removed
+* Removed support for PHP 8.0 by @danielmorell in #643.
+### Fixed
+* Fixed PHP 8.4 deprecations by @basmilius in #641.
+
 ## [4.1.0-beta] - 2024-03-01
 ### Added
 * Added support for Telemetry by @danielmorell in #634.
