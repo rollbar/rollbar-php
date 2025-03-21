@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [4.1.1] - 2025-02-21
+## [4.1.1] - 2025-03-21
 ### Fixed
 * Fixed #648 TelemetryEvent cannot handle nested array as $body argument by @danielmorell #649.
 
