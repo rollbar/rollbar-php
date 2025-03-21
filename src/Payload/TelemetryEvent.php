@@ -47,7 +47,7 @@ class TelemetryEvent implements SerializerInterface
         if (is_null($this->timestamp)) {
             $this->timestamp = floor(microtime(true) * 1000);
         }
-        $this->body = is_array($body) ? new TelemetryBody(...$body): $body;
+        $this->body = is_array($body) ? TelemetryBody::fromArray($body): $body;
     }
 
     public function serialize(): array

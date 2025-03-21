@@ -71,6 +71,29 @@ class TelemetryBody implements SerializerInterface
     }
 
     /**
+     * Creates a {@see TelemetryBody} instance from an array of data.
+     *
+     * The data array may be loosely structured, as only the keys that match the defined keys will be used to create the
+     * instance. Any undefined keys in data will be stored in the {@see $extra} property.
+     *
+     * @param array $data The data to create the {@see TelemetryBody} instance from.
+     * @return self
+     *
+     * @since 4.1.1
+     */
+    public static function fromArray(array $data): self
+    {
+        // This filters out any keys that are not accepted by the constructor to prevent duplicate parameter errors from
+        // named and positional arguments.
+        $params = array_intersect_key($data, array_flip(self::DEFINED_KEYS));
+        // Generates an array of all the keys not used in the constructor.
+        $extra = array_diff_key($data, $params);
+        $instance = new self(...$params);
+        $instance->extra = $extra;
+        return $instance;
+    }
+
+    /**
      * Returns the array representation of the telemetry body.
      *
      * @return array
