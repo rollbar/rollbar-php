@@ -2,6 +2,8 @@
 
 namespace Rollbar;
 
+use Serializable;
+
 final class Utilities
 {
     private static $ObjectHashes;
@@ -138,6 +140,36 @@ final class Utilities
 
         return $returnVal;
     }
+
+    /**
+     * Serialize the given object to an array.
+     *
+     * @param mixed $obj The object to serialize.
+     * @return array The serialized object as an array.
+     *
+     * @since 4.1.2
+     */
+    public static function serializeToArray(mixed $obj): array
+    {
+        if (is_array($obj)) {
+            return $obj;
+        }
+
+        // This is the most reliable way to serialize an object that does not potentially cause issues with other
+        // frameworks.
+        if ($obj instanceof Serializable && method_exists($obj, '__serialize')) {
+            return $obj->__serialize();
+        }
+
+        if (is_object($obj)) {
+            return array(
+                'type' => 'object',
+                'class' => get_class($obj),
+            );
+        }
+
+        return array('type' => gettype($obj));
+    }
     
     private static function serializeObject(
         $obj,
@@ -157,7 +189,7 @@ final class Utilities
         }
 
         // All other classes.
-        if ($obj instanceof \Serializable) {
+        if ($obj instanceof Serializable) {
             self::markSerialized($obj, $objectHashes);
             if (method_exists($obj, '__serialize')) {
                 return $obj->__serialize();

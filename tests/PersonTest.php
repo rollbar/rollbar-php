@@ -42,6 +42,13 @@ class PersonTest extends BaseRollbarTest
         $this->assertEquals("testing", $person->test);
     }
 
+    public function testExtraId(): void
+    {
+        $person = new Person('42', extra: ['id' => 'testing']);
+        $this->assertEquals('42', $person->getId());
+        $this->assertEquals(array('id' => '42'), $person->serialize());
+    }
+
     public function testEncode(): void
     {
         $person = new Person("1024");
