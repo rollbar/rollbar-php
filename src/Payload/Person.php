@@ -15,12 +15,21 @@ class Person implements SerializerInterface
 {
     use UtilitiesTrait;
 
+    /**
+     * Any additional data to be sent with the person object.
+     *
+     * @var array<string, mixed> $extra
+     */
+    private array $extra;
+
     public function __construct(
         private string $id,
         private ?string $username = null,
         private ?string $email = null,
-        private array $extra = []
+        array $extra = [],
     ) {
+        unset($extra['id'], $extra['email'], $extra['username']);
+        $this->extra = $extra;
     }
 
     public function getId(): string

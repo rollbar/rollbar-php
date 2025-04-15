@@ -1,6 +1,7 @@
 <?php namespace Rollbar;
 
 use Rollbar\Payload\Level;
+use Rollbar\TestHelpers\ArrayLogger;
 use Rollbar\TestHelpers\CustomSerializable;
 use Rollbar\TestHelpers\CycleCheck\ParentCycleCheck;
 use Rollbar\TestHelpers\CycleCheck\ChildCycleCheck;
@@ -113,6 +114,24 @@ class UtilitiesTest extends BaseRollbarTest
         $this->assertArrayNotHasKey("myNullValue", $result);
         $this->assertArrayNotHasKey("my_null_value", $result);
     }
+
+    public function testSerializeToArray(): void
+    {
+        $this->assertSame(array('type' => 'NULL'), Utilities::serializeToArray(null));
+        $this->assertSame(array('type' => 'integer'), Utilities::serializeToArray(4));
+        $this->assertSame(array(1, 2), Utilities::serializeToArray(array(1, 2)));
+        $this->assertSame(
+            array('foo' => 'bar'),
+            Utilities::serializeToArray(new CustomSerializable(array('foo' => 'bar'))),
+        );
+        $this->assertSame(
+            array(
+                'type' => 'object',
+                'class' => 'Rollbar\TestHelpers\ArrayLogger'
+            ),
+            Utilities::serializeToArray(new ArrayLogger()),
+        );
+    }
     
     public function testSerializationCycleChecking(): void
     {
@@ -131,17 +150,17 @@ class UtilitiesTest extends BaseRollbarTest
         
         $this->assertMatchesRegularExpression(
             '/<CircularReference.*/',
-            $result["obj"]["value"]["child"]["value"]["parent"]
+            $result["obj"]["value"]["child"]["value"]["parent"],
         );
         
         $this->assertMatchesRegularExpression(
             '/<CircularReference.*/',
-            $result["serializedObj"]["child"]["parent"]
+            $result["serializedObj"]["child"]["parent"],
         );
         
         $this->assertMatchesRegularExpression(
             '/<CircularReference.*/',
-            $result["payload"]["data"]["body"]["extra"][0]["value"]["child"]["value"]["parent"]
+            $result["payload"]["data"]["body"]["extra"][0]["value"]["child"]["value"]["parent"],
         );
     }
 

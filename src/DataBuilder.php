@@ -945,6 +945,9 @@ class DataBuilder implements DataBuilderInterface
             $username = $personData['username'];
         }
 
+        if (!is_array($personData)) {
+            $personData = Utilities::serializeToArray($personData);
+        }
         unset($personData['id'], $personData['email'], $personData['username']);
         return new Person($identifier, $username, $email, $personData);
     }
