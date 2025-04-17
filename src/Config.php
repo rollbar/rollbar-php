@@ -347,10 +347,10 @@ class Config
         }
 
         $this->utilities()->validateString(
-            $config['access_token'],
-            "config['access_token']",
-            32,
-            !$this->sender->requireAccessToken(),
+            input: $config['access_token'],
+            name: "config['access_token']",
+            len: [32, 96],
+            allowNull: !$this->sender->requireAccessToken(),
         );
         $this->accessToken = $config['access_token'] ?? '';
     }
