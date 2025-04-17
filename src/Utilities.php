@@ -13,12 +13,25 @@ final class Utilities
         return php_uname('s') == 'Windows NT';
     }
 
+    /**
+     * Validate that the given $input is a string or null if $allowNull is true and that it has as many characters as
+     * one of the given $len.
+     *
+     * @param mixed $input The value to validate.
+     * @param string $name The name of the variable being validated.
+     * @param int|int[]|null $len The length(s) to validate against. Can be a single integer or an array of integers.
+     * @param bool $allowNull Whether to allow null values.
+     * @return void
+     *
+     * @since 1.0.0
+     * @since 4.1.3 Added support for array of lengths.
+     */
     public static function validateString(
-        $input,
-        $name = "?",
-        $len = null,
-        $allowNull = true
-    ) {
+        mixed $input,
+        string $name = "?",
+        int|array $len = null,
+        bool $allowNull = true
+    ): void {
         if (is_null($input)) {
             if (!$allowNull) {
                 throw new \InvalidArgumentException("\$$name must not be null");
@@ -29,9 +42,19 @@ final class Utilities
         if (!is_string($input)) {
             throw new \InvalidArgumentException("\$$name must be a string");
         }
-        if (!is_null($len) && strlen($input) != $len) {
-            throw new \InvalidArgumentException("\$$name must be $len characters long, was '$input'");
+        if (null === $len) {
+            return;
         }
+        if (!is_array($len)) {
+            $len = [$len];
+        }
+        foreach ($len as $l) {
+            if (strlen($input) == $l) {
+                return;
+            }
+        }
+        $lens = implode(", ", $len);
+        throw new \InvalidArgumentException("\$$name must be $lens characters long, was '$input'");
     }
 
     public static function validateBoolean(

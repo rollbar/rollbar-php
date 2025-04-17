@@ -38,6 +38,14 @@ class UtilitiesTest extends BaseRollbarTest
         } catch (\InvalidArgumentException $e) {
             $this->assertEquals("\$str must be 2 characters long, was '1'", $e->getMessage());
         }
+
+        try {
+            Utilities::validateString("foo", "str", [2, 4]);
+            $this->fail("Above should throw");
+        } catch (\InvalidArgumentException $e) {
+            $this->assertEquals("\$str must be 2, 4 characters long, was 'foo'", $e->getMessage());
+        }
+        Utilities::validateString("four", "local", [2, 4]);
     }
 
     public function testValidateInteger(): void
