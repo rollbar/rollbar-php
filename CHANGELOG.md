@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.1.3] - 2025-04-17
+### Fixed
+* Fixed new 96 character access token fails validation.  @danielmorell #654.
+
 ## [4.1.2] - 2025-04-15
 ### Fixed
 * Fixed #651 Person::$extra must be an array and an object was given.  @danielmorell #652.
