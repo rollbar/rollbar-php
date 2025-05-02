@@ -29,7 +29,7 @@ final class Utilities
     public static function validateString(
         mixed $input,
         string $name = "?",
-        int|array $len = null,
+        int|array|null $len = null,
         bool $allowNull = true
     ): void {
         if (is_null($input)) {
