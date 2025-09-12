@@ -59,7 +59,7 @@ class BodyTest extends BaseRollbarTest
         // Create deeply nested array that would cause memory issues
         $deepArray = array('level1' => array('level2' => array('level3' => array('level4' => 'deep_value'))));
         
-        // Test without depth limit - should serialize completely  
+        // Test without depth limit - should serialize completely
         $bodyNoLimit = new Body($value, array('deep' => $deepArray), null, -1);
         $resultNoLimit = $bodyNoLimit->serialize();
         
