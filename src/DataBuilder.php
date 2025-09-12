@@ -59,6 +59,8 @@ class DataBuilder implements DataBuilderInterface
     protected $captureEmail;
     protected $captureUsername;
     
+    protected $maxNestingDepth;
+    
     /**
      * @var Utilities
      */
@@ -99,6 +101,7 @@ class DataBuilder implements DataBuilderInterface
         $this->setCustom($config);
         $this->setFingerprint($config);
         $this->setTitle($config);
+        $this->setMaxNestingDepth($config);
         $this->setNotifier($config);
         $this->setBaseException($config);
         $this->setIncludeCodeContext($config);
@@ -128,6 +131,12 @@ class DataBuilder implements DataBuilderInterface
     {
         $fromConfig = $config['capture_username'] ?? null;
         $this->captureUsername = self::$defaults->captureUsername($fromConfig);
+    }
+    
+    protected function setMaxNestingDepth($config)
+    {
+        $fromConfig = $config['max_nesting_depth'] ?? null;
+        $this->maxNestingDepth = self::$defaults->maxNestingDepth($fromConfig);
     }
 
     protected function setEnvironment($config)
@@ -411,7 +420,7 @@ class DataBuilder implements DataBuilderInterface
         } else {
             $content = $this->getMessage($toLog);
         }
-        return new Body($content, $context, $this->getTelemetry());
+        return new Body($content, $context, $this->getTelemetry(), $this->maxNestingDepth);
     }
 
     public function getErrorTrace(ErrorWrapper $error)
