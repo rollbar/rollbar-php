@@ -125,9 +125,8 @@ class Body implements SerializerInterface
 
         if ($this->maxDepth === -1) {
             return $this->utilities()->serializeForRollbarInternal($result, array('extra'));
-        } else {
-            $objectHashes = array();
-            return $this->utilities()->serializeForRollbar($result, array('extra'), $objectHashes, $this->maxDepth);
         }
+        $objectHashes = array();
+        return $this->utilities()->serializeForRollbar($result, array('extra'), $objectHashes, $this->maxDepth);
     }
 }
