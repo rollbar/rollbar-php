@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.1.4] - 2025-09-26
+### Fixed
+* Fixed #657 Param `$len` should not be implicitly nullable. @danielmorell #658
+* Fixed Body serialization should respect `max_nesting_depth` config. @AronNovak #661
+
 ## [4.1.3] - 2025-04-17
 ### Fixed
 * Fixed new 96 character access token fails validation.  @danielmorell #654.
