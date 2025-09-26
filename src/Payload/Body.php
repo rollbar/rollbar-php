@@ -23,7 +23,8 @@ class Body implements SerializerInterface
     public function __construct(
         private ContentInterface $value,
         private array $extra = [],
-        private ?array $telemetry = null
+        private ?array $telemetry = null,
+        private int $maxDepth = -1
     ) {
     }
 
@@ -122,6 +123,10 @@ class Body implements SerializerInterface
             $result['telemetry'] = $this->telemetry;
         }
 
-        return $this->utilities()->serializeForRollbarInternal($result, array('extra'));
+        if ($this->maxDepth === -1) {
+            return $this->utilities()->serializeForRollbarInternal($result, array('extra'));
+        }
+        $objectHashes = array();
+        return $this->utilities()->serializeForRollbar($result, array('extra'), $objectHashes, $this->maxDepth);
     }
 }
