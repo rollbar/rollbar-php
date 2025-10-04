@@ -124,25 +124,47 @@ class Scrubber implements ScrubberInterface
     {
         if (is_array($data)) {
             // scrub arrays
-            $data = $this->scrubArray($data, $fields, $replacement, $path);
-        } elseif (is_string($data)) {
+            return $this->scrubArray($data, $fields, $replacement, $path);
+        }
+        if (is_string($data)) {
             // scrub URLs and query strings
             $query = parse_url($data, PHP_URL_QUERY);
             if ($query) {
-                $data = str_replace(
+                return str_replace(
                     $query,
                     $this->scrubQueryString($query, $fields),
                     $data
                 );
-            } else {
-                // PHP reports warning if parse_str() detects more than max_input_vars items.
-                @parse_str($data, $parsedData);
-                if (http_build_query($parsedData) === $data) {
-                    $data = $this->scrubQueryString($data, $fields);
-                }
+            }
+            if ($this->isQueryStringable($data)) {
+                return $this->scrubQueryString($data, $fields);
             }
         }
         return $data;
+    }
+
+    /**
+     * Checks if a string is a valid query string.
+     *
+     * @param string $data The string to check.
+     * @return bool True if the string is a valid query string, false otherwise.
+     *
+     * @since 4.2.0
+     */
+    public function isQueryStringable(string $data): bool
+    {
+        // PHP reports warning if parse_str() detects more than max_input_vars items.
+        @parse_str($data, $parsedData);
+        $rebuilt = http_build_query($parsedData);
+        $parts = explode('&', $data);
+        $partsRebuilt = array_map(urldecode(...), explode('&', $rebuilt));
+
+        // Because nested arrays are supported by parse_str(), we need to sort the parts before comparing them. To
+        // avoid false negatives due to ordering differences. Since the original nested data keys do not need to be in
+        // order.
+        sort($parts);
+        sort($partsRebuilt);
+        return $parts === $partsRebuilt;
     }
 
     /**
@@ -211,6 +233,6 @@ class Scrubber implements ScrubberInterface
         // PHP reports warning if parse_str() detects more than max_input_vars items.
         @parse_str($query, $parsed);
         $scrubbed = $this->internalScrub($parsed, $fields, $replacement, '');
-        return http_build_query($scrubbed);
+        return str_replace(' ', '+', urldecode(http_build_query($scrubbed)));
     }
 }

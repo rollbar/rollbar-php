@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+* Query strings no longer forced strings to have percent encoding.
+### Fixed 
+* Fixed #463 PII can be leaked if nested query string keys are out of order.
 
 ## [4.1.4] - 2025-09-26
 ### Fixed

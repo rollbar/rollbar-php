@@ -161,7 +161,6 @@ class ScrubberTest extends BaseRollbarTest
                 'non sensitive data 7' => 'a=stuff&foo=superSecret',
                 'sensitive data' => '456',
                 array(
-                    'non sensitive data 3' => '789',
                     'non sensitive data 5' => '789&5=',
                     'recursive sensitive data' => 'qwe',
                     'non sensitive data 3' => 'rty',
@@ -184,7 +183,6 @@ class ScrubberTest extends BaseRollbarTest
                 'non sensitive data 7' => 'a=stuff&foo=xxxxxxxx',
                 'sensitive data' => '********',
                 array(
-                    'non sensitive data 3' => '789',
                     'non sensitive data 5' => '789&5=',
                     'recursive sensitive data' => '********',
                     'non sensitive data 3' => 'rty',
@@ -246,7 +244,7 @@ class ScrubberTest extends BaseRollbarTest
             ),
             // $expected
             array(
-                '?' . http_build_query(
+                '?' . str_replace(' ', '+', urldecode(http_build_query(
                     array(
                         'arg1'      => 'val 1',
                         'sensitive' => 'xxxxxxxx',
@@ -255,7 +253,7 @@ class ScrubberTest extends BaseRollbarTest
                             'sensitive' => 'xxxxxxxx',
                         ),
                     )
-                ),
+                ))),
             ),
         );
     }
@@ -268,7 +266,6 @@ class ScrubberTest extends BaseRollbarTest
                 'non sensitive data 2' => '456',
                 'sensitive data' => '456',
                 array(
-                    'non sensitive data 3' => '789',
                     'recursive sensitive data' => 'qwe',
                     'non sensitive data 3' => '?' . http_build_query(
                         array(
@@ -298,9 +295,8 @@ class ScrubberTest extends BaseRollbarTest
                 'non sensitive data 2' => '456',
                 'sensitive data' => '********',
                 array(
-                    'non sensitive data 3' => '789',
                     'recursive sensitive data' => '********',
-                    'non sensitive data 3' => '?' . http_build_query(
+                    'non sensitive data 3' => '?' . str_replace(' ', '+', urldecode(http_build_query(
                         array(
                             'arg1' => 'val 1',
                             'sensitive' => 'xxxxxxxx',
@@ -311,7 +307,7 @@ class ScrubberTest extends BaseRollbarTest
                                 'sensitive2' => 'xxxxxxxx'
                             )
                         )
-                    ),
+                    ))),
                     array(
                         'recursive sensitive data' => '********',
                     )
@@ -360,7 +356,6 @@ class ScrubberTest extends BaseRollbarTest
                     'non sensitive data 2' => '456',
                     'sensitive data' => '456',
                     array(
-                        'non sensitive data 3' => '789',
                         'recursive sensitive data' => 'qwe',
                         'non sensitive data 3' => 'rty',
                         array(
@@ -377,7 +372,6 @@ class ScrubberTest extends BaseRollbarTest
                     'non sensitive data 2' => '456',
                     'sensitive data' => '********',
                     array(
-                        'non sensitive data 3' => '789',
                         'recursive sensitive data' => '********',
                         'non sensitive data 3' => 'rty',
                         array(
@@ -400,5 +394,28 @@ class ScrubberTest extends BaseRollbarTest
         $result = $scrubber->scrub($testData, "@@@@@@@@");
 
         $this->assertEquals("@@@@@@@@", $result['scrubit']);
+    }
+
+    public function testIssue463(): void
+    {
+        $a = ['query' => 'login[username]=test@test.com&login[password]=secret'];
+        $b = ['query' => 'login[username]=test@test.com&unrelatedField=123&login[password]=secret'];
+
+        $aExpected = ['query' => 'login[username]=test@test.com&login[password]=xxxxxxxx'];
+        $bExpected = ['query' => 'login[username]=test@test.com&login[password]=xxxxxxxx&unrelatedField=123'];
+
+        $scrubber = new Scrubber([
+            'scrubFields' => [
+                'password',
+            ],
+        ]);
+
+        $this->assertEquals(['password'], $scrubber->getScrubFields());
+
+        $result = $scrubber->scrub($a);
+        $this->assertEquals($aExpected, $result);
+
+        $result = $scrubber->scrub($b);
+        $this->assertEquals($bExpected, $result);
     }
 }
