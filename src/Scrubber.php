@@ -133,10 +133,10 @@ class Scrubber implements ScrubberInterface
                 return str_replace(
                     $query,
                     $this->scrubQueryString($query, $fields),
-                    $data
+                    $data,
                 );
             }
-            if ($this->isQueryStringable($data)) {
+            if (self::isQueryStringable($data)) {
                 return $this->scrubQueryString($data, $fields);
             }
         }
@@ -151,20 +151,58 @@ class Scrubber implements ScrubberInterface
      *
      * @since 4.2.0
      */
-    public function isQueryStringable(string $data): bool
+    public static function isQueryStringable(string $data): bool
     {
+        // Because we only scrub values based on keys, we can safely assume that the string is not a query string if
+        // it does not contain an '=' character.
+        if (!str_contains($data, '=')) {
+            return false;
+        }
         // PHP reports warning if parse_str() detects more than max_input_vars items.
         @parse_str($data, $parsedData);
         $rebuilt = http_build_query($parsedData);
         $parts = explode('&', $data);
-        $partsRebuilt = array_map(urldecode(...), explode('&', $rebuilt));
+        $partsEncoded = array_map(urldecode(...), $parts);
+        $rebuiltParts = explode('&', $rebuilt);
+        $partsRebuiltEncoded = array_map(urldecode(...), $rebuiltParts);
 
         // Because nested arrays are supported by parse_str(), we need to sort the parts before comparing them. To
         // avoid false negatives due to ordering differences. Since the original nested data keys do not need to be in
         // order.
         sort($parts);
-        sort($partsRebuilt);
-        return $parts === $partsRebuilt;
+        sort($partsEncoded);
+        sort($rebuiltParts);
+        sort($partsRebuiltEncoded);
+        return $parts === $rebuiltParts || $partsEncoded === $partsRebuiltEncoded;
+    }
+
+    /**
+     * Checks if the given string contains percent encoded data.
+     *
+     * @param string $data The string to check.
+     * @return bool
+     *
+     * @since 4.2.0
+     */
+    public static function hasPercentEncodedData(string $data): bool
+    {
+        $parts = explode('%', $data);
+        if (count($parts) === 1) {
+            return false;
+        }
+
+        $percentEncoded = false;
+        foreach ($parts as $part) {
+            if (strlen($part) < 2) {
+                continue;
+            }
+            // Check if the first two characters are hexadecimal digits.
+            if (ctype_xdigit(substr($part, 0, 2))) {
+                $percentEncoded = true;
+                break;
+            }
+        }
+        return $percentEncoded;
     }
 
     /**
@@ -182,7 +220,7 @@ class Scrubber implements ScrubberInterface
         array &$arr,
         array $fields,
         string $replacement = '********',
-        string $path = ''
+        string $path = '',
     ): array {
         if (!$fields || !$arr) {
             return $arr;
@@ -191,12 +229,12 @@ class Scrubber implements ScrubberInterface
         $scrubber   = $this;
         $scrubberFn = function (
             &$val,
-            $key
+            $key,
         ) use (
             $fields,
             $replacement,
             $scrubber,
-            &$path
+            &$path,
         ) {
             $current = !$path ? (string)$key : $path . '.' . $key;
 
@@ -230,9 +268,16 @@ class Scrubber implements ScrubberInterface
      */
     protected function scrubQueryString(string $query, array $fields, string $replacement = 'xxxxxxxx'): string
     {
+        // Check if the query string contains percent encoded characters.
+        $percentEncoded = self::hasPercentEncodedData($query);
         // PHP reports warning if parse_str() detects more than max_input_vars items.
         @parse_str($query, $parsed);
         $scrubbed = $this->internalScrub($parsed, $fields, $replacement, '');
-        return str_replace(' ', '+', urldecode(http_build_query($scrubbed)));
+
+        // If the original query string was percent encoded, we need to re-encode the scrubbed data.
+        if (!$percentEncoded) {
+            return str_replace(' ', '+', urldecode(http_build_query($scrubbed)));
+        }
+        return http_build_query($scrubbed);
     }
 }

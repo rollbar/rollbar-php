@@ -228,7 +228,7 @@ class ScrubberTest extends BaseRollbarTest
         return array(
             // $testData
             array(
-                '?' . http_build_query(
+                '?' . str_replace(' ', '+', urldecode(http_build_query(
                     array(
                         'arg1'      => 'val 1',
                         'sensitive' => 'scrubit',
@@ -236,8 +236,8 @@ class ScrubberTest extends BaseRollbarTest
                             'arg3'      => 'val 3',
                             'sensitive' => 'scrubit',
                         ),
-                    )
-                ),
+                    ),
+                ))),
             ),
             array( // $scrubFields
                 'sensitive',
@@ -296,7 +296,7 @@ class ScrubberTest extends BaseRollbarTest
                 'sensitive data' => '********',
                 array(
                     'recursive sensitive data' => '********',
-                    'non sensitive data 3' => '?' . str_replace(' ', '+', urldecode(http_build_query(
+                    'non sensitive data 3' => '?' . http_build_query(
                         array(
                             'arg1' => 'val 1',
                             'sensitive' => 'xxxxxxxx',
@@ -304,10 +304,10 @@ class ScrubberTest extends BaseRollbarTest
                                 'arg3' => 'val 3',
                                 'sensitive' => 'xxxxxxxx',
                                 'SENSITIVE' => 'xxxxxxxx',
-                                'sensitive2' => 'xxxxxxxx'
-                            )
-                        )
-                    ))),
+                                'sensitive2' => 'xxxxxxxx',
+                            ),
+                        ),
+                    ),
                     array(
                         'recursive sensitive data' => '********',
                     )
@@ -417,5 +417,68 @@ class ScrubberTest extends BaseRollbarTest
 
         $result = $scrubber->scrub($b);
         $this->assertEquals($bExpected, $result);
+    }
+
+    /**
+     * @dataProvider isQueryStringableDataProvider
+     */
+    public function testIsQueryStringable(string $string, bool $expected): void
+    {
+        $this->assertSame($expected, Scrubber::isQueryStringable($string));
+    }
+
+    public static function isQueryStringableDataProvider(): array
+    {
+        return array(
+            array('foo=bar', true),
+            array('foo =bar', false),
+            array('foo=bar&baz=qux', true),
+            array('foo[one]=bar&foo[two]=qux', true),
+            array('foo[one]=bar&bar=42&foo[two]=qux', true),
+            array('foo[one]=bar&bar=42&foo[two]=qux%3F', true),
+        );
+    }
+    
+    public function testHasPercentEncodedData(): void
+    {
+        $this->assertTrue(
+            Scrubber::hasPercentEncodedData('login[username]=test@test.com&login[password]=secret&foo=bar%3F'),
+        );
+        // Invalid percent encoding
+        $this->assertFalse(
+            Scrubber::hasPercentEncodedData('login[username]=test@test.com&login[password]=secret&foo=bar%Ye'),
+        );
+        // No percent encoded data
+        $this->assertFalse(
+            Scrubber::hasPercentEncodedData('login[username]=test@test.com&login[password]=secret&foo=bar'),
+        );
+    }
+
+    public function testNoPercentEncoding(): void
+    {
+        $input = ['query' => 'login[username]=test@test.com&login[password]=secret'];
+        $expected = ['query' => 'login[username]=test@test.com&login[password]=xxxxxxxx'];
+        $scrubber = new Scrubber([
+            'scrubFields' => [
+                'password',
+            ],
+        ]);
+
+        $result = $scrubber->scrub($input);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testPercentEncoding(): void
+    {
+        $input = ['query' => 'login[username]=test@test.com&login[password]=secret&foo=bar%3F'];
+        $expected = ['query' => 'login%5Busername%5D=test%40test.com&login%5Bpassword%5D=xxxxxxxx&foo=bar%3F'];
+        $scrubber = new Scrubber([
+            'scrubFields' => [
+                'password',
+            ],
+        ]);
+
+        $result = $scrubber->scrub($input);
+        $this->assertEquals($expected, $result);
     }
 }
