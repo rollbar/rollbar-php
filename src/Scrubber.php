@@ -274,7 +274,7 @@ class Scrubber implements ScrubberInterface
         @parse_str($query, $parsed);
         $scrubbed = $this->internalScrub($parsed, $fields, $replacement, '');
 
-        // If the original query string was percent encoded, we need to re-encode the scrubbed data.
+        // If the original query string was not percent encoded, we need to decode the scrubbed data.
         if (!$percentEncoded) {
             return str_replace(' ', '+', urldecode(http_build_query($scrubbed)));
         }
