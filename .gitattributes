@@ -1,0 +1,14 @@
+.github/ export-ignore
+tests/ export-ignore
+.dockerignore export-ignore
+.gitattributes export-ignore
+.gitignore export-ignore
+CONTRIBUTING.md export-ignore
+Dockerfile export-ignore
+EXAMPLES.md export-ignore
+phpunit.xml export-ignore
+POST_FORMAT.md export-ignore
+psalm.baseline export-ignore
+psalm.xml export-ignore
+THANKS.md export-ignore
+TODO.md export-ignore
