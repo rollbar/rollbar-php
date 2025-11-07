@@ -1,0 +1,41 @@
+name: update_js_snippet.yml
+on:
+  workflow_dispatch:
+
+jobs:
+  update_js_snippet:
+    name: Update JS Snippet
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JS
+        run: npm init -y
+
+      - name: Install Rollbar
+        run: npm install --save-dev rollbar
+
+      - name: Update JS Snippet
+        run: cp -f node_modules/rollbar/dist/rollbar.snippet.js data/rollbar.snippet.js
+
+      - name: Capture Version
+        id: capture_version
+        run: | 
+          echo "ROLLBAR_VERSION=$(node -p "require('./node_modules/rollbar/package.json').version")" >> $GITHUB_OUTPUT
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: Update JS Snippet to ${{ steps.capture_version.outputs.ROLLBAR_VERSION }}
+          title: Update JS Snippet to ${{ steps.capture_version.outputs.ROLLBAR_VERSION }}
+          add-paths: |
+            data/rollbar.snippet.js
+          body: |
+            Updated the JS snippet to version `${{ steps.capture_version.outputs.ROLLBAR_VERSION }}` of [Rollbar.js][1].
+            
+            [1]: https://github.com/rollbar/rollbar.js
+          branch: updated/js-snippet
+          base: master
+          reviewers: danielmorell
+          assignees: danielmorell
