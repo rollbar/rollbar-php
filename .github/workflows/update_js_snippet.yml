@@ -1,4 +1,9 @@
-name: update_js_snippet.yml
+name: Update JS Snippet
+
+permissions:
+  contents: write
+  pull-requests: write
+
 on:
   workflow_dispatch:
     inputs:
