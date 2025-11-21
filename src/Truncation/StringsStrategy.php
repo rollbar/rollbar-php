@@ -31,6 +31,7 @@ class StringsStrategy extends AbstractStrategy
      * @return EncodedPayload The truncated payload.
      * @throws Exception If the JSON encoding fails.
      */
+    #[\Override]
     public function execute(EncodedPayload $payload): EncodedPayload
     {
         $data     = $payload->data();

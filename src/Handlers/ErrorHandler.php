@@ -8,6 +8,7 @@ use Rollbar\Payload\Level;
 
 class ErrorHandler extends AbstractHandler
 {
+    #[\Override]
     public function register()
     {
         $this->previousHandler = set_error_handler(array($this, 'handle'));
@@ -15,6 +16,7 @@ class ErrorHandler extends AbstractHandler
         parent::register();
     }
 
+    #[\Override]
     public function handle(...$args)
     {
         parent::handle(...$args);

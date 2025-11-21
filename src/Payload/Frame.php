@@ -102,6 +102,7 @@ class Frame implements SerializerInterface
         return $this;
     }
 
+    #[\Override]
     public function serialize()
     {
         $result = array(

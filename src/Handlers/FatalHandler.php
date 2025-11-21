@@ -15,14 +15,16 @@ class FatalHandler extends AbstractHandler
 {
     
     private static $fatalErrors = array(E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR);
-    
+
+    #[\Override]
     public function register()
     {
         \register_shutdown_function(array($this, 'handle'));
         
         parent::register();
     }
-    
+
+    #[\Override]
     public function handle(...$args)
     {
         parent::handle(...$args);

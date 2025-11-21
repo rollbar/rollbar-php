@@ -94,6 +94,7 @@ class Scrubber implements ScrubberInterface
      *
      * @return mixed
      */
+    #[\Override]
     public function scrub(array &$data, string $replacement = '********', string $path = ''): array
     {
         $fields = $this->getScrubFields();

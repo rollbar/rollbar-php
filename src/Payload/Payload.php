@@ -40,6 +40,7 @@ class Payload implements SerializerInterface
         return $this;
     }
 
+    #[\Override]
     public function serialize($maxDepth = -1): array
     {
         $objectHashes = array();

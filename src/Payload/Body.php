@@ -110,6 +110,7 @@ class Body implements SerializerInterface
      *
      * @since 4.1.0 Includes the 'telemetry' key, if it is not empty.
      */
+    #[\Override]
     public function serialize()
     {
         $result = array();
