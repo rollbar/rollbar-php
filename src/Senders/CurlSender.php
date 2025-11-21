@@ -77,8 +77,6 @@ class CurlSender implements SenderInterface
         $result = $result === false ?
                     curl_error($handle) :
                     json_decode($result, true);
-        
-        curl_close($handle);
 
         $data = $payload->data();
         $uuid = $data['data']['uuid'] ?? null;
@@ -200,7 +198,6 @@ class CurlSender implements SenderInterface
                 unset($this->inflightRequests[$handleArrayKey]);
                 curl_multi_remove_handle($this->multiHandle, $handle);
             }
-            curl_close($handle);
         }
         $this->maybeSendMoreBatchRequests($accessToken);
     }
