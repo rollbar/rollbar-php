@@ -66,6 +66,7 @@ class CurlSender implements SenderInterface
         return $this->endpoint;
     }
 
+    #[\Override]
     public function send(EncodedPayload $payload, string $accessToken): Response
     {
         $handle = curl_init();
@@ -84,6 +85,7 @@ class CurlSender implements SenderInterface
         return new Response($statusCode, $result, $uuid);
     }
 
+    #[\Override]
     public function sendBatch(array $batch, string $accessToken): void
     {
         if ($this->multiHandle === null) {
@@ -99,6 +101,7 @@ class CurlSender implements SenderInterface
         $this->checkForCompletedRequests($accessToken);
     }
 
+    #[\Override]
     public function wait(string $accessToken, int $max = 0): void
     {
         if (count($this->inflightRequests) <= $max) {
@@ -120,6 +123,7 @@ class CurlSender implements SenderInterface
      * @return bool
      * @since 4.0.0
      */
+    #[\Override]
     public function requireAccessToken(): bool
     {
         return false;

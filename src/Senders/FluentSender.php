@@ -69,6 +69,7 @@ class FluentSender implements SenderInterface
      * @SuppressWarnings(PHPMD.UnusedFormalParameter) Unused parameter is
      * intended here to comply with SenderInterface
      */
+    #[\Override]
     public function send(EncodedPayload $payload, string $accessToken): Response
     {
         if (empty($this->fluentLogger)) {
@@ -85,6 +86,7 @@ class FluentSender implements SenderInterface
         return new Response($status, $info, $uuid);
     }
 
+    #[\Override]
     public function sendBatch(array $batch, string $accessToken, &$responses = array ()): void
     {
         $responses = array();
@@ -96,6 +98,7 @@ class FluentSender implements SenderInterface
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
+    #[\Override]
     public function wait(string $accessToken, int $max): void
     {
         return;
@@ -108,6 +111,7 @@ class FluentSender implements SenderInterface
      * @return bool
      * @since 4.0.0
      */
+    #[\Override]
     public function requireAccessToken(): bool
     {
         return false;

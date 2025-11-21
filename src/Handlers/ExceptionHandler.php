@@ -8,13 +8,15 @@ use Rollbar\Payload\Level;
 
 class ExceptionHandler extends AbstractHandler
 {
+    #[\Override]
     public function register()
     {
         $this->previousHandler = set_exception_handler(array($this, 'handle'));
         
         parent::register();
     }
-    
+
+    #[\Override]
     public function handle(...$args)
     {
         parent::handle(...$args);
