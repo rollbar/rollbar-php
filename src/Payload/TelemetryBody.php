@@ -98,6 +98,7 @@ class TelemetryBody implements SerializerInterface
      *
      * @return array
      */
+    #[\Override]
     public function serialize(): array
     {
         // This filters out any null or empty values.

@@ -50,6 +50,7 @@ class TelemetryStrategy extends AbstractStrategy
      *
      * @since 4.1.0
      */
+    #[\Override]
     public function execute(EncodedPayload $payload): EncodedPayload
     {
         $data = $payload->data();
@@ -81,6 +82,7 @@ class TelemetryStrategy extends AbstractStrategy
      *
      * @since 4.1.0
      */
+    #[\Override]
     public function applies(EncodedPayload $payload): bool
     {
         // If the payload does not telemetry data, then this strategy does not apply.

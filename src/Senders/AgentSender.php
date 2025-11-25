@@ -27,6 +27,7 @@ class AgentSender implements SenderInterface
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
+    #[\Override]
     public function send(EncodedPayload $payload, string $accessToken): Response
     {
         if (empty($this->agentLog)) {
@@ -42,6 +43,7 @@ class AgentSender implements SenderInterface
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
+    #[\Override]
     public function sendBatch(array $batch, string $accessToken): void
     {
         if (empty($this->agentLog)) {
@@ -55,6 +57,7 @@ class AgentSender implements SenderInterface
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
+    #[\Override]
     public function wait(string $accessToken, int $max): void
     {
         return;
@@ -69,6 +72,7 @@ class AgentSender implements SenderInterface
      *
      * @return bool
      */
+    #[\Override]
     public function requireAccessToken(): bool
     {
         return true;

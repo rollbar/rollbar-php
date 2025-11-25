@@ -43,6 +43,7 @@ class Notifier implements SerializerInterface
         return $this;
     }
 
+    #[\Override]
     public function serialize()
     {
         $result = array(

@@ -15,11 +15,13 @@ abstract class AbstractStrategy implements StrategyInterface
     {
     }
 
+    #[\Override]
     public function execute(EncodedPayload $payload): EncodedPayload
     {
         return $payload;
     }
 
+    #[\Override]
     public function applies(EncodedPayload $payload): bool
     {
         return true;

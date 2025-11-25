@@ -57,6 +57,7 @@ class Level implements SerializerInterface
      *
      * @return string
      */
+    #[\Override]
     public function serialize()
     {
         return $this->level;

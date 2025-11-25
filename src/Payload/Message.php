@@ -14,6 +14,7 @@ class Message implements ContentInterface
     ) {
     }
 
+    #[\Override]
     public function getKey(): string
     {
         return 'message';
@@ -41,6 +42,7 @@ class Message implements ContentInterface
         return $this;
     }
 
+    #[\Override]
     public function serialize()
     {
         $toSerialize = array(
