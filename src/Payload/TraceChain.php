@@ -10,6 +10,7 @@ class TraceChain implements ContentInterface
     {
     }
 
+    #[\Override]
     public function getKey(): string
     {
         return 'trace_chain';
@@ -26,6 +27,7 @@ class TraceChain implements ContentInterface
         return $this;
     }
 
+    #[\Override]
     public function serialize()
     {
         $mapValue = function ($value) {

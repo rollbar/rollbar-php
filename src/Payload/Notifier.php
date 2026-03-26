@@ -8,7 +8,7 @@ use Rollbar\UtilitiesTrait;
 class Notifier implements SerializerInterface
 {
     const NAME = "rollbar-php";
-    const VERSION = "4.1.4";
+    const VERSION = "4.2.0";
 
     use UtilitiesTrait;
 
@@ -43,6 +43,7 @@ class Notifier implements SerializerInterface
         return $this;
     }
 
+    #[\Override]
     public function serialize()
     {
         $result = array(

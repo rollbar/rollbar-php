@@ -50,6 +50,7 @@ class TelemetryEvent implements SerializerInterface
         $this->body = is_array($body) ? TelemetryBody::fromArray($body): $body;
     }
 
+    #[\Override]
     public function serialize(): array
     {
         $result = array_filter([

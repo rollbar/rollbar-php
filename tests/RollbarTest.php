@@ -109,8 +109,7 @@ class RollbarTest extends BaseRollbarTest
         $logger = Rollbar::logger();
         $reflection = new \ReflectionClass(get_class($logger));
         $method = $reflection->getMethod('getPayload');
-        $method->setAccessible(true);
-        
+
         $payload = $method->invokeArgs(
             $logger,
             array(

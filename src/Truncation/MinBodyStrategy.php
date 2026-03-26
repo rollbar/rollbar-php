@@ -31,6 +31,7 @@ class MinBodyStrategy extends AbstractStrategy
      * @return EncodedPayload
      * @throws Exception If the payload encoding fails.
      */
+    #[\Override]
     public function execute(EncodedPayload $payload): EncodedPayload
     {
         $data      = $payload->data();

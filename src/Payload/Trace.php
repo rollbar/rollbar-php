@@ -14,6 +14,7 @@ class Trace implements ContentInterface
     ) {
     }
 
+    #[\Override]
     public function getKey(): string
     {
         return 'trace';
@@ -41,6 +42,7 @@ class Trace implements ContentInterface
         return $this;
     }
 
+    #[\Override]
     public function serialize()
     {
         $result = array(

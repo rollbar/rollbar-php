@@ -303,6 +303,7 @@ class DataBuilder implements DataBuilderInterface
      *
      * @return void
      */
+    #[\Override]
     public function setCustom(array $config): void
     {
         $this->custom = $config['custom'] ?? \Rollbar\Defaults::get()->custom();
@@ -373,6 +374,7 @@ class DataBuilder implements DataBuilderInterface
      *
      * @return Data
      */
+    #[\Override]
     public function makeData(string $level, Throwable|string|Stringable $toLog, array $context): Data
     {
         $env  = $this->getEnvironment();
@@ -1013,6 +1015,7 @@ class DataBuilder implements DataBuilderInterface
      *
      * @return array|null
      */
+    #[\Override]
     public function getCustom(): ?array
     {
         return $this->custom;
@@ -1103,6 +1106,7 @@ class DataBuilder implements DataBuilderInterface
      *
      * @return void
      */
+    #[\Override]
     public function addCustom(string $key, mixed $data): void
     {
         if (!is_array($this->custom)) {
@@ -1119,6 +1123,7 @@ class DataBuilder implements DataBuilderInterface
      *
      * @return void
      */
+    #[\Override]
     public function removeCustom(string $key): void
     {
         unset($this->custom[$key]);
@@ -1186,6 +1191,7 @@ class DataBuilder implements DataBuilderInterface
      *
      * @return ErrorWrapper
      */
+    #[\Override]
     public function generateErrorWrapper(int $errno, string $errstr, ?string $errfile, ?int $errline): ErrorWrapper
     {
         return new ErrorWrapper(

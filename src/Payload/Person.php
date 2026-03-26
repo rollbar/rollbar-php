@@ -75,6 +75,7 @@ class Person implements SerializerInterface
         $this->extra[$name] = $val;
     }
 
+    #[\Override]
     public function serialize()
     {
         $result = array(

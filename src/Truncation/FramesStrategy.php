@@ -26,6 +26,7 @@ class FramesStrategy extends AbstractStrategy
      * @return EncodedPayload
      * @throws Exception If the payload encoding fails.
      */
+    #[\Override]
     public function execute(EncodedPayload $payload): EncodedPayload
     {
         $data = $payload->data();
@@ -74,6 +75,7 @@ class FramesStrategy extends AbstractStrategy
      *
      * @return bool
      */
+    #[\Override]
     public function applies(EncodedPayload $payload): bool
     {
         $payload = $payload->data();

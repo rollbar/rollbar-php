@@ -11,6 +11,7 @@ use Rollbar\Payload\EncodedPayload;
  */
 class RawStrategy extends AbstractStrategy
 {
+    #[\Override]
     public function execute(EncodedPayload $payload): EncodedPayload
     {
         return $payload;

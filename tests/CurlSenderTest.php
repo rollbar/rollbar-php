@@ -66,7 +66,6 @@ class CurlSenderTest extends BaseRollbarTest
     {
         $reflection = new ReflectionClass($object);
         $property = $reflection->getProperty($property);
-        $property->setAccessible(true);
         return $property->getValue($object);
     }
 }
