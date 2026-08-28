@@ -76,5 +76,10 @@ jobs:
       - name: Install dependencies PHP
         run: composer update --prefer-${{ matrix.dependency }} --prefer-dist --no-interaction
 
+        # Temporary workaround to fix nikic/php-parser incompatibility with Psalm until
+        # https://github.com/vimeo/psalm/pull/11927 is released.
+      - name: Fix nikic/php-parser incompatibility with Psalm
+        run: composer update nikic/php-parser --prefer-dist --no-interaction
+
       - name: Execute tests PHP
         run: composer test
