@@ -20,7 +20,7 @@ on:
     branches-ignore:
       - next/**
   schedule:
-    - cron: '42 2 * * *'
+    - cron: '42 2 * * 4'
 
 jobs:
   # Check that this runs on PHP on all versions we claim to support, on both
