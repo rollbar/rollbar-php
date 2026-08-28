@@ -36,14 +36,14 @@ jobs:
       matrix:
         # All the versions, OS, and dependency levels we want to support
         os: [ubuntu]         # TODO: windows, macos
-        php: [ '8.1', '8.2', '8.3', '8.4', '8.5' ]
+        php: [ '8.2', '8.3', '8.4', '8.5' ]
         dependency: [ stable ]
         # Our code has paths for with- and without- XDebug, and we want to test
         # both of them.
         # @see https://xdebug.org/docs/all_settings#mode
         xdebug3-mode: ['develop,coverage', 'coverage']
         include:
-          - php: '8.1'
+          - php: '8.2'
             os: 'ubuntu'
             dependency: 'lowest'
             xdebug3-mode: 'develop,coverage'
