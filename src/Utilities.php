@@ -2,6 +2,7 @@
 
 namespace Rollbar;
 
+use Exception;
 use Serializable;
 
 final class Utilities
@@ -261,29 +262,32 @@ final class Utilities
     {
         return '<CircularReference type:('.get_class($obj).') ref:('.spl_object_hash($obj).')>';
     }
-    
-    // from http://www.php.net/manual/en/function.uniqid.php#94959
-    public static function uuid4()
+
+    /**
+     * Returns a random UUID version 4 string.
+     *
+     * Uses a lower-entropy pseudo-random fallback if secure randomness is unavailable.
+     *
+     * @return string
+     *
+     * @since 1.2.0
+     * @since 4.3.0 Prefers random_bytes() with an mt_rand() fallback.
+     */
+    public static function uuid4(): string
     {
-        mt_srand();
-        return sprintf(
-            '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-            // 32 bits for "time_low"
-            mt_rand(0, 0xffff),
-            mt_rand(0, 0xffff),
-            // 16 bits for "time_mid"
-            mt_rand(0, 0xffff),
-            // 16 bits for "time_hi_and_version",
-            // four most significant bits holds version number 4
-            mt_rand(0, 0x0fff) | 0x4000,
-            // 16 bits, 8 bits for "clk_seq_hi_res",
-            // 8 bits for "clk_seq_low",
-            // two most significant bits holds zero and one for variant DCE1.1
-            mt_rand(0, 0x3fff) | 0x8000,
-            // 48 bits for "node"
-            mt_rand(0, 0xffff),
-            mt_rand(0, 0xffff),
-            mt_rand(0, 0xffff)
-        );
+        try {
+            $bytes = random_bytes(16);
+        } catch (Exception) {
+            $bytes = '';
+            for ($i = 0; $i < 16; $i++) {
+                $bytes .= chr(mt_rand(0, 0xff));
+            }
+        }
+
+        // Set the version to 4 and the variant to RFC 4122.
+        $bytes[6] = chr((ord($bytes[6]) & 0x0f) | 0x40);
+        $bytes[8] = chr((ord($bytes[8]) & 0x3f) | 0x80);
+
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($bytes), 4));
     }
 }

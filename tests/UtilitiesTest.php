@@ -1,13 +1,12 @@
 <?php namespace Rollbar;
 
-use Rollbar\Payload\Level;
 use Rollbar\TestHelpers\ArrayLogger;
 use Rollbar\TestHelpers\CustomSerializable;
 use Rollbar\TestHelpers\CycleCheck\ParentCycleCheck;
-use Rollbar\TestHelpers\CycleCheck\ChildCycleCheck;
 use Rollbar\TestHelpers\CycleCheck\ParentCycleCheckSerializable;
 use Rollbar\TestHelpers\CycleCheck\ChildCycleCheckSerializable;
 use Rollbar\TestHelpers\DeprecatedSerializable;
+use Rollbar\TestHelpers\RandomBytesStub;
 
 class UtilitiesTest extends BaseRollbarTest
 {
@@ -140,7 +139,7 @@ class UtilitiesTest extends BaseRollbarTest
             Utilities::serializeToArray(new ArrayLogger()),
         );
     }
-    
+
     public function testSerializationCycleChecking(): void
     {
         $config = new Config(array("access_token"=>$this->getTestAccessToken()));
@@ -153,19 +152,19 @@ class UtilitiesTest extends BaseRollbarTest
             "serializedObj" => new ParentCycleCheckSerializable(),
         );
         $objectHashes = array();
-        
+
         $result = Utilities::serializeForRollbar($obj, null, $objectHashes);
-        
+
         $this->assertMatchesRegularExpression(
             '/<CircularReference.*/',
             $result["obj"]["value"]["child"]["value"]["parent"],
         );
-        
+
         $this->assertMatchesRegularExpression(
             '/<CircularReference.*/',
             $result["serializedObj"]["child"]["parent"],
         );
-        
+
         $this->assertMatchesRegularExpression(
             '/<CircularReference.*/',
             $result["payload"]["data"]["body"]["extra"][0]["value"]["child"]["value"]["parent"],
@@ -183,7 +182,7 @@ class UtilitiesTest extends BaseRollbarTest
                 ),
             ),
         );
-        
+
         $objectHashes = array();
         $result = Utilities::serializeForRollbar($obj, null, $objectHashes, 2);
         $this->assertArrayHasKey('one', $result);
@@ -257,5 +256,102 @@ class UtilitiesTest extends BaseRollbarTest
         restore_error_handler();
 
         $this->assertEquals(['foo' => 'bar'], $result['serializedObj']);
+    }
+
+    public function testUuid4ReturnsVersion4Uuid(): void
+    {
+        $this->assertMatchesRegularExpression(
+            '/\A[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\z/',
+            Utilities::uuid4()
+        );
+    }
+
+    /**
+     * @dataProvider uuid4RandomBytesProvider
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testUuid4UsesSecureRandomBytes(string $bytes, string $expectedUuid): void
+    {
+        $requestedLengths = [];
+        RandomBytesStub::$callback = static function (int $length) use ($bytes, &$requestedLengths): string {
+            $requestedLengths[] = $length;
+            return $bytes;
+        };
+
+        $this->assertSame($expectedUuid, Utilities::uuid4());
+        $this->assertSame([16], $requestedLengths);
+    }
+
+    public static function uuid4RandomBytesProvider(): array
+    {
+        return [
+            'zero bits' => [str_repeat("\x00", 16), '00000000-0000-4000-8000-000000000000'],
+            'one bits' => [str_repeat("\xff", 16), 'ffffffff-ffff-4fff-bfff-ffffffffffff'],
+            'mixed bits' => [
+                hex2bin('0011223344556677a899aabbccddeeff'),
+                '00112233-4455-4677-a899-aabbccddeeff',
+            ],
+        ];
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testUuid4DoesNotChangeMtRandStateWhenSecureRandomnessIsAvailable(): void
+    {
+        RandomBytesStub::$callback = static function (int $length): string {
+            return str_repeat("\x00", $length);
+        };
+
+        \mt_srand(12345);
+        $expected = \mt_rand();
+
+        \mt_srand(12345);
+        Utilities::uuid4();
+
+        $this->assertSame($expected, \mt_rand());
+    }
+
+    /**
+     * @param class-string<\Exception> $exceptionClass
+     * @dataProvider uuid4RandomnessExceptionProvider
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testUuid4FallsBackWithoutReseedingWhenSecureRandomnessFails(string $exceptionClass): void
+    {
+        $requestedLengths = [];
+        RandomBytesStub::$callback = static function (int $length) use ($exceptionClass, &$requestedLengths): string {
+            $requestedLengths[] = $length;
+            throw new $exceptionClass('No secure randomness available.');
+        };
+
+        \mt_srand(12345);
+        $firstUuid = Utilities::uuid4();
+        $secondUuid = Utilities::uuid4();
+
+        foreach ([$firstUuid, $secondUuid] as $uuid) {
+            $this->assertMatchesRegularExpression(
+                '/\A[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\z/',
+                $uuid
+            );
+        }
+        $this->assertNotSame($firstUuid, $secondUuid);
+
+        // Replaying the seed must reproduce the sequence without uuid4() reseeding it.
+        \mt_srand(12345);
+        $this->assertSame($firstUuid, Utilities::uuid4());
+        $this->assertSame($secondUuid, Utilities::uuid4());
+        $this->assertSame([16, 16, 16, 16], $requestedLengths);
+    }
+
+    public static function uuid4RandomnessExceptionProvider(): array
+    {
+        return [
+            'generic exception' => [\Exception::class],
+            'random exception' => [\Random\RandomException::class],
+        ];
     }
 }
