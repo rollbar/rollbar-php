@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Removed
 * Removed support for PHP 8.1. @danielmorell #673.
+### Fixed
+* Fixed #476 UUID v4 not sufficiently random. @danielmorell #675.
+### Changed
+* Updated Rollbar JS Snippet to v4.0.0. #674.
 
 ## [4.2.1] - 2026-03-27
 ### Changed
