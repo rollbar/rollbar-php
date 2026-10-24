@@ -782,6 +782,20 @@ class RollbarLoggerTest extends BaseRollbarTest
             'use provided max_items' => array(3)
         );
     }
+
+    public function testMaxItemsDisabled(): void
+    {
+        $logger = new RollbarLogger(array(
+            'access_token' => $this->getTestAccessToken(),
+            'environment' => 'test',
+            'max_items' => -1
+        ));
+
+        for ($i = 0; $i < 11; $i++) {
+            $response = $logger->report(Level::INFO, 'testing info level');
+            $this->assertEquals(200, $response->getStatus());
+        }
+    }
     
     public function testRaiseOnError(): void
     {
