@@ -166,6 +166,21 @@ class VerbosityTest extends BaseRollbarTest
         $this->assertVerboseLogContains('Maximum number of items per request has been reached.', LogLevel::WARNING);
     }
 
+    public function testRollbarLoggerSendMaxItemsDisabled(): void
+    {
+        Rollbar::init([
+            'access_token'   => $this->getTestAccessToken(),
+            'environment'    => 'testing-php',
+            'verbose_logger' => $this->verboseLogger,
+            'max_items'      => -1,
+        ]);
+        Rollbar::log(LogLevel::INFO, 'Testing PHP Notifier');
+        $this->assertVerboseLogDoesNotContain(
+            'Maximum number of items per request has been reached.',
+            LogLevel::WARNING,
+        );
+    }
+
     /**
      * Test verbosity of \Rollbar\RollbarLogger::log for adding occurrences to the queue when `batched` == true.
      *
@@ -583,6 +598,15 @@ class VerbosityTest extends BaseRollbarTest
         );
     }
 
+    private function assertVerboseLogDoesNotContain(string $messageRegEx, string $level): void
+    {
+        self::assertSame(
+            -1,
+            $this->verboseLogger->indexOfRegex($level, $messageRegEx),
+            'Verbose log contains unexpected message: "' . $messageRegEx . '" at level "' . $level . '"',
+        );
+    }
+
     /**
      * Asserts that the {@see $this->verboseLogger} contains the given logs in the given order, and that they are
      * consecutive.
@@ -619,7 +643,7 @@ class VerbosityTest extends BaseRollbarTest
                 // If we are expecting consecutive matches, and the current log message does not match the current
                 // constraint, then we can fail early.
                 $this->fail(
-                    'Expected log message at index "' . $i . '" to match "' . $message . '" at level "' . $level . '"'
+                    'Expected log message at index "' . $i . '" to match "' . $message . '" at level "' . $level . '"',
                 );
             }
             if ($matches) {

@@ -389,7 +389,8 @@ class RollbarLogger extends AbstractLogger
      */
     protected function send(EncodedPayload $payload, string $accessToken): Response
     {
-        if ($this->reportCount >= $this->config->getMaxItems()) {
+        $maxItems = $this->config->getMaxItems();
+        if ($maxItems >= 0 && $this->reportCount >= $maxItems) {
             $response = new Response(
                 0,
                 "Maximum number of items per request has been reached. If you " .
@@ -398,9 +399,8 @@ class RollbarLogger extends AbstractLogger
             );
             $this->verboseLogger()->warning($response->getInfo());
             return $response;
-        } else {
-            $this->reportCount++;
         }
+        $this->incrementReportCount();
 
         if ($this->config->getBatched()) {
             $response = new Response(0, "Pending");
@@ -527,5 +527,22 @@ class RollbarLogger extends AbstractLogger
         $encoded = new EncodedPayload($payload);
         $encoded->encode();
         return $encoded;
+    }
+
+    /**
+     * Increments the report count, resetting it to 0 if it reaches PHP_INT_MAX.
+     *
+     * This is highly unlikely to happen, but if it does, PHP changes the value to a float, which causes comparison and
+     * typing problems. Resetting to 0 avoids this issue and allows the logger to continue functioning even if an
+     * accurate report count is lost.
+     *
+     * @return void
+     */
+    private function incrementReportCount(): void
+    {
+        if ($this->reportCount === PHP_INT_MAX) {
+            $this->reportCount = 0;
+        }
+        $this->reportCount++;
     }
 }
