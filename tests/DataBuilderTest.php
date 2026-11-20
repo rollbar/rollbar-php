@@ -40,6 +40,22 @@ class DataBuilderTest extends BaseRollbarTest
         $output = $this->dataBuilder->makeData(Level::ERROR, "testing", array());
         $this->assertEquals('tests', $output->getEnvironment());
     }
+
+    public function testLogInfoIsRecognizedWithCustomBaseException(): void
+    {
+        $dataBuilder = new DataBuilder([
+            'accessToken' => $this->getTestAccessToken(),
+            'environment' => 'tests',
+            'baseException' => \RuntimeException::class,
+            'utilities' => new Utilities(),
+        ]);
+
+        $data = $dataBuilder->makeData(Level::INFO, new LogInfo('log message'), []);
+
+        $trace = $data->getBody()->getValue();
+        $this->assertInstanceOf(\Rollbar\Payload\Trace::class, $trace);
+        $this->assertSame('LogInfo', $trace->getException()->getClass());
+    }
     
     /**
      * @dataProvider getUrlProvider
@@ -924,7 +940,7 @@ class DataBuilderTest extends BaseRollbarTest
         );
         // The line number where the comment "// A" is found should be the expected value.
         $this->assertEquals(
-            920,
+            936,
             $frames[count($frames)-1]->getLineno(),
             "Possible false negative: did this file change? Check the line number for line with '// A' comment"
         );

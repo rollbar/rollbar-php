@@ -217,8 +217,9 @@ class RollbarLogger extends AbstractLogger
      * @throws InvalidArgumentException If $level is not a valid level.
      * @throws Throwable Rethrown $message if it is {@see Throwable} and {@see Config::raiseOnError} is true.
      *
-     * @since  4.0.0
-     * @since  4.1.0 Will include the reported item in the telemetry events if applicable.
+     * @since 4.0.0
+     * @since 4.1.0 Will include the reported item in the telemetry events if applicable.
+     * @since 4.3.0 Will include a stack trace if `$context['includeTrace']` is `true` and no exception is provided.
      */
     public function report(
         string|Level $level,
@@ -244,7 +245,20 @@ class RollbarLogger extends AbstractLogger
             throw $exception;
         }
 
+        // Create a new payload message that may be wrapped in a LogInfo exception if we need to capture a stack trace
+        // for it.
+        $payloadMessage = $message;
+        $includeTrace = ($context['includeTrace'] ?? null) === true;
+        unset($context['includeTrace']);
+
         $this->verboseLogger()->info("Attempting to log: [$level] " . $message);
+
+        $hasExistingException = $message instanceof Throwable
+            || (($context['exception'] ?? null) instanceof Throwable);
+        if ($includeTrace && !$hasExistingException) {
+            // Wrap the message in a LogInfo exception so that we can capture a stack trace for it.
+            $payloadMessage = new LogInfo((string)$message);
+        }
 
         $accessToken = $this->getAccessToken();
         $payload = null;
@@ -254,7 +268,7 @@ class RollbarLogger extends AbstractLogger
         // This is done before adding the event to the telemetry queue, so the reported occurrence is not duplicated in
         // the telemetry data.
         if (!$ignored) {
-            $payload = $this->getPayload($accessToken, $level, $message, $context);
+            $payload = $this->getPayload($accessToken, $level, $payloadMessage, $context);
         }
         // Add the event to the telemetry queue if it is enabled, but after we have built the payload, so it is not
         // duplicated in the telemetry data as well.
