@@ -417,7 +417,7 @@ class DataBuilder implements DataBuilderInterface
             $content = $this->getExceptionTrace($context['exception'], $message);
         } elseif ($toLog instanceof ErrorWrapper) {
             $content = $this->getErrorTrace($toLog);
-        } elseif ($toLog instanceof $baseException) {
+        } elseif ($toLog instanceof LogInfo || $toLog instanceof $baseException) {
             $content = $this->getExceptionTrace($toLog);
         } else {
             $content = $this->getMessage($toLog);
@@ -488,7 +488,7 @@ class DataBuilder implements DataBuilderInterface
         }
 
         return new Trace($frames, new ExceptionInfo(
-            $classOverride ?: get_class($exception),
+            $classOverride ?: ($exception instanceof LogInfo ? 'LogInfo' : get_class($exception)),
             $exceptionMessage,
             $description,
         ));
@@ -563,6 +563,16 @@ class DataBuilder implements DataBuilderInterface
             
             // Add the Exception's file and line as the last frame of the trace
             array_unshift($trace, array('file' => $exc->getFile(), 'line' => $exc->getLine()));
+
+            // If the exception is a LogInfo, filter out frames that are from the Rollbar source code.
+            if ($exc instanceof LogInfo) {
+                $sourceDirectory = __DIR__ . DIRECTORY_SEPARATOR;
+                $trace = array_values(array_filter(
+                    $trace,
+                    static fn(array $frame): bool =>
+                        !isset($frame['file']) || !str_starts_with($frame['file'], $sourceDirectory)
+                ));
+            }
             
             return $trace;
         }

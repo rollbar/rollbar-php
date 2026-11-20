@@ -29,6 +29,18 @@ class RollbarLoggerTest extends BaseRollbarTest
         Rollbar::destroy();
         parent::tearDown();
     }
+
+    private function createPayloadCaptureSender(array &$payloads): SenderInterface
+    {
+        $sender = $this->createMock(SenderInterface::class);
+        $sender->method('send')->willReturnCallback(
+            static function (EncodedPayload $payload, string $accessToken) use (&$payloads): Response {
+                $payloads[] = $payload->data();
+                return new Response(200, 'ok');
+            }
+        );
+        return $sender;
+    }
     
     public function testAddCustom(): void
     {
@@ -142,6 +154,129 @@ class RollbarLoggerTest extends BaseRollbarTest
 //        print_r($array->logs);
         $this->assertContains('[info]Attempting to log: [' . Level::WARNING . '] Testing PHP Notifier', $verbose->logs);
         $this->assertContains('[info]Occurrence successfully logged', $verbose->logs);
+    }
+
+    public function testIncludeTraceWorksAcrossPublicLoggingEntryPoints(): void
+    {
+        $payloads = [];
+        $logger = new RollbarLogger([
+            'access_token' => $this->getTestAccessToken(),
+            'environment' => 'testing-php',
+            'sender' => $this->createPayloadCaptureSender($payloads),
+        ]);
+
+        $logger->log(Level::INFO, 'Logger log message', ['includeTrace' => true]);
+        $logger->report(Level::INFO, 'Logger report message', ['includeTrace' => true]);
+
+        Rollbar::init($logger);
+        Rollbar::log(Level::INFO, 'Static log message', ['includeTrace' => true]);
+        Rollbar::report(Level::INFO, 'Static report message', ['includeTrace' => true]);
+
+        $this->assertCount(4, $payloads);
+        foreach ($payloads as $payload) {
+            $this->assertSame('LogInfo', $payload['data']['body']['trace']['exception']['class']);
+            $this->assertArrayNotHasKey('includeTrace', $payload['data']['body']['extra'] ?? []);
+        }
+    }
+
+    public function testIncludeTracePreservesContextAndStartsAtCallSite(): void
+    {
+        $payloads = [];
+        $logger = new RollbarLogger([
+            'access_token' => $this->getTestAccessToken(),
+            'environment' => 'testing-php',
+            'sender' => $this->createPayloadCaptureSender($payloads),
+        ]);
+
+        $logger->report(Level::INFO, 'Message from app', [
+            'includeTrace' => true,
+            'request_id' => 'request-123',
+        ]);
+
+        $body = $payloads[0]['data']['body'];
+        $this->assertSame('Message from app', $body['trace']['exception']['message']);
+        $this->assertSame('request-123', $body['extra']['request_id']);
+        $this->assertArrayNotHasKey('includeTrace', $body['extra']);
+
+        $frames = $body['trace']['frames'];
+        $lastFrame = $frames[array_key_last($frames)];
+        $this->assertSame(realpath(__FILE__), realpath($lastFrame['filename']));
+        $sourceDirectory = realpath(__DIR__ . '/../src') . DIRECTORY_SEPARATOR;
+        foreach ($frames as $frame) {
+            $filename = realpath($frame['filename'] ?? '') ?: ($frame['filename'] ?? '');
+            $this->assertFalse(str_starts_with((string)$filename, $sourceDirectory));
+        }
+    }
+
+    public function testIncludeTraceOnlyWrapsNonThrowableMessagesWhenExactlyTrue(): void
+    {
+        $payloads = [];
+        $logger = new RollbarLogger([
+            'access_token' => $this->getTestAccessToken(),
+            'environment' => 'testing-php',
+            'sender' => $this->createPayloadCaptureSender($payloads),
+        ]);
+        $exception = new \RuntimeException('Existing exception');
+        $contextException = new \LogicException('Existing context exception');
+
+        $logger->report(Level::ERROR, $exception, ['includeTrace' => true]);
+        $logger->report(Level::INFO, 'Message without trace', ['includeTrace' => 'true']);
+        $logger->report(Level::ERROR, 'Message with context exception', [
+            'includeTrace' => true,
+            'exception' => $contextException,
+        ]);
+
+        $exceptionTrace = $payloads[0]['data']['body']['trace'];
+        $this->assertSame(\RuntimeException::class, $exceptionTrace['exception']['class']);
+        $this->assertSame('Existing exception', $exceptionTrace['exception']['message']);
+
+        $messageBody = $payloads[1]['data']['body'];
+        $this->assertArrayHasKey('message', $messageBody);
+        $this->assertArrayNotHasKey('trace', $messageBody);
+        $this->assertArrayNotHasKey('includeTrace', $messageBody['extra'] ?? []);
+
+        $contextTrace = $payloads[2]['data']['body']['trace'];
+        $this->assertSame(\LogicException::class, $contextTrace['exception']['class']);
+        $this->assertSame('Message with context exception', $contextTrace['exception']['message']);
+    }
+
+    public function testIncludeTraceDoesNotRethrowSyntheticException(): void
+    {
+        $payloads = [];
+        $logger = new RollbarLogger([
+            'access_token' => $this->getTestAccessToken(),
+            'environment' => 'testing-php',
+            'raise_on_error' => true,
+            'sender' => $this->createPayloadCaptureSender($payloads),
+        ]);
+
+        $logger->report(Level::INFO, 'Message from app', ['includeTrace' => true]);
+
+        $this->assertCount(1, $payloads);
+        $this->assertSame('LogInfo', $payloads[0]['data']['body']['trace']['exception']['class']);
+    }
+
+    public function testIncludeTraceStillRethrowsOriginalThrowableWhenConfigured(): void
+    {
+        $payloads = [];
+        $logger = new RollbarLogger([
+            'access_token' => $this->getTestAccessToken(),
+            'environment' => 'testing-php',
+            'raise_on_error' => true,
+            'sender' => $this->createPayloadCaptureSender($payloads),
+        ]);
+        $exception = new \RuntimeException('Existing exception');
+        $thrown = null;
+
+        try {
+            $logger->report(Level::ERROR, $exception, ['includeTrace' => true]);
+        } catch (\RuntimeException $caught) {
+            $thrown = $caught;
+        }
+
+        $this->assertSame($exception, $thrown);
+        $this->assertCount(1, $payloads);
+        $this->assertSame(\RuntimeException::class, $payloads[0]['data']['body']['trace']['exception']['class']);
     }
 
     public function testNotLoggingPayload(): void
