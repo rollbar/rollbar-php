@@ -245,8 +245,9 @@ class RollbarLogger extends AbstractLogger
             throw $exception;
         }
 
-        // Store the original message so we can rethrow it if needed.
-        $originalMessage = $message;
+        // Create a new payload message that may be wrapped in a LogInfo exception if we need to capture a stack trace
+        // for it.
+        $payloadMessage = $message;
         $includeTrace = ($context['includeTrace'] ?? null) === true;
         unset($context['includeTrace']);
 
@@ -256,7 +257,7 @@ class RollbarLogger extends AbstractLogger
             || (($context['exception'] ?? null) instanceof Throwable);
         if ($includeTrace && !$hasExistingException) {
             // Wrap the message in a LogInfo exception so that we can capture a stack trace for it.
-            $message = new LogInfo((string)$message);
+            $payloadMessage = new LogInfo((string)$message);
         }
 
         $accessToken = $this->getAccessToken();
@@ -267,7 +268,7 @@ class RollbarLogger extends AbstractLogger
         // This is done before adding the event to the telemetry queue, so the reported occurrence is not duplicated in
         // the telemetry data.
         if (!$ignored) {
-            $payload = $this->getPayload($accessToken, $level, $message, $context);
+            $payload = $this->getPayload($accessToken, $level, $payloadMessage, $context);
         }
         // Add the event to the telemetry queue if it is enabled, but after we have built the payload, so it is not
         // duplicated in the telemetry data as well.
@@ -311,8 +312,8 @@ class RollbarLogger extends AbstractLogger
             $this->verboseLogger()->info('Occurrence successfully logged');
         }
 
-        if ($originalMessage instanceof Throwable && $this->config->getRaiseOnError()) {
-            throw $originalMessage;
+        if ($message instanceof Throwable && $this->config->getRaiseOnError()) {
+            throw $message;
         }
 
         return $response;
